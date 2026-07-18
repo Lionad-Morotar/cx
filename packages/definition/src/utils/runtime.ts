@@ -4,14 +4,14 @@ import {
   isCxComponentGroups,
   isCxComponentGroup,
   isSlottedCxComponentGroup,
-} from '../index'
+} from '../guards'
 import type {
   CxLoaderInstance,
   CxComponentRuntime,
   CxComponentStructured,
   CxComponentSlot,
   CxComponentMetaDefined,
-} from '../index'
+} from '../types'
 import type { CxMetadataUtils } from './metadata'
 import { readonly, toRaw, unref } from 'vue'
 import { preIndex, nextIndex, insertIndex } from './number'
@@ -150,7 +150,7 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
         slotKey,
       }),
     )
-    delete cmpt.components?.[slotKey]
+    delete (cmpt.components as Record<string, any>)[slotKey]
   }
 
   // 初始化组件

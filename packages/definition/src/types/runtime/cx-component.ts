@@ -1,4 +1,4 @@
-import type { CxComponentStyle, CxComponentMetaProps, CxEvent, CxMetaBase } from '../../index'
+import type { CxComponentStyle, CxComponentMetaProps, CxEvent, CxMetaBase } from '../index'
 
 // 资产包（业务意义上的，配合编辑器使用）
 export type CxComponentBundle = {

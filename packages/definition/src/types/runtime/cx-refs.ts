@@ -6,7 +6,7 @@ import type { CxComponentRuntime } from './cx-component'
  * 组件 ref 管理器的结构化类型。
  * 原代码从 hooks 导入名为 RefsManager 的类型，但该名字在任何包中都未定义
  * （p-ray use-refs.ts 实际导出 RefsMan），此处按 useRefs 返回结构补齐定义，
- * 由 cx-vue 的 useRefs 实现并对齐。
+ * 由本包 utils/refs.ts 的 useRefs 实现并对齐。
  */
 export interface RefsManager<
   Data = {

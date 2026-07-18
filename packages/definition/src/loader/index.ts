@@ -9,7 +9,8 @@ import {
 } from 'vue'
 import { useMemoize } from '@vueuse/core'
 import camelCase from 'lodash-es/camelCase'
-import * as NPromise from 'nativebird'
+// @ts-expect-error nativebird 类型为 export=，运行时 ESM default 可用（已验证 .map 存在）
+import NPromise from 'nativebird'
 
 import { createCxEmitter } from '../events/cx-emitter'
 import { useRefs } from '../utils/refs'
@@ -22,7 +23,7 @@ import { getDefaultExportFromModule } from './module'
 
 import type { ComputedRef, DeepReadonly } from 'vue'
 import type { CxUtils, CxDatas } from '../utils'
-import type { CxRefs, CxEmitter, CxComponentMetaDefined, CxLoaderConfig } from '../index'
+import type { CxRefs, CxEmitter, CxComponentMetaDefined, CxLoaderConfig } from '../types'
 import { v4 as uuidv4 } from 'uuid'
 
 const getArray = <T>(x: T | T[]) => (Array.isArray(x) ? x : x ? [x] : [])

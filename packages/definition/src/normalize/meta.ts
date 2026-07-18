@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import type { CxComponentMetaDefined } from '../index'
+import type { CxComponentMetaDefined } from '../types'
 import { has } from '../utils/guard'
 
 // 格式化组件元信息

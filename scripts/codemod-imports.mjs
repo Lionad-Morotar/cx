@@ -3,11 +3,15 @@
  * cx 迁移 codemod：alias 重写 + 基于 tsc 错误输出的精确显式导入注入。
  *
  * 用法：
- *   node scripts/codemod-imports.mjs alias <pkgSrcDir>     # 重写 @cx/* alias 为相对路径
- *   node scripts/codemod-imports.mjs fix <pkgSrcDir> <tscOutputFile>  # 按 TS2304 错误注入 import
+ *   node scripts/codemod-imports.mjs alias <pkgSrcDir> <aliasMapJson>  # 重写 @cx/* alias 为相对路径
+ *   node scripts/codemod-imports.mjs fix <pkgSrcDir> <tscOutputFile>   # 按 TS2304/TS2552 错误注入 import
  *
  * 设计：alias 重写是纯机械替换；导入注入只处理类型检查器实报的错误标识符，
  * 不做猜测性注入（避免与文件内局部声明冲突）。
+ *
+ * 已知盲区：被 @ts-ignore / @ts-nocheck 压制的未定义标识符不会出现在 tsc
+ * 输出中（useOmit 漏网即此路径），迁移后需对 KNOWN 之外的 use* / 大写驼峰
+ * 裸调用点做一次启发式人工排查。
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { relative, dirname, join, resolve } from 'node:path'
@@ -15,7 +19,7 @@ import { readdirSync, statSync } from 'node:fs'
 
 const [mode, srcDir, extra] = process.argv.slice(2)
 if (!mode || !srcDir) {
-  console.error('usage: codemod-imports.mjs <alias|fix> <srcDir> [tscOutputFile]')
+  console.error('usage: codemod-imports.mjs <alias|fix> <srcDir> [aliasMapJson|tscOutputFile]')
   process.exit(1)
 }
 const SRC = resolve(srcDir)
@@ -30,13 +34,12 @@ const walk = (dir, out = []) => {
   return out
 }
 
-/** alias 映射：返回基于 src 根的目标子路径（不含扩展名） */
-const ALIASES = [
-  [/^@cx\/definition\/(.+)$/, (m) => m[1]],
-  [/^@cx\/definition$/, () => 'index'],
-  [/^@cx\/configs$/, () => 'configs/index'],
-  [/^@cx\/utils$/, () => 'utils/index'],
-]
+/** alias 映射：从 JSON 文件读入 per-package 配置，格式 [["^pattern$", "target/subpath"], ...] */
+const loadAliases = (jsonPath) => {
+  if (!jsonPath) return []
+  const raw = JSON.parse(readFileSync(resolve(process.cwd(), jsonPath), 'utf8'))
+  return raw.map(([pattern, target]) => [new RegExp(pattern), () => target])
+}
 
 const toRelative = (file, targetSub) => {
   // 目标可能指向目录的 index 或具体文件；统一先按无扩展名相对路径计算
@@ -46,11 +49,11 @@ const toRelative = (file, targetSub) => {
   return rel
 }
 
-const rewriteAlias = (file) => {
+const rewriteAlias = (file, aliases) => {
   let content = readFileSync(file, 'utf8')
   let changed = false
   content = content.replace(/from\s+(['"])(@cx\/[^'"]+)\1/g, (whole, quote, spec) => {
-    for (const [re, fn] of ALIASES) {
+    for (const [re, fn] of aliases) {
       const m = spec.match(re)
       if (m) {
         changed = true
@@ -230,6 +233,12 @@ const KNOWN = {
   z: ['zod'],
   dayjs: ['dayjs', 'default'],
   Fuse: ['fuse.js', 'default'],
+  // radashi use* 别名族（p-ray 经 Nuxt imports preset 从 radashi 全量 use* 化 auto-import）
+  // 仅收录与 lodash-es 语义等价的条目；无等价物的走 [skip] 人工处理
+  useOmit: ['lodash-es', 'named-as', 'omit'],
+  usePick: ['lodash-es', 'named-as', 'pick'],
+  useGet: ['lodash-es', 'named-as', 'get'],
+  useClone: ['lodash-es', 'named-as', 'cloneDeep'],
 }
 
 /** 在文件内容中注入 import 语句（.ts 插到文件头，.vue 插到 script 块内） */
@@ -268,7 +277,12 @@ const injectImport = (content, file, name, spec) => {
   const stmt = `import ${isType ? 'type ' : ''}${kind === 'default' ? clause : `{ ${clause} }`} from '${module}'\n`
 
   if (file.endsWith('.vue')) {
-    // 插到 <script ...> 标签之后
+    // 优先插到 <script setup> 块（双 script 块的 SFC 中普通块对 setup 不可见）
+    const setupMatch = content.match(/<script[^>]*\bsetup\b[^>]*>\s*/)
+    if (setupMatch) {
+      const idx = setupMatch.index + setupMatch[0].length
+      return content.slice(0, idx) + stmt + content.slice(idx)
+    }
     return content.replace(/(<script[^>]*>\s*)/, `$1${stmt}`)
   }
   // 插到最后一个 import 之后，否则文件头
@@ -309,9 +323,14 @@ const fixFromTscOutput = (outFile) => {
 }
 
 if (mode === 'alias') {
+  const aliases = loadAliases(extra)
+  if (!aliases.length) {
+    console.error('alias 模式需要映射 JSON：[[ "^pattern$", "target/subpath" ], ...]')
+    process.exit(1)
+  }
   const files = walk(SRC)
   let n = 0
-  for (const f of files) if (rewriteAlias(f)) n++
+  for (const f of files) if (rewriteAlias(f, aliases)) n++
   console.log(`alias 重写完成：${n}/${files.length} 文件变更`)
 } else if (mode === 'fix') {
   if (!extra) {

@@ -1,4 +1,4 @@
-import type { CxComponentSlot } from '../../index'
+import type { CxComponentSlot } from '../index'
 import type { RecordToUnion } from '../helper'
 import type { UnionToIntersection } from 'type-fest'
 import type { AllowedComponentProps, App, Component, Plugin, VNodeProps } from 'vue'

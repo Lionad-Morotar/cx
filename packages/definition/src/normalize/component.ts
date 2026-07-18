@@ -21,7 +21,7 @@ import type {
   KeyofComponentEmits,
   NormalizeKey,
   CxLoaderInstance,
-} from '../index'
+} from '../types'
 
 /**
  * normalizeCxComponent

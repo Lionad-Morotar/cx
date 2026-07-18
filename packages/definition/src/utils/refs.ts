@@ -1,7 +1,8 @@
+import type { RefsManager } from '../types/runtime/cx-refs'
+import { useSleep } from './schedule'
 import { reactive, computed, toValue, ref } from 'vue'
 import type { MaybeRefOrGetter, ComponentPublicInstance } from 'vue'
 import { watchImmediate, tryOnScopeDispose } from '@vueuse/core'
-const useSleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 type UseRefsOptions<T> = {
   defaultValue?: MaybeRefOrGetter<Partial<T>>
@@ -130,4 +131,4 @@ export function useRefs<T = Element | ComponentPublicInstance | Record<string, a
   return states
 }
 
-export type RefsMan<T = Element> = ReturnType<typeof useRefs<T>>
+export type RefsMan<T = Element> = RefsManager<any>

@@ -3,10 +3,10 @@ import {
   isCxComponentGroup,
   isCxComponentGroups,
   isSlottedCxComponentGroup,
-} from '../index'
+} from '../guards'
 import { createCxMetadataUtils } from './metadata'
 import { createCxRuntimeUtils } from './runtime'
-import type { CxLoaderInstance } from '../index'
+import type { CxLoaderInstance } from '../types'
 
 export * from './datas'
 
@@ -32,3 +32,8 @@ export type CxUtils = ReturnType<typeof createCxUtils>
 export * from './tree'
 export * from './empty-array'
 export * from './guard'
+export * from './refs'
+export * from './use-fn'
+export * from './cleanups'
+export * from './schedule'
+export * from './number'

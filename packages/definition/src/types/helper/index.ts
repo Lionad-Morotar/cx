@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// @ts-nocheck
+// @ts-nocheck —— 类型体操集在 tsgo/TS7 下求值行为未经实测，豁免待后续治理验证后摘除
 
 import type { KebabCase, UnionToIntersection } from 'type-fest'
 

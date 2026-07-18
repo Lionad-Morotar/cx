@@ -1,6 +1,6 @@
 import { values } from 'lodash-es'
-import { isCxComponent, isCxComponentGroup, isCxComponentGroups } from '../index'
-import type { CxComponentRuntime } from '../index'
+import { isCxComponent, isCxComponentGroup, isCxComponentGroups } from '../guards'
+import type { CxComponentRuntime } from '../types'
 
 type Handler = (cmpt: CxComponentRuntime) => void
 

@@ -1,4 +1,4 @@
-import type { CxComponentRuntime, CxLoaderInstance } from '../index'
+import type { CxComponentRuntime, CxLoaderInstance } from '../types'
 
 import { useCleanups } from './cleanups'
 import { useMacroTask } from './schedule'

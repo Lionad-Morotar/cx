@@ -1,4 +1,4 @@
-export type CxEventKey = string
+import type { CxEventKey } from '../../configs'
 import type { CxComponentRuntime } from './cx-component'
 import type { RefsManager } from './cx-refs'
 

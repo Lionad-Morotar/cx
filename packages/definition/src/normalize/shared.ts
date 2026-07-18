@@ -1,7 +1,7 @@
 import kebabCase from 'lodash-es/kebabCase'
 import cloneDeep from 'lodash-es/cloneDeep'
 import isFunction from 'lodash-es/isFunction'
-import type { CxComponentMetaDefined, Meta } from '../index'
+import type { CxComponentMetaDefined, Meta } from '../types'
 
 export const toJSON = (_meta: CxComponentMetaDefined): Meta => {
   _meta = cloneDeep(_meta)
@@ -39,11 +39,12 @@ export const toJSON = (_meta: CxComponentMetaDefined): Meta => {
       const vuePropOptions = meta.props?.[k]?.options
       const optionDefaultValue = vuePropOptions?.default
       if (isFunction(optionDefaultValue)) {
-        delete meta.props[k].default
+        // 删除路径必须在 options 层级（原为复制粘贴残留的顶层路径，函数会泄漏进 JSON）
+        delete meta.props[k].options.default
       }
       const optionInitialValue = vuePropOptions?.initial
       if (isFunction(optionInitialValue)) {
-        delete meta.props[k].initial
+        delete meta.props[k].options.initial
       }
     } catch {
       // do nothing

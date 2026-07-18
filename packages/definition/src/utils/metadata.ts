@@ -1,5 +1,5 @@
-import { isCxComponent, isCxComponentMeta } from '../index'
-import { touch } from './index'
+import { isCxComponent, isCxComponentMeta } from '../guards'
+import { touch } from './tree'
 import type {
   CxEvent,
   CxComponentMetaDefined,
@@ -7,7 +7,7 @@ import type {
   CxComponentRuntime,
   CxLoaderInstance,
   CxPropCTX,
-} from '../index'
+} from '../types'
 import { useMemoize } from '@vueuse/core'
 import { toRaw } from 'vue'
 import { isString } from '@vue/shared'

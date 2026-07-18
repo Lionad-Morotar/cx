@@ -112,4 +112,30 @@ describe('toJSON', () => {
     expect(json.props.content.default).toBeUndefined()
     expect(json.props.content.initial).toBeUndefined()
   })
+
+  it('props.options 嵌套的函数 default/initial 同样被剥离', () => {
+    const cmpt = normalize({
+      name: '文本',
+      icon: 'i-tabler-edit',
+      description: '文本组件',
+      key: 'cx-text',
+      component: stubCmpt,
+      props: {
+        content: {
+          name: '文本内容',
+          type: 'select',
+          options: {
+            default: () => '嵌套默认值',
+            initial: () => '嵌套初始值',
+          },
+        },
+      },
+    }) as any
+
+    const json = toJSON(cmpt._cx_meta) as any
+    expect(json.props.content.options.default).toBeUndefined()
+    expect(json.props.content.options.initial).toBeUndefined()
+    // 产物必须可 JSON 序列化
+    expect(() => JSON.stringify(json)).not.toThrow()
+  })
 })

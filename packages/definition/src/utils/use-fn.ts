@@ -1,6 +1,7 @@
 import kareem from 'kareem'
 import type { AnyFn } from '@vueuse/core'
 import { nanoid } from 'nanoid'
+import { omit } from 'lodash-es'
 import { effectScope } from 'vue'
 import { tryOnScopeDispose } from '@vueuse/core'
 
@@ -138,7 +139,7 @@ export const genUseHooks =
       [fnName]: function (...args: Parameters<T>) {
         const partialArgs = getPartialArgs ? getPartialArgs(args) : {}
         // @ts-ignore
-        const arg = Object.assign(args[0] || {}, useOmit(partialArgs, Object.keys(args[0] || {})))
+        const arg = Object.assign(args[0] || {}, omit(partialArgs, Object.keys(args[0] || {})))
         const newArgs = [arg, ...args.slice(1)]
 
         // console.log('[info] calling hooks', name, args)

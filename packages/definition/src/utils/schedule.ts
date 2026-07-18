@@ -2,7 +2,7 @@ import { tryOnScopeDispose, whenever } from '@vueuse/core'
 import { onMounted, toValue, ref } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
 /** radash sleep 的最小等价实现，避免引入整库 */
-const useSleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+export const useSleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const macroTask = () => {
   return new Promise((resolve) => {
