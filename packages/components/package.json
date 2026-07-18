@@ -15,6 +15,6 @@
   },
   "scripts": {
     "build": "vp pack",
-    "typecheck": "vue-tsgo --noEmit"
+    "typecheck": "vue-tsgo --tsdk ../../node_modules/typescript --noEmit"
   }
 }

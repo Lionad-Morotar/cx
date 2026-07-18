@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "vp pack && vue-tsc -p tsconfig.build.json",
-    "typecheck": "vue-tsgo --noEmit"
+    "typecheck": "vue-tsgo --tsdk ../../node_modules/typescript --noEmit"
   },
   "dependencies": {
     "@iconify/vue": "^5.0.1",
