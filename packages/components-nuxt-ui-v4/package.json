@@ -16,5 +16,9 @@
   "scripts": {
     "build": "vp pack",
     "typecheck": "vue-tsgo --tsdk ../../node_modules/typescript --noEmit"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false
 }

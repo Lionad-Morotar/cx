@@ -13,7 +13,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs"
-    }
+    },
+    "./style": "./dist/style.css"
   },
   "scripts": {
     "build": "vp pack && vue-tsc -p tsconfig.build.json",
@@ -39,6 +40,11 @@
   },
   "peerDependencies": {
     "@vueuse/core": "^13.0.0 || ^14.0.0",
-    "vue": "^3.5.0"
-  }
+    "vue": "^3.5.0",
+    "@vue/shared": "^3.5.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false
 }

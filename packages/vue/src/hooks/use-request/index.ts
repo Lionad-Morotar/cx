@@ -6,9 +6,9 @@ import { useAsync } from '../use-task'
  * 请求函数形态（宿主应用注入的 API 调用器）。
  * 原代码从 '@cx/apis/types' 导入，该路径在 p-ray 中不存在（幻影 import）。
  */
-export type Request = <Res = any>(opts: Record<string, any>) => Promise<Res>
+export type CxRequestFn = <Res = any>(opts: Record<string, any>) => Promise<Res>
 /** 响应包装形态：getData 按 objects → data.data → data 的顺序回退取数 */
-export type Response<T = any> = {
+export type CxResponse<T = any> = {
   objects?: T
   data?: T & { data?: T }
   [key: string]: any
@@ -22,12 +22,12 @@ type UseRequestOpts = {
   effect?: () => void
 }
 
-const requests: Request[] = []
-const provideInstance = (request: Request) => {
+const requests: CxRequestFn[] = []
+const provideInstance = (request: CxRequestFn) => {
   console.info('[info] request instance provide in useRequest', request)
   requests.push(request)
 }
-const removeInstance = (request: Request) => {
+const removeInstance = (request: CxRequestFn) => {
   console.info('[info] request instance removed', request)
   const idx = requests.indexOf(request)
   if (idx >= 0) {
@@ -52,7 +52,7 @@ function _useRequest<Req = unknown, Res = unknown>(
   const apiNormal = async (data?: Req) => {
     try {
       const request = requests[requests.length - 1]!
-      const res = await request<Response<Res>>(
+      const res = await request<CxResponse<Res>>(
         Object.assign(
           {
             method: 'POST',
