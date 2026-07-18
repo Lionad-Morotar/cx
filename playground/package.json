@@ -1,0 +1,8 @@
+{
+  "name": "cx-playground",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --host"
+  }
+}

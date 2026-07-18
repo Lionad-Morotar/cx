@@ -1,0 +1,20 @@
+{
+  "name": "@lionad/cx-vue",
+  "version": "0.1.0",
+  "description": "cx Vue runtime: composables and shared runtime components",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "vp pack",
+    "typecheck": "tsgo --noEmit"
+  }
+}

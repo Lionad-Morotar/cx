@@ -1,0 +1,10 @@
+# flow-dev 运行文档（不入库）
+docs/
+
+# 依赖与产物
+node_modules/
+dist/
+*.tsbuildinfo
+
+# 系统
+.DS_Store
