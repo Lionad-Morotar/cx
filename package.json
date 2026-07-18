@@ -11,8 +11,10 @@
   },
   "devDependencies": {
     "@voidzero-dev/vite-plus-core": "latest",
+    "@vue/test-utils": "^2.4.11",
     "happy-dom": "^20.11.0",
     "typescript": "^7.0.0",
+    "unplugin-vue": "^7.2.0",
     "vite-plus": "latest",
     "vitest": "^4.1.10",
     "vue-tsgo": "latest"

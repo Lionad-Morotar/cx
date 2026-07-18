@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite-plus'
+import Vue from 'unplugin-vue/vite'
 
 /**
  * Vite+ 统一工具链配置：测试、lint、格式化、任务编排单一出口。
  * vendored 第三方源码不参与 lint/fmt。
  */
 export default defineConfig({
+  plugins: [Vue()],
   test: {
     include: ['packages/*/src/**/*.test.ts', 'packages/*/tests/**/*.test.ts'],
     environment: 'happy-dom',

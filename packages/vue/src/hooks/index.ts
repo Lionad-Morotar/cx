@@ -25,7 +25,7 @@ export * from './use-cx-edit-mode'
 export * from './use-request'
 export * from './use-scoped-css'
 export * from './use-task'
-export * from './use-cx-upload'
+export * from './use-cx-media'
 
 export const useCx = () => {
   return inject<CxLoaderInstance>('cx')!
