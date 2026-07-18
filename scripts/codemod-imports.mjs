@@ -34,11 +34,15 @@ const walk = (dir, out = []) => {
   return out
 }
 
-/** alias 映射：从 JSON 文件读入 per-package 配置，格式 [["^pattern$", "target/subpath"], ...] */
+/** alias 映射：从 JSON 文件读入 per-package 配置，格式 [["^pattern$", "target/subpath"], ...]
+ * target 支持 $1..$9 捕获组占位。 */
 const loadAliases = (jsonPath) => {
   if (!jsonPath) return []
   const raw = JSON.parse(readFileSync(resolve(process.cwd(), jsonPath), 'utf8'))
-  return raw.map(([pattern, target]) => [new RegExp(pattern), () => target])
+  return raw.map(([pattern, target]) => [
+    new RegExp(pattern),
+    (m) => target.replace(/\$(\d)/g, (_, i) => m[Number(i)] ?? ''),
+  ])
 }
 
 const toRelative = (file, targetSub) => {
@@ -235,14 +239,18 @@ const KNOWN = {
   Fuse: ['fuse.js', 'default'],
   // radashi use* 别名族（p-ray 经 Nuxt imports preset 从 radashi 全量 use* 化 auto-import）
   // 仅收录与 lodash-es 语义等价的条目；无等价物的走 [skip] 人工处理
+  withDirectives: ['vue'],
+  has: ['@lionad/cx-definition'],
+  useCleanups: ['@lionad/cx-definition'],
+  useMountedWatchImmediate: ['@lionad/cx-vue'],
   useOmit: ['lodash-es', 'named-as', 'omit'],
   usePick: ['lodash-es', 'named-as', 'pick'],
   useGet: ['lodash-es', 'named-as', 'get'],
   useClone: ['lodash-es', 'named-as', 'cloneDeep'],
 }
 
-/** 在文件内容中注入 import 语句（.ts 插到文件头，.vue 插到 script 块内） */
-const injectImport = (content, file, name, spec) => {
+/** 在文件内容中注入 import 语句（.ts 插到文件头，.vue 插到错误所在 script 块内） */
+const injectImport = (content, file, name, spec, lineNo) => {
   const [module, kind, as] = spec
   const isType = kind === 'type'
   const clause = kind === 'default' ? name : kind === 'named-as' ? `${as} as ${name}` : name
@@ -277,7 +285,25 @@ const injectImport = (content, file, name, spec) => {
   const stmt = `import ${isType ? 'type ' : ''}${kind === 'default' ? clause : `{ ${clause} }`} from '${module}'\n`
 
   if (file.endsWith('.vue')) {
-    // 优先插到 <script setup> 块（双 script 块的 SFC 中普通块对 setup 不可见）
+    // 收集全部 script 块区间，优先注入包含错误行的块（双 script 块 SFC 场景）
+    const blocks = [...content.matchAll(/<script[^>]*>/g)].map((m) => ({
+      openEnd: m.index + m[0].length,
+      start: m.index,
+      tag: m[0],
+    }))
+    if (blocks.length && lineNo) {
+      // 以开标签行号近似判断归属（块结束标签行号无需精确）
+      const lineOf = (idx) => content.slice(0, idx).split('\n').length
+      const owner = blocks.find((b, i) => {
+        const from = lineOf(b.start)
+        const to = i + 1 < blocks.length ? lineOf(blocks[i + 1].start) : Number.MAX_SAFE_INTEGER
+        return lineNo >= from && lineNo < to
+      })
+      if (owner) {
+        return content.slice(0, owner.openEnd) + '\n' + stmt + content.slice(owner.openEnd)
+      }
+    }
+    // 退化：优先 <script setup>，否则第一个 script 块
     const setupMatch = content.match(/<script[^>]*\bsetup\b[^>]*>\s*/)
     if (setupMatch) {
       const idx = setupMatch.index + setupMatch[0].length
@@ -299,11 +325,12 @@ const fixFromTscOutput = (outFile) => {
   const output = readFileSync(outFile, 'utf8')
   // 兼容两种输出格式：tsgo `file(行,列):` 与 vue-tsgo `file:行:列 -`
   const re =
-    /^([^\s(]+\.(?:ts|vue))(?:\((\d+),(\d+)\)|:\d+:\d+)\s*[-:]\s*error TS2(?:304|552): Cannot find name '([^']+)'/gm
+    /^([^\s(]+\.(?:ts|vue))(?:\((\d+),(\d+)\)|:(\d+):\d+)\s*[-:]\s*error TS2(?:304|552): Cannot find name '([^']+)'/gm
   const byFile = new Map()
   let m
   while ((m = re.exec(output))) {
-    const [, rawPath, , , name] = m
+    const [, rawPath, lineA, , lineB, name] = m
+    const lineNo = Number(lineA ?? lineB ?? 0)
     const file = resolve(process.cwd(), rawPath)
     if (!file.startsWith(SRC)) continue
     if (!KNOWN[name]) {
@@ -311,12 +338,12 @@ const fixFromTscOutput = (outFile) => {
       continue
     }
     if (!byFile.has(file)) byFile.set(file, new Map())
-    byFile.get(file).set(name, KNOWN[name])
+    byFile.get(file).set(name, { spec: KNOWN[name], lineNo })
   }
   for (const [file, names] of byFile) {
     let content = readFileSync(file, 'utf8')
-    for (const [name, spec] of names) {
-      content = injectImport(content, file, name, spec)
+    for (const [name, { spec, lineNo }] of names) {
+      content = injectImport(content, file, name, spec, lineNo)
     }
     writeFileSync(file, content)
     console.log(`[fix] ${file.replace(SRC, 'src')}: +${[...names.keys()].join(', ')}`)

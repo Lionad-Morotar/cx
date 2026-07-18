@@ -6,7 +6,13 @@ export default defineConfig({
     plugins: [Vue({ isProduction: true })],
     dts: false,
     deps: {
-      neverBundle: ['vue', '@vue/shared', '@vueuse/core', '@iconify/vue', '@lionad/cx-definition'],
+      neverBundle: [
+        'vue',
+        '@vue/shared',
+        '@vueuse/core',
+        '@lionad/cx-definition',
+        '@lionad/cx-vue',
+      ],
     },
   },
 })

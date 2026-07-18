@@ -10,4 +10,5 @@ onlyBuiltDependencies:
   - vue-demi
 
 allowBuilds:
+  '@parcel/watcher': true
   vue-demi: true
