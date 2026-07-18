@@ -5,3 +5,9 @@ packages:
 overrides:
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vitest: 4.1.10
+
+onlyBuiltDependencies:
+  - vue-demi
+
+allowBuilds:
+  vue-demi: true

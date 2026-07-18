@@ -1,7 +1,14 @@
-import type { WatchSource } from 'vue'
+import { getRect, getStyle } from '../../vue/dom'
+import { useMacroTask } from '@lionad/cx-definition'
+import type { WatchSource, MaybeRef } from 'vue'
+import { ref } from 'vue'
+import { watchEffect } from 'vue'
+import { unref } from 'vue'
+import { unrefElement } from '@vueuse/core'
+import { watch } from 'vue'
 
 type UseCxReRenderOptions = {
-  withMargin: boolean
+  withMargin?: boolean
 }
 
 // popper 配置项变化时重新渲染，并使用空 div 做占位防回流，
@@ -9,7 +16,7 @@ type UseCxReRenderOptions = {
 export const useCxReRender = <T extends MaybeRef<HTMLElement>>(
   cmptRef: T,
   getter: WatchSource,
-  opts?: UseCxReRenderOptions = {}
+  opts: UseCxReRenderOptions = {},
 ) => {
   const isReRendering = ref(false)
   const size = ref({ width: '0', height: '0' })
@@ -32,12 +39,12 @@ export const useCxReRender = <T extends MaybeRef<HTMLElement>>(
     // console.log('[debug] elem', elem)
     if (!elem?.getBoundingClientRect) return
 
-    const { width, height } = getRect(elem as HTMLElement)
+    const { width, height } = getRect(elem as HTMLElement)!
     if (!withMargin) {
-      return size.value = {
+      return (size.value = {
         width: `${width}px`,
-        height: `${height}px`
-      }
+        height: `${height}px`,
+      })
     }
 
     const style = getStyle(elem as HTMLElement)
@@ -53,7 +60,7 @@ export const useCxReRender = <T extends MaybeRef<HTMLElement>>(
 
     size.value = {
       width: `${w}px`,
-      height: `${h}px`
+      height: `${h}px`,
     }
   })
 
@@ -63,11 +70,11 @@ export const useCxReRender = <T extends MaybeRef<HTMLElement>>(
     // for debug
     // await useSleep(1000 * 10)
 
-    useMacroTask(() => isReRendering.value = false)
+    useMacroTask(() => (isReRendering.value = false))
   })
 
   return {
     isReRendering,
-    size
+    size,
   }
 }

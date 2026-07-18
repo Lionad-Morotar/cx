@@ -30,7 +30,7 @@ const getTimeRecorder = () => {
     done: () => {
       instance.recordParseTime()
       setTimeout(instance.recordRenderTime, 0)
-    }
+    },
   }
   return instance
 }
@@ -40,11 +40,7 @@ const getTimeRecorder = () => {
  * to make content safe,
  * also avoid style conflict
  */
-export const useScopedCSS = (
-  id: string,
-  unScoped: MaybeRef<string>,
-  prefix?: MaybeRef<string>
-) => {
+export const useScopedCSS = (id: string, unScoped: MaybeRef<string>, prefix?: MaybeRef<string>) => {
   const { css } = useStyleTag('', { id })
   watchEffect(() => {
     try {

@@ -1,3 +1,4 @@
+import { pick as usePick } from 'lodash-es'
 export const bgColorStrengthOptions = [
   { value: '50', label: '50' },
   { value: '100', label: '100' },
@@ -9,13 +10,12 @@ export const bgColorStrengthOptions = [
   { value: '700', label: '700' },
   { value: '800', label: '800' },
   { value: '900', label: '900' },
-  { value: '950', label: '950' }
+  { value: '950', label: '950' },
 ] as const
 
-export const bgColorStrengths = bgColorStrengthOptions.map(x => x.value)
+export const bgColorStrengths = bgColorStrengthOptions.map((x) => x.value)
 
 export const colorNameOptions = [
-
   /* fixed colors */
   { value: 'black', label: '黑' },
   { value: 'white', label: '白' },
@@ -46,22 +46,29 @@ export const colorNameOptions = [
   { value: 'slate', label: '暗蓝灰', strength: bgColorStrengths },
   { value: 'zinc', label: '锌', strength: bgColorStrengths },
   { value: 'neutral', label: '中性', strength: bgColorStrengths },
-  { value: 'stone', label: '石', strength: bgColorStrengths }
-
+  { value: 'stone', label: '石', strength: bgColorStrengths },
 ] as const
 
 export const cmptColorNames = [
   { label: '主色', value: 'primary' },
   ...colorNameOptions
-    .filter(x => !['black', 'white', 'transparent', 'slate', 'zinc', 'neutral', 'stone'].includes(x.value))
-    .map(x => usePick(x, ['label', 'value']))
+    .filter(
+      (x) =>
+        !['black', 'white', 'transparent', 'slate', 'zinc', 'neutral', 'stone'].includes(x.value),
+    )
+    .map((x) => usePick(x, ['label', 'value'])),
 ]
 
 export const cmptColorNames3 = [
   { label: '主色', value: 'primary' },
   ...colorNameOptions
-    .filter(x => !['gray', 'black', 'white', 'transparent', 'slate', 'zinc', 'neutral', 'stone'].includes(x.value))
-    .map(x => usePick(x, ['label', 'value']))
+    .filter(
+      (x) =>
+        !['gray', 'black', 'white', 'transparent', 'slate', 'zinc', 'neutral', 'stone'].includes(
+          x.value,
+        ),
+    )
+    .map((x) => usePick(x, ['label', 'value'])),
 ]
 
 // cmptColorNames with black and white
@@ -69,6 +76,6 @@ export const cmptColorNames3 = [
 export const cmptColorNames2 = [
   { label: '主色', value: 'primary' },
   ...colorNameOptions
-    .filter(x => !['transparent', 'slate', 'zinc', 'neutral', 'stone'].includes(x.value))
-    .map(x => usePick(x, ['label', 'value']))
+    .filter((x) => !['transparent', 'slate', 'zinc', 'neutral', 'stone'].includes(x.value))
+    .map((x) => usePick(x, ['label', 'value'])),
 ]

@@ -1,5 +1,11 @@
-import { getCurrentInstance, reactive, useAttrs } from 'vue'
-import type { CxUtils, ComponentEmits, CxComponentRuntime, CxLoaderInstance, CxPropBase } from '@cx/definition'
+import { getCurrentInstance, reactive, useAttrs, inject, computed } from 'vue'
+import type {
+  CxUtils,
+  ComponentEmits,
+  CxComponentRuntime,
+  CxLoaderInstance,
+  CxPropBase,
+} from '@lionad/cx-definition'
 
 type PropsWithDefaults<Base, Defaults> = Base & {
   [K in keyof Defaults]: K extends keyof Base
@@ -17,9 +23,9 @@ export const useCxPanel = <
   T = unknown,
   ExtraProps = {
     // nothing
-  }
+  },
 >(
-  defaultValue?: T
+  defaultValue?: T,
   // extra?: Record<string, unknown>
 ) => {
   const cx = inject<CxLoaderInstance>('cx')!
@@ -55,8 +61,8 @@ export const useCxPanel = <
     set(val: T) {
       // console.log('set', val)
       // emits['update:datas']({ ...props.datas, [props.valueKey]: val })
-      return (props.datas[props.valueKey] as T) = val
-    }
+      return ((props.datas[props.valueKey] as T) = val)
+    },
   })
   if (defaultValue && !value.value) {
     value.value = defaultValue
@@ -69,7 +75,7 @@ export const useCxPanel = <
     instance,
     emits,
     props: reactive(props),
-    value
+    value,
   }
   return states
 }

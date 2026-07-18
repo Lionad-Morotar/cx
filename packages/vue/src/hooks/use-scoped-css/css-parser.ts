@@ -33,9 +33,9 @@ export class CSSParser {
     this.matchLeadingSpaces()
     this.matchComments()
     while (
-      this.cssText.length
-      && this.cssText.charAt(0) !== '}'
-      && (this.matchAtRule() || this.matchStyleRule())
+      this.cssText.length &&
+      this.cssText.charAt(0) !== '}' &&
+      (this.matchAtRule() || this.matchStyleRule())
     ) {
       this.matchComments()
     }
@@ -70,9 +70,7 @@ export class CSSParser {
       if (selector === '&') {
         selector = this.prefix
       } else if (selector.startsWith(`${escape} `)) {
-        selector = `${escape} ${this.prefix} ${selector.slice(
-          escape.length + 1
-        )}`
+        selector = `${escape} ${this.prefix} ${selector.slice(escape.length + 1)}`
       } else {
         selector = `${this.prefix} ${selector}`
       }
@@ -83,22 +81,18 @@ export class CSSParser {
 
   // https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration
   private styleDeclarations(): boolean | void {
-    if (!this.matchOpenBrace()) return parseError('CSS Declaration missing \'{\'')
+    if (!this.matchOpenBrace()) return parseError("CSS Declaration missing '{'")
 
     this.matchAllDeclarations()
 
-    if (!this.matchCloseBrace())
-      return parseError('CSS Declaration missing \'}\'')
+    if (!this.matchCloseBrace()) return parseError("CSS Declaration missing '}'")
 
     return true
   }
 
   private matchAllDeclarations(nesting = 1): void {
     let cssValue = (
-      this.commonMatch(
-        /^(?:url\(["']?(?:[^)"'}]+)["']?\)|[^{}/])*/,
-        true
-      ) as RegExpExecArray
+      this.commonMatch(/^(?:url\(["']?(?:[^)"'}]+)["']?\)|[^{}/])*/, true) as RegExpExecArray
     )[0]
 
     if (cssValue) {
@@ -142,18 +136,18 @@ export class CSSParser {
   private matchAtRule(): boolean | void {
     if (this.cssText[0] !== '@') return false
     return (
-      this.keyframesRule()
-      || this.mediaRule()
-      || this.customMediaRule()
-      || this.supportsRule()
-      || this.importRule()
-      || this.charsetRule()
-      || this.namespaceRule()
-      || this.containerRule()
-      || this.documentRule()
-      || this.pageRule()
-      || this.hostRule()
-      || this.fontFaceRule()
+      this.keyframesRule() ||
+      this.mediaRule() ||
+      this.customMediaRule() ||
+      this.supportsRule() ||
+      this.importRule() ||
+      this.charsetRule() ||
+      this.namespaceRule() ||
+      this.containerRule() ||
+      this.documentRule() ||
+      this.pageRule() ||
+      this.hostRule() ||
+      this.fontFaceRule()
     )
   }
 
@@ -161,19 +155,18 @@ export class CSSParser {
   private keyframesRule(): boolean | void {
     if (!this.commonMatch(/^@([-\w]+)?keyframes\s*/)) return false
 
-    if (!this.commonMatch(/^[^{]+/))
-      return parseError('@keyframes missing name')
+    if (!this.commonMatch(/^[^{]+/)) return parseError('@keyframes missing name')
 
     this.matchComments()
 
-    if (!this.matchOpenBrace()) return parseError('@keyframes missing \'{\'')
+    if (!this.matchOpenBrace()) return parseError("@keyframes missing '{'")
 
     this.matchComments()
     while (this.keyframeRule()) {
       this.matchComments()
     }
 
-    if (!this.matchCloseBrace()) return parseError('@keyframes missing \'}\'')
+    if (!this.matchCloseBrace()) return parseError("@keyframes missing '}'")
 
     this.matchLeadingSpaces()
 
@@ -200,8 +193,7 @@ export class CSSParser {
 
   // https://github.com/postcss/postcss-custom-media
   private customMediaRule(): boolean {
-    if (!this.commonMatch(/^@custom-media\s+(--[^\s]+)\s*([^{;]+);/))
-      return false
+    if (!this.commonMatch(/^@custom-media\s+(--[^\s]+)\s*([^{;]+);/)) return false
 
     this.matchLeadingSpaces()
 
@@ -225,26 +217,17 @@ export class CSSParser {
   }
 
   // https://developer.mozilla.org/en-US/docs/Web/API/CSSMediaRule
-  private mediaRule = this.createMatcherForRuleWithChildRule(
-    /^@media *([^{]+)/,
-    '@media'
-  )
+  private mediaRule = this.createMatcherForRuleWithChildRule(/^@media *([^{]+)/, '@media')
 
   // https://developer.mozilla.org/en-US/docs/Web/API/CSSSupportsRule
-  private supportsRule = this.createMatcherForRuleWithChildRule(
-    /^@supports *([^{]+)/,
-    '@supports'
-  )
+  private supportsRule = this.createMatcherForRuleWithChildRule(/^@supports *([^{]+)/, '@supports')
 
   private documentRule = this.createMatcherForRuleWithChildRule(
     /^@([-\w]+)?document *([^{]+)/,
-    '@document'
+    '@document',
   )
 
-  private hostRule = this.createMatcherForRuleWithChildRule(
-    /^@host\s*/,
-    '@host'
-  )
+  private hostRule = this.createMatcherForRuleWithChildRule(/^@host\s*/, '@host')
 
   // :global is CSS Modules rule, it will be converted to normal syntax
   // private globalRule = this.createMatcherForRuleWithChildRule(/^:global([^{]*)/, ':global')
@@ -257,14 +240,11 @@ export class CSSParser {
   // https://developer.mozilla.org/en-US/docs/Web/CSS/@container
   private containerRule = this.createMatcherForRuleWithChildRule(
     /^@container *([^{]+)/,
-    '@container'
+    '@container',
   )
 
   // common matcher for @media, @supports, @document, @host, :global, @container
-  private createMatcherForRuleWithChildRule(
-    reg: RegExp,
-    name: string
-  ): () => boolean | void {
+  private createMatcherForRuleWithChildRule(reg: RegExp, name: string): () => boolean | void {
     return () => {
       if (!this.commonMatch(reg)) return false
 
@@ -312,13 +292,12 @@ export class CSSParser {
 
   // css comment
   private matchComment(): boolean | void {
-    if (this.cssText.charAt(0) !== '/' || this.cssText.charAt(1) !== '*')
-      return false
+    if (this.cssText.charAt(0) !== '/' || this.cssText.charAt(1) !== '*') return false
 
     let i = 2
     while (
-      this.cssText.charAt(i) !== ''
-      && (this.cssText.charAt(i) !== '*' || this.cssText.charAt(i + 1) !== '/')
+      this.cssText.charAt(i) !== '' &&
+      (this.cssText.charAt(i) !== '*' || this.cssText.charAt(i + 1) !== '/')
     )
       ++i
     i += 2
@@ -341,10 +320,7 @@ export class CSSParser {
     return true
   }
 
-  private commonMatch(
-    reg: RegExp,
-    skip = false
-  ): RegExpExecArray | null | void {
+  private commonMatch(reg: RegExp, skip = false): RegExpExecArray | null | void {
     const matchArray = reg.exec(this.cssText)
     if (!matchArray) return
     const matchStr = matchArray[0]

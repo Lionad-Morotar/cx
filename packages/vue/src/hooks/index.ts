@@ -1,4 +1,6 @@
-import type { CxLoaderInstance } from '@cx/definition'
+import { inject } from 'vue'
+
+import type { CxLoaderInstance } from '@lionad/cx-definition'
 
 /** Utils? */
 
@@ -22,8 +24,8 @@ export * from './use-cx-edit-mode'
 
 export * from './use-request'
 export * from './use-scoped-css'
-
-export const useCxOSS = createSharedComposable(useOSS)
+export * from './use-task'
+export * from './use-cx-upload'
 
 export const useCx = () => {
   return inject<CxLoaderInstance>('cx')!

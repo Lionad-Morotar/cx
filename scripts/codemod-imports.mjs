@@ -297,12 +297,13 @@ const injectImport = (content, file, name, spec) => {
 
 const fixFromTscOutput = (outFile) => {
   const output = readFileSync(outFile, 'utf8')
-  // tsc 输出路径可能是相对（相对其运行 cwd）或绝对，统一解析为绝对路径
-  const re = /^([^\s(]+\.(?:ts|vue))\(\d+,\d+\): error TS2(?:304|552): Cannot find name '([^']+)'/gm
+  // 兼容两种输出格式：tsgo `file(行,列):` 与 vue-tsgo `file:行:列 -`
+  const re =
+    /^([^\s(]+\.(?:ts|vue))(?:\((\d+),(\d+)\)|:\d+:\d+)\s*[-:]\s*error TS2(?:304|552): Cannot find name '([^']+)'/gm
   const byFile = new Map()
   let m
   while ((m = re.exec(output))) {
-    const [, rawPath, name] = m
+    const [, rawPath, , , name] = m
     const file = resolve(process.cwd(), rawPath)
     if (!file.startsWith(SRC)) continue
     if (!KNOWN[name]) {

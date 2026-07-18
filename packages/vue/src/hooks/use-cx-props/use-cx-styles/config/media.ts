@@ -1,9 +1,39 @@
 export const breakPointOptions = [
-  { value: '', tooltip: '默认', width: 0, height: 0, icon: 'i-material-symbols-desktop-mac-outline' },
-  { value: 'desktop', tooltip: '电脑', width: 1920, height: 1024, icon: 'i-material-symbols-desktop-mac-outline' },
-  { value: 'mobile', tooltip: '手机', width: 375, height: 812, icon: 'i-material-symbols-phone-iphone-outline' },
-  { value: 'tablet', tooltip: '平板', width: 768, height: 1024, icon: 'i-material-symbols-tablet-mac-outline' },
-  { value: 'laptop', tooltip: '笔记本', width: 1366, height: 768, icon: 'i-material-symbols-laptop-mac-outline' }
+  {
+    value: '',
+    tooltip: '默认',
+    width: 0,
+    height: 0,
+    icon: 'i-material-symbols-desktop-mac-outline',
+  },
+  {
+    value: 'desktop',
+    tooltip: '电脑',
+    width: 1920,
+    height: 1024,
+    icon: 'i-material-symbols-desktop-mac-outline',
+  },
+  {
+    value: 'mobile',
+    tooltip: '手机',
+    width: 375,
+    height: 812,
+    icon: 'i-material-symbols-phone-iphone-outline',
+  },
+  {
+    value: 'tablet',
+    tooltip: '平板',
+    width: 768,
+    height: 1024,
+    icon: 'i-material-symbols-tablet-mac-outline',
+  },
+  {
+    value: 'laptop',
+    tooltip: '笔记本',
+    width: 1366,
+    height: 768,
+    icon: 'i-material-symbols-laptop-mac-outline',
+  },
 ] as const
 
 export const deviceOptionsGroup = [
@@ -22,7 +52,7 @@ export const deviceOptionsGroup = [
     { name: 'iPhone 13 mini', width: 375, height: 812 },
     { name: 'iPhone SE', width: 320, height: 568 },
     { name: 'iPhone 8 Plus', width: 414, height: 736 },
-    { name: 'iPhone 8', width: 375, height: 667 }
+    { name: 'iPhone 8', width: 375, height: 667 },
   ],
   // tablet
   [
@@ -31,7 +61,7 @@ export const deviceOptionsGroup = [
     { name: 'iPad mini 8.3"', width: 744, height: 1133 },
     { name: 'iPad Air 10.9"', width: 820, height: 1180 },
     { name: 'iPad Pro 11"', width: 834, height: 1194 },
-    { name: 'iPad Pro 12.9"', width: 1024, height: 1366 }
+    { name: 'iPad Pro 12.9"', width: 1024, height: 1366 },
   ],
   // desktop
   [
@@ -40,12 +70,12 @@ export const deviceOptionsGroup = [
     { name: 'MacBook Air 13"', width: 1280, height: 800 },
     { name: 'MacBook Pro 14"', width: 1512, height: 982 },
     { name: 'MacBook Pro 16"', width: 1728, height: 1117 },
-    { name: 'iMac', width: 1280, height: 720 }
+    { name: 'iMac', width: 1280, height: 720 },
   ],
   // PPT
   [
     { name: '幻灯片 16:9', width: 1920, height: 1080 },
-    { name: '幻灯片 4:3', width: 1024, height: 768 }
+    { name: '幻灯片 4:3', width: 1024, height: 768 },
   ],
   // Watch
   [
@@ -56,7 +86,7 @@ export const deviceOptionsGroup = [
     { name: 'Apple Watch 44mm', width: 184, height: 224 },
     { name: 'Apple Watch 45mm', width: 198, height: 242 },
     { name: 'Apple Watch 46mm', width: 208, height: 248 },
-    { name: 'Apple Watch 49mm', width: 205, height: 251 }
+    { name: 'Apple Watch 49mm', width: 205, height: 251 },
   ],
   // Print
   [
@@ -71,7 +101,7 @@ export const deviceOptionsGroup = [
     { name: 'B3', width: 1001, height: 1417 },
     { name: 'B4', width: 709, height: 1001 },
     { name: 'B5', width: 499, height: 709 },
-    { name: 'B6', width: 354, height: 499 }
+    { name: 'B6', width: 354, height: 499 },
   ],
   // Social Media
   [
@@ -91,6 +121,6 @@ export const deviceOptionsGroup = [
     { name: 'Pinterest Pin 2:3', width: 800, height: 1200 },
     { name: 'Facebook 封面 16:9', width: 820, height: 312 },
     { name: 'Twitter 封面 3:1', width: 1500, height: 500 },
-    { name: 'LinkedIn 封面 4:1', width: 1584, height: 396 }
-  ]
+    { name: 'LinkedIn 封面 4:1', width: 1584, height: 396 },
+  ],
 ] as const

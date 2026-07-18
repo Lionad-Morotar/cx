@@ -39,7 +39,7 @@
     "vue": "^3.5.40"
   },
   "peerDependencies": {
-    "@vueuse/core": "^13.0.0",
+    "@vueuse/core": "^13.0.0 || ^14.0.0",
     "vue": "^3.5.0"
   }
 }

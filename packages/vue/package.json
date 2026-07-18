@@ -7,14 +7,38 @@
     "dist"
   ],
   "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.mjs"
     }
   },
   "scripts": {
-    "build": "vp pack",
-    "typecheck": "tsgo --noEmit"
+    "build": "vp pack && vue-tsc -p tsconfig.build.json",
+    "typecheck": "vue-tsgo --noEmit"
+  },
+  "dependencies": {
+    "@iconify/vue": "^5.0.1",
+    "@lionad/cx-definition": "workspace:*",
+    "lodash-es": "^4.18.1",
+    "use-semantic-version": "^0.0.7",
+    "uuid": "^14.0.1",
+    "vue-concurrency": "5.0.3"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^26.1.1",
+    "@types/uuid": "^11.0.0",
+    "@vueuse/core": "^14.3.0",
+    "typescript": "^6.0.3",
+    "unplugin-vue": "^7.2.0",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.7"
+  },
+  "peerDependencies": {
+    "@vueuse/core": "^13.0.0 || ^14.0.0",
+    "vue": "^3.5.0"
   }
 }

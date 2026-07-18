@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import { cloneDeep, isFunction, isNil, isString } from 'lodash-es'
-import { useCxState } from '@cx/hooks'
-import type { CxImageUploadPropValue } from '@cx/definition'
+import { useCxState } from '../index'
+import type { CxImageUploadPropValue } from '@lionad/cx-definition'
 
 import type { Ref } from 'vue'
 
@@ -10,29 +10,26 @@ type UseCxStateParams = Parameters<typeof useCxState>
 const getDefaultValue = () => Object.freeze({ url: '', fit: 'cover' })
 
 const fallback = (...args: any[]) => {
-  return args.find(x => !isNil(x)) || null
+  return args.find((x) => !isNil(x)) || null
 }
 
-const clean = (
-  value: Ref<CxImageUploadPropValue>,
-  defaultOverride: Record<string, any>
-) => {
+const clean = (value: Ref<CxImageUploadPropValue>, defaultOverride: Record<string, any>) => {
   const defaultValue = getDefaultValue()
   if (isString(value.value) || isNil(value.value)) {
     value.value = Object.assign(
       defaultValue,
       {
         url: value.value || '',
-        fit: 'cover'
+        fit: 'cover',
       },
-      defaultOverride || {}
+      defaultOverride || {},
     )
   } else {
     const cloned = cloneDeep(value.value || {})
     const override = defaultOverride || {}
     Object.assign(value.value, {
       url: fallback(cloned.url, override.url, defaultValue.url),
-      fit: fallback(cloned.fit, override.fit, defaultValue.fit)
+      fit: fallback(cloned.fit, override.fit, defaultValue.fit),
     })
   }
 }
@@ -49,7 +46,7 @@ export const useCxPropImageUpload = (...args: UseCxStateParams) => {
   const states = reactive({
     value,
     clean,
-    getDefaultValue
+    getDefaultValue,
   })
 
   return states

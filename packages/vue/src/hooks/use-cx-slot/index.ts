@@ -1,4 +1,6 @@
-import type { CxComponentRuntime, CxComponentSlot } from '@cx/definition'
+import { has, genUseHooks } from '@lionad/cx-definition'
+import type { CxComponentRuntime, CxComponentSlot } from '@lionad/cx-definition'
+import { computed, unref, inject } from 'vue'
 
 export const useCxSlot = (cmpt: CxComponentRuntime) => {
   const isEditMode = computed(() => unref(inject('is-cx-edit', false)))
@@ -31,6 +33,6 @@ export const useCxSlot = (cmpt: CxComponentRuntime) => {
 
   return {
     showSlot,
-    showDefault
+    showDefault,
   }
 }

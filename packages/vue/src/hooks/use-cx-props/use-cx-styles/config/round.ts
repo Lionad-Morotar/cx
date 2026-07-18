@@ -3,7 +3,7 @@ export const roundOptions = [
   { value: 'md', label: '中' },
   { value: 'lg', label: '大' },
   { value: 'xl', label: '超大' },
-  { value: '2xl', label: '超大2' }
+  { value: '2xl', label: '超大2' },
   // { value: 'full', label: '圆' },
 ]
 

@@ -1,6 +1,18 @@
 import { useMemoize } from '@vueuse/core'
 import { cloneDeep } from 'lodash-es'
-import type { Request, Response } from '@cx/apis/types'
+import { useAsync } from '../use-task'
+
+/**
+ * 请求函数形态（宿主应用注入的 API 调用器）。
+ * 原代码从 '@cx/apis/types' 导入，该路径在 p-ray 中不存在（幻影 import）。
+ */
+export type Request = <Res = any>(opts: Record<string, any>) => Promise<Res>
+/** 响应包装形态：getData 按 objects → data.data → data 的顺序回退取数 */
+export type Response<T = any> = {
+  objects?: T
+  data?: T & { data?: T }
+  [key: string]: any
+}
 
 type UseRequestOpts = {
   method?: string
@@ -28,7 +40,7 @@ const removeInstance = (request: Request) => {
  */
 function _useRequest<Req = unknown, Res = unknown>(
   requestOpts: UseRequestOpts = { url: '' },
-  dataOverride?: Partial<Req>
+  dataOverride?: Partial<Req>,
 ) {
   const defaultOpts = cloneDeep(requestOpts)
   const effect = defaultOpts.effect
@@ -46,15 +58,10 @@ function _useRequest<Req = unknown, Res = unknown>(
             method: 'POST',
             data: Array.isArray(data)
               ? requestOpts.data || data || []
-              : Object.assign(
-                  {},
-                  requestOpts.data,
-                  data || {},
-                  dataOverride || {}
-                )
+              : Object.assign({}, requestOpts.data, data || {}, dataOverride || {}),
           },
-          defaultOpts
-        )
+          defaultOpts,
+        ),
       )
       if (res && effect) {
         await effect?.()
@@ -78,22 +85,17 @@ function _useRequest<Req = unknown, Res = unknown>(
 
   // 默认的取数据方法，从请求中取得实际的数据内容（不包含 code、success 等），
   // 应当从这里移除，放到使用方实现
-  const getData
-    = (fn: typeof apiNormal | typeof apiCached) => async (t: Req) => {
-      const res = (await fn(t)) as any
-      return (res?.objects
-        || res?.data?.data
-        || res?.data
-        || res) as unknown as Res
-    }
+  const getData = (fn: typeof apiNormal | typeof apiCached) => async (t: Req) => {
+    const res = (await fn(t)) as any
+    return (res?.objects || res?.data?.data || res?.data || res) as unknown as Res
+  }
 
   apiNormal.task = useAsync(getData(apiNormal))
   apiCached.task = useAsync(getData(apiCached))
 
   /** ---------------------------------------------------------------------- method task */
 
-  const reload = (fn: typeof apiNormal | typeof apiCached) => (t: Req) =>
-    fn.task.exec(t)
+  const reload = (fn: typeof apiNormal | typeof apiCached) => (t: Req) => fn.task.exec(t)
 
   apiNormal.reload = reload(apiNormal)
   apiCached.reload = reload(apiCached)
@@ -105,7 +107,7 @@ function _useRequest<Req = unknown, Res = unknown>(
 
 const methods = {
   provideInstance,
-  removeInstance
+  removeInstance,
 }
 
 export const useRequest = Object.assign(_useRequest, methods)

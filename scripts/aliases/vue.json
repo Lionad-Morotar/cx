@@ -1,0 +1,4 @@
+[
+  ["^@cx/hooks$", "hooks/index"],
+  ["^@cx/hooks/(.+)$", "hooks/$1"]
+]

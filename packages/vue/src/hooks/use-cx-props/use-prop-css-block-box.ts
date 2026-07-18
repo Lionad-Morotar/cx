@@ -1,14 +1,20 @@
+import { has, genUseHooks } from '@lionad/cx-definition'
 import { isFunction, isString, isBoolean } from 'lodash-es'
-import { useToggle } from '@vueuse/core'
+import { useToggle, whenever } from '@vueuse/core'
 import { useSemanticVersion } from 'use-semantic-version'
 import {
   colorNameOptions,
   circleOption,
   fontFamilyOptions,
-  roundOptions
+  roundOptions,
 } from './use-cx-styles/config'
-import type { Ref } from 'vue'
-import type { CxComponentStyle } from '@cx/definition'
+import type { Ref, MaybeRef } from 'vue'
+import type { CxComponentStyle } from '@lionad/cx-definition'
+import { ref } from 'vue'
+import { computed } from 'vue'
+import { unref } from 'vue'
+import { watch } from 'vue'
+import { watchEffect } from 'vue'
 
 export * from './use-cx-styles/config'
 
@@ -17,7 +23,7 @@ export type DeepPartial<T extends any> = {
 }
 
 const CSSDefaultValue = [
-  { value: '', label: '默认' }
+  { value: '', label: '默认' },
   // { value: 'unset', label: '不设置' },
   // { value: 'inherit', label: '继承父组件' },
   // { value: 'auto', label: '自动' },
@@ -26,7 +32,7 @@ const CSSDefaultValue = [
 ]
 
 type UseCxStyleOptions<Initial = string> = {
-  options?: { value: string, label: string }[]
+  options?: { value: string; label: string }[]
   initValue?: Initial
   onChange?: (x: Initial) => void
 }
@@ -34,174 +40,218 @@ type UseCxStyleOptions<Initial = string> = {
 /**
  * 可以统一设置的值（border、round）
  */
-const genUseCxStyleUnified = (
-  _options: MaybeRef<UseCxStyleOptions['options']>,
-  _optionsUnified?: MaybeRef<UseCxStyleOptions['options']>
-) => (_opts: UseCxStyleOptions) => {
-  const useHooks = genUseHooks()
-  const version = useSemanticVersion('0.0.1')
-  const opts = Object.assign({
-    initValue: '',
-    onChange: undefined
-  }, _opts || {})
+const genUseCxStyleUnified =
+  (
+    _options: MaybeRef<UseCxStyleOptions['options']>,
+    _optionsUnified?: MaybeRef<UseCxStyleOptions['options']>,
+  ) =>
+  (_opts: UseCxStyleOptions) => {
+    const useHooks = genUseHooks()
+    const version = useSemanticVersion('0.0.1')
+    const opts = Object.assign(
+      {
+        initValue: '',
+        onChange: undefined,
+      },
+      _opts || {},
+    )
 
-  // 是否统一设置所有值
-  const isSetAll = ref(true)
+    // 是否统一设置所有值
+    const isSetAll = ref(true)
 
-  const optionsUnUnified = computed(() => CSSDefaultValue.concat(unref(_options).concat(_opts.options || [])))
-  const optionsUnified = computed(() => {
-    return _optionsUnified
-      ? CSSDefaultValue.concat(unref(_optionsUnified).concat(_opts.options || []))
-      : unref(optionsUnUnified)
-  })
-  const options = computed(() => {
-    return isSetAll.value
-      ? unref(optionsUnified)
-      : unref(optionsUnUnified)
-  })
+    const optionsUnUnified = computed(() =>
+      CSSDefaultValue.concat(unref(_options)!.concat(_opts.options || [])),
+    )
+    const optionsUnified = computed(() => {
+      return _optionsUnified
+        ? CSSDefaultValue.concat(unref(_optionsUnified)!.concat(_opts.options || []))
+        : unref(optionsUnUnified)
+    })
+    const options = computed(() => {
+      return isSetAll.value ? unref(optionsUnified) : unref(optionsUnUnified)
+    })
 
-  const [_t, r, b, l] = [ref(''), ref(''), ref(''), ref('')]
-  const t = computed({
-    get() {
-      return unref(_t)
-    },
-    set(x: string) {
-      _t.value = x
-      if (unref(isSetAll)) {
-        r.value = x
-        b.value = x
-        l.value = x
+    const [_t, r, b, l] = [ref(''), ref(''), ref(''), ref('')]
+    const t = computed({
+      get() {
+        return unref(_t)
+      },
+      set(x: string) {
+        _t.value = x
+        if (unref(isSetAll)) {
+          r.value = x
+          b.value = x
+          l.value = x
+        }
+      },
+    })
+    const values = computed({
+      get() {
+        return [unref(_t), unref(r), unref(b), unref(l)]
+      },
+      set(x: string[]) {
+        _t.value = x[0]!
+        r.value = x[1]!
+        b.value = x[2]!
+        l.value = x[3]!
+      },
+    })
+
+    const touch = (x: any) => unref(x)
+    touch(values)
+
+    const isEnabled = ref(true)
+    const toggleEnable = useHooks(() => (isEnabled.value = !isEnabled.value))
+
+    const isConfigured = computed(() => {
+      return values.value.map((x) => unref(x) !== '').filter(Boolean).length > 0
+    })
+
+    const getIDX = (x: Ref<string>) => options.value.findIndex((y) => y.value === unref(x))
+    const getZipValue = () => `${getIDX(_t)}/${getIDX(r)}/${getIDX(l)}/${getIDX(b)}`
+    const unzipValue = (s: string) => {
+      const [tl, tr, br, bl] = s
+        .split('/')
+        .concat(['', '', '', ''])
+        .slice(0, 4)
+        .map((x) => options.value[Number(x)]?.value || '') as [string, string, string, string]
+      _t.value = tl
+      r.value = tr
+      l.value = br
+      b.value = bl
+      // console.log('[debug] unzipValue', tl, tr, br, bl)
+      if (tl) {
+        if (tl === tr && tr === br && br === bl) {
+          isSetAll.value = true
+        } else {
+          isSetAll.value = false
+        }
       }
     }
-  })
-  const values = computed({
-    get() {
-      return [unref(_t), unref(r), unref(b), unref(l)]
-    },
-    set(x: string[]) {
-      _t.value = x[0]
-      r.value = x[1]
-      b.value = x[2]
-      l.value = x[3]
-    }
-  })
 
-  const touch = x => unref(x)
-  touch(values)
-
-  const isEnabled = ref(true)
-  const toggleEnable = useHooks(() => isEnabled.value = !isEnabled.value)
-
-  const isConfigured = computed(() => {
-    return values.value.map(x => unref(x) !== '').filter(Boolean).length > 0
-  })
-
-  const getIDX = (x: Ref<string>) => options.value.findIndex(y => y.value === unref(x))
-  const getZipValue = () => `${getIDX(_t)}/${getIDX(r)}/${getIDX(l)}/${getIDX(b)}`
-  const unzipValue = (s: string) => {
-    const [tl, tr, br, bl] = s
-      .split('/')
-      .concat(['', '', '', ''])
-      .slice(0, 4)
-      .map(x => options.value[Number(x)].value || '')
-    _t.value = tl
-    r.value = tr
-    l.value = br
-    b.value = bl
-    // console.log('[debug] unzipValue', tl, tr, br, bl)
-    if (tl) {
-      if (tl === tr && tr === br && br === bl) {
-        isSetAll.value = true
+    const toggleSetAll = () => {
+      if (!isEnabled.value) {
+        return false
       } else {
-        isSetAll.value = false
+        isSetAll.value = !isSetAll.value
       }
+      const x = Number(_t.value) >= 0 && _t.value ? _t.value : ''
+      values.value = [x, x, x, x]
     }
-  }
 
-  const toggleSetAll = () => {
-    if (!isEnabled.value) {
-      return false
-    } else {
-      isSetAll.value = !isSetAll.value
+    const isInited = ref(false)
+    const init = (x: string = '') => {
+      unzipValue(x)
+      isEnabled.value = has(x)
+      isInited.value = true
     }
-    const x = (Number(_t.value) >= 0 && _t.value) ? _t.value : ''
-    values.value = [x, x, x, x]
-  }
 
-  const isInited = ref(false)
-  const init = (x: string = '') => {
-    unzipValue(x)
-    isEnabled.value = has(x)
-    isInited.value = true
-  }
-
-  if (Object.keys(opts).includes('initValue')) {
-    init(opts.initValue)
-  }
-
-  const reset = () => {
-    init('')
-    isInited.value = false
-  }
-  whenever(() => !isEnabled.value, reset)
-
-  const onChangeFn = ref(opts.onChange)
-  const onChange = (fn: (x: string) => void) => onChangeFn.value = fn
-  // todo perf when onChangeFn is not null
-  watch(
-    values,
-    () => {
-      if (isFunction(unref(onChangeFn))) {
-        onChangeFn.value(getZipValue())
-      }
-    }, {
-      deep: true
+    if (Object.keys(opts).includes('initValue')) {
+      init(opts.initValue)
     }
-  )
 
-  const states = {
-    version,
-    isEnabled,
-    toggleEnable,
-    options,
-    top: t,
-    right: r,
-    bottom: b,
-    left: l,
-    values,
-    isConfigured,
-    getZipValue,
-    unzipValue,
-    isSetAll,
-    init,
-    reset,
-    isInited,
-    toggleSetAll,
-    onChange
-  } as const
+    const reset = () => {
+      init('')
+      isInited.value = false
+    }
+    whenever(() => !isEnabled.value, reset)
 
-  return states
-}
+    const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+    const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
+    // todo perf when onChangeFn is not null
+    watch(
+      values,
+      () => {
+        if (isFunction(unref(onChangeFn))) {
+          onChangeFn.value!(getZipValue())
+        }
+      },
+      {
+        deep: true,
+      },
+    )
+
+    const states = {
+      version,
+      isEnabled,
+      toggleEnable,
+      options,
+      top: t,
+      right: r,
+      bottom: b,
+      left: l,
+      values,
+      isConfigured,
+      getZipValue,
+      unzipValue,
+      isSetAll,
+      init,
+      reset,
+      isInited,
+      toggleSetAll,
+      onChange,
+    } as const
+
+    return states
+  }
 export const useCxStyleRound = (_opts: UseCxStyleOptions) => {
-  return genUseCxStyleUnified(
-    roundOptions,
-    roundOptions.concat([circleOption])
-  )(_opts)
+  return genUseCxStyleUnified(roundOptions, roundOptions.concat([circleOption]))(_opts)
 }
 export const useCxStyleBorder = (_opts: UseCxStyleOptions) => {
   return genUseCxStyleUnified([
     { value: '0', label: '无' },
     { value: '1', label: '细' },
     { value: '2', label: '中' },
-    { value: '4', label: '粗' }
+    { value: '4', label: '粗' },
   ])(_opts)
 }
 
 const SpacingValues = [0, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32, 40, 48, 56, 64]
 const WHValues = [
-  '0.5', '1', '2', '3', '4', '5', '6', '8', '10', '12', '16', '20', '24', '32', '40', '48', '56', '64',
-  '1/2', '1/3', '2/3', '1/4', '2/4', '3/4', '1/5', '2/5', '3/5', '4/5', '1/6', '2/6', '3/6', '4/6', '5/6',
-  '1/12', '2/12', '3/12', '4/12', '5/12', '6/12', '7/12', '8/12', '9/12', '10/12', '11/12'
+  '0.5',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '8',
+  '10',
+  '12',
+  '16',
+  '20',
+  '24',
+  '32',
+  '40',
+  '48',
+  '56',
+  '64',
+  '1/2',
+  '1/3',
+  '2/3',
+  '1/4',
+  '2/4',
+  '3/4',
+  '1/5',
+  '2/5',
+  '3/5',
+  '4/5',
+  '1/6',
+  '2/6',
+  '3/6',
+  '4/6',
+  '5/6',
+  '1/12',
+  '2/12',
+  '3/12',
+  '4/12',
+  '5/12',
+  '6/12',
+  '7/12',
+  '8/12',
+  '9/12',
+  '10/12',
+  '11/12',
 ]
 
 /**
@@ -210,32 +260,61 @@ const WHValues = [
 export const useCxStyleBox = (_opts: UseCxStyleOptions) => {
   const useHooks = genUseHooks()
   const version = useSemanticVersion('0.0.1')
-  const opts = Object.assign({
-    initValue: '',
-    onChange: undefined
-  }, _opts || {})
+  const opts = Object.assign(
+    {
+      initValue: '',
+      onChange: undefined,
+    },
+    _opts || {},
+  )
 
-  const options = CSSDefaultValue.concat([
-    { value: '0', label: '无' },
-    { value: 'px', label: '像素' },
-    { value: '%', label: '百分比' },
-    { value: 'auto', label: '适应' },
-    { value: 'vw', label: '屏幕宽度' },
-    { value: 'vh', label: '屏幕高度' }
-  ].concat(
-    WHValues.map(x => ({
-      value: x.toString(),
-      label: `${x} size`
-    }))
-  ))
+  const options = CSSDefaultValue.concat(
+    [
+      { value: '0', label: '无' },
+      { value: 'px', label: '像素' },
+      { value: '%', label: '百分比' },
+      { value: 'auto', label: '适应' },
+      { value: 'vw', label: '屏幕宽度' },
+      { value: 'vh', label: '屏幕高度' },
+    ].concat(
+      WHValues.map((x) => ({
+        value: x.toString(),
+        label: `${x} size`,
+      })),
+    ),
+  )
 
-  const [w, minW, maxW, wMeter, minWMeter, maxWMeter] = [ref(''), ref(''), ref(''), ref(''), ref(''), ref('')]
-  const [h, minH, maxH, hMeter, minHMeter, maxHMeter] = [ref(''), ref(''), ref(''), ref(''), ref(''), ref('')]
+  const [w, minW, maxW, wMeter, minWMeter, maxWMeter] = [
+    ref(''),
+    ref(''),
+    ref(''),
+    ref(''),
+    ref(''),
+    ref(''),
+  ]
+  const [h, minH, maxH, hMeter, minHMeter, maxHMeter] = [
+    ref(''),
+    ref(''),
+    ref(''),
+    ref(''),
+    ref(''),
+    ref(''),
+  ]
   const values = computed({
     get() {
       return [
-        unref(w), unref(minW), unref(maxW), unref(wMeter), unref(minWMeter), unref(maxWMeter),
-        unref(h), unref(minH), unref(maxH), unref(hMeter), unref(minHMeter), unref(maxHMeter)
+        unref(w),
+        unref(minW),
+        unref(maxW),
+        unref(wMeter),
+        unref(minWMeter),
+        unref(maxWMeter),
+        unref(h),
+        unref(minH),
+        unref(maxH),
+        unref(hMeter),
+        unref(minHMeter),
+        unref(maxHMeter),
       ]
     },
     set(x: string[]) {
@@ -251,7 +330,7 @@ export const useCxStyleBox = (_opts: UseCxStyleOptions) => {
       hMeter.value = x[9] || ''
       minHMeter.value = x[10] || ''
       maxHMeter.value = x[11] || ''
-    }
+    },
   })
 
   // 判断该单位是否需要配合数值使用
@@ -274,15 +353,15 @@ export const useCxStyleBox = (_opts: UseCxStyleOptions) => {
   watchEffect(() => !isFreeSetMaxH.value && (maxH.value = ''))
 
   const isEnabled = ref(true)
-  const toggleEnable = useHooks(() => isEnabled.value = !isEnabled.value)
+  const toggleEnable = useHooks(() => (isEnabled.value = !isEnabled.value))
 
   const isEnabledMinWidth = computed({
     get: () => isMeterFreeSetting(unref(wMeter)),
-    set: mw => !mw && (minW.value = '')
+    set: (mw) => !mw && (minW.value = ''),
   })
   const isEnabledMaxWidth = computed({
     get: () => isMeterFreeSetting(unref(wMeter)),
-    set: mw => !mw && (maxW.value = '')
+    set: (mw) => !mw && (maxW.value = ''),
   })
   const toggleEnableMinMaxWidth = useHooks(() => {
     isEnabledMinWidth.value = !isEnabledMinWidth.value
@@ -291,11 +370,11 @@ export const useCxStyleBox = (_opts: UseCxStyleOptions) => {
 
   const isEnabledMinHeight = computed({
     get: () => isMeterFreeSetting(unref(hMeter)),
-    set: mw => !mw && (minH.value = '')
+    set: (mw) => !mw && (minH.value = ''),
   })
   const isEnabledMaxHeight = computed({
     get: () => isMeterFreeSetting(unref(hMeter)),
-    set: mw => !mw && (maxH.value = '')
+    set: (mw) => !mw && (maxH.value = ''),
   })
   const toggleEnableMinMaxHeight = useHooks(() => {
     isEnabledMinHeight.value = !isEnabledMinHeight.value
@@ -303,30 +382,37 @@ export const useCxStyleBox = (_opts: UseCxStyleOptions) => {
   })
 
   const isConfigured = computed(() => {
-    return values.value.map(x => unref(x) !== '').filter(Boolean).length > 0
+    return values.value.map((x) => unref(x) !== '').filter(Boolean).length > 0
   })
 
   const getZipValue = () => {
-    const wMeterIDX = options.findIndex(x => x.value === unref(wMeter))
-    const hMeterIDX = options.findIndex(x => x.value === unref(hMeter))
-    const minWMeterIDX = options.findIndex(x => x.value === unref(minWMeter))
-    const maxWMeterIDX = options.findIndex(x => x.value === unref(maxWMeter))
-    const minHMeterIDX = options.findIndex(x => x.value === unref(minHMeter))
-    const maxHMeterIDX = options.findIndex(x => x.value === unref(maxHMeter))
+    const wMeterIDX = options.findIndex((x) => x.value === unref(wMeter))
+    const hMeterIDX = options.findIndex((x) => x.value === unref(hMeter))
+    const minWMeterIDX = options.findIndex((x) => x.value === unref(minWMeter))
+    const maxWMeterIDX = options.findIndex((x) => x.value === unref(maxWMeter))
+    const minHMeterIDX = options.findIndex((x) => x.value === unref(minHMeter))
+    const maxHMeterIDX = options.findIndex((x) => x.value === unref(maxHMeter))
     return `${w.value}/${minW.value}/${maxW.value}/${wMeterIDX}/${minWMeterIDX}/${maxWMeterIDX}/${h.value}/${minH.value}/${maxH.value}/${hMeterIDX}/${minHMeterIDX}/${maxHMeterIDX}`
   }
   const unzipValue = (s: string) => {
-    const [
-      w1, w2, w3, w4, w5, w6,
-      h1, h2, h3, h4, h5, h6
-    ] = s
+    const [w1, w2, w3, w4, w5, w6, h1, h2, h3, h4, h5, h6] = s
       .split('/')
-      .concat([
-        '', '', '', '', '', '',
-        '', '', '', '', '', ''
-      ])
+      .concat(['', '', '', '', '', '', '', '', '', '', '', ''])
       .slice(0, 12)
-      .map(x => x || '')
+      .map((x) => x || '') as [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ]
     w.value = w1
     minW.value = w2
     maxW.value = w3
@@ -362,18 +448,19 @@ export const useCxStyleBox = (_opts: UseCxStyleOptions) => {
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref(opts.onChange)
-  const onChange = (fn: (x: string) => void) => onChangeFn.value = fn
+  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+  const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
     values,
     () => {
       if (isFunction(unref(onChangeFn))) {
-        onChangeFn.value(getZipValue())
+        onChangeFn.value!(getZipValue())
       }
-    }, {
-      deep: true
-    }
+    },
+    {
+      deep: true,
+    },
   )
 
   const states = {
@@ -412,7 +499,7 @@ export const useCxStyleBox = (_opts: UseCxStyleOptions) => {
     init,
     reset,
     isInited,
-    onChange
+    onChange,
   } as const
 
   return states
@@ -424,20 +511,25 @@ export const useCxStyleBox = (_opts: UseCxStyleOptions) => {
 export const useCxStyleSpacing = (_opts: UseCxStyleOptions) => {
   const useHooks = genUseHooks()
   const version = useSemanticVersion('0.0.1')
-  const opts = Object.assign({
-    initValue: '',
-    onChange: undefined
-  }, _opts || {})
+  const opts = Object.assign(
+    {
+      initValue: '',
+      onChange: undefined,
+    },
+    _opts || {},
+  )
 
-  const options = CSSDefaultValue.concat([
-    { value: '0', label: '无' },
-    { value: '1px', label: '1px' }
-  ].concat(
-    SpacingValues.map(x => ({
-      value: x.toString(),
-      label: `${x} size`
-    }))
-  ))
+  const options = CSSDefaultValue.concat(
+    [
+      { value: '0', label: '无' },
+      { value: '1px', label: '1px' },
+    ].concat(
+      SpacingValues.map((x) => ({
+        value: x.toString(),
+        label: `${x} size`,
+      })),
+    ),
+  )
 
   const [top, right, bottom, left] = [ref(''), ref(''), ref(''), ref('')]
   const values = computed({
@@ -448,18 +540,18 @@ export const useCxStyleSpacing = (_opts: UseCxStyleOptions) => {
       if (isString(x)) {
         x = [x, x, x, x]
       }
-      top.value = x[0]
-      right.value = x[1]
-      bottom.value = x[2]
-      left.value = x[3]
-    }
+      top.value = x[0]!
+      right.value = x[1]!
+      bottom.value = x[2]!
+      left.value = x[3]!
+    },
   })
 
   const isEnabled = ref(true)
-  const toggleEnable = useHooks(() => isEnabled.value = !isEnabled.value)
+  const toggleEnable = useHooks(() => (isEnabled.value = !isEnabled.value))
 
   const isConfigured = computed(() => {
-    return values.value.map(x => unref(x) !== '').filter(Boolean).length > 0
+    return values.value.map((x) => unref(x) !== '').filter(Boolean).length > 0
   })
 
   const getZipValue = () => {
@@ -470,7 +562,20 @@ export const useCxStyleSpacing = (_opts: UseCxStyleOptions) => {
       .split('/')
       .concat(['', '', '', ''])
       .slice(0, 4)
-      .map(x => x || '')
+      .map((x) => x || '') as [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ]
     top.value = t
     right.value = r
     bottom.value = d
@@ -494,18 +599,19 @@ export const useCxStyleSpacing = (_opts: UseCxStyleOptions) => {
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref(opts.onChange)
-  const onChange = (fn: (x: string) => void) => onChangeFn.value = fn
+  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+  const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
     values,
     () => {
       if (isFunction(unref(onChangeFn))) {
-        onChangeFn.value(getZipValue())
+        onChangeFn.value!(getZipValue())
       }
-    }, {
-      deep: true
-    }
+    },
+    {
+      deep: true,
+    },
   )
 
   const states = {
@@ -524,7 +630,7 @@ export const useCxStyleSpacing = (_opts: UseCxStyleOptions) => {
     init,
     reset,
     isInited,
-    onChange
+    onChange,
   } as const
 
   return states
@@ -542,35 +648,38 @@ export const useCxStylePadding = (_opts: UseCxStyleOptions) => {
 export const useCxStyleLayout = (_opts: UseCxStyleOptions) => {
   const useHooks = genUseHooks()
   const version = useSemanticVersion('0.0.1')
-  const opts = Object.assign({
-    initValue: '',
-    onChange: undefined
-  }, _opts || {})
+  const opts = Object.assign(
+    {
+      initValue: '',
+      onChange: undefined,
+    },
+    _opts || {},
+  )
 
   const direction = ref('')
   const directionOptions = [
     {
       value: 'h',
-      label: '水平'
+      label: '水平',
     },
     {
       value: 'v',
-      label: '垂直'
+      label: '垂直',
     },
     {
       value: 'w',
-      label: '换行'
-    }
+      label: '换行',
+    },
   ]
 
   const [isReverse, toggleReverse] = useToggle<true | false | ''>('')
 
   const gap = ref('')
   const gapOptions = CSSDefaultValue.concat(
-    SpacingValues.map(x => ({
+    SpacingValues.map((x) => ({
       value: x.toString(),
-      label: `${x} size`
-    }))
+      label: `${x} size`,
+    })),
   )
 
   const align = ref('')
@@ -583,7 +692,7 @@ export const useCxStyleLayout = (_opts: UseCxStyleOptions) => {
     { value: 'cr', label: '右侧居中' },
     { value: 'bl', label: '左下对齐' },
     { value: 'bc', label: '底部居中' },
-    { value: 'br', label: '右下对齐' }
+    { value: 'br', label: '右下对齐' },
     // { value: 't', label: '顶部对齐' },
     // { value: 'c', label: '中间对齐' },
     // { value: 'b', label: '底部对齐' },
@@ -614,7 +723,7 @@ export const useCxStyleLayout = (_opts: UseCxStyleOptions) => {
         unref(gap),
         unref(isFull),
         unref(isReverse),
-        unref(isStretch)
+        unref(isStretch),
       ]
     },
     set(x: [string, string, string, '' | boolean, '' | boolean, '' | boolean]) {
@@ -624,14 +733,14 @@ export const useCxStyleLayout = (_opts: UseCxStyleOptions) => {
       isFull.value = Boolean(x[3])
       isReverse.value = Boolean(x[4])
       isStretch.value = Boolean(x[5])
-    }
+    },
   })
 
   const isEnabled = ref(true)
-  const toggleEnable = useHooks(() => isEnabled.value = !isEnabled.value)
+  const toggleEnable = useHooks(() => (isEnabled.value = !isEnabled.value))
 
   const isConfigured = computed(() => {
-    return values.value.map(x => unref(x) !== '').filter(Boolean).length > 0
+    return values.value.map((x) => unref(x) !== '').filter(Boolean).length > 0
   })
 
   const getZipValue = () => {
@@ -642,7 +751,20 @@ export const useCxStyleLayout = (_opts: UseCxStyleOptions) => {
       .split('/')
       .concat(['', '', '', '', '', ''])
       .slice(0, 6)
-      .map(x => x || '')
+      .map((x) => x || '') as [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ]
     direction.value = d
     align.value = a
     gap.value = g
@@ -668,18 +790,19 @@ export const useCxStyleLayout = (_opts: UseCxStyleOptions) => {
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref(opts.onChange)
-  const onChange = (fn: (x: string) => void) => onChangeFn.value = fn
+  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+  const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
     values,
     () => {
       if (isFunction(unref(onChangeFn))) {
-        onChangeFn.value(getZipValue())
+        onChangeFn.value!(getZipValue())
       }
-    }, {
-      deep: true
-    }
+    },
+    {
+      deep: true,
+    },
   )
 
   const states = {
@@ -705,7 +828,7 @@ export const useCxStyleLayout = (_opts: UseCxStyleOptions) => {
     init,
     reset,
     isInited,
-    onChange
+    onChange,
   } as const
 
   return states
@@ -719,24 +842,27 @@ const LineHeightValues = [3, 4, 5, 6, 7, 8, 9, 10]
 export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
   const useHooks = genUseHooks()
   const version = useSemanticVersion('0.0.1')
-  const opts = Object.assign({
-    initValue: '',
-    onChange: undefined
-  }, _opts || {})
+  const opts = Object.assign(
+    {
+      initValue: '',
+      onChange: undefined,
+    },
+    _opts || {},
+  )
 
   const align = ref<'' | 'left' | 'center' | 'right'>('')
   const alignOptions = CSSDefaultValue.concat([
     { value: 'left', label: '左对齐' },
     { value: 'center', label: '居中' },
-    { value: 'right', label: '右对齐' }
+    { value: 'right', label: '右对齐' },
   ])
 
   const lineHeight = ref('')
   const lineHeightOptions = CSSDefaultValue.concat(
-    LineHeightValues.map(x => ({
+    LineHeightValues.map((x) => ({
       value: x.toString(),
-      label: `${x} size`
-    }))
+      label: `${x} size`,
+    })),
   )
 
   const size = ref('')
@@ -752,7 +878,7 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
     { value: '5xl', label: '超大5' },
     { value: '6xl', label: '超大6' },
     { value: '7xl', label: '超大7' },
-    { value: '8xl', label: '超大8' }
+    { value: '8xl', label: '超大8' },
   ])
 
   const weight = ref<'' | 'light' | 'regular' | 'medium' | 'bold'>('')
@@ -760,14 +886,14 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
     { value: 'normal', label: '正常' },
     { value: 'light', label: '细' },
     { value: 'medium', label: '中等' },
-    { value: 'bold', label: '粗' }
+    { value: 'bold', label: '粗' },
   ])
 
   const cosm = ref<'' | 'normal' | 'italic' | 'oblique'>('')
   const cosmOptions = CSSDefaultValue.concat([
     { value: 'normal', label: '正常' },
     { value: 'italic', label: '斜体' },
-    { value: 'oblique', label: '强制斜体' }
+    { value: 'oblique', label: '强制斜体' },
   ])
 
   /**
@@ -780,14 +906,14 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
     subsets: string[]
   }[]
   const familySubsets = computed(() => {
-    return familyOptions.find(x => x.value === unref(family))
+    return familyOptions.find((x) => x.value === unref(family))
   })
 
   const familySubset = ref('')
-  const isEnableFamilySubset = computed(() => familySubsets.value?.subsets?.length > 0)
+  const isEnableFamilySubset = computed(() => (familySubsets.value?.subsets?.length ?? 0) > 0)
   const familySubsetOptions = computed(() => {
-    return familySubsets.value?.subsets?.length > 0
-      ? familySubsets.value.subsets.map(x => ({ value: x, label: x }))
+    return (familySubsets.value?.subsets?.length ?? 0) > 0
+      ? familySubsets.value!.subsets!.map((x) => ({ value: x, label: x }))
       : []
   })
   watchEffect(() => {
@@ -805,7 +931,7 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
         unref(weight),
         unref(cosm),
         unref(family),
-        unref(familySubset)
+        unref(familySubset),
       ]
     },
     set(x: [string, string, string, string, string, string, string]) {
@@ -816,14 +942,14 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
       cosm.value = x[4] as any
       family.value = x[5]
       familySubset.value = x[6]
-    }
+    },
   })
 
   const isEnabled = ref(true)
-  const toggleEnable = useHooks(() => isEnabled.value = !isEnabled.value)
+  const toggleEnable = useHooks(() => (isEnabled.value = !isEnabled.value))
 
   const isConfigured = computed(() => {
-    return values.value.map(x => unref(x) !== '').filter(Boolean).length > 0
+    return values.value.map((x) => unref(x) !== '').filter(Boolean).length > 0
   })
 
   const getZipValue = () => {
@@ -834,7 +960,20 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
       .split('/')
       .concat(['', '', '', '', '', '', '', ''])
       .slice(0, 7)
-      .map(x => x || '')
+      .map((x) => x || '') as [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ]
     lineHeight.value = l
     align.value = a as any
     size.value = s
@@ -861,18 +1000,19 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref(opts.onChange)
-  const onChange = (fn: (x: string) => void) => onChangeFn.value = fn
+  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+  const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
     values,
     () => {
       if (isFunction(unref(onChangeFn))) {
-        onChangeFn.value(getZipValue())
+        onChangeFn.value!(getZipValue())
       }
-    }, {
-      deep: true
-    }
+    },
+    {
+      deep: true,
+    },
   )
 
   const states = {
@@ -902,7 +1042,7 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
     init,
     reset,
     isInited,
-    onChange
+    onChange,
   } as const
 
   return states
@@ -914,14 +1054,17 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
 export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) => {
   const useHooks = genUseHooks()
   const version = useSemanticVersion('0.0.1')
-  const opts = Object.assign({
-    initValue: '',
-    onChange: undefined
-  }, _opts || {})
+  const opts = Object.assign(
+    {
+      initValue: '',
+      onChange: undefined,
+    },
+    _opts || {},
+  )
 
   const bgType = ref('')
   const bgTypeOptions = CSSDefaultValue.concat([
-    { value: 'color', label: '颜色' }
+    { value: 'color', label: '颜色' },
     // { value: 'gradient', label: '渐变' },
     // { value: 'image', label: '图片' },
   ])
@@ -934,13 +1077,13 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
   }[]
 
   const bgColorStrengths = computed(() => {
-    return bgColorNameOptions.find(x => x.value === unref(bgColorName))?.strength || []
+    return bgColorNameOptions.find((x) => x.value === unref(bgColorName))?.strength || []
   })
   const bgColorStrength = ref('')
   const bgColorStrengthOptions = computed(() => {
-    return bgColorStrengths.value.map(x => ({
+    return bgColorStrengths.value.map((x) => ({
       value: x,
-      label: x
+      label: x,
     }))
   })
   watchEffect(() => {
@@ -950,15 +1093,14 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
   })
 
   const opacity = ref('')
-  const opacityOptions = CSSDefaultValue.concat([
-    { value: '0', label: '透明' }
-  ].concat(
-    [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
-      .map(x => ({
+  const opacityOptions = CSSDefaultValue.concat(
+    [{ value: '0', label: '透明' }].concat(
+      [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100].map((x) => ({
         value: x.toString(),
-        label: `${x}%`
-      }))
-  ))
+        label: `${x}%`,
+      })),
+    ),
+  )
 
   // const shadow = ref('')
   // const shadowOptions = CSSDefaultValue.concat([
@@ -970,7 +1112,7 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
     { value: 'text', label: '文本' },
     { value: 'move', label: '移动' },
     { value: 'not-allowed', label: '不允许' },
-    { value: 'help', label: '帮助' }
+    { value: 'help', label: '帮助' },
   ])
 
   const filter = ref('')
@@ -984,7 +1126,7 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
     { value: 'invert', label: '反色' },
     { value: 'opacity', label: '透明度' },
     { value: 'saturate', label: '饱和度' },
-    { value: 'sepia', label: '深褐色' }
+    { value: 'sepia', label: '深褐色' },
   ])
 
   const values = computed({
@@ -993,34 +1135,35 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
         b: [unref(bgType), unref(bgColorName), unref(bgColorStrength)],
         o: unref(opacity),
         c: unref(cursor),
-        f: unref(filter)
+        f: unref(filter),
       }
     },
-    set(x: { b: [string, string, string], o: string, c: string, f: string }) {
+    set(x: { b: [string, string, string]; o: string; c: string; f: string }) {
       bgType.value = x.b?.[0] || ''
       bgColorName.value = x.b?.[1] || ''
       bgColorStrength.value = x.b?.[2] || ''
       opacity.value = x.o || ''
       cursor.value = x.c || ''
       filter.value = x.f || ''
-    }
+    },
   })
 
   const isEnabled = ref(true)
-  const toggleEnable = useHooks(() => isEnabled.value = !isEnabled.value)
+  const toggleEnable = useHooks(() => (isEnabled.value = !isEnabled.value))
 
   const isConfigured = computed(() => {
     const changed = []
     ;['o', 'c', 'f'].map((x) => {
-      if (values.value[x] !== '') {
+      if ((values.value as unknown as Record<string, string>)[x] !== '') {
         changed.push(x)
       }
     })
-    values.value.b && values.value.b.map((x) => {
-      if (x !== '') {
-        changed.push(x)
-      }
-    })
+    values.value.b &&
+      values.value.b.map((x) => {
+        if (x !== '') {
+          changed.push(x)
+        }
+      })
     return changed.length > 0
   })
 
@@ -1029,7 +1172,7 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
       b: [bgType.value || '', bgColorName.value || '', bgColorStrength.value || ''],
       o: opacity.value || '',
       c: cursor.value || '',
-      f: filter.value || ''
+      f: filter.value || '',
     }
   }
   const unzipValue = (_s: CxComponentStyle['c']) => {
@@ -1059,18 +1202,19 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref(opts.onChange)
-  const onChange = (fn: (x: string) => void) => onChangeFn.value = fn
+  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+  const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
     values,
     () => {
       if (isFunction(unref(onChangeFn))) {
-        onChangeFn.value(getZipValue())
+        onChangeFn.value!(getZipValue())
       }
-    }, {
-      deep: true
-    }
+    },
+    {
+      deep: true,
+    },
   )
 
   const states = {
@@ -1096,7 +1240,7 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
     init,
     reset,
     isInited,
-    onChange
+    onChange,
   } as const
 
   return states

@@ -1,5 +1,20 @@
 export const fontFamilyOptions = [
-  { value: 'Alibaba PuHuiTi', label: '阿里巴巴普惠体', subsets: ['Thin', 'Light', 'Regular', 'RegularL3', 'SemiBold', 'Medium', 'Bold', 'ExtraBold', 'Heavy', 'Black'] }
+  {
+    value: 'Alibaba PuHuiTi',
+    label: '阿里巴巴普惠体',
+    subsets: [
+      'Thin',
+      'Light',
+      'Regular',
+      'RegularL3',
+      'SemiBold',
+      'Medium',
+      'Bold',
+      'ExtraBold',
+      'Heavy',
+      'Black',
+    ],
+  },
   // { value: 'Alimama ShuHeiTi', label: '阿里巴巴书黑体' },
   // { value: 'ZhanKu WenYiTI', label: '站酷文艺体' },
   // { value: 'SiYuan SongTi', label: '思源宋体' },
