@@ -1,0 +1,26 @@
+[
+  // Budibase 中的表格组件数据示例
+  {
+    "_id": "c9ee2f0f4f6284c64a667e8cc6eb77467",
+    "_component": "@budibase/standard-components/button",
+    "_styles": {
+      "normal": {},
+      "hover": {},
+      "active": {},
+      "selected": {},
+    },
+    "_instanceName": "",
+    "_children": [],
+    "onClick": [
+      {
+        "##eventHandlerType": "Navigate To",
+        "parameters": {
+          "type": "url",
+          "url": "/employees/new",
+        },
+      },
+    ],
+    "text": "Create row",
+    "type": "cta",
+  },
+]
