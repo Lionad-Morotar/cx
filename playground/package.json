@@ -3,6 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "nuxt dev --host"
+    "dev": "nuxt dev --host --port 3209"
+  },
+  "dependencies": {
+    "@lionad/cx-definition": "workspace:*",
+    "@lionad/cx-nuxt": "workspace:*",
+    "@lionad/cx-render": "workspace:*",
+    "@unhead/vue": "^3.1.8",
+    "nuxt": "^4.5.0",
+    "vue": "^3.5.40"
   }
 }

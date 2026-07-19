@@ -9,16 +9,35 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs"
-    }
+      "types": "./dist/types.d.mts",
+      "import": "./dist/module.mjs"
+    },
+    "./types": "./dist/types.d.mts"
   },
   "scripts": {
-    "build": "vp pack",
-    "typecheck": "tsgo --noEmit"
+    "build": "nuxt-module-build build",
+    "typecheck": "tsgo --noEmit",
+    "prepublishOnly": "nuxt-module-build build"
   },
   "publishConfig": {
     "access": "public"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "dependencies": {
+    "@lionad/cx-components": "workspace:*",
+    "@lionad/cx-components-nuxt-ui-v4": "workspace:*",
+    "@lionad/cx-definition": "workspace:*",
+    "@lionad/cx-render": "workspace:*",
+    "@lionad/cx-vue": "workspace:*"
+  },
+  "main": "./dist/module.mjs",
+  "types": "./dist/types.d.mts",
+  "devDependencies": {
+    "@nuxt/kit": "^4.5.0",
+    "@nuxt/module-builder": "^1.0.2",
+    "@nuxt/schema": "^4.5.0",
+    "nuxt": "^4.5.0",
+    "typescript": "^6.0.3",
+    "vue": "^3.5.40"
+  }
 }
