@@ -20,11 +20,9 @@ import { computed } from 'vue'
 import type { PropType } from 'vue'
 
 import { DatePicker as VCalendarDatePicker } from 'v-calendar'
-// @ts-ignore
-import type {
-  DatePickerDate,
-  DatePickerRangeObject,
-} from 'v-calendar/dist/types/src/use/datePicker'
+/** 原引用路径在 v-calendar@3 中不存在（幻影类型），按使用面本地定义 */
+type DatePickerDate = Date | string | number | null
+type DatePickerRangeObject = { start: DatePickerDate; end: DatePickerDate }
 import 'v-calendar/dist/style.css'
 
 defineOptions({
