@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "vp pack && vue-tsc -p tsconfig.build.json",
-    "typecheck": "vue-tsgo --tsdk ../../node_modules/typescript --noEmit"
+    "typecheck": "vue-tsgo --tsdk ../../node_modules/.pnpm/typescript@7.0.2/node_modules/typescript --noEmit"
   },
   "dependencies": {
     "@lionad/cx-definition": "workspace:*",

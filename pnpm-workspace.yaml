@@ -5,10 +5,12 @@ packages:
 overrides:
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vitest: 4.1.10
+  vue: 3.5.26
 
 onlyBuiltDependencies:
   - vue-demi
 
 allowBuilds:
   '@parcel/watcher': true
+  core-js: true
   vue-demi: true

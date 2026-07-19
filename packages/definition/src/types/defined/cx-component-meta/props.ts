@@ -63,8 +63,18 @@ export type CxPropBase = {
   type: string
   // 属性在组件中独一无二的标志
   key?: string
-  // 属性展示名称
-  name: string
+  // 属性展示名称（部分物料以 label 表达同一语义，二者至少其一）
+  name?: string
+  // 展示名别名（部分物料用 label 表达同一语义）
+  label?: string
+  // 选项型属性的选项集（结构随 type 而定）
+  options?: any
+  // 透传给被包装组件的 ui 覆盖配置
+  ui?: any
+  // 卡片选择器的预览标记
+  isPreview?: boolean
+  // 从 props/data 中挑选子集的映射函数
+  pickData?: AnyFn
   // 提示信息
   help?: CxGen<string>
   // 属性图标（目前在编辑面板中可能会被展示）
@@ -129,7 +139,8 @@ type RichtextProp = {
 type NumberProp = {
   type: 'number' | 'num' | 'range'
   min?: number | ((ctx: CxPropCTX) => number)
-  max?: number | ((ctx: CxPropCTX) => number)
+  // 缺省时由被包装组件决定上限（如进度条默认 100）
+  max?: number | ((ctx: CxPropCTX) => number | undefined)
   step?: number | ((ctx: CxPropCTX) => number)
 }
 
@@ -178,7 +189,7 @@ type FormilyProp = Record<string, any> & {
 
 /* --------------------------- prop card-selector --------------------------- */
 
-export type CxCardSelectorPropOption<OptionValue extends string | number = string> = {
+export type CxCardSelectorPropOption<OptionValue extends string | number = string | number> = {
   label: string
   description?: string
   value: OptionValue

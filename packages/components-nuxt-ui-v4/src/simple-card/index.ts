@@ -1,4 +1,4 @@
-import { normalize } from '@cx/definition'
+import { normalize } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
 export default normalize({

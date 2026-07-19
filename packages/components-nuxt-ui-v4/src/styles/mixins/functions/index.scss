@@ -1,0 +1,17 @@
+@mixin touchable() {
+  & {
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.92;
+    }
+    &:active {
+      opacity: 0.8;
+    }
+    .is-disabled {
+      opacity: 0.32;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+}

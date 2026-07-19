@@ -13,7 +13,7 @@ type UseCxReRenderOptions = {
 
 // popper 配置项变化时重新渲染，并使用空 div 做占位防回流，
 // 也许应该有 popper instance 的 API 可以直接调用？
-export const useCxReRender = <T extends MaybeRef<HTMLElement>>(
+export const useCxReRender = <T extends MaybeRef<HTMLElement | null>>(
   cmptRef: T,
   getter: WatchSource,
   opts: UseCxReRenderOptions = {},

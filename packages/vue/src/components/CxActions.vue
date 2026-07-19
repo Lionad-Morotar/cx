@@ -1,58 +1,79 @@
 <template>
   <!-- 动作按钮组（原为 p-ray p-actions 的 cx 轻量替代；u-button/u-separator 降级为原生元素） -->
   <div class="cx-actions">
-    <template v-for="(group, idx) in actions" :key="idx">
+    <template
+      v-for="(group, idx) in groupedActions"
+      :key="idx"
+    >
       <button
         v-for="button in group"
         :key="button.label"
         type="button"
         class="cx-actions__button"
-        @click="emits('click', button)"
+        @click="onClick($event, button)"
       >
         {{ button.label }}
       </button>
-      <span v-if="idx < actions.length - 1" class="cx-actions__separator" />
+      <span
+        v-if="idx < groupedActions.length - 1"
+        class="cx-actions__separator"
+      />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 /**
- * 兼容 dropdown-menu actions 字段的按钮组。
- * actions 为分组数组，组间渲染分隔符。
+ * 动作按钮组：兼容 dropdown-menu actions 字段（单组或分组数组，自动归一）。
+ * 原版为 p-ray 全局组件 p-actions；视觉差异：u-button/u-separator 降级为原生元素。
  */
 defineOptions({ name: 'CxActions' })
 
-withDefaults(
+const emits = defineEmits(['after-click', 'hover', 'unhover'])
+
+const props = withDefaults(
   defineProps<{
-    actions?: Array<Array<{ label: string; [key: string]: any }>>
+    actions?: any[]
   }>(),
-  { actions: () => [] },
+  { actions: () => [] }
 )
 
-const emits = defineEmits(['click'])
+const groupedActions = computed(() => {
+  const acts = props.actions
+  const isGroup = acts?.[0]?.[0]
+  const ret = isGroup ? acts : [acts]
+  return ret.filter((g: any) => g && g.length > 0)
+})
+
+// 先触发按钮自带 click，再广播 after-click（与原组件一致的执行序）
+const onClick = async ($event: MouseEvent, button: any) => {
+  await button?.click?.(button, $event)
+  emits('after-click', button, $event)
+}
 </script>
 
 <style scoped>
 .cx-actions {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  flex-direction: column;
 }
 .cx-actions__button {
-  padding: 2px 8px;
+  padding: 4px 8px;
   border: none;
   border-radius: 4px;
   background: transparent;
   font-size: 12px;
+  text-align: left;
   cursor: pointer;
 }
 .cx-actions__button:hover {
   background: #f3f4f6;
 }
 .cx-actions__separator {
-  width: 1px;
-  height: 14px;
+  height: 1px;
+  margin: 4px 0;
   background: #e5e7eb;
 }
 </style>

@@ -1,0 +1,36 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "types": [
+      "node"
+    ],
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "paths": {
+      "#imports": [
+        "./vendor/shims/imports.ts"
+      ],
+      "#build/app.config": [
+        "./vendor/shims/app.config.ts"
+      ],
+      "#ui-colors": [
+        "./vendor/shims/ui-colors.d.ts"
+      ],
+      "nuxt/schema": [
+        "./vendor/shims/nuxt-schema.d.ts"
+      ],
+      "#app": [
+        "./vendor/shims/imports.ts"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "vendor/**/*.ts",
+    "vendor/**/*.vue"
+  ]
+}
