@@ -32,7 +32,33 @@ pnpm gen:mocks        # 重新生成 mocks/data/*.json（以当日为锚，同�
 ```
 
 - 写操作（开会/结束/参会人/备忘/改标题/同步）走 server 内存态；**nitro 热重载或重启后重置为种子数据**
+- **重新生成数据后需重启 dev server 生效**：mock-store 的种子在首次访问时载入内存态，`pnpm gen:mocks` 只更新磁盘 JSON
 - 数据契约与再生成说明见 `mocks/README.md`
+
+### API 路由表（11 读 + 8 写 + 1 GET，统一 POST + 包络 `{code,message,success,data}`）
+
+| 端点 | 读写 | 用途 |
+| --- | --- | --- |
+| `/api/standup/list` | 读 | 会议列表（type 过滤） |
+| `/api/standup/detail` | 读 | 会议详情（participants 为 JSON 字符串） |
+| `/api/standup/sync-time` | 读 | 数据同步截止时间 |
+| `/api/standup/memo/get` | 读 | 个人备忘（不存在时返回非法 problem，前端自动 create 重试） |
+| `/api/issues/list` | 读 | 议题分页 |
+| `/api/issues/user-list` | 读 | 会议关联议题（date/assigneeUserName/initData 过滤） |
+| `/api/project/detail` | 读 | 项目详情（五角色展开） |
+| `/api/user/setting` | 读 | 用户设置（默认项目 ID） |
+| `/api/users` | 读 | 用户列表 |
+| `/api/labels` | 读 | 标签列表（含 19 个 stage 标签） |
+| `/api/gitlab-projects` | 读 | 仓库列表 |
+| `/api/standup/start` | 写 | 开会（可重复调用，复用进行中会议） |
+| `/api/standup/end` | 写 | 结束会议 |
+| `/api/standup/participants` | 写 | 更新参会人 |
+| `/api/standup/memo/create` | 写 | 创建备忘（同 assignee+meetingId 幂等） |
+| `/api/standup/memo/update` | 写 | 更新备忘（全量覆盖 problem） |
+| `/api/issues/sync` | 写 | 手动同步（刷新 syncTime） |
+| `/api/issues/title` | 写 | 行内改标题（name/title 双字段同步） |
+| `/api/project/select` | 写 | 设置默认项目 |
+| `/api/avatar/[seed]` | GET | 首字 SVG 头像（HSL 背景） |
 
 ## 目录结构
 
@@ -46,7 +72,7 @@ app/
 │   ├── states/ apis/ hooks/ utils/ styles/ assets/
 ├── app.vue                 # NuxtPage 壳
 ├── app.config.ts           # ui.colors 等 vendored 物料配置兜底
-server/api/                 # Mock 层路由（16 读 + 8 写 + avatar）
+server/api/                 # Mock 层路由（11 读 + 8 写 + 1 avatar GET，共 20 个）
 server/utils/mock-store.ts  # 种子加载 + 内存态写层
 mocks/data/                 # 生成产物（入库，开箱即用）
 scripts/generate-mocks.mjs  # 批量数据生成脚本
