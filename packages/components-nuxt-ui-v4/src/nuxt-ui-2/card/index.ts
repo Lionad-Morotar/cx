@@ -12,16 +12,16 @@ export default normalize({
     return [
       {
         key: 'default',
-        name: '卡片内容'
+        name: '卡片内容',
       },
       {
         key: 'header',
-        name: '卡片头部'
+        name: '卡片头部',
       },
       {
         key: 'footer',
-        name: '卡片底部'
-      }
+        name: '卡片底部',
+      },
     ].filter(Boolean)
-  }
+  },
 })

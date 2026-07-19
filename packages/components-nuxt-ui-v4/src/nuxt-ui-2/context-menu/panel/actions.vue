@@ -1,8 +1,5 @@
 <template>
-  <el-form
-    :model="value"
-    label-position="top"
-  >
+  <el-form :model="value" label-position="top">
     <template v-for="(group, gIDX) in value">
       <el-form-item class="item">
         <template #label>
@@ -20,15 +17,8 @@
       </el-form-item>
 
       <div class="sub-form">
-        <template
-          v-for="(item, iIDX) in group"
-          :key="`${gIDX}-${iIDX}-${item.id}`"
-        >
-          <el-form-item
-            :rules="itemLabelRule"
-            :prop="`${gIDX}.${iIDX}`"
-            class="item"
-          >
+        <template v-for="(item, iIDX) in group" :key="`${gIDX}-${iIDX}-${item.id}`">
+          <el-form-item :rules="itemLabelRule" :prop="`${gIDX}.${iIDX}`" class="item">
             <template #label>
               <div class="label">
                 <span>菜单名称</span>
@@ -42,20 +32,13 @@
             <el-input v-model="item.label" />
           </el-form-item>
         </template>
-        <el-button
-          class="mt-2 w-full text-center"
-          @click="() => addActionItem(gIDX)"
-        >
+        <el-button class="mt-2 w-full text-center" @click="() => addActionItem(gIDX)">
           添加菜单项
         </el-button>
       </div>
     </template>
 
-    <el-button
-      class="mt-4 w-full text-center"
-      type="primary"
-      @click="addGroup"
-    >
+    <el-button class="mt-4 w-full text-center" type="primary" @click="addGroup">
       添加菜单分组
     </el-button>
   </el-form>
@@ -74,11 +57,11 @@ const itemLabelRule = [
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { label } = item || {}
-      if (label.length <= 0) return cb(new Error(('请输入项目标题')))
-      if (label.length >= 20) return cb(new Error(('项目标题不能超过 20 个字符')))
+      if (label.length <= 0) return cb(new Error('请输入项目标题'))
+      if (label.length >= 20) return cb(new Error('项目标题不能超过 20 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 
 const addGroup = () => {
@@ -92,7 +75,7 @@ const addActionItem = (gIDX: number) => {
   const newItemName = `item-${((value.value as any[])?.length || 0) + 1}`
   const newItem = createItem({
     label: '新菜单项',
-    icon: 'i-tabler-menu'
+    icon: 'i-tabler-menu',
   })
   value.value[gIDX]!.push(newItem)
 }

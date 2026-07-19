@@ -14,19 +14,19 @@ export default normalize({
       isPreview: true,
       options: [
         { value: 1, label: '图片列表' },
-        { value: 2, label: '文字列表' }
+        { value: 2, label: '文字列表' },
       ],
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-5'
-      }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-5',
+      },
     },
     noAnimation: {
       type: 'boolean',
-      name: '关闭动画'
+      name: '关闭动画',
     },
     padded: {
       type: 'boolean',
-      name: '内边距'
-    }
-  }
+      name: '内边距',
+    },
+  },
 })

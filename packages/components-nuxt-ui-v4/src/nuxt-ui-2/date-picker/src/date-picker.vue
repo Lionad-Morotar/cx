@@ -21,19 +21,22 @@ import type { PropType } from 'vue'
 
 import { DatePicker as VCalendarDatePicker } from 'v-calendar'
 // @ts-ignore
-import type { DatePickerDate, DatePickerRangeObject } from 'v-calendar/dist/types/src/use/datePicker'
+import type {
+  DatePickerDate,
+  DatePickerRangeObject,
+} from 'v-calendar/dist/types/src/use/datePicker'
 import 'v-calendar/dist/style.css'
 
 defineOptions({
   name: 'CxDatePicker',
-  inheritAttrs: false
+  inheritAttrs: false,
 })
 
 const props = defineProps({
   modelValue: {
     type: [Date, Object] as PropType<DatePickerDate | DatePickerRangeObject | null>,
-    default: null
-  }
+    default: null,
+  },
 })
 
 const emit = defineEmits(['update:model-value', 'close'])
@@ -43,15 +46,15 @@ const date = computed({
   set: (value) => {
     emit('update:model-value', value)
     emit('close')
-  }
+  },
 })
 
 const attrs = {
-  'transparent': true,
-  'borderless': true,
-  'color': 'primary',
+  transparent: true,
+  borderless: true,
+  color: 'primary',
   'is-dark': { selector: 'html', darkClass: 'dark' },
-  'first-day-of-week': 2
+  'first-day-of-week': 2,
 }
 
 function onDayClick(_: any, event: MouseEvent) {
@@ -66,7 +69,6 @@ function onDayClick(_: any, event: MouseEvent) {
 $ns: 'cx';
 
 @layer cx {
-
   :root {
     --vc-neutral-50: rgb(var(--color-neutral-50));
     --vc-neutral-100: rgb(var(--color-neutral-100));

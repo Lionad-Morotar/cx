@@ -1,9 +1,6 @@
 <template>
   <template v-if="isReRendering">
-    <div
-      :class="ns.e('placeholder-box')"
-      :style="size"
-    />
+    <div :class="ns.e('placeholder-box')" :style="size" />
   </template>
   <UCarousel
     v-else
@@ -16,32 +13,15 @@
     @select="onSelect"
   >
     <template #default="{ item, index }">
-      <template
-        v-if="item"
-        :key="item?.id || item?.content"
-      >
-        <div
-          :class="ns.e('item')"
-          draggable="false"
-        >
-          <slot
-            v-if="showSlot('default')"
-            name="default"
-            v-bind="{ item, index }"
-          />
-          <CxEmptyImage
-            v-else
-            class="w-full h-40"
-          />
+      <template v-if="item" :key="item?.id || item?.content">
+        <div :class="ns.e('item')" draggable="false">
+          <slot v-if="showSlot('default')" name="default" v-bind="{ item, index }" />
+          <CxEmptyImage v-else class="w-full h-40" />
         </div>
       </template>
     </template>
     <template #prev="{ onClick, disabled }">
-      <slot
-        v-if="showSlot('prev')"
-        name="prev"
-        v-bind="{ onClick, disabled }"
-      />
+      <slot v-if="showSlot('prev')" name="prev" v-bind="{ onClick, disabled }" />
       <button
         v-else-if="has(props.arrow)"
         color="gray"
@@ -52,11 +32,7 @@
       />
     </template>
     <template #next="{ onClick, disabled }">
-      <slot
-        v-if="showSlot('next')"
-        name="next"
-        v-bind="{ onClick, disabled }"
-      />
+      <slot v-if="showSlot('next')" name="next" v-bind="{ onClick, disabled }" />
       <button
         v-else-if="has(props.arrow)"
         color="gray"
@@ -67,11 +43,7 @@
       />
     </template>
     <template #indicator="{ onClick, page, active }">
-      <slot
-        v-if="showSlot('indicator')"
-        name="indicator"
-        v-bind="{ onClick, page, active }"
-      />
+      <slot v-if="showSlot('indicator')" name="indicator" v-bind="{ onClick, page, active }" />
       <UButton
         v-else-if="has(props.indicators)"
         :label="String(page)"
@@ -90,13 +62,13 @@ import { twMerge as tm } from 'tailwind-merge'
 
 import { has } from '@lionad/cx-definition'
 
-import { useElementHover , useIntervalFn} from '@vueuse/core'
+import { useElementHover, useIntervalFn } from '@vueuse/core'
 
-import { useAttrs , useTemplateRef, computed, onBeforeUnmount} from 'vue'
+import { useAttrs, useTemplateRef, computed, onBeforeUnmount } from 'vue'
 
 import { UButton, UCarousel } from '../../../../vendor/bridge'
 
-import { useCxSlot, useCxReRender , useCxBEM, useMountedWatchImmediate} from '@lionad/cx-vue'
+import { useCxSlot, useCxReRender, useCxBEM, useMountedWatchImmediate } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
 defineOptions({ name: 'CxCarousel' })
@@ -124,25 +96,23 @@ const isHover = useElementHover(cmptRef)
 
 const ui = computed(() => {
   return {
-    wrapper: tm([
-      props.single ? 'w-64 mx-auto rounded-lg' : ''
-    ]),
+    wrapper: tm([props.single ? 'w-64 mx-auto rounded-lg' : '']),
     item: tm([
       props.snap === 'l' ? 'snap-start' : props.snap === 'r' ? 'snap-end' : 'snap-center',
-      props.size ? (props.size === '1' ? 'basis-full' : `basis-${props.size}`) : 'basis-full'
-    ])
+      props.size ? (props.size === '1' ? 'basis-full' : `basis-${props.size}`) : 'basis-full',
+    ]),
   }
 })
 
 const arrowProps = computed(() => {
   return {
-    arrows: has(props.arrow)
+    arrows: has(props.arrow),
   }
 })
 
 const indicatorProps = computed(() => {
   return {
-    indicators: has(props.indicators)
+    indicators: has(props.indicators),
   }
 })
 
@@ -164,7 +134,7 @@ useMountedWatchImmediate(
       return
     }
     interval.resume()
-  }
+  },
 )
 onBeforeUnmount(interval.pause)
 
@@ -181,7 +151,7 @@ defineExpose({
   page: computed(() => cmptRef.value?.page),
   prev: () => cmptRef.value?.prev(),
   next: () => cmptRef.value?.next(),
-  select: (page: number) => cmptRef.value?.select(page)
+  select: (page: number) => cmptRef.value?.select(page),
 })
 </script>
 

@@ -1,17 +1,7 @@
 <template>
-  <el-form
-    :model="value"
-    label-position="top"
-  >
-    <template
-      v-for="(group, gIDX) in value"
-      :key="`${gIDX}-${group.key}`"
-    >
-      <el-form-item
-        :rules="groupKeyRule"
-        :prop="`${gIDX}`"
-        class="item"
-      >
+  <el-form :model="value" label-position="top">
+    <template v-for="(group, gIDX) in value" :key="`${gIDX}-${group.key}`">
+      <el-form-item :rules="groupKeyRule" :prop="`${gIDX}`" class="item">
         <template #label>
           <div class="label">
             <span>分组标识</span>
@@ -26,11 +16,7 @@
         </template>
         <el-input v-model="group.key" />
       </el-form-item>
-      <el-form-item
-        :rule="groupLabelRule"
-        :prop="`${gIDX}`"
-        class="item"
-      >
+      <el-form-item :rule="groupLabelRule" :prop="`${gIDX}`" class="item">
         <template #label>
           <span>分组标题</span>
         </template>
@@ -38,15 +24,8 @@
       </el-form-item>
 
       <div class="sub-form">
-        <template
-          v-for="(item, iIDX) in group.commands"
-          :key="`${gIDX}-${iIDX}-${item.id}`"
-        >
-          <el-form-item
-            :rules="itemIDRule"
-            :prop="`${gIDX}.commands.${iIDX}`"
-            class="item"
-          >
+        <template v-for="(item, iIDX) in group.commands" :key="`${gIDX}-${iIDX}-${item.id}`">
+          <el-form-item :rules="itemIDRule" :prop="`${gIDX}.commands.${iIDX}`" class="item">
             <template #label>
               <div class="label">
                 <span>项目标识</span>
@@ -59,31 +38,20 @@
             </template>
             <el-input v-model="item.id" />
           </el-form-item>
-          <el-form-item
-            :rules="itemLabelRule"
-            :prop="`${gIDX}.commands.${iIDX}`"
-            class="item"
-          >
+          <el-form-item :rules="itemLabelRule" :prop="`${gIDX}.commands.${iIDX}`" class="item">
             <template #label>
               <span>项目标题</span>
             </template>
             <el-input v-model="item.label" />
           </el-form-item>
         </template>
-        <el-button
-          class="mt-2 w-full text-center"
-          @click="() => addItem(gIDX)"
-        >
+        <el-button class="mt-2 w-full text-center" @click="() => addItem(gIDX)">
           添加一项
         </el-button>
       </div>
     </template>
 
-    <el-button
-      class="mt-4 w-full text-center"
-      type="primary"
-      @click="addGroupItem"
-    >
+    <el-button class="mt-4 w-full text-center" type="primary" @click="addGroupItem">
       添加分组
     </el-button>
   </el-form>
@@ -102,44 +70,44 @@ const groupKeyRule = [
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { key } = item || {}
-      if (key.length <= 0) return cb(new Error(('请输入分组标识')))
-      if (key.length >= 32) return cb(new Error(('分组标识不能超过 32 个字符')))
+      if (key.length <= 0) return cb(new Error('请输入分组标识'))
+      if (key.length >= 32) return cb(new Error('分组标识不能超过 32 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 const groupLabelRule = [
   {
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { label } = item || {}
-      if (label.length <= 0) return cb(new Error(('请输入分组标题')))
-      if (label.length >= 50) return cb(new Error(('分组标题不能超过 50 个字符')))
+      if (label.length <= 0) return cb(new Error('请输入分组标题'))
+      if (label.length >= 50) return cb(new Error('分组标题不能超过 50 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 const itemIDRule = [
   {
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { id } = item || {}
-      if (id.length <= 0) return cb(new Error(('请输入标题')))
-      if (id.length >= 32) return cb(new Error(('标题不能超过 32 个字符')))
+      if (id.length <= 0) return cb(new Error('请输入标题'))
+      if (id.length >= 32) return cb(new Error('标题不能超过 32 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 const itemLabelRule = [
   {
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { label } = item || {}
-      if (label.length <= 0) return cb(new Error(('请输入项目标题')))
-      if (label.length >= 50) return cb(new Error(('项目标题不能超过 50 个字符')))
+      if (label.length <= 0) return cb(new Error('请输入项目标题'))
+      if (label.length >= 50) return cb(new Error('项目标题不能超过 50 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 
 const addGroupItem = () => {
@@ -150,9 +118,9 @@ const addGroupItem = () => {
     commands: [
       createItem({
         id: 'item-1',
-        label: '新项目'
-      })
-    ]
+        label: '新项目',
+      }),
+    ],
   })
   value.value.push(newItem)
 }
@@ -164,7 +132,7 @@ const deleteGroupItem = (idx: number) => {
 const addItem = (gIDX: number) => {
   const newItem = createItem({
     id: `item-${((value.value[gIDX]!.commands as any[])?.length || 0) + 1}`,
-    label: '新项目'
+    label: '新项目',
   })
   value.value[gIDX]!.commands.push(newItem)
 }

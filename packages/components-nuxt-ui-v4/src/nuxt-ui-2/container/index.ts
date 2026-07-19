@@ -12,8 +12,8 @@ export default normalize({
     return [
       {
         key: 'default',
-        name: '容器内'
-      }
+        name: '容器内',
+      },
     ].filter(Boolean)
-  }
+  },
 })

@@ -14,23 +14,16 @@
     @update:model-value="onSelect"
     @close="$emit('close')"
   >
-    <template
-      v-for="(_, name) in $slots"
-      #[name]="x"
-    >
-      <slot
-        v-if="showSlot(name)"
-        :name="(name as unknown as string)"
-        v-bind="x"
-      />
+    <template v-for="(_, name) in $slots" #[name]="x">
+      <slot v-if="showSlot(name)" :name="name as unknown as string" v-bind="x" />
     </template>
   </UCommandPalette>
 </template>
 
 <script setup lang="ts">
-import { useAttrs , computed, useTemplateRef, ref, watchEffect, unref} from 'vue'
+import { useAttrs, computed, useTemplateRef, ref, watchEffect, unref } from 'vue'
 
-import { useCxBEM , safeIcon} from '@lionad/cx-vue'
+import { useCxBEM, safeIcon } from '@lionad/cx-vue'
 
 import { UCommandPalette } from '../../../../vendor/bridge'
 
@@ -57,7 +50,7 @@ const showSlot = (name: string) => props.cmpt?.components?.[name]?.length
 const clearOpts = computed(() => {
   return (
     props.clear
-      ? ({ icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false })
+      ? { icon: 'i-heroicons-x-mark-20-solid', color: 'gray', variant: 'link', padded: false }
       : null
   ) as any
 })
@@ -78,8 +71,8 @@ const fuseOpts = computed(() => ({
   fuseOptions: {
     threshold: 0.1,
     includeMatches: true,
-    keys: ['title', 'description', 'keywords', 'tags', 'label', 'key']
-  }
+    keys: ['title', 'description', 'keywords', 'tags', 'label', 'key'],
+  },
 }))
 
 const icon = computed(() => safeIcon(inner.icon || 'i-tabler-search'))
@@ -98,7 +91,7 @@ function onSelect(item: Item) {
 defineExpose({
   query: computed(() => cmptRef.value?.query),
   updateQuery: (query: string) => (cmptRef.value as any).updateQuery?.(query),
-  results: computed(() => (cmptRef.value as any).results)
+  results: computed(() => (cmptRef.value as any).results),
 })
 </script>
 

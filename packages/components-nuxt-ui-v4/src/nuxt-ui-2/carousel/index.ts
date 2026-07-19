@@ -1,5 +1,5 @@
 import z from 'zod'
-import { normalize , has, not} from '@lionad/cx-definition'
+import { normalize, has, not } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { slotItemBinds, slotPrevBinds, slotNextBinds, slotIndicatorBinds } from './slots'
 import panelContent from './panel/content.vue'
@@ -17,13 +17,13 @@ export default normalize({
       component: panelContent,
       initial: () => [
         { id: '1', content: '内容项1' },
-        { id: '2', content: '内容项2' }
-      ]
+        { id: '2', content: '内容项2' },
+      ],
     },
     single: {
       type: 'switch',
       name: '单个显示',
-      initial: true
+      initial: true,
     },
     snap: {
       type: 'button-group',
@@ -32,9 +32,9 @@ export default normalize({
       options: [
         { label: '左', value: 'l', icon: 'i-tabler-box-align-left' },
         { label: '中', value: 'c', icon: 'i-tabler-box-margin' },
-        { label: '右', value: 'r', icon: 'i-tabler-box-align-right' }
+        { label: '右', value: 'r', icon: 'i-tabler-box-align-right' },
       ],
-      hidden: ({ cmpt }: any) => not(cmpt.data?.size) || has(cmpt.data?.single)
+      hidden: ({ cmpt }: any) => not(cmpt.data?.size) || has(cmpt.data?.single),
     },
     size: {
       type: 'button-group',
@@ -43,24 +43,24 @@ export default normalize({
         { value: '1', label: '100%' },
         { value: '1/2', label: '1/2' },
         { value: '1/3', label: '1/3' },
-        { value: '1/4', label: '1/4' }
+        { value: '1/4', label: '1/4' },
       ],
-      hidden: ({ cmpt }: any) => has(cmpt.data?.single)
+      hidden: ({ cmpt }: any) => has(cmpt.data?.single),
     },
     arrow: {
       type: 'switch',
       name: '切换按钮',
-      initial: false
+      initial: false,
     },
     indicators: {
       type: 'switch',
       name: '指示器',
-      initial: false
+      initial: false,
     },
     autoplay: {
       type: 'switch',
       name: '自动播放',
-      initial: false
+      initial: false,
     },
     autoplayTime: {
       type: 'range',
@@ -68,69 +68,69 @@ export default normalize({
       initial: 3000,
       min: 1000,
       max: 10000,
-      hidden: ({ cmpt }: any) => not(cmpt.data?.autoplay)
-    }
+      hidden: ({ cmpt }: any) => not(cmpt.data?.autoplay),
+    },
   },
   emits: {
     prev: {
       name: '上一项',
-      description: '切换到上一项'
+      description: '切换到上一项',
     },
     next: {
       name: '下一项',
-      description: '切换到下一项'
+      description: '切换到下一项',
     },
     select: {
       name: '选中',
       description: '选中了某一项',
-      schema: z.number()
-    }
+      schema: z.number(),
+    },
   },
   exposes: {
     pages: {
       name: '总页数',
-      schema: z.number()
+      schema: z.number(),
     },
     page: {
       name: '当前页',
-      schema: z.number()
+      schema: z.number(),
     },
     prev: {
       name: '上一项',
-      description: '切换到上一项'
+      description: '切换到上一项',
     },
     next: {
       name: '下一项',
-      description: '切换到下一项'
+      description: '切换到下一项',
     },
     select: {
       name: '选中',
       description: '选中了某一项（1、2、3...）',
-      schema: z.instanceof(Function)
-    }
+      schema: z.instanceof(Function),
+    },
   },
   slots: () => {
     return [
       {
         key: 'default',
         name: '内容项',
-        binds: slotItemBinds
+        binds: slotItemBinds,
       },
       {
         key: 'indicator',
         name: '指示器',
-        binds: slotIndicatorBinds
+        binds: slotIndicatorBinds,
       },
       {
         key: 'prev',
         name: '切换上一项',
-        binds: slotPrevBinds
+        binds: slotPrevBinds,
       },
       {
         key: 'next',
         name: '切换下一项',
-        binds: slotNextBinds
-      }
+        binds: slotNextBinds,
+      },
     ].filter(Boolean)
-  }
+  },
 })

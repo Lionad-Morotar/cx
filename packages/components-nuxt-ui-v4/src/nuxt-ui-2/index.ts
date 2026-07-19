@@ -81,7 +81,7 @@ export {
   CxTabs,
   CxTextarea,
   CxToggle,
-  CxTooltip
+  CxTooltip,
 }
 
 export default [
@@ -125,5 +125,5 @@ export default [
   CxTabs,
   CxTextarea,
   CxToggle,
-  CxTooltip
+  CxTooltip,
 ]

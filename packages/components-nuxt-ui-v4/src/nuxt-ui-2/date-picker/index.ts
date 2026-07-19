@@ -15,22 +15,19 @@ export default normalize({
       initial: 'date',
       options: [
         { label: '日期', value: 'date' },
-        { label: '日期范围', value: 'date-range' }
-      ]
-    }
+        { label: '日期范围', value: 'date-range' },
+      ],
+    },
   },
   emits: {
     change: {
       name: '日期变更',
       description: '设定好日期（或日期范围）变更时触发',
-      schema: z.union([
-        z.date(),
-        z.array(z.date()).min(2).max(2)
-      ])
+      schema: z.union([z.date(), z.array(z.date()).min(2).max(2)]),
     },
     close: {
       name: '关闭',
-      description: '关闭日期选择器面板时触发'
-    }
-  }
+      description: '关闭日期选择器面板时触发',
+    },
+  },
 })

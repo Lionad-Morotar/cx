@@ -9,37 +9,23 @@
     @change="$emit('change', $event)"
   >
     <template #label="x">
-      <slot
-        v-if="showSlot('label')"
-        name="label"
-        v-bind="x"
-      />
-      <span
-        v-else
-        v-cx="{ text: 'label', cmpt: props.cmpt.id }"
-      >{{ props.label }}</span>
+      <slot v-if="showSlot('label')" name="label" v-bind="x" />
+      <span v-else v-cx="{ text: 'label', cmpt: props.cmpt.id }">{{ props.label }}</span>
     </template>
     <template #help="x">
-      <slot
-        v-if="showSlot('help')"
-        name="help"
-        v-bind="x"
-      />
-      <span
-        v-else
-        v-cx="{ text: 'help', cmpt: props.cmpt.id }"
-      >{{ props.help }}</span>
+      <slot v-if="showSlot('help')" name="help" v-bind="x" />
+      <span v-else v-cx="{ text: 'help', cmpt: props.cmpt.id }">{{ props.help }}</span>
     </template>
   </URadio>
 </template>
 
 <script setup lang="ts">
 import { has } from '@lionad/cx-definition'
-import { useAttrs , useTemplateRef, ref} from 'vue'
+import { useAttrs, useTemplateRef, ref } from 'vue'
 
 import { URadio } from '../../../../vendor/bridge'
 
-import { useCxSlot , useCxBEM} from '@lionad/cx-vue'
+import { useCxSlot, useCxBEM } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
 defineOptions({ name: 'CxRadio' })

@@ -13,81 +13,82 @@ export default normalize({
     title: {
       type: 'short',
       name: '标题',
-      initial: () => '错误警告'
+      initial: () => '错误警告',
     },
     description: {
       type: 'short',
       name: '描述',
-      initial: () => '警告可以伴随一条详细的描述信息'
+      initial: () => '警告可以伴随一条详细的描述信息',
     },
     icon: {
       type: 'icon',
-      name: '图标'
+      name: '图标',
     },
     closeable: {
       type: 'boolean',
       name: '可关闭',
-      initial: false
+      initial: false,
     },
     variant: {
       type: 'card-selector',
       name: '警告样式',
       isPreview: true,
       ui: {
-        item: 'w-[90%] h-36 p-4 pb-6'
+        item: 'w-[90%] h-36 p-4 pb-6',
       },
       options: [
         {
           value: 'solid',
-          label: '实心'
+          label: '实心',
         },
         {
           value: 'outline',
-          label: '描边'
+          label: '描边',
         },
         {
           value: 'subtle',
-          label: '低调'
+          label: '低调',
         },
         {
           value: 'soft',
-          label: '柔和'
-        }
-      ]
+          label: '柔和',
+        },
+      ],
     },
     color: {
       ...CxButton._cx_meta.props.color!,
       ui: {
-        item: 'w-[90%] h-36 p-4 pb-6'
+        item: 'w-[90%] h-36 p-4 pb-6',
       },
       // @ts-ignore
-      options: (CxButton._cx_meta.props.color.options)
-        .filter((color: any) => !['black', 'gray'].includes(color.value))
-    }
+      options: CxButton._cx_meta.props.color.options.filter(
+        (color: any) => !['black', 'gray'].includes(color.value),
+      ),
+    },
   },
   emits: {
     open: {
       name: '打开',
-      description: '打开警告'
+      description: '打开警告',
     },
     close: {
       name: '关闭',
-      description: '关闭警告'
-    }
+      description: '关闭警告',
+    },
   },
   exposes: {
     open: {
       name: '打开',
-      description: '打开警告'
+      description: '打开警告',
     },
     close: {
       name: '关闭',
-      description: '关闭警告'
+      description: '关闭警告',
     },
     ...CxEvents.displaySubCmpt.define,
-    ...CxEvents.init.define
+    ...CxEvents.init.define,
   },
-  slots: ((): any => {
+  slots: (): any => {
     return [
       {
         key: 'title',
@@ -96,9 +97,9 @@ export default normalize({
           title: {
             name: '标题',
             description: '警告组件的标题',
-            schema: z.string()
-          }
-        }
+            schema: z.string(),
+          },
+        },
       },
       {
         key: 'description',
@@ -107,9 +108,9 @@ export default normalize({
           description: {
             name: '描述',
             description: '警告组件的描述',
-            schema: z.string()
-          }
-        }
+            schema: z.string(),
+          },
+        },
       },
       {
         key: 'icon',
@@ -118,9 +119,9 @@ export default normalize({
           icon: {
             name: '图标',
             description: '警告组件的图标',
-            schema: z.string()
-          }
-        }
+            schema: z.string(),
+          },
+        },
       },
       {
         key: 'actions',
@@ -135,8 +136,8 @@ export default normalize({
           //     onClick: z.instanceof(Function),
           //   })),
           // }
-        }
-      }
+        },
+      },
     ].filter(Boolean)
-  })
+  },
 })

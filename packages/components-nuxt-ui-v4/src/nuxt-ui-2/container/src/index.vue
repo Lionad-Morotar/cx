@@ -1,13 +1,7 @@
 <template>
-  <UContainer
-    ref="cmpt"
-    :class="ns.b()"
-  >
+  <UContainer ref="cmpt" :class="ns.b()">
     <template #default>
-      <slot
-        v-if="showSlot('default')"
-        name="default"
-      />
+      <slot v-if="showSlot('default')" name="default" />
       <CxEmptyImage v-else="showDefault()" />
     </template>
   </UContainer>
@@ -15,11 +9,11 @@
 
 <script setup lang="ts">
 import { CxEmptyImage, CxEmpty } from '@lionad/cx-vue'
-import { useAttrs , useTemplateRef, computed} from 'vue'
+import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { UContainer } from '../../../../vendor/bridge'
 
-import { useCxSlot , useCxBEM} from '@lionad/cx-vue'
+import { useCxSlot, useCxBEM } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
 defineOptions({ name: 'CxContainer' })

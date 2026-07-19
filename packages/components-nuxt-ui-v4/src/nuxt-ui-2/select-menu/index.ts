@@ -1,5 +1,5 @@
 import z from 'zod'
-import { normalize , has} from '@lionad/cx-definition'
+import { normalize, has } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import PanelItems from './panel/items.vue'
 import CxSelect from '../select/index'
@@ -22,80 +22,80 @@ export default normalize({
       type: 'custom',
       name: '选项',
       component: PanelItems,
-      initial: () => [createItem({ label: '选项1', value: '1' })]
+      initial: () => [createItem({ label: '选项1', value: '1' })],
     },
     multiple: {
       type: 'boolean',
       name: '多选',
-      disabled: false
+      disabled: false,
     },
     // maxSelectCount: {
     //   type: 'number',
     //   name: '最大选择数量',
     //   initial: 0,
     // },
-    dftValue: CxSelect._cx_meta.props.dftValue!!,
-    placeholder: CxSelect._cx_meta.props.placeholder!!,
-    icon: CxSelect._cx_meta.props.icon!!,
+    dftValue: CxSelect._cx_meta.props.dftValue!,
+    placeholder: CxSelect._cx_meta.props.placeholder!,
+    icon: CxSelect._cx_meta.props.icon!,
     trailingIcon: {
-      ...CxSelect._cx_meta.props.icon!!,
-      name: '尾部图标'
+      ...CxSelect._cx_meta.props.icon!,
+      name: '尾部图标',
     },
-    disabled: CxSelect._cx_meta.props.disabled!!,
-    loading: CxSelect._cx_meta.props.loading!!,
-    padded: CxSelect._cx_meta.props.padded!!,
+    disabled: CxSelect._cx_meta.props.disabled!,
+    loading: CxSelect._cx_meta.props.loading!,
+    padded: CxSelect._cx_meta.props.padded!,
     variant: {
-      ...CxSelect._cx_meta.props.variant!!,
+      ...CxSelect._cx_meta.props.variant!,
       pickData: ({ data }: any) => useOmit(data, ['options']),
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-5'
-      }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-5',
+      },
     },
     size: {
-      ...CxSelect._cx_meta.props.size!!,
+      ...CxSelect._cx_meta.props.size!,
       pickData: ({ data }: any) => useOmit(data, ['options']),
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-5'
-      }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-5',
+      },
     },
     color: {
-      ...CxSelect._cx_meta.props.color!!,
+      ...CxSelect._cx_meta.props.color!,
       pickData: ({ data }: any) => useOmit(data, ['options']),
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-5'
-      }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-5',
+      },
     },
     searchable: {
       type: 'boolean',
       name: '可搜索',
-      initial: false
+      initial: false,
     },
     searchablePlaceholder: {
       type: 'short',
       name: '搜索占位符',
-      initial: '搜索'
+      initial: '搜索',
     },
     clearSearchOnClose: {
       type: 'boolean',
       name: '关闭时清空搜索',
-      initial: true
+      initial: true,
     },
     dftQuery: {
-      ...CxSelect._cx_meta.props.dftValue!!,
-      name: '默认搜索值'
+      ...CxSelect._cx_meta.props.dftValue!,
+      name: '默认搜索值',
     },
     creatable: {
       type: 'boolean',
       name: '搜索时可创建新选项',
       initial: false,
       disabled: true,
-      help: '暂不支持'
+      help: '暂不支持',
     },
     direction: {
       type: 'card-selector',
       name: '打开方向',
-      options: popperPlacementOptions
-    }
+      options: popperPlacementOptions,
+    },
     // * 显示会有问题，先不展示箭头的配置项
     // arrow: {
     //   type: 'boolean',
@@ -106,17 +106,17 @@ export default normalize({
   emits: {
     open: {
       name: '打开',
-      description: '当下拉菜单打开时触发'
+      description: '当下拉菜单打开时触发',
     },
     close: {
       name: '关闭',
-      description: '当下拉菜单关闭时触发'
+      description: '当下拉菜单关闭时触发',
     },
     change: {
       name: '变更',
       description: '当选项变更时触发',
-      schema: z.union([zItem, z.array(zItem)])
-    }
+      schema: z.union([zItem, z.array(zItem)]),
+    },
   },
   slots: ({ cmpt }: any) => {
     const canSearch = cmpt.data?.searchable
@@ -125,41 +125,42 @@ export default normalize({
       {
         key: 'leading',
         name: '输入前区域',
-        binds: inputBinds
+        binds: inputBinds,
       },
       {
         key: 'trailing',
         name: '输入后区域',
-        binds: inputBinds
+        binds: inputBinds,
       },
       {
         key: 'label',
         name: '选中区域',
         binds: {
-          selected: bindOption.selected
-        }
+          selected: bindOption.selected,
+        },
       },
       {
         key: 'option',
         name: '选项',
-        binds: bindOption
+        binds: bindOption,
       },
       {
         key: 'empty',
         name: '没有选项',
-        binds: bindQuery
+        binds: bindQuery,
       },
       canSearch && {
         key: 'option-empty',
         name: '没有搜索结果',
-        binds: bindQuery
+        binds: bindQuery,
       },
-      canSearch && canCreate && {
-        key: 'option-create',
-        name: '创建新选项',
-        disabled: true,
-        binds: bindOption
-      }
+      canSearch &&
+        canCreate && {
+          key: 'option-create',
+          name: '创建新选项',
+          disabled: true,
+          binds: bindOption,
+        },
     ].filter(has) as CxComponentSlot[]
-  }
+  },
 })

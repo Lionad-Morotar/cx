@@ -1,20 +1,10 @@
 <template>
-  <el-form
-    :model="value"
-    label-position="top"
-  >
-    <template
-      v-for="(tab, idx) in value"
-      :key="`${idx}-${tab.id}`"
-    >
-      <el-form-item
-        :rules="labelRule"
-        :prop="`${idx}`"
-        class="accordion-item"
-      >
+  <el-form :model="value" label-position="top">
+    <template v-for="(tab, idx) in value" :key="`${idx}-${tab.id}`">
+      <el-form-item :rules="labelRule" :prop="`${idx}`" class="accordion-item">
         <template #label>
           <div class="label">
-            <span>{{ `${('项目')} ${idx + 1}` }}</span>
+            <span>{{ `${'项目'} ${idx + 1}` }}</span>
             <span
               v-if="value.length > 1"
               class="delete-text"
@@ -26,25 +16,12 @@
         </template>
         <el-input v-model="tab.label" />
       </el-form-item>
-      <el-form-item
-        :rules="contentRule"
-        :prop="`${idx}`"
-        class="accordion-item -mt-2"
-      >
-        <el-input
-          v-model="tab.icon"
-          type="textarea"
-        />
+      <el-form-item :rules="contentRule" :prop="`${idx}`" class="accordion-item -mt-2">
+        <el-input v-model="tab.icon" type="textarea" />
       </el-form-item>
     </template>
 
-    <el-button
-      class="mt-4 w-full text-center"
-      type="primary"
-      @click="addTab"
-    >
-      添加项目
-    </el-button>
+    <el-button class="mt-4 w-full text-center" type="primary" @click="addTab"> 添加项目 </el-button>
   </el-form>
 </template>
 
@@ -60,29 +37,29 @@ const labelRule = [
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { label } = item || {}
-      if (label.length <= 0) return cb(new Error(('请输入标题')))
-      if (label.length >= 50) return cb(new Error(('标题不能超过 50 个字符')))
+      if (label.length <= 0) return cb(new Error('请输入标题'))
+      if (label.length >= 50) return cb(new Error('标题不能超过 50 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 const contentRule = [
   {
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { icon } = item || {}
-      if (icon.length <= 0) return cb(new Error(('请输入图标标识')))
-      if (icon.length >= 50) return cb(new Error(('图标标识不能超过 50 个字符')))
+      if (icon.length <= 0) return cb(new Error('请输入图标标识'))
+      if (icon.length >= 50) return cb(new Error('图标标识不能超过 50 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 
 const addTab = () => {
-  const newTabName = `${('标题')}${((value.value as any[])?.length || 0) + 1}`
+  const newTabName = `${'标题'}${((value.value as any[])?.length || 0) + 1}`
   const newTab = createItem({
     label: newTabName,
-    icon: '图标标识'
+    icon: '图标标识',
   })
   value.value.push(newTab)
 }

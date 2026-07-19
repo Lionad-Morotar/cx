@@ -13,37 +13,37 @@ export default normalize({
     label: {
       type: 'short',
       name: '标题',
-      initial: '标题'
+      initial: '标题',
     },
     description: {
       type: 'short',
       name: '描述',
-      initial: ''
+      initial: '',
     },
     hint: {
       type: 'short',
       name: '提示',
-      initial: ''
+      initial: '',
     },
     help: {
       type: 'short',
       name: '帮助',
-      initial: ''
+      initial: '',
     },
     required: {
       type: 'boolean',
-      name: '是否必填'
+      name: '是否必填',
     },
     size: {
       type: 'card-selector',
       name: '尺寸',
-      options: useSizeOptions('2xs', 'xl')
+      options: useSizeOptions('2xs', 'xl'),
     },
     eagerValidation: {
       type: 'boolean',
       name: '立即校验',
-      help: '默认情况下，表单项失去鼠标焦点后才进行校验。开启立即校验后，表单项在输入时就会进行校验，这在提示某些“必填”选项的时候很有用'
-    }
+      help: '默认情况下，表单项失去鼠标焦点后才进行校验。开启立即校验后，表单项在输入时就会进行校验，这在提示某些“必填”选项的时候很有用',
+    },
   },
   slots: () => {
     return [
@@ -51,34 +51,34 @@ export default normalize({
         key: 'default',
         name: '表单项区域',
         binds: {
-          error: binds.error
-        }
+          error: binds.error,
+        },
       },
       {
         key: 'label',
         name: '标题区域',
-        binds
+        binds,
       },
       {
         key: 'description',
         name: '描述区域',
-        binds
+        binds,
       },
       {
         key: 'hint',
         name: '提示区域',
-        binds
+        binds,
       },
       {
         key: 'help',
         name: '帮助区域',
-        binds
+        binds,
       },
       {
         key: 'error',
         name: '错误区域',
-        binds
-      }
+        binds,
+      },
     ].filter(Boolean) as CxComponentSlot[]
-  }
+  },
 })

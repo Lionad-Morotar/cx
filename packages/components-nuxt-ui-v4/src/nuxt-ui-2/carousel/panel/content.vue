@@ -1,20 +1,10 @@
 <template>
-  <el-form
-    :model="value"
-    label-position="top"
-  >
-    <template
-      v-for="(tab, idx) in value"
-      :key="`${idx}-${tab.id}`"
-    >
-      <el-form-item
-        :rules="contentRule"
-        :prop="`${idx}`"
-        class="accordion-item"
-      >
+  <el-form :model="value" label-position="top">
+    <template v-for="(tab, idx) in value" :key="`${idx}-${tab.id}`">
+      <el-form-item :rules="contentRule" :prop="`${idx}`" class="accordion-item">
         <template #label>
           <div class="content">
-            <span>{{ `${('内容')} ${idx + 1}` }}</span>
+            <span>{{ `${'内容'} ${idx + 1}` }}</span>
             <span
               v-if="value.length > 1"
               class="delete-text"
@@ -28,13 +18,7 @@
       </el-form-item>
     </template>
 
-    <el-button
-      class="mt-4 w-full text-center"
-      type="primary"
-      @click="addTab"
-    >
-      添加项目
-    </el-button>
+    <el-button class="mt-4 w-full text-center" type="primary" @click="addTab"> 添加项目 </el-button>
   </el-form>
 </template>
 
@@ -50,17 +34,17 @@ const contentRule = [
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { content } = item || {}
-      if (content.length <= 0) return cb(new Error(('请输入内容')))
-      if (content.length >= 100) return cb(new Error(('内容不能超过 100 个字符')))
+      if (content.length <= 0) return cb(new Error('请输入内容'))
+      if (content.length >= 100) return cb(new Error('内容不能超过 100 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 
 const addTab = () => {
-  const newTabName = `${('内容')}${((value.value as any[])?.length || 0) + 1}`
+  const newTabName = `${'内容'}${((value.value as any[])?.length || 0) + 1}`
   const newTab = createItem({
-    content: newTabName
+    content: newTabName,
   })
   value.value.push(newTab)
 }

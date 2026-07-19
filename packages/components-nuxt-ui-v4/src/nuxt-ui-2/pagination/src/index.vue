@@ -1,45 +1,16 @@
 <template>
-  <UPagination
-    ref="cmpt"
-    v-model="currentPage"
-    :class="ns.b()"
-    v-bind="attrs"
-  >
-    <template
-      v-if="showSlot('prev')"
-      #prev="x"
-    >
-      <slot
-        name="prev"
-        v-bind="x"
-      />
+  <UPagination ref="cmpt" v-model="currentPage" :class="ns.b()" v-bind="attrs">
+    <template v-if="showSlot('prev')" #prev="x">
+      <slot name="prev" v-bind="x" />
     </template>
-    <template
-      v-if="showSlot('first')"
-      #first="x"
-    >
-      <slot
-        name="first"
-        v-bind="x"
-      />
+    <template v-if="showSlot('first')" #first="x">
+      <slot name="first" v-bind="x" />
     </template>
-    <template
-      v-if="showSlot('last')"
-      #last="x"
-    >
-      <slot
-        name="last"
-        v-bind="x"
-      />
+    <template v-if="showSlot('last')" #last="x">
+      <slot name="last" v-bind="x" />
     </template>
-    <template
-      v-if="showSlot('next')"
-      #next="x"
-    >
-      <slot
-        name="next"
-        v-bind="x"
-      />
+    <template v-if="showSlot('next')" #next="x">
+      <slot name="next" v-bind="x" />
     </template>
   </UPagination>
 </template>
@@ -47,11 +18,11 @@
 <script setup lang="ts">
 import { safeNum } from '@lionad/cx-definition'
 
-import { useAttrs , useTemplateRef, computed, ref} from 'vue'
+import { useAttrs, useTemplateRef, computed, ref } from 'vue'
 
 import { UPagination } from '../../../../vendor/bridge'
 
-import { useCxSlot , useCxBEM} from '@lionad/cx-vue'
+import { useCxSlot, useCxBEM } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 import { isBoolean } from 'lodash-es'
 
@@ -74,13 +45,16 @@ const ui = computed(() => {})
 
 const currentPage = ref(1)
 
-const attrs = computed(() => ({
-  total: safeNum(props.total, 100),
-  pageCount: safeNum(props.pageCount, 10),
-  max: safeNum(props.max, 10),
-  size: props.size,
-  disabled: isBoolean(props.disabled) ? props.disabled : false
-} as const))
+const attrs = computed(
+  () =>
+    ({
+      total: safeNum(props.total, 100),
+      pageCount: safeNum(props.pageCount, 10),
+      max: safeNum(props.max, 10),
+      size: props.size,
+      disabled: isBoolean(props.disabled) ? props.disabled : false,
+    }) as const,
+)
 
 defineExpose({})
 </script>

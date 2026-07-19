@@ -5,11 +5,11 @@ export const binds = {
   link: {
     name: '项目',
     description: '当前插槽对应导航项',
-    schema: zItem
+    schema: zItem,
   },
   isActive: {
     name: '激活',
     description: '当前导航项是否激活',
-    schema: z.boolean()
-  }
+    schema: z.boolean(),
+  },
 }

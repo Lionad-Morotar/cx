@@ -10,25 +10,16 @@
     :inset="props.inset || false"
   >
     <template #default="x">
-      <slot
-        name="default"
-        v-bind="x"
-      />
+      <slot name="default" v-bind="x" />
     </template>
-    <template
-      v-if="showSlotContent"
-      #content="x"
-    >
-      <slot
-        name="content"
-        v-bind="x"
-      />
+    <template v-if="showSlotContent" #content="x">
+      <slot name="content" v-bind="x" />
     </template>
   </UChip>
 </template>
 
 <script setup lang="ts">
-import { useAttrs , computed, useTemplateRef} from 'vue'
+import { useAttrs, computed, useTemplateRef } from 'vue'
 
 import { useCxBEM } from '@lionad/cx-vue'
 

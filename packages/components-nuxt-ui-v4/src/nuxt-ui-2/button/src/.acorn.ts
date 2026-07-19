@@ -9,11 +9,11 @@ if (!UButton.render._cx_patched) {
         node.init = {
           type: 'CallExpression',
           callee: { type: 'Identifier', name: '_resolveComponent' },
-          arguments: [{ type: 'Literal', value: 'p-icon' }]
+          arguments: [{ type: 'Literal', value: 'p-icon' }],
         }
       }
       return node
-    }
+    },
   })
 
   let params, body
@@ -23,12 +23,12 @@ if (!UButton.render._cx_patched) {
         params = node.params
         body = node.body
       }
-    }
+    },
   })
 
   const newSFCRender = new Function(
-    ...params.map(p => p.name),
-    `with(window.renderCtx) { return ${escodegen.generate(body)} }`
+    ...params.map((p) => p.name),
+    `with(window.renderCtx) { return ${escodegen.generate(body)} }`,
   )
   UButton.render = newSFCRender
   UButton.render._cx_patched = true

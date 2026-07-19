@@ -11,7 +11,11 @@ const byKey = (key: string) => CxNuxtUI.find((x: any) => x._cx_meta.key === key)
 /** 物料运行于 cx-render 时会收到运行时组件上下文，smoke 以最小桩注入 */
 const fakeCmpt = (key: string) => ({ id: `test-${key}`, key, data: {}, components: {} })
 
-const mountMaterial = (cmpt: any, props: Record<string, any> = {}, opts: Record<string, any> = {}) =>
+const mountMaterial = (
+  cmpt: any,
+  props: Record<string, any> = {},
+  opts: Record<string, any> = {},
+) =>
   mount(cmpt, {
     props: { cmpt: fakeCmpt(cmpt._cx_meta?.key || 'x'), ...props },
     global: {

@@ -25,40 +25,36 @@
         v-if="showSubActionMenu"
         v-model:open="isSubOpen"
         :class="[ns.b()]"
-        :virtual-element="(hoverItemElement as Record<string, any>)"
+        :virtual-element="hoverItemElement as Record<string, any>"
         :popper="{
-          placement: 'right-start'
+          placement: 'right-start',
           // overflowPadding: 20
         }"
         @close="onClose"
       >
-        <CxActions
-          size="sm"
-          :actions="hoverSubActions"
-          @after-click="resetTask.exec"
-        />
+        <CxActions size="sm" :actions="hoverSubActions" @after-click="resetTask.exec" />
       </UContextMenu>
     </teleport>
   </div>
 </template>
 
-/**
- * * * mobile capable
- * * dark mode
- * * i18n
- * * basic docs
- */
-
+/** * * * mobile capable * * dark mode * * i18n * * basic docs */
 
 <script lang="ts" setup>
 import { CxActions } from '@lionad/cx-vue'
 import { onKeyStroke } from '@vueuse/core'
 import { isFunction } from '@vue/shared'
 
-import { useTemplateRef , ref, computed, unref} from 'vue'
+import { useTemplateRef, ref, computed, unref } from 'vue'
 
 import { UContextMenu } from '../../../../vendor/bridge'
-import { useCxEditMode , useBEM, useSharedMouse, useSharedWindowScroll, useAsync} from '@lionad/cx-vue'
+import {
+  useCxEditMode,
+  useBEM,
+  useSharedMouse,
+  useSharedWindowScroll,
+  useAsync,
+} from '@lionad/cx-vue'
 import { useLastPosition } from '../hooks/use-position'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 import type { Action } from '../types'
@@ -73,14 +69,14 @@ const onClose = () => (emits as any)('close')
 const props = withDefaults(
   defineProps<{
     disabled?: boolean
-    actions?: ((row: any) => (Action[] | Action[][])) | (Action[] | Action[][])
+    actions?: ((row: any) => Action[] | Action[][]) | (Action[] | Action[][])
     path?: string[]
   }>(),
   {
     disabled: false,
-    actions: () => ([]),
-    path: () => []
-  }
+    actions: () => [],
+    path: () => [],
+  },
 )
 
 /* -------------------------------------------------------------------------- */
@@ -100,12 +96,12 @@ const isOpen = computed({
       return
     }
     _isOpen.value = val
-  }
+  },
 })
 
 const isSubOpen = ref(true)
 const virtualElement = ref({
-  getBoundingClientRect: () => ({})
+  getBoundingClientRect: () => ({}),
 })
 // watchEffect(() => {
 //   console.log('x, y', x.value, y.value, windowY.value)
@@ -129,10 +125,10 @@ const hoverItemElement = computed(() => {
   if (label) {
     isSubOpen.value = true
     return [...document.body.querySelectorAll('.p-actions')]
-      .map($action => [...$action.children] as HTMLElement[])
+      .map(($action) => [...$action.children] as HTMLElement[])
       .flat(5)
-      .filter($x => $x.tagName.toLowerCase() === 'button')
-      .find($x => $x.innerText === label)
+      .filter(($x) => $x.tagName.toLowerCase() === 'button')
+      .find(($x) => $x.innerText === label)
   }
   // console.log('[info] hoverItemElement', hoverItemElement.value)
 })
@@ -142,13 +138,11 @@ const recordHoverItem = (item: any) => {
 }
 
 const hoverSubActions = computed(() => {
-  return hoverItem.value?.actions
-    ? hoverItem.value.actions(bindItemToAction.value)
-    : []
+  return hoverItem.value?.actions ? hoverItem.value.actions(bindItemToAction.value) : []
 })
 const showSubActionMenu = computed(() => {
   // console.log('hoverSubActions.value.length', hoverSubActions.value.length, Boolean(hoverItemElement.value))
-  return (hoverSubActions.value.length > 0) && hoverItemElement.value as Record<string, any>
+  return hoverSubActions.value.length > 0 && (hoverItemElement.value as Record<string, any>)
 })
 
 /* -------------------------------------------------------------------------- */
@@ -164,11 +158,15 @@ const mouseEventHandlers = computed(() => {
     : { onContextmenu: (e: MouseEvent) => open(e) }
 })
 
-const open = ($event: MouseEvent, _item?: any, customPosition?: {
-  x: number
-  y: number
-  isUseLastPosition: false
-}) => {
+const open = (
+  $event: MouseEvent,
+  _item?: any,
+  customPosition?: {
+    x: number
+    y: number
+    isUseLastPosition: false
+  },
+) => {
   // console.log('[info] $event', $event)
 
   if ($event) {
@@ -184,8 +182,8 @@ const open = ($event: MouseEvent, _item?: any, customPosition?: {
     top = lastPosition.value.top
     left = lastPosition.value.left
   } else {
-    top = customPosition?.y || (unref(y) - unref(windowY))
-    left = customPosition?.x || (unref(x))
+    top = customPosition?.y || unref(y) - unref(windowY)
+    left = customPosition?.x || unref(x)
     lastPosition.value.top = top
     lastPosition.value.left = left
   }
@@ -195,14 +193,14 @@ const open = ($event: MouseEvent, _item?: any, customPosition?: {
     width: 0,
     height: 0,
     top,
-    left
+    left,
   }
-  virtualElement.value.getBoundingClientRect = () => (pos)
+  virtualElement.value.getBoundingClientRect = () => pos
 
   isOpen.value = true
 
   return {
-    position: pos
+    position: pos,
   }
 }
 const close = async () => {
@@ -231,7 +229,7 @@ defineExpose({
   isOpen,
   open,
   close,
-  hoverItem
+  hoverItem,
 })
 </script>
 

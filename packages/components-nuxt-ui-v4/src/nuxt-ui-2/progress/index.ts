@@ -1,6 +1,6 @@
-import { normalize , safeNum} from '@lionad/cx-definition'
+import { normalize, safeNum } from '@lionad/cx-definition'
 import component from './src/index.vue'
-import { cmptColorNames3 , useSizeOptions} from '@lionad/cx-vue'
+import { cmptColorNames3, useSizeOptions } from '@lionad/cx-vue'
 import PanelItems from './panel/items.vue'
 import { binds } from './slots'
 
@@ -22,7 +22,7 @@ export default normalize({
             ? (cmpt.data?.maxItems || []).length - 1
             : undefined
       },
-      step: 1
+      step: 1,
     },
     type: {
       type: 'select',
@@ -30,13 +30,13 @@ export default normalize({
       initial: 'number',
       options: [
         { label: '数值', value: 'number' },
-        { label: '标签', value: 'label' }
-      ]
+        { label: '标签', value: 'label' },
+      ],
     },
     max: {
       type: 'number',
       name: '最大值',
-      hidden: ({ cmpt }: any) => cmpt.data?.type !== 'number'
+      hidden: ({ cmpt }: any) => cmpt.data?.type !== 'number',
     },
     // todo combine with max
     maxItems: {
@@ -44,12 +44,12 @@ export default normalize({
       name: '最大值',
       component: PanelItems,
       initial: () => [],
-      hidden: ({ cmpt }: any) => cmpt.data?.type !== 'label'
+      hidden: ({ cmpt }: any) => cmpt.data?.type !== 'label',
     },
     indicator: {
       type: 'boolean',
       name: '指示器',
-      hidden: ({ cmpt }: any) => cmpt.data?.type === 'label'
+      hidden: ({ cmpt }: any) => cmpt.data?.type === 'label',
     },
     animation: {
       type: 'card-selector',
@@ -60,11 +60,11 @@ export default normalize({
         { value: 'carousel', label: '轮播' },
         { value: 'carousel-inverse', label: '轮播反向' },
         { value: 'swing', label: '摇摆' },
-        { value: 'elastic', label: '弹性' }
+        { value: 'elastic', label: '弹性' },
       ],
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-8'
-      }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-8',
+      },
     },
     size: {
       type: 'card-selector',
@@ -72,8 +72,8 @@ export default normalize({
       isPreview: true,
       options: useSizeOptions('2xs', '2xl'),
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-8'
-      }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-8',
+      },
     },
     color: {
       type: 'card-selector',
@@ -81,9 +81,9 @@ export default normalize({
       isPreview: true,
       options: cmptColorNames3,
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-8'
-      }
-    }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-8',
+      },
+    },
   },
   slots: ({ cmpt }: any) => {
     const res = []
@@ -92,8 +92,8 @@ export default normalize({
         key: 'indicator',
         name: '指示器',
         binds: {
-          percent: binds.percent
-        }
+          percent: binds.percent,
+        },
       })
     }
     if (cmpt.data?.type === 'label') {
@@ -103,11 +103,11 @@ export default normalize({
           key: `step-${index}`,
           name: item.label,
           binds: {
-            step: binds.step
-          }
+            step: binds.step,
+          },
         })
       })
     }
     return res
-  }
+  },
 })

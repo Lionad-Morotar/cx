@@ -13,28 +13,28 @@ export default normalize({
       type: 'short',
       name: '按钮内容',
       initial: '发送通知',
-      help: '向页面通知的触发区域添加组件将会覆盖默认的触发按钮'
+      help: '向页面通知的触发区域添加组件将会覆盖默认的触发按钮',
     },
     title: {
       type: 'short',
       name: '通知标题',
-      initial: '通知标题'
+      initial: '通知标题',
     },
     description: {
       type: 'short',
       name: '通知内容',
-      initial: '通知内容'
+      initial: '通知内容',
     },
     icon: {
       type: 'icon',
       name: '图标',
-      initial: ''
+      initial: '',
     },
     id: {
       type: 'short',
       name: '通知标识',
       initial: '',
-      help: '在页面上只会同时存在一个同标识的通知'
+      help: '在页面上只会同时存在一个同标识的通知',
     },
     timeout: {
       type: 'range',
@@ -43,9 +43,8 @@ export default normalize({
       min: 0,
       max: 20,
       step: 1,
-      help: '默认时间为 3 秒；设置为 0 时不会自动关闭；'
-    }
-
+      help: '默认时间为 3 秒；设置为 0 时不会自动关闭；',
+    },
   },
   slots: {
     title: {
@@ -55,9 +54,9 @@ export default normalize({
         title: {
           name: '标题',
           description: '通知标题',
-          schema: z.string()
-        }
-      }
+          schema: z.string(),
+        },
+      },
     },
     description: {
       key: 'description',
@@ -66,13 +65,13 @@ export default normalize({
         description: {
           name: '内容',
           description: '通知内容',
-          schema: z.string()
-        }
-      }
+          schema: z.string(),
+        },
+      },
     },
     trigger: {
       key: 'trigger',
-      name: '触发区域'
-    }
-  }
+      name: '触发区域',
+    },
+  },
 })

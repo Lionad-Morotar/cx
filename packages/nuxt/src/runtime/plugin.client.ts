@@ -9,7 +9,7 @@ import { installCxBundles } from './install'
 export default defineNuxtPlugin({
   name: 'cx',
   enforce: 'pre',
-  async setup(nuxtApp) {
+  async setup(nuxtApp: any) {
     const cx = new CxLoader()
     await cx.init(window.location.href, { app: nuxtApp.vueApp })
 

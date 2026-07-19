@@ -7,57 +7,30 @@
     v-bind="attrs"
     @change="onChange"
   >
-    <template
-      v-if="showSlot('icon')"
-      #icon="x"
-    >
-      <slot
-        name="icon"
-        v-bind="x"
-      />
+    <template v-if="showSlot('icon')" #icon="x">
+      <slot name="icon" v-bind="x" />
     </template>
-    <template
-      v-if="showSlot('default')"
-      #default="x"
-    >
-      <slot
-        name="default"
-        v-bind="x"
-      />
+    <template v-if="showSlot('default')" #default="x">
+      <slot name="default" v-bind="x" />
     </template>
-    <template
-      v-for="tab in tabs"
-      :key="tab.value"
-      #[tab.value]="x"
-    >
+    <template v-for="tab in tabs" :key="tab.value" #[tab.value]="x">
       <slot name="default-start" />
 
-      <slot
-        v-if="showSlot(tab.value)"
-        :name="tab.value"
-        v-bind="x"
-      />
-      <el-empty
-        v-else
-        :description="(`${tab.label || ''}`) + ('内没有内容')"
-        :image-size="50"
-      />
+      <slot v-if="showSlot(tab.value)" :name="tab.value" v-bind="x" />
+      <el-empty v-else :description="`${tab.label || ''}` + '内没有内容'" :image-size="50" />
 
-      <slot
-        name="default-end"
-        v-bind="x"
-      />
+      <slot name="default-end" v-bind="x" />
     </template>
   </UTabs>
 </template>
 
 <script setup lang="ts">
-import { inject , useAttrs, useTemplateRef, computed, ref} from 'vue'
+import { inject, useAttrs, useTemplateRef, computed, ref } from 'vue'
 
 import { UTabs } from '../../../../vendor/bridge'
 
 import { CxEventDisplayCmptKey } from '@lionad/cx-definition'
-import { useCxSlot , useCxBEM, useMountedWatchImmediate} from '@lionad/cx-vue'
+import { useCxSlot, useCxBEM, useMountedWatchImmediate } from '@lionad/cx-vue'
 import type { CxLoaderInstance, CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 import type { Tab } from '../types'
 
@@ -80,7 +53,7 @@ const cmptRef = useTemplateRef('cmpt')
 
 const attrs = computed(() => {
   return {
-    orientation: props.orientation || 'horizontal'
+    orientation: props.orientation || 'horizontal',
   }
 })
 
@@ -89,7 +62,7 @@ const tabs = computed(() => {
     return {
       label: x.name,
       slot: x.value,
-      value: x.value
+      value: x.value,
     }
   })
 })
@@ -97,14 +70,12 @@ const tabs = computed(() => {
 const value = ref('')
 
 const resetValue = () => {
-  value.value = tabs.value.length
-    ? (tabs.value[0]?.value ?? '')
-    : ''
+  value.value = tabs.value.length ? (tabs.value[0]?.value ?? '') : ''
 }
 resetValue()
 
 const defaultIndex = computed(() => {
-  const index = tabs.value.findIndex(x => x.value === value.value)
+  const index = tabs.value.findIndex((x) => x.value === value.value)
   return index === -1 ? -1 : index
 })
 useMountedWatchImmediate(defaultIndex, resetValue)
@@ -121,8 +92,7 @@ defineExpose({
     if (!toDisplayCmpt) return
     const slots = cx.utils.calcSlots(props.cmpt)
     const slotToDisplay = slots.find((slot) => {
-      const isFind = (props.cmpt.components![slot.key] || [])
-        .some(c => c.id === toDisplayCmpt.id)
+      const isFind = (props.cmpt.components![slot.key] || []).some((c) => c.id === toDisplayCmpt.id)
       return isFind ? slot : null
     })
     if (!slotToDisplay) {
@@ -133,13 +103,13 @@ defineExpose({
     if (['default-start', 'default-end'].includes(slotToDisplay.key)) {
       return // do nothing
     }
-    const tabIDX = tabs.value.findIndex(tab => tab.value === slotToDisplay.key)
+    const tabIDX = tabs.value.findIndex((tab) => tab.value === slotToDisplay.key)
     if (tabIDX === -1) {
       return
     } else {
       value.value = tabs.value[tabIDX]!.value
     }
-  }
+  },
 })
 </script>
 
@@ -150,7 +120,7 @@ $ns: 'cx';
 
 @layer cx {
   @include b('tabs') {
-// ...
+    // ...
   }
 }
 </style>

@@ -14,23 +14,23 @@ export default normalize({
     label: {
       type: 'short',
       name: '按钮文本',
-      initial: '下拉菜单'
+      initial: '下拉菜单',
     },
     hoverMode: {
       type: 'switch',
-      name: '悬停打开'
+      name: '悬停打开',
     },
     direction: {
       type: 'card-selector',
       name: '打开方向',
-      options: popperPlacementOptions
+      options: popperPlacementOptions,
     },
     items: {
       type: 'custom',
       name: '菜单项',
       component: panelActions,
-      initial: () => []
-    }
+      initial: () => [],
+    },
   },
   slots: () => {
     return [
@@ -41,16 +41,16 @@ export default normalize({
           open: {
             name: '打开',
             description: '打开下拉菜单',
-            schema: z.instanceof(Function)
+            schema: z.instanceof(Function),
           },
           disabled: {
             name: '禁用',
             description: '当前下来菜单是否被禁用',
-            schema: z.boolean()
-          }
-        }
-      }
+            schema: z.boolean(),
+          },
+        },
+      },
       // todo item slots
     ].filter(Boolean)
-  }
+  },
 })

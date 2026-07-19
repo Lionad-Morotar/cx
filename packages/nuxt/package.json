@@ -7,6 +7,9 @@
     "dist"
   ],
   "type": "module",
+  "sideEffects": false,
+  "main": "./dist/module.mjs",
+  "types": "./dist/types.d.mts",
   "exports": {
     ".": {
       "types": "./dist/types.d.mts",
@@ -14,15 +17,14 @@
     },
     "./types": "./dist/types.d.mts"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "nuxt-module-build build",
     "typecheck": "tsgo --noEmit",
     "prepublishOnly": "nuxt-module-build build"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "sideEffects": false,
   "dependencies": {
     "@lionad/cx-components": "workspace:*",
     "@lionad/cx-components-nuxt-ui-v4": "workspace:*",
@@ -30,8 +32,6 @@
     "@lionad/cx-render": "workspace:*",
     "@lionad/cx-vue": "workspace:*"
   },
-  "main": "./dist/module.mjs",
-  "types": "./dist/types.d.mts",
   "devDependencies": {
     "@nuxt/kit": "^4.5.0",
     "@nuxt/module-builder": "^1.0.2",

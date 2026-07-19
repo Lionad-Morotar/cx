@@ -2,14 +2,10 @@
   <UAvatarGroup
     v-if="isGroup"
     :class="[ns.b(), ns.is('group'), ns.is(props.size as string)]"
-    :size="(props.size as any)"
+    :size="props.size as any"
     :max="safeNum(inner.max, 5)"
   >
-    <cx-render-component
-      v-for="avatar in avatars"
-      :key="avatar.id"
-      :component="avatar"
-    />
+    <cx-render-component v-for="avatar in avatars" :key="avatar.id" :component="avatar" />
   </UAvatarGroup>
   <UAvatar
     v-else
@@ -21,14 +17,18 @@
 
 <script setup lang="ts">
 import { safeNum } from '@lionad/cx-definition'
-import { has , not} from '@lionad/cx-definition'
+import { has, not } from '@lionad/cx-definition'
 
-import { useAttrs , useTemplateRef, computed, toRef, unref} from 'vue'
+import { useAttrs, useTemplateRef, computed, toRef, unref } from 'vue'
 
 import { UAvatar, UAvatarGroup } from '../../../../vendor/bridge'
 
-import { useCx, useCxMedia, useCxSlot , useCxBEM} from '@lionad/cx-vue'
-import type { CxComponentRuntime, ComponentProps, CxImageUploadPropValue } from '@lionad/cx-definition'
+import { useCx, useCxMedia, useCxSlot, useCxBEM } from '@lionad/cx-vue'
+import type {
+  CxComponentRuntime,
+  ComponentProps,
+  CxImageUploadPropValue,
+} from '@lionad/cx-definition'
 
 defineOptions({ name: 'CxAvatar' })
 
@@ -56,7 +56,7 @@ const avatars = computed(() => {
     if (cmpt.key === 'cx-avatar') {
       const newAvatar = cx.utils.cloneComponent(cmpt, ['data', 'id', 'parents', 'sortn'])
       newAvatar.data.size = props.size
-      newAvatar.data.isInGroup = not((cmpt.id === props.cmpt.id) && isGroup)
+      newAvatar.data.isInGroup = not(cmpt.id === props.cmpt.id && isGroup)
       newAvatar.data.index = String(res.length)
       res.push(newAvatar)
     }
@@ -70,7 +70,7 @@ const avatarAttrs = computed(() => ({
   src: unref(src),
   alt: props.alt,
   title: props.alt,
-  size: props.size
+  size: props.size,
 }))
 const chipAttrs = computed(() => {
   return not(props.enableChip)
@@ -78,13 +78,13 @@ const chipAttrs = computed(() => {
     : {
         chipText: props.chipText || '',
         chipColor: props.chipColor || 'primary',
-        chipPosition: props.chipPosition || 'top-right'
+        chipPosition: props.chipPosition || 'top-right',
       }
 })
 
 const isInGroup = computed(() => has(props.isInGroup))
 defineExpose({
-  isInGroup
+  isInGroup,
 })
 </script>
 

@@ -8,44 +8,26 @@
     :color="props.color"
   >
     <template #leading>
-      <slot
-        v-if="showSlot('leading')"
-        name="leading"
-      />
-      <span
-        v-else
-        v-cx="{ text: 'prefix' }"
-      >{{ inner.prefix || '' }}</span>
+      <slot v-if="showSlot('leading')" name="leading" />
+      <span v-else v-cx="{ text: 'prefix' }">{{ inner.prefix || '' }}</span>
     </template>
     <template #default>
-      <slot
-        v-if="showSlot('default')"
-        name="default"
-      />
-      <span
-        v-else
-        v-cx="{ text: 'label' }"
-      >{{ props.label || '' }}</span>
+      <slot v-if="showSlot('default')" name="default" />
+      <span v-else v-cx="{ text: 'label' }">{{ props.label || '' }}</span>
     </template>
     <template #trailing>
-      <slot
-        v-if="showSlot('trailing')"
-        name="trailing"
-      />
-      <span
-        v-else
-        v-cx="{ text: 'postfix' }"
-      >{{ props.postfix || '' }}</span>
+      <slot v-if="showSlot('trailing')" name="trailing" />
+      <span v-else v-cx="{ text: 'postfix' }">{{ props.postfix || '' }}</span>
     </template>
   </UBadge>
 </template>
 
 <script setup lang="ts">
-import { useAttrs , useTemplateRef, computed} from 'vue'
+import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { UBadge } from '../../../../vendor/bridge'
 
-import { useCxSlot , useCxBEM} from '@lionad/cx-vue'
+import { useCxSlot, useCxBEM } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
 defineOptions({ name: 'CxBadge' })
@@ -65,7 +47,7 @@ const props = useAttrs() as UBadgeProps & {
 const { showSlot } = useCxSlot(props.cmpt)
 
 const cmptRef = useTemplateRef('cmpt')
-const ui = computed(() => props.round ? { rounded: 'rounded-full' } : {})
+const ui = computed(() => (props.round ? { rounded: 'rounded-full' } : {}))
 </script>
 
 <style lang="scss">

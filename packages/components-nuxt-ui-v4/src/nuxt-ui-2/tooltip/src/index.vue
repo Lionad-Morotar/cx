@@ -1,54 +1,21 @@
 <template>
-  <button
-    :class="ns.b()"
-    class="flex"
-  >
+  <button :class="ns.b()" class="flex">
     <template v-if="isReRendering">
-      <div
-        :class="ns.e('placeholder-box')"
-        :style="size"
-      />
+      <div :class="ns.e('placeholder-box')" :style="size" />
     </template>
-    <div
-      v-else
-      ref="cmpt"
-      v-bind="mouseHandlers"
-    >
-      <UTooltip
-        ref="tooltipRef"
-        v-bind="attrs"
-        style="pointer-events: none"
-      >
+    <div v-else ref="cmpt" v-bind="mouseHandlers">
+      <UTooltip ref="tooltipRef" v-bind="attrs" style="pointer-events: none">
         <template #default="x">
-          <slot
-            v-if="showSlot('default')"
-            name="default"
-            v-bind="x"
-          />
-          <UButton
-            v-else
-            color="neutral"
-            variant="outline"
-          >
+          <slot v-if="showSlot('default')" name="default" v-bind="x" />
+          <UButton v-else color="neutral" variant="outline">
             <span v-cx="{ text: 'label', cmpt: props.cmpt.id }">{{ props.label }}</span>
           </UButton>
         </template>
 
         <template #text>
-          <div
-            :class="ns.e('text')"
-            v-bind="editModeModalHandlers"
-          >
-            <slot
-              v-if="showSlot('text')"
-              name="text"
-            />
-            <CxEmpty
-              v-else
-              show-empty
-              text-only
-              text="弹出层没有内容"
-            />
+          <div :class="ns.e('text')" v-bind="editModeModalHandlers">
+            <slot v-if="showSlot('text')" name="text" />
+            <CxEmpty v-else show-empty text-only text="弹出层没有内容" />
           </div>
         </template>
       </UTooltip>
@@ -60,12 +27,12 @@
 import { CxEmpty } from '@lionad/cx-vue'
 import { unrefElement } from '@vueuse/core'
 
-import { useAttrs , useTemplateRef, ref, computed, watch, unref} from 'vue'
+import { useAttrs, useTemplateRef, ref, computed, watch, unref } from 'vue'
 
 import { UButton, UTooltip } from '../../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey , safeNum, useMacroTask} from '@lionad/cx-definition'
-import { useCxSlot, useCxReRender, useCxEditMode , useCxBEM} from '@lionad/cx-vue'
+import { CxEventDisplayCmptKey, safeNum, useMacroTask } from '@lionad/cx-definition'
+import { useCxSlot, useCxReRender, useCxEditMode, useCxBEM } from '@lionad/cx-vue'
 import type { Placement } from '@popperjs/core'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
@@ -89,21 +56,22 @@ const cmptRef = useTemplateRef('cmpt')
 const tooltipRef = ref()
 const ui = computed(() => {})
 
-const attrs = computed(() => ({
-  openDelay: safeNum(props.openDelay),
-  closeDelay: safeNum(props.closeDelay),
-  popper: {
-    placement: props.direction || 'bottom-start'
-    // arrow: props.arrow || false,
-  }
-} as const))
+const attrs = computed(
+  () =>
+    ({
+      openDelay: safeNum(props.openDelay),
+      closeDelay: safeNum(props.closeDelay),
+      popper: {
+        placement: props.direction || 'bottom-start',
+        // arrow: props.arrow || false,
+      },
+    }) as const,
+)
 
 const dblClickMode = ref(false)
 const toggleDblClickMode = () => {
   dblClickMode.value = !dblClickMode.value
-  dblClickMode.value
-    ? (tooltipRef.value.open = true)
-    : (tooltipRef.value.open = false)
+  dblClickMode.value ? (tooltipRef.value.open = true) : (tooltipRef.value.open = false)
 }
 // watchEffect(() => {
 //   console.log('[info] dblClickMode', dblClickMode.value, tooltipRef.value.open)
@@ -129,11 +97,11 @@ const mouseHandlers = computed(() => {
     ? {
         onMouseenter: open,
         onMouseleave: close,
-        onDblclick: toggleDblClickMode
+        onDblclick: toggleDblClickMode,
       }
     : {
         onMouseenter: open,
-        onMouseleave: close
+        onMouseleave: close,
       }
   return evts
 })
@@ -141,49 +109,55 @@ const mouseHandlers = computed(() => {
 const { isReRendering, size } = useCxReRender(cmptRef, () => {
   return props.direction
 })
-watch(() => props.direction, () => {
-  dblClickMode.value = false
-})
+watch(
+  () => props.direction,
+  () => {
+    dblClickMode.value = false
+  },
+)
 
 const editModeModalHandlers = computed(() => {
-  return !isEditMode.value ? {} : {
-    onClick: (e: MouseEvent) => {
-      e.preventDefault()
-      e.stopImmediatePropagation()
+  return !isEditMode.value
+    ? {}
+    : {
+        onClick: (e: MouseEvent) => {
+          e.preventDefault()
+          e.stopImmediatePropagation()
 
-      const fakeEvt = new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-        clientX: e.clientX,
-        clientY: e.clientY
-      })
-      const elm = unrefElement(cmptRef)
-      if (!elm?.dispatchEvent) return
-      elm.dispatchEvent(fakeEvt)
-    },
-    onContextmenu: (e: MouseEvent) => {
-      e.preventDefault()
-      e.stopImmediatePropagation()
+          const fakeEvt = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: e.clientX,
+            clientY: e.clientY,
+          })
+          const elm = unrefElement(cmptRef)
+          if (!elm?.dispatchEvent) return
+          elm.dispatchEvent(fakeEvt)
+        },
+        onContextmenu: (e: MouseEvent) => {
+          e.preventDefault()
+          e.stopImmediatePropagation()
 
-      const fakeEvt = new MouseEvent('contextmenu', {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-        clientX: e.clientX,
-        clientY: e.clientY
-      })
-      const elm = unrefElement(cmptRef)
-      if (!elm?.dispatchEvent) return
-      elm.dispatchEvent(fakeEvt)
-    },
-    onMouseleave: (e: MouseEvent) => {
-      // wait for u-tooltip catch the event
-      useMacroTask(() => {
-        unref(tooltipRef.value?.closeTimeout) && clearTimeout(unref(tooltipRef.value.closeTimeout))
-      })
-    }
-  }
+          const fakeEvt = new MouseEvent('contextmenu', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: e.clientX,
+            clientY: e.clientY,
+          })
+          const elm = unrefElement(cmptRef)
+          if (!elm?.dispatchEvent) return
+          elm.dispatchEvent(fakeEvt)
+        },
+        onMouseleave: (e: MouseEvent) => {
+          // wait for u-tooltip catch the event
+          useMacroTask(() => {
+            unref(tooltipRef.value?.closeTimeout) &&
+              clearTimeout(unref(tooltipRef.value.closeTimeout))
+          })
+        },
+      }
 })
 
 defineExpose({
@@ -191,11 +165,11 @@ defineExpose({
   [CxEventDisplayCmptKey]: (toDisplayCmpt: CxComponentRuntime) => {
     if (!toDisplayCmpt) return
     const cmptsInModal = props.cmpt?.components?.text || []
-    const isFind = cmptsInModal.some(cmpt => cmpt.id === toDisplayCmpt.id)
+    const isFind = cmptsInModal.some((cmpt) => cmpt.id === toDisplayCmpt.id)
     if (isFind) {
       open()
     }
-  }
+  },
 })
 </script>
 

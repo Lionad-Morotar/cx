@@ -11,12 +11,12 @@
 <script setup lang="ts">
 import { safeNum } from '@lionad/cx-definition'
 
-import { useAttrs , useTemplateRef, computed, ref} from 'vue'
+import { useAttrs, useTemplateRef, computed, ref } from 'vue'
 
 import { URange } from '../../../../vendor/bridge'
 
 import { isBoolean } from 'lodash-es'
-import { useCxSlot , useCxBEM} from '@lionad/cx-vue'
+import { useCxSlot, useCxBEM } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
 defineOptions({ name: 'CxMeter' })
@@ -41,14 +41,17 @@ const ui = computed(() => {})
 
 const value = ref(0)
 
-const attrs = computed(() => ({
-  min: safeNum(inner.min, 0),
-  max: safeNum(inner.max, 100),
-  step: safeNum(inner.step, 1),
-  disabled: isBoolean(props.disabled) ? props.disabled : false,
-  size: props.size,
-  color: props.color
-} as const))
+const attrs = computed(
+  () =>
+    ({
+      min: safeNum(inner.min, 0),
+      max: safeNum(inner.max, 100),
+      step: safeNum(inner.step, 1),
+      disabled: isBoolean(props.disabled) ? props.disabled : false,
+      size: props.size,
+      color: props.color,
+    }) as const,
+)
 
 defineExpose({})
 </script>

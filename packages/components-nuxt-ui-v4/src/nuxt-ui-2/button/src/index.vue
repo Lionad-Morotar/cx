@@ -15,16 +15,9 @@
         size="16"
         :class="isLoading ? 'animate-spin' : ''"
       />
-      <slot
-        v-else
-        name="leading"
-        v-bind="x"
-      />
+      <slot v-else name="leading" v-bind="x" />
     </template>
-    <span
-      v-if="(props.label)"
-      v-cx="{ text: 'label' }"
-    >{{ props.label }}</span>
+    <span v-if="props.label" v-cx="{ text: 'label' }">{{ props.label }}</span>
     <template #trailing="x">
       <CxIcon
         v-if="isShowIconTrailing"
@@ -32,11 +25,7 @@
         size="16"
         :class="isLoading ? 'animate-spin' : ''"
       />
-      <slot
-        v-else
-        name="trailing"
-        v-bind="x"
-      />
+      <slot v-else name="trailing" v-bind="x" />
     </template>
   </UButton>
 </template>
@@ -45,10 +34,9 @@
 import { CxIcon } from '@lionad/cx-vue'
 import { has } from '@lionad/cx-definition'
 
-import { useAttrs , useTemplateRef, computed} from 'vue'
+import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { useCxBEM } from '@lionad/cx-vue'
-
 
 import { UButton } from '../../../../vendor/bridge'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
@@ -69,7 +57,7 @@ const props = useAttrs() as UButtonProps & {
 
 const cmptRef = useTemplateRef('cmpt')
 
-const ui = computed(() => props.round ? { rounded: 'rounded-full' } : {})
+const ui = computed(() => (props.round ? { rounded: 'rounded-full' } : {}))
 
 const isLoading = computed(() => props.loading)
 
@@ -91,7 +79,7 @@ $ns: 'cx';
     // ...
   }
 }
-@include b("button") {
+@include b('button') {
   &:has(> span:empty + .iconify),
   &:has(> span:empty + .p-icon),
   &:has(> .iconify + span:empty),

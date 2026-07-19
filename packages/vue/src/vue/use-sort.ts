@@ -3,7 +3,7 @@ import { anysort } from 'anysort'
 
 import type { Ref } from 'vue'
 
-type Sort = { field: string, order: 'asc' | 'desc' }
+type Sort = { field: string; order: 'asc' | 'desc' }
 
 type UseSortOptions<T> = {
   records: Ref<T[]>
@@ -17,18 +17,18 @@ export const useAnysort = <T>(opts: UseSortOptions<T>) => {
 
   const records: Ref<T[]> = opts.sorted || ref([])
   const sorts = shallowRef<Sort[]>(opts.defaultValues || [])
-  const init = () => records.value = [...opts.records.value]
+  const init = () => (records.value = [...opts.records.value])
 
   const sort = (field: string, order: 'asc' | 'desc') => {
-    if (!sorts.value.find(s => s.field === field)) {
+    if (!sorts.value.find((s) => s.field === field)) {
       sorts.value = [{ field, order }]
     } else {
-      sorts.value = sorts.value.map(s => s.field === field ? { field, order } : s)
+      sorts.value = sorts.value.map((s) => (s.field === field ? { field, order } : s))
     }
   }
 
   const toggle = (field: string, dft?: 'asc' | 'desc') => {
-    const sort = sorts.value.find(s => s.field === field)
+    const sort = sorts.value.find((s) => s.field === field)
     if (sort) {
       sort.order = (sort.order === 'asc' ? 'desc' : 'asc') as 'asc' | 'desc'
     } else {
@@ -36,12 +36,14 @@ export const useAnysort = <T>(opts: UseSortOptions<T>) => {
     }
   }
 
-  const sortPlugins = computed(() => sorts.value.map(({ field, order }) => {
-    return `${field}-${order}()`
-  }))
+  const sortPlugins = computed(() =>
+    sorts.value.map(({ field, order }) => {
+      return `${field}-${order}()`
+    }),
+  )
   watchEffect(() => {
     if (sortPlugins.value.length) {
-      anysort(records.value, ...sortPlugins.value as any)
+      anysort(records.value, ...(sortPlugins.value as any))
     } else {
       records.value = [...opts.records.value]
     }
@@ -52,7 +54,7 @@ export const useAnysort = <T>(opts: UseSortOptions<T>) => {
     sorted: records,
     sorts,
     sort,
-    toggle
+    toggle,
   }
 }
 

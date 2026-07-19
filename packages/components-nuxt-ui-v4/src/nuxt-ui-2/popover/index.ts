@@ -14,23 +14,23 @@ export default normalize({
       type: 'short',
       name: '触发区文本',
       initial: '触发区',
-      help: '向弹出层的触发区域添加组件将会覆盖默认的触发按钮。'
+      help: '向弹出层的触发区域添加组件将会覆盖默认的触发按钮。',
     },
     hoverMode: {
       type: 'boolean',
       name: '悬停打开',
-      initial: true
+      initial: true,
     },
     dftOpen: {
       type: 'boolean',
       name: '默认打开',
-      initial: false
+      initial: false,
     },
     direction: {
       type: 'card-selector',
       name: '打开方向',
-      options: popperPlacementOptions
-    }
+      options: popperPlacementOptions,
+    },
     // * 显示会有问题，先不展示箭头的配置项
     // arrow: {
     //   type: 'boolean',
@@ -43,13 +43,13 @@ export default normalize({
       {
         key: 'trigger',
         name: '触发区域',
-        binds
+        binds,
       },
       {
         key: 'panel',
         name: '弹出内容',
-        binds
-      }
+        binds,
+      },
     ].filter(Boolean)
-  }
+  },
 })

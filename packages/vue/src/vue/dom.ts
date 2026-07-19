@@ -32,7 +32,7 @@ export const useQuery = (selector: string, opts: UseQueryOpts = {}) => {
     fromElm = document,
     autoStop = true,
     retry = 10,
-    getRetryTimeout = (retry: number) => 100 * (retry ** 2),
+    getRetryTimeout = (retry: number) => 100 * retry ** 2,
   } = opts || {}
 
   const count = ref(0)
@@ -41,23 +41,26 @@ export const useQuery = (selector: string, opts: UseQueryOpts = {}) => {
     tick && clearInterval(tick)
   }
   const start = () => {
-    tick = setInterval(() => {
-      count.value++
-      if (count.value > retry) {
-        clearInterval(tick)
-      }
-      if (!unref(fromElm)) {
-        elm.value = null
-        return
-      }
-      const res = unref(fromElm).querySelector(selector)
-      if (res) {
-        if (autoStop) stop()
-        elm.value = res as HTMLElement
-      } else {
-        elm.value = null
-      }
-    }, getRetryTimeout(count.value, 100))
+    tick = setInterval(
+      () => {
+        count.value++
+        if (count.value > retry) {
+          clearInterval(tick)
+        }
+        if (!unref(fromElm)) {
+          elm.value = null
+          return
+        }
+        const res = unref(fromElm).querySelector(selector)
+        if (res) {
+          if (autoStop) stop()
+          elm.value = res as HTMLElement
+        } else {
+          elm.value = null
+        }
+      },
+      getRetryTimeout(count.value, 100),
+    )
   }
 
   watch(() => unref(fromElm), start, { immediate: true })

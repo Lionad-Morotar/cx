@@ -14,16 +14,10 @@
     @open="($event) => $emit('open', $event)"
     @close="($event) => $emit('close', $event)"
   >
-    <template
-      v-for="(_, name) in $slots"
-      #[name]="x"
-    >
+    <template v-for="(_, name) in $slots" #[name]="x">
       <template v-if="showSlot(name)">
         <div :class="name.startsWith('item-') ? ns.e('item') : ns.e('trigger')">
-          <slot
-            :name="(name as unknown as string)"
-            v-bind="x"
-          />
+          <slot :name="name as unknown as string" v-bind="x" />
         </div>
       </template>
     </template>
@@ -33,12 +27,12 @@
 <script setup lang="ts">
 import { unrefElement } from '@vueuse/core'
 
-import { useAttrs , useTemplateRef, computed} from 'vue'
+import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { UAccordion, UButton } from '../../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey , useSleep} from '@lionad/cx-definition'
-import { useCx, useCxSlot , useCxBEM, safeIcon} from '@lionad/cx-vue'
+import { CxEventDisplayCmptKey, useSleep } from '@lionad/cx-definition'
+import { useCx, useCxSlot, useCxBEM, safeIcon } from '@lionad/cx-vue'
 import type { ComponentProps, CxComponentRuntime } from '@lionad/cx-definition'
 import type { Item } from '../types'
 
@@ -52,22 +46,25 @@ const ns = useCxBEM('accordion')
 const inner = defineProps<{
   items: Item[]
 }>()
-const props = useAttrs() as UAccordionProps & UButtonProps & {
-  defaultClose?: boolean
-  openIcon?: string
-  closeIcon?: string
-  items?: Item[]
-  cmpt: CxComponentRuntime
-}
+const props = useAttrs() as UAccordionProps &
+  UButtonProps & {
+    defaultClose?: boolean
+    openIcon?: string
+    closeIcon?: string
+    items?: Item[]
+    cmpt: CxComponentRuntime
+  }
 const { showSlot } = useCxSlot(props.cmpt)
 
 const cmptRef: any = useTemplateRef('cmpt')
 const ui = {}
 
-const items = computed(() => (inner.items || []).map(item => ({
-  ...item,
-  slot: 'item-' + (item as any).id
-})))
+const items = computed(() =>
+  (inner.items || []).map((item) => ({
+    ...item,
+    slot: 'item-' + (item as any).id,
+  })),
+)
 
 const openIcon = computed(() => safeIcon(props.openIcon))
 const closeIcon = computed(() => safeIcon(props.closeIcon))
@@ -77,10 +74,10 @@ const defaultOpen = computed(() => !props.defaultClose)
 const open = async (index: number, reverse = false) => {
   const elm = unrefElement(cmptRef.value)
   const triggerElm = [...elm.querySelectorAll(`& > div > .${ns.e('trigger')}`)][index]
-  return (triggerElm.getAttribute('aria-expanded') === (reverse ? 'false' : 'true'))
+  return triggerElm.getAttribute('aria-expanded') === (reverse ? 'false' : 'true')
     ? false
-    // wait for animation end
-    : (triggerElm.click(), await useSleep(1000))
+    : // wait for animation end
+      (triggerElm.click(), await useSleep(1000))
 }
 const close = (index: number) => open(index, true)
 
@@ -103,11 +100,11 @@ defineExpose({
     if (slotKey === 'default') {
       return true
     }
-    const slotIndex = items.value.findIndex(x => x.slot === slotKey)
+    const slotIndex = items.value.findIndex((x) => x.slot === slotKey)
     if (slotIndex !== -1) {
       await open(slotIndex)
     }
-  }
+  },
 })
 </script>
 

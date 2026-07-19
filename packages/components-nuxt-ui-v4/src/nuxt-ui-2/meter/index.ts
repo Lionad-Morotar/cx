@@ -1,6 +1,6 @@
 import { normalize } from '@lionad/cx-definition'
 import component from './src/index.vue'
-import { cmptColorNames3 , useSizeOptions} from '@lionad/cx-vue'
+import { cmptColorNames3, useSizeOptions } from '@lionad/cx-vue'
 import { binds } from './slots'
 
 export default normalize({
@@ -15,27 +15,27 @@ export default normalize({
       name: '值',
       min: ({ cmpt }: any) => cmpt.data?.min || 0,
       max: ({ cmpt }: any) => cmpt.data?.max || 100,
-      step: 1
+      step: 1,
     },
     min: {
       type: 'number',
-      name: '最小值'
+      name: '最小值',
     },
     max: {
       type: 'number',
-      name: '最大值'
+      name: '最大值',
     },
     indicator: {
       type: 'boolean',
-      name: '指示器'
+      name: '指示器',
     },
     label: {
       type: 'short',
-      name: '标签'
+      name: '标签',
     },
     icon: {
       type: 'icon',
-      name: '图标'
+      name: '图标',
     },
     size: {
       type: 'card-selector',
@@ -43,8 +43,8 @@ export default normalize({
       isPreview: true,
       options: useSizeOptions('2xs', '2xl'),
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-8'
-      }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-8',
+      },
     },
     color: {
       type: 'card-selector',
@@ -52,24 +52,24 @@ export default normalize({
       isPreview: true,
       options: cmptColorNames3,
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-8'
-      }
-    }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-8',
+      },
+    },
   },
   slots: {
     label: {
       key: 'label',
       name: '标签',
-      binds
+      binds,
     },
     icon: {
       key: 'icon',
-      name: '标签前图标'
+      name: '标签前图标',
     },
     indicator: {
       key: 'indicator',
       name: '指示器',
-      binds
-    }
-  }
+      binds,
+    },
+  },
 })

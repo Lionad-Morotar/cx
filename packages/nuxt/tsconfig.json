@@ -2,7 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "#imports": ["./node_modules/nuxt/dist/app/nuxt.d.ts"],
+      "#app": ["./node_modules/nuxt/dist/app/index.d.ts"]
+    }
   },
   "include": ["src/**/*.ts"]
 }

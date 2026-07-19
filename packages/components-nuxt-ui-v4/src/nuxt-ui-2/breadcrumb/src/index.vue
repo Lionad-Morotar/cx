@@ -5,38 +5,20 @@
     :links="props.links || []"
     :divider="props.divider || '/'"
   >
-    <template
-      v-if="showSlotDefault"
-      #default="x"
-    >
-      <slot
-        name="default"
-        v-bind="x"
-      />
+    <template v-if="showSlotDefault" #default="x">
+      <slot name="default" v-bind="x" />
     </template>
-    <template
-      v-if="showSlotDivider"
-      #divider="x"
-    >
-      <slot
-        name="divider"
-        v-bind="x"
-      />
+    <template v-if="showSlotDivider" #divider="x">
+      <slot name="divider" v-bind="x" />
     </template>
-    <template
-      v-if="showSlotIcon"
-      #icon="x"
-    >
-      <slot
-        name="icon"
-        v-bind="x"
-      />
+    <template v-if="showSlotIcon" #icon="x">
+      <slot name="icon" v-bind="x" />
     </template>
   </UBreadcrumb>
 </template>
 
 <script setup lang="ts">
-import { useAttrs , computed, useTemplateRef} from 'vue'
+import { useAttrs, computed, useTemplateRef } from 'vue'
 
 import { useCxBEM } from '@lionad/cx-vue'
 

@@ -14,34 +14,34 @@ export default normalize({
     label: {
       type: 'short',
       name: '标题',
-      initial: '复选框'
+      initial: '复选框',
     },
     help: {
       type: 'short',
       name: '提示信息',
-      initial: '关于复选框的提示信息'
+      initial: '关于复选框的提示信息',
     },
     color: {
       name: '颜色',
       type: 'card-selector',
       isPreview: true,
-      options: cmptColorNames3
+      options: cmptColorNames3,
     },
     required: {
       name: '是否必填',
-      type: 'switch'
+      type: 'switch',
     },
     disabled: {
       name: '禁用',
-      type: 'switch'
-    }
+      type: 'switch',
+    },
   },
   emits: {
     change: {
       name: '勾选改变',
       description: '当勾选状态变化时触发',
-      schema: z.boolean()
-    }
+      schema: z.boolean(),
+    },
   },
   slots: () => {
     const res = [] as CxComponentSlot[]
@@ -53,14 +53,14 @@ export default normalize({
           label: {
             name: '标题',
             description: '复选框的标题',
-            schema: z.string()
+            schema: z.string(),
           },
           required: {
             name: '是否必填',
             description: '必填时，默认的标题后会有星号',
-            schema: z.boolean()
-          }
-        }
+            schema: z.boolean(),
+          },
+        },
       },
       {
         key: 'help',
@@ -69,11 +69,11 @@ export default normalize({
           help: {
             name: '提示信息',
             description: '复选框的提示信息',
-            schema: z.string()
-          }
-        }
-      }
+            schema: z.string(),
+          },
+        },
+      },
     )
     return res
-  }
+  },
 })

@@ -11,15 +11,19 @@ export const useKeyStrokeWhen = (
   key: KeyFilter,
   fn: (event: KeyboardEvent) => void,
   opts: OnKeyStrokeOptions = {
-    target: window
-  }
+    target: window,
+  },
 ) => {
   const clean = useCleanups()
-  watch(getter, (nv) => {
-    clean.cleanup()
-    const shouldExec = Array.isArray(nv) ? (nv.length && nv.every(Boolean)) : Boolean(nv)
-    if (shouldExec) {
-      clean.add(onKeyStroke(key, fn, opts))
-    }
-  }, { immediate: true })
+  watch(
+    getter,
+    (nv) => {
+      clean.cleanup()
+      const shouldExec = Array.isArray(nv) ? nv.length && nv.every(Boolean) : Boolean(nv)
+      if (shouldExec) {
+        clean.add(onKeyStroke(key, fn, opts))
+      }
+    },
+    { immediate: true },
+  )
 }

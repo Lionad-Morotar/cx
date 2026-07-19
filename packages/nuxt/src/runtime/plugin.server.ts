@@ -10,7 +10,7 @@ import { installCxBundles } from './install'
 export default defineNuxtPlugin({
   name: 'cx',
   enforce: 'pre',
-  setup(nuxtApp) {
+  setup(nuxtApp: any) {
     const cx = new CxLoader()
 
     installCxBundles(cx, nuxtApp)

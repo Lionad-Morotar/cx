@@ -12,7 +12,7 @@ export default normalize({
     name: {
       type: 'icon',
       name: '图标',
-      initial: 'i-fluent-shapes-20-regular'
+      initial: 'i-fluent-shapes-20-regular',
     },
     size: {
       type: 'range',
@@ -20,7 +20,7 @@ export default normalize({
       initial: 16,
       min: 8,
       max: 64,
-      step: 1
-    }
-  }
+      step: 1,
+    },
+  },
 })

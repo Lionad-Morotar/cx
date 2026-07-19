@@ -17,38 +17,40 @@ export default normalize({
       initial: () => [
         {
           label: 'Home',
-          icon: 'i-heroicons-home'
-        }, {
+          icon: 'i-heroicons-home',
+        },
+        {
           label: 'Navigation',
-          icon: 'i-heroicons-square-3-stack-3d'
-        }, {
+          icon: 'i-heroicons-square-3-stack-3d',
+        },
+        {
           label: 'Breadcrumb',
-          icon: 'i-heroicons-link'
-        }
-      ]
+          icon: 'i-heroicons-link',
+        },
+      ],
     },
     divider: {
       type: 'short',
       name: '分隔符',
-      hidden: ({ cmpt }: any) => cmpt.data?.links?.length > 0
-    }
+      hidden: ({ cmpt }: any) => cmpt.data?.links?.length > 0,
+    },
   },
   slots: () => {
     return [
       {
         key: 'default',
         name: '默认',
-        binds: slotBinds
+        binds: slotBinds,
       },
       {
         key: 'icon',
         name: '图标',
-        binds: slotBinds
+        binds: slotBinds,
       },
       {
         key: 'divider',
-        name: '分隔符'
-      }
+        name: '分隔符',
+      },
     ].filter(Boolean)
-  }
+  },
 })

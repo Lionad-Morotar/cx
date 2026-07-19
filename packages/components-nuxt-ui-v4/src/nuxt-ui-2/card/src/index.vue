@@ -1,8 +1,5 @@
 <template>
-  <UCard
-    ref="cmpt"
-    :class="ns.b()"
-  >
+  <UCard ref="cmpt" :class="ns.b()">
     <template #header>
       <slot name="header" />
     </template>
@@ -16,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAttrs , useTemplateRef, computed} from 'vue'
+import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { useCxBEM } from '@lionad/cx-vue'
 

@@ -47,11 +47,12 @@
 
 <script setup lang="ts">
 import { useTranslator } from '@lionad/cx-definition'
-import { useAttrs , useTemplateRef, computed} from 'vue'
+import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { useCxBEM } from '@lionad/cx-vue'
 
-const IconTip = 'data:image/svg+xml,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M8%201a7%207%200%20110%2014A7%207%200%20018%201zm0%201.188a5.813%205.813%200%20000%2011.624A5.813%205.813%200%20008%202.188zM8.375%207c.069%200%20.125.056.125.125v4.25a.125.125%200%2001-.125.125h-.75a.125.125%200%2001-.125-.125v-4.25c0-.069.056-.125.125-.125zM8%204.5A.75.75%200%20118%206a.75.75%200%20010-1.5z%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E%0A'
+const IconTip =
+  'data:image/svg+xml,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M8%201a7%207%200%20110%2014A7%207%200%20018%201zm0%201.188a5.813%205.813%200%20000%2011.624A5.813%205.813%200%20008%202.188zM8.375%207c.069%200%20.125.056.125.125v4.25a.125.125%200%2001-.125.125h-.75a.125.125%200%2001-.125-.125v-4.25c0-.069.056-.125.125-.125zM8%204.5A.75.75%200%20118%206a.75.75%200%20010-1.5z%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E%0A'
 import { UPopover } from '../../../vendor/bridge'
 
 defineOptions({ name: 'CxSimpleCard' })

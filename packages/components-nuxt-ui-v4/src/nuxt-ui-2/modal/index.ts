@@ -13,24 +13,24 @@ export default normalize({
       type: 'short',
       name: '按钮内容',
       initial: '打开弹窗',
-      help: '向弹窗的触发区域添加组件将会覆盖默认的触发按钮。如果您已经添加了新的触发组件，想打开弹窗而不是选中触发组件，需要长按 0.5 秒。'
+      help: '向弹窗的触发区域添加组件将会覆盖默认的触发按钮。如果您已经添加了新的触发组件，想打开弹窗而不是选中触发组件，需要长按 0.5 秒。',
     },
     overlay: {
       type: 'boolean',
       name: '遮罩',
-      initial: true
+      initial: true,
     },
     fullscreen: {
       type: 'boolean',
       name: '全屏弹窗',
-      initial: false
+      initial: false,
     },
     notPreventClose: {
       type: 'boolean',
       name: '点击空白处关闭弹窗',
       initial: true,
-      help: '在编辑模式中，可以通过双击弹窗的空白处关闭弹窗'
-    }
+      help: '在编辑模式中，可以通过双击弹窗的空白处关闭弹窗',
+    },
     // escClose: {
     //   type: 'boolean',
     //   name: '按 ESC 键关闭弹窗',
@@ -39,32 +39,32 @@ export default normalize({
     // },
   },
   emits: {
-    'close': {
+    close: {
       name: '关闭',
-      description: '弹窗关闭时触发'
+      description: '弹窗关闭时触发',
     },
     'close-prevented': {
       name: '关闭被阻止',
-      description: '尝试关闭弹窗但被阻止时触发'
+      description: '尝试关闭弹窗但被阻止时触发',
     },
     'after-leave': {
       name: '销毁',
-      description: '弹窗关闭动画结束后触发，此时界面是可交互的'
-    }
+      description: '弹窗关闭动画结束后触发，此时界面是可交互的',
+    },
   },
   exposes: {
-    ...CxEvents.displaySubCmpt.define
+    ...CxEvents.displaySubCmpt.define,
   },
   slots: ({ cmpt, cx }: any) => {
     const res = [
       {
         key: 'trigger',
-        name: '触发区域'
+        name: '触发区域',
       },
       {
         key: 'modal',
-        name: '弹窗内容'
-      }
+        name: '弹窗内容',
+      },
     ]
     const ref = (cx?.refs?.get?.(cmpt.id) || {}).ref
     if (unref(ref?.isOpen)) {
@@ -72,5 +72,5 @@ export default normalize({
     } else {
       return res
     }
-  }
+  },
 })

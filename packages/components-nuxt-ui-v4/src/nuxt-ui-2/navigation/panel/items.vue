@@ -1,8 +1,5 @@
 <template>
-  <el-form
-    :model="value"
-    label-position="top"
-  >
+  <el-form :model="value" label-position="top">
     <el-form-item
       v-for="(tab, idx) in value"
       :key="`${idx}-${tab.value}`"
@@ -12,24 +9,14 @@
     >
       <template #label>
         <div class="label">
-          <span>{{ `${('项目')} ${idx + 1}` }}</span>
-          <span
-            class="delete-text"
-            @click="() => remove(idx)"
-            v-text="'删除'"
-          />
+          <span>{{ `${'项目'} ${idx + 1}` }}</span>
+          <span class="delete-text" @click="() => remove(idx)" v-text="'删除'" />
         </div>
       </template>
       <el-input v-model="tab.label" />
     </el-form-item>
 
-    <el-button
-      class="mt-4 w-full text-center"
-      type="primary"
-      @click="add"
-    >
-      添加项目
-    </el-button>
+    <el-button class="mt-4 w-full text-center" type="primary" @click="add"> 添加项目 </el-button>
   </el-form>
 </template>
 
@@ -45,16 +32,15 @@ const tabRule = [
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { label } = item || {}
-      if (label.length <= 0) return cb(new Error(('请输入项目名称')))
-      if (label.length >= 25)
-        return cb(new Error(('项目名称不能超过 25 个字符')))
+      if (label.length <= 0) return cb(new Error('请输入项目名称'))
+      if (label.length >= 25) return cb(new Error('项目名称不能超过 25 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 
 const add = () => {
-  const newTabName = `${('项目')}${((value.value as any[])?.length || 0) + 1}`
+  const newTabName = `${'项目'}${((value.value as any[])?.length || 0) + 1}`
   const newTab = createItem(newTabName)
   value.value.push(newTab)
 }

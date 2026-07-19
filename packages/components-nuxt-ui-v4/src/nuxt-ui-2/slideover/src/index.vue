@@ -1,13 +1,6 @@
 <template>
-  <button
-    ref="cmpt"
-    :class="ns.b()"
-    v-bind="attrs"
-  >
-    <slot
-      v-if="showSlot('trigger')"
-      name="trigger"
-    />
+  <button ref="cmpt" :class="ns.b()" v-bind="attrs">
+    <slot v-if="showSlot('trigger')" name="trigger" />
     <UButton
       v-else
       v-cx="{ text: 'label', cmpt: props.cmpt.id }"
@@ -25,14 +18,8 @@
       @close-prevented="$emit('close-prevented')"
       @after-leave="$emit('after-leave')"
     >
-      <slot
-        v-if="showSlot('slideover')"
-        name="slideover"
-      />
-      <CxEmpty
-        v-else
-        :text="'当前弹窗内容为空'"
-      />
+      <slot v-if="showSlot('slideover')" name="slideover" />
+      <CxEmpty v-else :text="'当前弹窗内容为空'" />
     </USlideover>
   </button>
 </template>
@@ -41,14 +28,21 @@
 import { CxEmpty } from '@lionad/cx-vue'
 import { v4 as uuidv4 } from 'uuid'
 
-import { useStyleTag , unrefElement} from '@vueuse/core'
+import { useStyleTag, unrefElement } from '@vueuse/core'
 
-import { useAttrs , useTemplateRef, ref, computed, watchEffect} from 'vue'
+import { useAttrs, useTemplateRef, ref, computed, watchEffect } from 'vue'
 
 import { UButton, USlideover } from '../../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey , not, useHooks, useMacroTask} from '@lionad/cx-definition'
-import { useCxSlot, useCxEditMode , useCxBEM, useTempPortalRoot, resetTempPortalRoot, useKeyStrokeWhen} from '@lionad/cx-vue'
+import { CxEventDisplayCmptKey, not, useHooks, useMacroTask } from '@lionad/cx-definition'
+import {
+  useCxSlot,
+  useCxEditMode,
+  useCxBEM,
+  useTempPortalRoot,
+  resetTempPortalRoot,
+  useKeyStrokeWhen,
+} from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
 defineOptions({ name: 'CxSlideover' })
@@ -71,12 +65,16 @@ const slideoverRef = ref<any>()
 const ui = computed(() => {})
 
 const attrs = computed(() => ({
-  onClick: openModal
+  onClick: openModal,
 }))
 
 const isOpen = ref(false)
-const openModal = useHooks(() => { isOpen.value = true })
-const closeModal = useHooks(() => { isOpen.value = false })
+const openModal = useHooks(() => {
+  isOpen.value = true
+})
+const closeModal = useHooks(() => {
+  isOpen.value = false
+})
 
 const { isEditMode } = useCxEditMode(() => {
   /* 单独呈现在编辑器中时，将 DOM 节点移动到编辑器内（而不是 teleport 到 body），其次 hack 样式中的 fixed 背景位置防止错位 */
@@ -84,14 +82,19 @@ const { isEditMode } = useCxEditMode(() => {
     // useTempPortalRoot('body')
     useTempPortalRoot('#p-page-edit-canvas > .p-page__content-x > .bg')
   })
-  openModal.post(() => useMacroTask(async () => {
-    resetTempPortalRoot()
-  }))
-  closeModal.post(() => useMacroTask(async () => {
-    resetTempPortalRoot()
-  }))
+  openModal.post(() =>
+    useMacroTask(async () => {
+      resetTempPortalRoot()
+    }),
+  )
+  closeModal.post(() =>
+    useMacroTask(async () => {
+      resetTempPortalRoot()
+    }),
+  )
 
-  useStyleTag(`
+  useStyleTag(
+    `
     #p-page-edit-canvas > .p-page__content-x > .bg > [data-headlessui-portal],
     #p-page-edit-canvas > .p-page__content-x > .bg [role="dialog"],
     #p-page-edit-canvas > .p-page__content-x > .bg > [data-headlessui-portal] > div {
@@ -102,9 +105,11 @@ const { isEditMode } = useCxEditMode(() => {
     #p-page-edit-canvas > .p-page__content-x > .bg > [data-headlessui-portal] > div .fixed {
       position: absolute !important;
     }
-  `, {
-    id: `cx-slideover_in_edit_mode-${uuidv4()}`
-  })
+  `,
+    {
+      id: `cx-slideover_in_edit_mode-${uuidv4()}`,
+    },
+  )
 
   // nuxt-ui-2 的 slideover 会在打开时将 body 和 app 设置为 inert，
   // 但是在编辑器中，我们需要保持 app 可操作，所以需要手动移除 inert 属性
@@ -134,7 +139,7 @@ const editModeModalHandlers = {
       cancelable: true,
       view: window,
       clientX: e.clientX,
-      clientY: e.clientY
+      clientY: e.clientY,
     })
     const elm = unrefElement(cmptRef)
     if (!elm?.dispatchEvent) return
@@ -149,7 +154,7 @@ const editModeModalHandlers = {
       cancelable: true,
       view: window,
       clientX: e.clientX,
-      clientY: e.clientY
+      clientY: e.clientY,
     })
     const elm = unrefElement(cmptRef)
     if (!elm?.dispatchEvent) return
@@ -157,27 +162,31 @@ const editModeModalHandlers = {
   },
   onDblclick: (e: MouseEvent) => {
     const targetElm = e.target as HTMLElement
-    if ((targetElm?.nextElementSibling as HTMLElement)?.getAttribute('id')!.startsWith('headlessui-dialog-panel-v-')) {
+    if (
+      (targetElm?.nextElementSibling as HTMLElement)
+        ?.getAttribute('id')!
+        .startsWith('headlessui-dialog-panel-v-')
+    ) {
       closeModal()
       // todo select(props.cmpt)
     }
-  }
+  },
 }
 
 useKeyStrokeWhen(
   () => props.escClose && isOpen.value,
   'Escape',
-  () => closeModal()
+  () => closeModal(),
 )
 
 const slideoverAttrs = computed(() => {
   const normalAttrs = {
-    preventClose: not(props.notPreventClose)
+    preventClose: not(props.notPreventClose),
   }
   return isEditMode.value
     ? {
         ...normalAttrs,
-        ...editModeModalHandlers
+        ...editModeModalHandlers,
       }
     : normalAttrs
 })
@@ -187,11 +196,11 @@ defineExpose({
   [CxEventDisplayCmptKey]: (toDisplayCmpt: CxComponentRuntime) => {
     if (!toDisplayCmpt) return
     const cmptsInModal = props.cmpt?.components?.slideover || []
-    const isFind = cmptsInModal.some(cmpt => cmpt.id === toDisplayCmpt.id)
+    const isFind = cmptsInModal.some((cmpt) => cmpt.id === toDisplayCmpt.id)
     if (isFind) {
       openModal()
     }
-  }
+  },
 })
 </script>
 

@@ -13,21 +13,21 @@ export default normalize({
     value: {
       type: 'short',
       name: '内容',
-      initial: 'Ctrl'
+      initial: 'Ctrl',
     },
     size: {
       type: 'card-selector',
       name: '尺寸',
       isPreview: true,
-      options: useSizeOptions('xs', 'md')
-    }
+      options: useSizeOptions('xs', 'md'),
+    },
   },
   slots: () => {
     const res = [] as CxComponentSlot[]
     res.push({
       key: 'default',
-      name: '按键内容'
+      name: '按键内容',
     })
     return res.filter(Boolean)
-  }
+  },
 })

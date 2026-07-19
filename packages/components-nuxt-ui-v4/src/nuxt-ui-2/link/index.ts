@@ -12,16 +12,16 @@ export default normalize({
     label: {
       type: 'short',
       name: '文本',
-      initial: '链接'
+      initial: '链接',
     },
     to: {
       type: 'short',
-      name: '前往'
+      name: '前往',
     },
     openInNew: {
       type: 'boolean',
-      name: '新窗口打开'
-    }
+      name: '新窗口打开',
+    },
   },
   slots: {
     default: {
@@ -31,9 +31,9 @@ export default normalize({
         isActive: {
           name: '是否激活',
           description: '当前项是否激活',
-          schema: z.boolean()
-        }
-      }
-    }
-  }
+          schema: z.boolean(),
+        },
+      },
+    },
+  },
 })

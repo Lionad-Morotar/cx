@@ -1,8 +1,5 @@
 <template>
-  <el-form
-    :model="value"
-    label-position="top"
-  >
+  <el-form :model="value" label-position="top">
     <el-form-item
       v-for="(tab, idx) in value"
       :key="`${idx}-${tab.value}`"
@@ -12,22 +9,14 @@
     >
       <template #label>
         <div class="label">
-          <span>{{ `${('标签页')} ${idx + 1}` }}</span>
-          <span
-            class="delete-text"
-            @click="() => deleteTab(idx)"
-            v-text="'删除'"
-          />
+          <span>{{ `${'标签页'} ${idx + 1}` }}</span>
+          <span class="delete-text" @click="() => deleteTab(idx)" v-text="'删除'" />
         </div>
       </template>
       <el-input v-model="tab.name" />
     </el-form-item>
 
-    <el-button
-      class="mt-4 w-full text-center"
-      type="primary"
-      @click="addTab"
-    >
+    <el-button class="mt-4 w-full text-center" type="primary" @click="addTab">
       添加标签页
     </el-button>
   </el-form>
@@ -45,16 +34,15 @@ const tabRule = [
     trigger: ['blur', 'change'],
     validator(rule: any, item: any, cb: any) {
       const { name } = item || {}
-      if (name.length <= 0) return cb(new Error(('请输入标签页名称')))
-      if (name.length >= 25)
-        return cb(new Error(('标签页名称不能超过 25 个字符')))
+      if (name.length <= 0) return cb(new Error('请输入标签页名称'))
+      if (name.length >= 25) return cb(new Error('标签页名称不能超过 25 个字符'))
       return cb()
-    }
-  }
+    },
+  },
 ]
 
 const addTab = () => {
-  const newTabName = `${('标签页')}${((value.value as any[])?.length || 0) + 1}`
+  const newTabName = `${'标签页'}${((value.value as any[])?.length || 0) + 1}`
   const newTab = createTab(newTabName)
   value.value.push(newTab)
 }

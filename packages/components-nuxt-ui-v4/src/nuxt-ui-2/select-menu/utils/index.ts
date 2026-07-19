@@ -5,6 +5,6 @@ export const createItem = ({ label, value }: Omit<Item, 'id'>) => {
   return {
     id: uuidv4(),
     label,
-    value: value || label
+    value: value || label,
   }
 }

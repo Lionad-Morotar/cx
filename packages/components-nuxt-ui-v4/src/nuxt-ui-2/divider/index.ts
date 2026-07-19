@@ -1,4 +1,4 @@
-import { normalize , has} from '@lionad/cx-definition'
+import { normalize, has } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { useSizeOptions } from '@lionad/cx-vue'
 
@@ -13,12 +13,12 @@ export default normalize({
       type: 'short',
       name: '文本',
       initial: '分隔',
-      hidden: ({ cmpt }: any) => has(cmpt.data?.icon)
+      hidden: ({ cmpt }: any) => has(cmpt.data?.icon),
     },
     icon: {
       type: 'icon',
       name: '图标',
-      hidden: ({ cmpt }: any) => has(cmpt.data?.label)
+      hidden: ({ cmpt }: any) => has(cmpt.data?.label),
     },
     orientation: {
       type: 'card-selector',
@@ -26,8 +26,8 @@ export default normalize({
       isPreview: true,
       options: [
         { label: '水平', value: 'horizontal' },
-        { label: '垂直', value: 'vertical' }
-      ]
+        { label: '垂直', value: 'vertical' },
+      ],
     },
     type: {
       type: 'card-selector',
@@ -36,20 +36,20 @@ export default normalize({
       options: [
         { label: '实线', value: 'solid' },
         { label: '虚线', value: 'dashed' },
-        { label: '点线', value: 'dotted' }
-      ]
+        { label: '点线', value: 'dotted' },
+      ],
     },
     size: {
       type: 'card-selector',
       name: '粗细',
       isPreview: true,
-      options: useSizeOptions('2xs', 'xl')
-    }
+      options: useSizeOptions('2xs', 'xl'),
+    },
   },
   slots: {
     default: {
       key: 'default',
-      name: '分隔线内容'
-    }
-  }
+      name: '分隔线内容',
+    },
+  },
 })

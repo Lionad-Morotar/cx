@@ -7,6 +7,6 @@ export const createItem = (item: Item) => {
   return {
     id: item.id || uuidv4(),
     label: item.label || '',
-    icon: item.icon || ''
+    icon: item.icon || '',
   }
 }

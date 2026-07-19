@@ -10,7 +10,7 @@ export const zItem = z.object({
   shortcut: z.string().optional(),
   description: z.string().optional(),
   to: z.string().optional(),
-  href: z.string().optional()
+  href: z.string().optional(),
 })
 
 export type Item = z.infer<typeof zItem>
@@ -18,7 +18,7 @@ export type Item = z.infer<typeof zItem>
 export const zGroupItem = z.object({
   key: z.string(),
   label: z.string(),
-  commands: z.array(zItem)
+  commands: z.array(zItem),
 })
 
 export type GroupItem = z.infer<typeof zGroupItem>

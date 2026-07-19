@@ -1,6 +1,6 @@
 import z from 'zod'
 import { normalize } from '@lionad/cx-definition'
-import { cmptColorNames3, positionOptions , useSizeOptions} from '@lionad/cx-vue'
+import { cmptColorNames3, positionOptions, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 import type { CxComponentSlot } from '@lionad/cx-definition'
 
@@ -16,41 +16,41 @@ export default normalize({
       name: '大小',
       isPreview: true,
       options: useSizeOptions('3xs', '3xl'),
-      pickComponent: () => ({})
+      pickComponent: () => ({}),
     },
     color: {
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
       options: cmptColorNames3,
-      pickComponent: () => ({})
+      pickComponent: () => ({}),
     },
     position: {
       type: 'card-selector',
       name: '位置',
-      options: positionOptions
+      options: positionOptions,
     },
     text: {
       type: 'short',
-      name: '文本'
+      name: '文本',
     },
     show: {
       type: 'switch',
       name: '是否显示',
-      initial: true
+      initial: true,
     },
     inset: {
       type: 'switch',
       name: '更靠近内部',
-      initial: false
-    }
+      initial: false,
+    },
   },
   slots: ({ cmpt }: any) => {
     const res = [] as CxComponentSlot[]
     res.push(
       {
         key: 'default',
-        name: '被标记内容'
+        name: '被标记内容',
       },
       // 防止没有内容时往标记内容添加一个很宽很长的组件导致样式错乱
       cmpt.components?.['default']?.length && {
@@ -60,11 +60,11 @@ export default normalize({
           text: {
             name: '文本',
             description: '标记内的简短的文字',
-            schema: z.string()
-          }
-        }
-      }
+            schema: z.string(),
+          },
+        },
+      },
     )
     return res.filter(Boolean)
-  }
+  },
 })

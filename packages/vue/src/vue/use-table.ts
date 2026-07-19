@@ -6,22 +6,22 @@ import { useClone } from './clone'
 
 import type { Ref } from 'vue'
 
-
-
 export const useTable = () => {
-  const columns = ref<{
-    field: string
-    title: string
-    width?: number
-    linkField?: any
-    linkModel?: any
-  }[]>([])
+  const columns = ref<
+    {
+      field: string
+      title: string
+      width?: number
+      linkField?: any
+      linkModel?: any
+    }[]
+  >([])
   const records = ref<Record<string, any>[]>([])
 
   const filters = ref<any[]>([])
   const filtered = ref<Record<string, any>[]>([])
 
-  const colsSort = ref<{ field: { id: string, name: string }, sort: 'asc' | 'desc' | '' }[]>([])
+  const colsSort = ref<{ field: { id: string; name: string }; sort: 'asc' | 'desc' | '' }[]>([])
   const sorted = ref<Record<string, any>[]>([])
 
   const useNewColsVisible = ref(false)
@@ -29,7 +29,7 @@ export const useTable = () => {
   const colsVisible = ref<Record<string, boolean>>({})
   const filteredColumns = computed(() => {
     return useNewColsVisible.value
-      ? columns.value.filter(col => colsVisible.value[col.field])
+      ? columns.value.filter((col) => colsVisible.value[col.field])
       : columns.value.filter((col, idx) => colsVisibleDeprecated.value[idx])
   })
 
@@ -40,7 +40,7 @@ export const useTable = () => {
     sorts: _sorts = [],
     colsVisibleDeprecated: _colsVisibleDeprecated = [],
     colsVisible: _colsVisible = {},
-    colsSort: _colsSort = []
+    colsSort: _colsSort = [],
   }: any) => {
     useNewColsVisible.value = _useNewColsVisible
 
@@ -51,23 +51,29 @@ export const useTable = () => {
     const emptyCols = columns.value.length === 0
     if (emptyCols && hasRecord) {
       const firstRecord = records.value[0] || {}
-      columns.value = Object.keys(firstRecord).map(key => ({
+      columns.value = Object.keys(firstRecord).map((key) => ({
         field: key,
-        title: key
+        title: key,
       }))
     }
 
     colsSort.value = _colsSort.filter(has)
     colsVisibleDeprecated.value = _colsVisibleDeprecated.filter(has)
-    colsVisible.value = columns.value.reduce((acc, col) => {
-      acc[col.field] = has(_colsVisible[col.field]) as boolean
-      return acc
-    }, {} as Record<string, boolean>)
-    if (useNewColsVisible.value && colsVisibleDeprecated.value.length) {
-      colsVisible.value = columns.value.reduce((acc, col, idx) => {
-        acc[col.field] = colsVisibleDeprecated.value[idx] as boolean
+    colsVisible.value = columns.value.reduce(
+      (acc, col) => {
+        acc[col.field] = has(_colsVisible[col.field]) as boolean
         return acc
-      }, {} as Record<string, boolean>)
+      },
+      {} as Record<string, boolean>,
+    )
+    if (useNewColsVisible.value && colsVisibleDeprecated.value.length) {
+      colsVisible.value = columns.value.reduce(
+        (acc, col, idx) => {
+          acc[col.field] = colsVisibleDeprecated.value[idx] as boolean
+          return acc
+        },
+        {} as Record<string, boolean>,
+      )
     }
 
     filtered.value = useClone(records.value)
@@ -85,10 +91,13 @@ export const useTable = () => {
     colsVisibleDeprecated.value = columns.value.map(() => true)
   }
   const resetVisible = () => {
-    colsVisible.value = columns.value.reduce((acc, col) => {
-      acc[col.field] = true
-      return acc
-    }, {} as Record<string, boolean>)
+    colsVisible.value = columns.value.reduce(
+      (acc, col) => {
+        acc[col.field] = true
+        return acc
+      },
+      {} as Record<string, boolean>,
+    )
   }
   const resetSorts = () => {
     colsSort.value = []
@@ -96,7 +105,7 @@ export const useTable = () => {
 
   const { sorts, init: initSort } = useAnysort({
     records: filtered,
-    sorted
+    sorted,
   })
 
   watch(filtered, initSort)
@@ -113,11 +122,13 @@ export const useTable = () => {
   watchEffect(() => {
     // console.log('filtered backup', filtered.value.length)
     sorts.value = colsSort.value
-      .filter(x => x.sort)
+      .filter((x) => x.sort)
       .map((sort) => {
         return {
           field: sort.field.id,
-          order: (sort.sort === 'asc' ? 'asc' : sort.sort === 'desc' ? 'desc' : undefined) as 'asc' | 'desc'
+          order: (sort.sort === 'asc' ? 'asc' : sort.sort === 'desc' ? 'desc' : undefined) as
+            | 'asc'
+            | 'desc',
         }
       })
   })
@@ -138,7 +149,7 @@ export const useTable = () => {
     sorts,
     colsSort,
     sorted,
-    resetSorts
+    resetSorts,
   }
 }
 

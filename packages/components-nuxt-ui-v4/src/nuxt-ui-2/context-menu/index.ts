@@ -15,19 +15,19 @@ export default normalize({
       name: '菜单项',
       help: '编辑模式下，左键双击展开菜单项',
       component: panelActions,
-      initial: () => []
-    }
+      initial: () => [],
+    },
   },
   emits: {
     close: {
       name: '关闭',
-      description: '右键菜单关闭时触发'
-    }
+      description: '右键菜单关闭时触发',
+    },
   },
   slots: {
     'trigger-area': {
       key: 'trigger-area',
-      name: '触发区域'
-    }
-  }
+      name: '触发区域',
+    },
+  },
 })

@@ -1,7 +1,7 @@
 import z from 'zod'
-import { normalize , has, not} from '@lionad/cx-definition'
+import { normalize, has, not } from '@lionad/cx-definition'
 import component from './src/index.vue'
-import { cmptColorNames3 , useSizeOptions} from '@lionad/cx-vue'
+import { cmptColorNames3, useSizeOptions } from '@lionad/cx-vue'
 
 export default normalize({
   key: 'cx-textarea',
@@ -13,12 +13,12 @@ export default normalize({
     placeholder: {
       type: 'short',
       name: '占位符',
-      initial: '输入内容'
+      initial: '输入内容',
     },
     autoresize: {
       type: 'boolean',
       name: '自动高度',
-      initial: true
+      initial: true,
     },
     maxrows: {
       type: 'range',
@@ -26,7 +26,7 @@ export default normalize({
       initial: 20,
       min: 1,
       max: 20,
-      hidden: ({ cmpt }: any) => not(cmpt.data?.autoresize)
+      hidden: ({ cmpt }: any) => not(cmpt.data?.autoresize),
     },
     rows: {
       type: 'range',
@@ -34,17 +34,17 @@ export default normalize({
       initial: 0,
       min: 0,
       max: 20,
-      hidden: ({ cmpt }: any) => has(cmpt.data?.autoresize)
+      hidden: ({ cmpt }: any) => has(cmpt.data?.autoresize),
     },
     resize: {
       type: 'boolean',
       name: '允许手动调节高度',
-      initial: false
+      initial: false,
     },
     padded: {
       type: 'boolean',
       name: '内边距',
-      initial: true
+      initial: true,
     },
     variant: {
       type: 'card-selector',
@@ -52,12 +52,12 @@ export default normalize({
       isPreview: true,
       options: [
         { label: '边框', value: 'outline' },
-        { label: '无边框', value: 'none' }
+        { label: '无边框', value: 'none' },
       ],
       pickData: ({ data }: any) => ({ ...data, autoresize: false, rows: 1 }),
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-5'
-      }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-5',
+      },
     },
     size: {
       type: 'card-selector',
@@ -66,8 +66,8 @@ export default normalize({
       options: useSizeOptions('2xs', 'xl'),
       pickData: ({ data }: any) => ({ ...data, autoresize: false, rows: 1 }),
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-5'
-      }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-5',
+      },
     },
     color: {
       type: 'card-selector',
@@ -76,19 +76,19 @@ export default normalize({
       options: cmptColorNames3,
       pickData: ({ data }: any) => ({ ...data, autoresize: false, rows: 1 }),
       ui: {
-        item: 'w-[80%] h-28 px-4 pt-1 pb-5'
-      }
-    }
+        item: 'w-[80%] h-28 px-4 pt-1 pb-5',
+      },
+    },
   },
   emits: {
     change: {
       name: '变化',
       description: '输入的值发生变化，通常在失焦时变化',
-      schema: z.string()
+      schema: z.string(),
     },
     blur: {
       name: '失焦',
-      description: '输入框失去焦点'
-    }
-  }
+      description: '输入框失去焦点',
+    },
+  },
 })

@@ -19,7 +19,7 @@ export default normalize({
       type: 'custom',
       name: '选项',
       component: PanelItems,
-      initial: () => [createItem({ label: '选项1', value: '1' })]
+      initial: () => [createItem({ label: '选项1', value: '1' })],
     },
     /**
      * @see https://ui.nuxt.com/components/input-menu#usage
@@ -28,55 +28,55 @@ export default normalize({
       type: 'boolean',
       name: '多选',
       disabled: true,
-      help: '选项框组件不支持多选，请使用下拉菜单组件'
+      help: '选项框组件不支持多选，请使用下拉菜单组件',
     },
     direction: {
       type: 'card-selector',
       name: '打开方向',
       options: popperPlacementOptions,
       disabled: true,
-      help: '选项框组件不支持打开方向，请使用下拉菜单组件'
+      help: '选项框组件不支持打开方向，请使用下拉菜单组件',
     },
-    dftValue: CxInput._cx_meta.props.dftValue!!,
-    placeholder: CxInput._cx_meta.props.placeholder!!,
-    icon: CxInput._cx_meta.props.icon!!,
+    dftValue: CxInput._cx_meta.props.dftValue!,
+    placeholder: CxInput._cx_meta.props.placeholder!,
+    icon: CxInput._cx_meta.props.icon!,
     trailingIcon: {
-      ...CxInput._cx_meta.props.icon!!,
-      name: '尾部图标'
+      ...CxInput._cx_meta.props.icon!,
+      name: '尾部图标',
     },
-    disabled: CxInput._cx_meta.props.disabled!!,
-    loading: CxInput._cx_meta.props.loading!!,
-    padded: CxInput._cx_meta.props.padded!!,
+    disabled: CxInput._cx_meta.props.disabled!,
+    loading: CxInput._cx_meta.props.loading!,
+    padded: CxInput._cx_meta.props.padded!,
     variant: {
-      ...CxInput._cx_meta.props.variant!!,
-      pickData: ({ data }: any) => useOmit(data, ['options'])
+      ...CxInput._cx_meta.props.variant!,
+      pickData: ({ data }: any) => useOmit(data, ['options']),
     },
     size: {
-      ...CxInput._cx_meta.props.size!!,
-      pickData: ({ data }: any) => useOmit(data, ['options'])
+      ...CxInput._cx_meta.props.size!,
+      pickData: ({ data }: any) => useOmit(data, ['options']),
     },
     color: {
-      ...CxInput._cx_meta.props.color!!,
-      pickData: ({ data }: any) => useOmit(data, ['options'])
-    }
+      ...CxInput._cx_meta.props.color!,
+      pickData: ({ data }: any) => useOmit(data, ['options']),
+    },
   },
   emits: {
     change: {
       name: '选中改变',
       description: '当选中项改变时触发',
-      schema: zItem
-    }
+      schema: zItem,
+    },
   },
   slots: {
     leading: {
       key: 'leading',
       name: '输入前区域',
-      binds: inputBinds
+      binds: inputBinds,
     },
     trailing: {
       key: 'trailing',
       name: '输入后区域',
-      binds: inputBinds
-    }
-  }
+      binds: inputBinds,
+    },
+  },
 })

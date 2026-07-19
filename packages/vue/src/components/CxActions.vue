@@ -1,10 +1,7 @@
 <template>
   <!-- 动作按钮组（原为 p-ray p-actions 的 cx 轻量替代；u-button/u-separator 降级为原生元素） -->
   <div class="cx-actions">
-    <template
-      v-for="(group, idx) in groupedActions"
-      :key="idx"
-    >
+    <template v-for="(group, idx) in groupedActions" :key="idx">
       <button
         v-for="button in group"
         :key="button.label"
@@ -14,10 +11,7 @@
       >
         {{ button.label }}
       </button>
-      <span
-        v-if="idx < groupedActions.length - 1"
-        class="cx-actions__separator"
-      />
+      <span v-if="idx < groupedActions.length - 1" class="cx-actions__separator" />
     </template>
   </div>
 </template>
@@ -37,7 +31,7 @@ const props = withDefaults(
   defineProps<{
     actions?: any[]
   }>(),
-  { actions: () => [] }
+  { actions: () => [] },
 )
 
 const groupedActions = computed(() => {

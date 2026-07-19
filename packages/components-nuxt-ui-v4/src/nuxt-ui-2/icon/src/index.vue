@@ -4,9 +4,8 @@
       ns.b(),
       ns.is('quick-center', props.center),
       ns.is('touchable', props.touchable),
-      ns.is('active', props.active)
-    ]
-    "
+      ns.is('active', props.active),
+    ]"
   >
     <UIcon
       v-if="showIcon"
@@ -19,11 +18,11 @@
 
 <script setup lang="ts">
 import { safeNum } from '@lionad/cx-definition'
-import { useAttrs , useTemplateRef, computed, inject} from 'vue'
+import { useAttrs, useTemplateRef, computed, inject } from 'vue'
 
 import { UIcon } from '../../../../vendor/bridge'
 
-import { useCxSlot , useCxBEM, safeIcon} from '@lionad/cx-vue'
+import { useCxSlot, useCxBEM, safeIcon } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
 defineOptions({ name: 'CxIcon' })
@@ -54,8 +53,7 @@ const showIcon = computed(() => isEdit || (inner.name?.length ?? 0) > 2)
 
 const iconName = computed(() => safeIcon(inner.name))
 
-const attrs = computed(() => ({
-} as const))
+const attrs = computed(() => ({}) as const)
 
 defineExpose({})
 </script>
@@ -71,16 +69,16 @@ $ns: 'cx';
     @apply min-w-1 min-h-1 leading-none align-top text-inherit overflow-hidden select-none;
 
     /** quick align with text when not in a flex container */
-    @include when("quick-center") {
+    @include when('quick-center') {
       position: relative;
       top: 0.13rem;
     }
 
-    @include when("touchable") {
+    @include when('touchable') {
       cursor: pointer;
     }
 
-    @include when("active") {
+    @include when('active') {
       @apply text-sky-500 dark:text-sky-400;
     }
   }

@@ -15,12 +15,12 @@ export default normalize({
       type: 'short',
       name: '触发区文本',
       initial: '触发区',
-      help: '向弹出提示的触发区域添加组件将会覆盖默认的触发按钮。编辑模式下，双击触发区域可持久弹出提示。'
+      help: '向弹出提示的触发区域添加组件将会覆盖默认的触发按钮。编辑模式下，双击触发区域可持久弹出提示。',
     },
     direction: {
       type: 'card-selector',
       name: '打开方向',
-      options: popperPlacementOptions
+      options: popperPlacementOptions,
     },
     openDelay: {
       type: 'range',
@@ -28,7 +28,7 @@ export default normalize({
       initial: 0,
       min: 0,
       max: 1000,
-      help: '鼠标进入触发区域后，弹出提示打开的延迟时间，单位毫秒。'
+      help: '鼠标进入触发区域后，弹出提示打开的延迟时间，单位毫秒。',
     },
     closeDelay: {
       type: 'range',
@@ -36,8 +36,8 @@ export default normalize({
       initial: 0,
       min: 0,
       max: 1000,
-      help: '鼠标离开触发区域后，弹出提示关闭的延迟时间，单位毫秒。'
-    }
+      help: '鼠标离开触发区域后，弹出提示关闭的延迟时间，单位毫秒。',
+    },
   },
   slots: ({ cmpt, cx }: any) => {
     const res = [
@@ -48,14 +48,14 @@ export default normalize({
           open: {
             name: '打开',
             description: '打开面板',
-            schema: z.instanceof(Function)
-          }
-        }
+            schema: z.instanceof(Function),
+          },
+        },
       },
       {
         key: 'text',
-        name: '弹出内容'
-      }
+        name: '弹出内容',
+      },
     ]
     const ref = (cx?.refs?.get?.(cmpt.id) || {}).ref
     if (unref(ref?.dblClickMode)) {
@@ -63,5 +63,5 @@ export default normalize({
     } else {
       return res
     }
-  }
+  },
 })

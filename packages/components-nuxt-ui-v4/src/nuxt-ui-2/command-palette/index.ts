@@ -15,53 +15,53 @@ export default normalize({
   props: {
     icon: {
       type: 'icon',
-      name: '图标'
+      name: '图标',
     },
     placeholder: {
       type: 'short',
-      name: '占位符'
+      name: '占位符',
     },
     clear: {
       type: 'switch',
-      name: '显示清除'
+      name: '显示清除',
     },
     groups: {
       type: 'custom',
       name: '分组',
       component: panelGroups,
-      initial: () => ([])
+      initial: () => [],
     },
     dftQuery: {
       type: 'short',
-      name: '默认搜索内容'
-    }
+      name: '默认搜索内容',
+    },
   },
   emits: {
     close: {
       name: '关闭',
-      description: '选项面板关闭时'
-    }
+      description: '选项面板关闭时',
+    },
   },
   exposes: {
     query: {
       name: '搜索内容',
-      schema: z.string()
+      schema: z.string(),
     },
     updateQuery: {
       name: '更新搜索内容',
-      schema: z.instanceof(Function)
+      schema: z.instanceof(Function),
     },
     results: {
       name: '搜索结果',
-      schema: z.any() as z.ZodType<FuseResults>
-    }
+      schema: z.any() as z.ZodType<FuseResults>,
+    },
   },
   slots: ({ cmpt }: any) => {
     const res = [] as CxComponentSlot[]
 
     res.push({
       key: 'empty-state',
-      name: '空状态'
+      name: '空状态',
     })
 
     const groups = cmpt.data?.groups || []
@@ -70,26 +70,26 @@ export default normalize({
         {
           key: `${group.key}-icon`,
           name: `${group.label}图标`,
-          binds: slotBinds
+          binds: slotBinds,
         },
         {
           key: `${group.key}-command`,
           name: `${group.label}选项`,
-          binds: slotBinds
+          binds: slotBinds,
         },
         {
           key: `${group.key}-active`,
           name: `${group.label}激活选项`,
-          binds: slotBinds
+          binds: slotBinds,
         },
         {
           key: `${group.key}-inactive`,
           name: `${group.label}非激活选项`,
-          binds: slotBinds
-        }
+          binds: slotBinds,
+        },
       )
     })
 
     return res.filter(Boolean)
-  }
+  },
 })

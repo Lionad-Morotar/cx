@@ -1,25 +1,11 @@
 <template>
   <template v-if="isReRendering">
-    <div
-      :class="ns.e('placeholder-box')"
-      :style="size"
-    />
+    <div :class="ns.e('placeholder-box')" :style="size" />
   </template>
-  <UDropdown
-    v-else
-    :class="ns.b()"
-    v-bind="{ ...attrs }"
-  >
+  <UDropdown v-else :class="ns.b()" v-bind="{ ...attrs }">
     <template #default="x">
-      <div
-        ref="cmpt"
-        :class="ns.e('content')"
-      >
-        <slot
-          v-if="showSlot('default')"
-          name="default"
-          v-bind="x"
-        />
+      <div ref="cmpt" :class="ns.e('content')">
+        <slot v-if="showSlot('default')" name="default" v-bind="x" />
         <UButton
           v-else
           v-cx="{ text: 'label', cmpt: props.cmpt.id }"
@@ -36,11 +22,11 @@
 <script setup lang="ts">
 import { has } from '@lionad/cx-definition'
 
-import { useAttrs , useTemplateRef, computed} from 'vue'
+import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { UButton, UDropdown } from '../../../../vendor/bridge'
 
-import { useCxSlot, useCxReRender , useCxBEM} from '@lionad/cx-vue'
+import { useCxSlot, useCxReRender, useCxBEM } from '@lionad/cx-vue'
 import type { Placement } from '@popperjs/core'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
@@ -62,11 +48,14 @@ const { showSlot } = useCxSlot(props.cmpt)
 const cmptRef = useTemplateRef('cmpt')
 const ui = computed(() => {})
 
-const attrs = computed(() => ({
-  mode: has(props.hoverMode) ? 'hover' : 'click',
-  items: props.items || [],
-  popper: { placement: props.direction || 'bottom-start' }
-} as const))
+const attrs = computed(
+  () =>
+    ({
+      mode: has(props.hoverMode) ? 'hover' : 'click',
+      items: props.items || [],
+      popper: { placement: props.direction || 'bottom-start' },
+    }) as const,
+)
 
 const { isReRendering, size } = useCxReRender(cmptRef, () => props.direction)
 

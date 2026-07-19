@@ -1,5 +1,5 @@
 import { normalize } from '@lionad/cx-definition'
-import { cmptColorNames , useSizeOptions} from '@lionad/cx-vue'
+import { cmptColorNames, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
 export default normalize({
@@ -13,19 +13,19 @@ export default normalize({
       name: '前缀',
       type: 'short',
       initial: '#',
-      hidden: ({ cmpt }: any) => cmpt.components?.['leading']?.length > 0
+      hidden: ({ cmpt }: any) => cmpt.components?.['leading']?.length > 0,
     },
     label: {
       name: '文本',
       type: 'short',
       initial: '标签',
-      hidden: ({ cmpt }: any) => cmpt.components?.['default']?.length > 0
+      hidden: ({ cmpt }: any) => cmpt.components?.['default']?.length > 0,
     },
     postfix: {
       name: '后缀',
       type: 'short',
       initial: '',
-      hidden: ({ cmpt }: any) => cmpt.components?.['trailing']?.length > 0
+      hidden: ({ cmpt }: any) => cmpt.components?.['trailing']?.length > 0,
     },
     variant: {
       type: 'card-selector',
@@ -34,51 +34,51 @@ export default normalize({
       options: [
         {
           value: 'solid',
-          label: '实心'
+          label: '实心',
         },
         {
           value: 'outline',
-          label: '描边'
+          label: '描边',
         },
         {
           value: 'subtle',
-          label: '低调'
+          label: '低调',
         },
         {
           value: 'soft',
-          label: '柔和'
-        }
-      ]
+          label: '柔和',
+        },
+      ],
     },
     color: {
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
-      options: cmptColorNames
+      options: cmptColorNames,
     },
     size: {
       type: 'card-selector',
       name: '尺寸',
       options: useSizeOptions('xs', 'lg'),
-      isPreview: true
+      isPreview: true,
     },
     round: {
       name: '圆角',
-      type: 'switch'
-    }
+      type: 'switch',
+    },
   },
   slots: {
     leading: {
       key: 'leading',
-      name: '内容前'
+      name: '内容前',
     },
     default: {
       key: 'default',
-      name: '内容'
+      name: '内容',
     },
     trailing: {
       key: 'trailing',
-      name: '内容后'
-    }
-  }
+      name: '内容后',
+    },
+  },
 })

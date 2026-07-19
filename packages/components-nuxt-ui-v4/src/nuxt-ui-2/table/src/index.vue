@@ -1,22 +1,8 @@
 <template>
-  <div
-    ref="cmpt"
-    :class="ns.b()"
-    v-bind="attrs"
-  >
-    <UTable
-      v-bind="tableBinds"
-      @select:all="$emit('select:all', $event)"
-    >
-      <template
-        v-for="(_, name) in $slots"
-        #[name]="x"
-      >
-        <slot
-          v-if="showSlot(name)"
-          :name="(name as unknown as string)"
-          v-bind="x"
-        />
+  <div ref="cmpt" :class="ns.b()" v-bind="attrs">
+    <UTable v-bind="tableBinds" @select:all="$emit('select:all', $event)">
+      <template v-for="(_, name) in $slots" #[name]="x">
+        <slot v-if="showSlot(name)" :name="name as unknown as string" v-bind="x" />
       </template>
     </UTable>
   </div>
@@ -27,11 +13,11 @@ import { useTable } from '@lionad/cx-vue'
 import type { UseTableReturn } from '@lionad/cx-vue'
 import { has } from '@lionad/cx-definition'
 
-import { useAttrs , useTemplateRef, computed} from 'vue'
+import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { UTable } from '../../../../vendor/bridge'
 
-import { useCxSlot , useCxBEM} from '@lionad/cx-vue'
+import { useCxSlot, useCxBEM } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 import type { Column, Data } from '../types'
 
@@ -53,35 +39,36 @@ const { showSlot } = useCxSlot(props.cmpt)
 const cmptRef = useTemplateRef('cmpt')
 const ui = computed(() => {})
 
-const attrs = computed(() => ({
-}))
+const attrs = computed(() => ({}))
 
 const table = useTable()
 table.init({
   useNewColsVisible: true,
   records: props.datas || [],
   colsVisible: props.columns || [],
-  colsSort: props.sorts || []
+  colsSort: props.sorts || [],
 })
 
-const columns = computed(() => table.filteredColumns.value.map((x: any) => {
-  return {
-    key: x.field,
-    label: x.title
-  }
-}))
+const columns = computed(() =>
+  table.filteredColumns.value.map((x: any) => {
+    return {
+      key: x.field,
+      label: x.title,
+    }
+  }),
+)
 const tableBinds = computed(() => {
   const cols = [...columns.value]
   if (props.showSelect) {
     cols.unshift({
       key: 'select',
-      label: ''
+      label: '',
     })
   }
   const binds = {
     rows: table.sorted.value,
     columns: cols,
-    singleSelect: has(props.singleSelect)
+    singleSelect: has(props.singleSelect),
   }
   if (!binds.columns?.length) {
     delete (binds as any).columns
@@ -92,7 +79,7 @@ const tableBinds = computed(() => {
 defineExpose({
   table,
   columns,
-  useTable: () => table
+  useTable: () => table,
 })
 </script>
 

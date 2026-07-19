@@ -9,7 +9,11 @@ import type { NuxtApp } from '#app'
  * 按模块选项安装物料集（与 p-ray 编辑器相同的装配形态）。
  */
 export const installCxBundles = (cx: CxLoaderInstance, nuxtApp: NuxtApp) => {
-  const enabled = (nuxtApp.$config.public.cx as any)?.materials || ['render', 'components', 'nuxt-ui']
+  const enabled = (nuxtApp.$config.public.cx as any)?.materials || [
+    'render',
+    'components',
+    'nuxt-ui',
+  ]
   const bundles: Record<string, any[]> = {
     render: [...CxRenderCmpts],
     components: [CxPage, CxGrid, CxCalendar, CxUserStyle, ...CxBasics],
