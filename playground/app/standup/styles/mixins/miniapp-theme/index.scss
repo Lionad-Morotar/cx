@@ -1,0 +1,898 @@
+// * auto imported
+// @import './custom_theme.scss';
+
+// 字号体系沿用设计稿基准
+
+/********************************* Vars */
+
+$gap-page: 12px;
+$gap-page-0: 0;
+$gap-page-1: 12px;
+$gap-page-2: 16px;
+$gap-page-3: 20px;
+$gap-page-4: 20px;
+
+$gap-sm: 4px;
+$gap: 8px;
+$gap-x: 12px;
+$gap-lg: 16px;
+$gap-xl: 20px;
+$gap-xxl: 24px;
+$gap-x3l: 28px;
+$gap-x4l: 32px;
+$gap-x5l: 36px;
+$gap-x6l: 40px;
+$gap-x7l: 44px;
+$gap-x8l: 48px;
+$gap-x9l: 52px;
+$gap-x10l: 56px;
+$gap-x11l: 60px;
+
+$gap-sm-t: 3px;
+$gap-t: 6px;
+$gap-x-t: 10px;
+$gap-lg-t: 13.5px;
+$gap-xl-t: 21px;
+$gap-xxl-t: 28px;
+
+$color: #0091ff;
+$color-main: $color;
+$color-main-transition: #ff6468;
+$color-blue: #337fff;
+$color-yellow: #fcde01;
+$color-orange: #faad14;
+$color-red: #ff3a33;
+$color-green: #03c470;
+$color-purple: #5c58fe;
+$color-dark-purple: #1a1c25;
+$color-dark-purple-transition: #222637;
+
+$color-main-bg: rgba($color, 0.19);
+
+$color-bg: white;
+$color-bg-light: #fafafa;
+$color-bg-lighter: #e9ebef;
+$color-bg-mask: rgba(0, 0, 0, 0.7);
+$color-bg-mask-lighter: rgba(0, 0, 0, 0.5);
+
+$color-bg-opacity: rgba(255, 255, 255, 0.2);
+$color-bg-divide: #e5e8ef;
+$color-bg-divide-2: #f0f0f0;
+$color-bg-opacity-l: rgba(255, 255, 255, 0.1);
+$color-bg-opacity-l2: rgba(23, 6, 6, 0.05);
+
+$gradient-theme: linear-gradient(126deg, #ffc870 -8%, #ff7da5 29%, #de6ad8 65%, #a75bed 94%);
+$gradient-main: linear-gradient(90deg, $color-main 0%, $color-main-transition 100%);
+$gradient-main-light: linear-gradient(
+  90deg,
+  rgba($color-main, 0.2) 0%,
+  rgba($color-main-transition, 0.2) 100%
+);
+$gradient-blue: linear-gradient(90deg, #339eff 0%, $color-blue 100%);
+$gradient-blue-light: linear-gradient(90deg, rgba(#339eff, 0.2) 0%, rgba($color-blue, 0.2) 100%);
+$gradient-dark-purple: linear-gradient(
+  90deg,
+  $color-dark-purple 0%,
+  $color-dark-purple-transition 100%
+);
+$gradient-dark-purple-light: linear-gradient(
+  90deg,
+  rgba($color-dark-purple, 0.2) 0%,
+  rgba($color-dark-purple-transition, 0.2) 100%
+);
+
+$color-divide: $color-bg-divide;
+
+$color-text-white: #fff;
+$color-text-darker: #111;
+$color-text-dark: #171a1d;
+$color-text: #333;
+$color-text-light: #595959;
+$color-text-lighter: #838991;
+$color-text-fade: #a1a1aa;
+$color-text-tip: #bfbfbf;
+
+$text-dark: $color-text-darker;
+$text: $color-text;
+$text-light: $color-text-light;
+$text-lighter: $color-text-lighter;
+$text-fade: $color-text-fade;
+
+$br: 8px;
+$br-t: 6px;
+$br-xs: 2px;
+$br-sm: 4px;
+$br-lg: 12px;
+$br-xl: 16px;
+$br-xxl: 20px;
+
+$font-size: 14px;
+$font-size-sm: 12px;
+$font-size-xs: 10px;
+$font-size-lg: 16px;
+$font-size-xl: 18px;
+$font-size-xxl: 20px;
+
+$font-size-sm-t: 11px;
+$font-size-t: 13px;
+$font-size-lg-t: 15px;
+$font-size-xl-t: 17px;
+
+$button-height-sm: 32px;
+$button-height: 42px;
+$button-height-lg: 48px;
+$button-height-xl: 56px;
+
+/********************************* Atomics */
+
+// 某些大号文字在排版时需要稍微向左偏移，以便在视觉上对齐小号字体
+@mixin preindent($indent: -0.05em) {
+  position: relative;
+  left: $indent;
+}
+@mixin postindent($indent: -0.05em) {
+  position: relative;
+  right: $indent;
+}
+@mixin height($height) {
+  height: $height;
+  line-height: $height;
+}
+
+/********************************* Box */
+
+@mixin box() {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+}
+@mixin box-w() {
+  @include box();
+  background: $color-bg;
+}
+@mixin box-n-w() {
+  @include box-n();
+  background: $color-bg;
+}
+@mixin box-x-w() {
+  @include box-x();
+  background: $color-bg;
+}
+@mixin box-sm-w() {
+  @include box-sm();
+  background: $color-bg;
+}
+@mixin box-lg-w() {
+  @include box-lg();
+  background: $color-bg;
+}
+@mixin box-xl-w() {
+  @include box-xl();
+  background: $color-bg;
+}
+@mixin box-xxl-w() {
+  @include box-xxl();
+  background: $color-bg;
+}
+@mixin box-n-x() {
+  @include box();
+  border-radius: 0;
+}
+@mixin box-x-x() {
+  @include box();
+  border-radius: $br;
+}
+@mixin box-sm-x() {
+  @include box();
+  border-radius: $br-sm;
+}
+@mixin box-lg-x() {
+  @include box();
+  border-radius: $br-lg;
+}
+@mixin box-xl-x() {
+  @include box();
+  border-radius: $br-xl;
+}
+@mixin box-xxl-x() {
+  @include box();
+  border-radius: $br-xxl;
+}
+@mixin box-x() {
+  @include box-x-x();
+}
+@mixin box-sm() {
+  @include box-sm-x();
+}
+@mixin box-lg() {
+  @include box-lg-x();
+}
+@mixin box-xl() {
+  @include box-xl-x();
+}
+@mixin box-xxl() {
+  @include box-xxl-x();
+}
+@mixin box-n-l() {
+  @include box-n-x();
+  background-color: $color-bg-light;
+}
+@mixin box-x-l() {
+  @include box-x-x();
+  background-color: $color-bg-light;
+}
+@mixin box-lg-l() {
+  @include box-lg-x();
+  background-color: $color-bg-light;
+}
+@mixin box-sm-l() {
+  @include box-sm-x();
+  background-color: $color-bg-light;
+}
+@mixin box-xl-l() {
+  @include box-xl-x();
+  background-color: $color-bg-light;
+}
+@mixin box-xxl-l() {
+  @include box-xxl-x();
+  background-color: $color-bg-light;
+}
+@mixin box-x-l2() {
+  @include box-x-x();
+  background-color: $color-bg-lighter;
+}
+@mixin box-lg-l2() {
+  @include box-lg-x();
+  background-color: $color-bg-lighter;
+}
+@mixin box-sm-l2() {
+  @include box-sm-x();
+  background-color: $color-bg-lighter;
+}
+@mixin box-xl-l2() {
+  @include box-xl-x();
+  background-color: $color-bg-lighter;
+}
+@mixin box-xxl-l2() {
+  @include box-xxl-x();
+  background-color: $color-bg-lighter;
+}
+
+/********************************* FlexBox */
+
+@mixin box-c() {
+  width: 100%;
+  @include flex-c();
+}
+
+/********************************* Flex */
+
+// row
+@mixin flex-r-s($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-start;
+}
+@mixin flex-s() {
+  @include flex-r-s();
+}
+@mixin flex-r-c($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: center;
+}
+@mixin flex-c() {
+  @include flex-r-c();
+}
+@mixin flex-r-e($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-end;
+}
+@mixin flex-e() {
+  @include flex-r-e();
+}
+@mixin flex-r-b($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: space-between;
+}
+@mixin flex-b() {
+  @include flex-r-b();
+}
+@mixin flex-r-ss($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+@mixin flex-r-cs($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: center;
+  align-items: flex-start;
+}
+@mixin flex-r-es($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+@mixin flex-r-bs($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+@mixin flex-r-sc($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-start;
+  align-items: center;
+}
+@mixin flex-r-cc($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: center;
+  align-items: center;
+}
+@mixin flex-r-ec($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-end;
+  align-items: center;
+}
+@mixin flex-r-bc($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: space-between;
+  align-items: center;
+}
+@mixin flex-r-se($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+@mixin flex-r-ce($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: center;
+  align-items: flex-end;
+}
+@mixin flex-r-ee($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+@mixin flex-r-be($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+@mixin flex-r-sb($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-start;
+  align-items: space-between;
+}
+@mixin flex-r-cb($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: center;
+  align-items: space-between;
+}
+@mixin flex-r-eb($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: flex-end;
+  align-items: space-between;
+}
+@mixin flex-r-bb($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  gap: $_;
+  justify-content: space-between;
+  align-items: space-between;
+}
+@mixin flex-ss() {
+  @include flex-r-ss();
+}
+@mixin flex-cs() {
+  @include flex-r-cs();
+}
+@mixin flex-es() {
+  @include flex-r-es();
+}
+@mixin flex-bs() {
+  @include flex-r-bs();
+}
+@mixin flex-sc() {
+  @include flex-r-sc();
+}
+@mixin flex-cc() {
+  @include flex-r-cc();
+}
+@mixin flex-ec() {
+  @include flex-r-ec();
+}
+@mixin flex-bs() {
+  @include flex-r-bs();
+}
+@mixin flex-se() {
+  @include flex-r-se();
+}
+@mixin flex-ce() {
+  @include flex-r-ce();
+}
+@mixin flex-ee() {
+  @include flex-r-ee();
+}
+@mixin flex-bs() {
+  @include flex-r-bs();
+}
+@mixin flex-sb() {
+  @include flex-r-sb();
+}
+@mixin flex-cb() {
+  @include flex-r-cb();
+}
+@mixin flex-eb() {
+  @include flex-r-eb();
+}
+@mixin flex-bb() {
+  @include flex-r-bb();
+}
+
+// column
+@mixin flex-c-ss($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+@mixin flex-c-cs($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: center;
+  align-items: flex-start;
+}
+@mixin flex-c-es($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+@mixin flex-c-bs($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+@mixin flex-c-sc($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: flex-start;
+  align-items: center;
+}
+@mixin flex-c-cc($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: center;
+  align-items: center;
+}
+@mixin flex-c-ec($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: flex-end;
+  align-items: center;
+}
+@mixin flex-c-bc($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: space-between;
+  align-items: center;
+}
+@mixin flex-c-se($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+@mixin flex-c-ce($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: center;
+  align-items: flex-end;
+}
+@mixin flex-c-ee($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+@mixin flex-c-be($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+@mixin flex-c-sb($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: flex-start;
+  align-items: space-between;
+}
+@mixin flex-c-cb($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: center;
+  align-items: space-between;
+}
+@mixin flex-c-eb($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: flex-end;
+  align-items: space-between;
+}
+@mixin flex-c-bb($_: $gap-sm) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $_;
+  justify-content: space-between;
+  align-items: space-between;
+}
+
+/********************************* Flex Box */
+
+@mixin flexbox-r-ss($_: $gap-sm) {
+  @include flex-r-ss($_);
+  @include box();
+}
+@mixin flexbox-r-cs($_: $gap-sm) {
+  @include flex-r-cs($_);
+  @include box();
+}
+@mixin flexbox-r-es($_: $gap-sm) {
+  @include flex-r-es($_);
+  @include box();
+}
+@mixin flexbox-r-bs($_: $gap-sm) {
+  @include flex-r-bs($_);
+  @include box();
+}
+@mixin flexbox-r-sc($_: $gap-sm) {
+  @include flex-r-sc($_);
+  @include box();
+}
+@mixin flexbox-r-cc($_: $gap-sm) {
+  @include flex-r-cc($_);
+  @include box();
+}
+@mixin flexbox-r-ec($_: $gap-sm) {
+  @include flex-r-ec($_);
+  @include box();
+}
+@mixin flexbox-r-bs($_: $gap-sm) {
+  @include flex-r-bs($_);
+  @include box();
+}
+@mixin flexbox-r-bc($_: $gap-sm) {
+  @include flex-r-bc($_);
+  @include box();
+}
+@mixin flexbox-r-se($_: $gap-sm) {
+  @include flex-r-se($_);
+  @include box();
+}
+@mixin flexbox-r-ce($_: $gap-sm) {
+  @include flex-r-ce($_);
+  @include box();
+}
+@mixin flexbox-r-ee($_: $gap-sm) {
+  @include flex-r-ee($_);
+  @include box();
+}
+@mixin flexbox-r-bs($_: $gap-sm) {
+  @include flex-r-bs($_);
+  @include box();
+}
+@mixin flexbox-r-sb($_: $gap-sm) {
+  @include flex-r-sb($_);
+  @include box();
+}
+@mixin flexbox-r-cb($_: $gap-sm) {
+  @include flex-r-cb($_);
+  @include box();
+}
+@mixin flexbox-r-eb($_: $gap-sm) {
+  @include flex-r-eb($_);
+  @include box();
+}
+@mixin flexbox-r-bb($_: $gap-sm) {
+  @include flex-r-bb($_);
+  @include box();
+}
+
+@mixin flexbox-ss($_: $gap-sm) {
+  @include flexbox-r-ss($_);
+}
+@mixin flexbox-cs($_: $gap-sm) {
+  @include flexbox-r-cs($_);
+}
+@mixin flexbox-es($_: $gap-sm) {
+  @include flexbox-r-es($_);
+}
+@mixin flexbox-bs($_: $gap-sm) {
+  @include flexbox-r-bs($_);
+}
+@mixin flexbox-sc($_: $gap-sm) {
+  @include flexbox-r-sc($_);
+}
+@mixin flexbox-cc($_: $gap-sm) {
+  @include flexbox-r-cc($_);
+}
+@mixin flexbox-ec($_: $gap-sm) {
+  @include flexbox-r-ec($_);
+}
+@mixin flexbox-bs($_: $gap-sm) {
+  @include flexbox-r-bs($_);
+}
+@mixin flexbox-se($_: $gap-sm) {
+  @include flexbox-r-se($_);
+}
+@mixin flexbox-ce($_: $gap-sm) {
+  @include flexbox-r-ce($_);
+}
+@mixin flexbox-ee($_: $gap-sm) {
+  @include flexbox-r-ee($_);
+}
+@mixin flexbox-bs($_: $gap-sm) {
+  @include flexbox-r-bs($_);
+}
+@mixin flexbox-sb($_: $gap-sm) {
+  @include flexbox-r-sb($_);
+}
+@mixin flexbox-cb($_: $gap-sm) {
+  @include flexbox-r-cb($_);
+}
+@mixin flexbox-eb($_: $gap-sm) {
+  @include flexbox-r-eb($_);
+}
+@mixin flexbox-bb($_: $gap-sm) {
+  @include flexbox-r-bb($_);
+}
+
+// Flex Column
+
+@mixin flexbox-c-ss($_: $gap-sm) {
+  @include flex-c-ss($_);
+  @include box();
+}
+@mixin flexbox-c-cs($_: $gap-sm) {
+  @include flex-c-cs($_);
+  @include box();
+}
+@mixin flexbox-c-es($_: $gap-sm) {
+  @include flex-c-es($_);
+  @include box();
+}
+@mixin flexbox-c-bs($_: $gap-sm) {
+  @include flex-c-bs($_);
+  @include box();
+}
+@mixin flexbox-c-be($_: $gap-sm) {
+  @include flex-c-be($_);
+  @include box();
+}
+@mixin flexbox-c-sc($_: $gap-sm) {
+  @include flex-c-sc($_);
+  @include box();
+}
+@mixin flexbox-c-cc($_: $gap-sm) {
+  @include flex-c-cc($_);
+  @include box();
+}
+@mixin flexbox-c-ec($_: $gap-sm) {
+  @include flex-c-ec($_);
+  @include box();
+}
+@mixin flexbox-c-bs($_: $gap-sm) {
+  @include flex-c-bs($_);
+  @include box();
+}
+@mixin flexbox-c-se($_: $gap-sm) {
+  @include flex-c-se($_);
+  @include box();
+}
+@mixin flexbox-c-ce($_: $gap-sm) {
+  @include flex-c-ce($_);
+  @include box();
+}
+@mixin flexbox-c-ee($_: $gap-sm) {
+  @include flex-c-ee($_);
+  @include box();
+}
+@mixin flexbox-c-bs($_: $gap-sm) {
+  @include flex-c-bs($_);
+  @include box();
+}
+@mixin flexbox-c-sb($_: $gap-sm) {
+  @include flex-c-sb($_);
+  @include box();
+}
+@mixin flexbox-c-cb($_: $gap-sm) {
+  @include flex-c-cb($_);
+  @include box();
+}
+@mixin flexbox-c-eb($_: $gap-sm) {
+  @include flex-c-eb($_);
+  @include box();
+}
+@mixin flexbox-c-bb($_: $gap-sm) {
+  @include flex-c-bb($_);
+  @include box();
+}
+
+/******************* Font */
+
+@import './font.scss';
+
+/******************* Title */
+
+@mixin text-h1() {
+  @include text-xxl-bold();
+}
+@mixin text-h2() {
+  @include text-xl-bold();
+}
+@mixin text-h3() {
+  @include text-lg-bold();
+}
+@mixin text-h4() {
+  @include text-bold();
+}
+
+/********************************* Buttons */
+
+@mixin button($_: $br-sm) {
+  @include flex-r-cc();
+  @include box-x-l();
+  @include text();
+  flex: 1;
+  width: auto;
+  height: 44px;
+  line-height: 44px;
+  border-radius: $_;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+@mixin button-round {
+  @include button(22px);
+}
+@mixin button-main() {
+  @include button();
+  background: $color-main;
+  color: $color-bg;
+}
+@mixin button-theme-gradient() {
+  @include button();
+  background: $gradient-theme;
+  color: $color-bg;
+}
+@mixin button-main-outlined {
+  @include button-main();
+  height: 42px;
+  line-height: 42px;
+  border: 1px solid $color-main;
+  background-color: transparent;
+  color: $color-main;
+}
+@mixin button-transparent() {
+  @include button();
+  background: rgba(255, 255, 255, 0.2);
+  @include text();
+  letter-spacing: 0.5px;
+}
+@mixin button-yellow() {
+  @include button();
+  background: $color-yellow;
+  color: #110100;
+}
+@mixin button-blue() {
+  @include button();
+  background: $color-blue;
+}
+
+/********************************* Images */
+
+@mixin image() {
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/************************************************************************************ Utilies */
+
+/********************************* Transition */
+
+@mixin trans() {
+  transition: 0.2s;
+}
+
+/********************************* Ellipses */
+
+@mixin ellipsis($lines: 1) {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+}
+
+/********************************* Atomics */
+
+// 某些大号文字在排版时需要稍微向左偏移，以便在视觉上对齐小号字体
+@mixin preindent($indent: -0.05em) {
+  position: relative;
+  left: $indent;
+}
+@mixin postindent($indent: -0.05em) {
+  position: relative;
+  right: $indent;
+}

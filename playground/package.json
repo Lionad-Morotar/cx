@@ -3,14 +3,35 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "nuxt dev --host 0.0.0.0 --port 3209"
+    "dev": "nuxt dev --host 0.0.0.0 --port 3209",
+    "build": "nuxt build",
+    "typecheck": "nuxi prepare && vue-tsc --noEmit -p .nuxt/tsconfig.json",
+    "gen:mocks": "node scripts/generate-mocks.mjs"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.2",
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-nuxt": "workspace:*",
     "@lionad/cx-render": "workspace:*",
+    "@lionad/cx-vue": "workspace:*",
     "@unhead/vue": "^3.1.8",
+    "@vueuse/core": "^13.9.0",
+    "@vueuse/router": "^13.9.0",
+    "chinese-workday": "^1.10.0",
+    "dayjs": "^1.11.21",
+    "deindent": "^0.1.0",
+    "element-plus": "^2.13.6",
+    "html-escaper": "^3.0.3",
+    "lodash-es": "^4.18.1",
+    "mitt": "^3.0.1",
+    "number-to-chinese-words": "^1.0.20",
     "nuxt": "^4.5.0",
-    "vue": "^3.5.40"
+    "uuid": "^9.0.1",
+    "vue": "^3.5.40",
+    "vuedraggable": "^4.1.0"
+  },
+  "devDependencies": {
+    "less": "^4.4.2",
+    "sass-embedded": "^1.100.0"
   }
 }

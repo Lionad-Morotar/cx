@@ -1,0 +1,10 @@
+.is-focus__useFocus {
+  outline: 2px solid #000;
+  // 防止 overflow: hidden
+  outline-offset: -2px;
+  transition: 0.15s;
+
+  &.is-disabled {
+    outline: 2px solid currentColor;
+  }
+}

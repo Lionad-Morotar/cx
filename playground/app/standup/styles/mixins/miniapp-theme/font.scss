@@ -1,0 +1,266 @@
+/********************************* Text */
+
+@mixin text() {
+  color: $color-text;
+  font-size: $font-size;
+  font-weight: inherit;
+  letter-spacing: 0.1px;
+}
+@mixin text-sm() {
+  color: rgba($color-text, 0.96);
+  font-size: $font-size-sm;
+  font-weight: inherit;
+}
+@mixin text-xs() {
+  color: $color-text;
+  font-size: $font-size-xs;
+  font-weight: inherit;
+  letter-spacing: 0.15px;
+}
+@mixin text-lg() {
+  color: $color-text;
+  font-size: $font-size-lg;
+  font-weight: inherit;
+  letter-spacing: 0.2px;
+}
+@mixin text-xl() {
+  color: $color-text;
+  font-size: $font-size-xl;
+  font-weight: inherit;
+  letter-spacing: 0.25px;
+}
+@mixin text-xxl() {
+  color: $color-text;
+  font-size: $font-size-xxl;
+  font-weight: inherit;
+  letter-spacing: 0.3px;
+}
+
+/******************* Bold */
+
+@mixin text-bold() {
+  @include text();
+  font-weight: bold;
+}
+@mixin text-sm-bold() {
+  @include text-sm();
+  font-weight: bold;
+}
+@mixin text-xs-bold() {
+  @include text-xs();
+  font-weight: bold;
+}
+@mixin text-lg-bold() {
+  @include text-lg();
+  font-weight: bold;
+}
+@mixin text-xl-bold() {
+  @include text-xl();
+  font-weight: bold;
+}
+@mixin text-xxl-bold() {
+  @include text-xxl();
+  font-weight: bold;
+}
+
+@mixin text-m() {
+  @include text();
+  font-weight: 500;
+}
+@mixin text-sm-m() {
+  @include text-sm();
+  font-weight: 500;
+}
+@mixin text-xs-m() {
+  @include text-xs();
+  font-weight: 500;
+}
+@mixin text-lg-m() {
+  @include text-lg();
+  font-weight: 500;
+}
+@mixin text-xl-m() {
+  @include text-xl();
+  font-weight: 500;
+}
+@mixin text-xxl-m() {
+  @include text-xxl();
+  font-weight: 500;
+}
+
+/******************* Light Color */
+
+@mixin text-l() {
+  @include text();
+  color: $color-text-light;
+}
+@mixin text-xs-l() {
+  @include text-xs();
+  color: $color-text-light;
+}
+@mixin text-sm-l() {
+  @include text-sm();
+  color: rgba($color-text-light, 0.96);
+}
+@mixin text-lg-l() {
+  @include text-lg();
+  color: $color-text-light;
+}
+@mixin text-xl-l() {
+  @include text-xl();
+  color: $color-text-light;
+}
+@mixin text-xxl-l() {
+  @include text-xxl();
+  color: $color-text-light;
+}
+
+@mixin text-light() {
+  @include text-l();
+}
+@mixin text-xs-light() {
+  @include text-xs-l();
+}
+@mixin text-sm-light() {
+  @include text-sm-l();
+}
+@mixin text-lg-light() {
+  @include text-lg-l();
+}
+@mixin text-xl-light() {
+  @include text-xl-l();
+}
+@mixin text-xxl-light() {
+  @include text-xxl-l();
+}
+
+@mixin text-light-bold() {
+  @include text-l();
+  font-weight: bold;
+}
+@mixin text-sm-light-bold() {
+  @include text-sm-l();
+  font-weight: bold;
+}
+@mixin text-xs-light-bold() {
+  @include text-xs-l();
+  font-weight: bold;
+}
+@mixin text-lg-light-bold() {
+  @include text-lg-l();
+  font-weight: bold;
+}
+@mixin text-xl-light-bold() {
+  @include text-xl-l();
+  font-weight: bold;
+}
+@mixin text-xxl-light-bold() {
+  @include text-xxl-l();
+  font-weight: bold;
+}
+
+@mixin text-l-m() {
+  @include text-l();
+  font-weight: 500;
+}
+@mixin text-light-m() {
+  @include text-l();
+  font-weight: 500;
+}
+@mixin text-sm-light-m() {
+  @include text-sm-l();
+  font-weight: 500;
+}
+@mixin text-xs-light-m() {
+  @include text-xs-l();
+  font-weight: 500;
+}
+@mixin text-lg-light-m() {
+  @include text-lg-l();
+  font-weight: 500;
+}
+@mixin text-xl-light-m() {
+  @include text-xl-l();
+  font-weight: 500;
+}
+@mixin text-xxl-light-m() {
+  @include text-xxl-l();
+  font-weight: 500;
+}
+
+/******************* Lighter Color */
+
+@mixin text-lighter() {
+  @include text();
+  color: $color-text-lighter;
+}
+@mixin text-xs-lighter() {
+  @include text-xs();
+  color: $color-text-lighter;
+}
+@mixin text-sm-lighter() {
+  @include text-sm();
+  color: rgba($color-text-lighter, 0.96);
+}
+@mixin text-lg-lighter() {
+  @include text-lg();
+  color: $color-text-lighter;
+}
+@mixin text-xl-lighter() {
+  @include text-xl();
+  color: $color-text-lighter;
+}
+@mixin text-xxl-lighter() {
+  @include text-xxl();
+  color: $color-text-lighter;
+}
+
+@mixin text-lighter-bold() {
+  @include text-lighter();
+  font-weight: bold;
+}
+@mixin text-sm-lighter-bold() {
+  @include text-sm-lighter();
+  font-weight: bold;
+}
+@mixin text-xs-lighter-bold() {
+  @include text-xs-lighter();
+  font-weight: bold;
+}
+@mixin text-lg-lighter-bold() {
+  @include text-lg-lighter();
+  font-weight: bold;
+}
+@mixin text-xl-lighter-bold() {
+  @include text-xl-lighter();
+  font-weight: bold;
+}
+@mixin text-xxl-lighter-bold() {
+  @include text-xxl-lighter();
+  font-weight: bold;
+}
+
+@mixin text-lighter-m() {
+  @include text-lighter();
+  font-weight: 500;
+}
+@mixin text-sm-lighter-m() {
+  @include text-sm-lighter();
+  font-weight: 500;
+}
+@mixin text-xs-lighter-m() {
+  @include text-xs-lighter();
+  font-weight: 500;
+}
+@mixin text-lg-lighter-m() {
+  @include text-lg-lighter();
+  font-weight: 500;
+}
+@mixin text-xl-lighter-m() {
+  @include text-xl-lighter();
+  font-weight: 500;
+}
+@mixin text-xxl-lighter-m() {
+  @include text-xxl-lighter();
+  font-weight: 500;
+}

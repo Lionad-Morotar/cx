@@ -1,0 +1,108 @@
+@use 'config';
+@use 'sass:list';
+@use 'sass:string';
+
+// BEM support Func
+@function selectorToString($selector) {
+  $selector: inspect($selector);
+  $selector: str-slice($selector, 2, -2);
+  @return $selector;
+}
+
+@function containsModifier($selector) {
+  $selector: selectorToString($selector);
+
+  @if str-index($selector, config.$modifier-separator) {
+    @return true;
+  } @else {
+    @return false;
+  }
+}
+
+@function containWhenFlag($selector) {
+  $selector: selectorToString($selector);
+
+  @if str-index($selector, '.' + config.$state-prefix) {
+    @return true;
+  } @else {
+    @return false;
+  }
+}
+
+@function containPseudoClass($selector) {
+  $selector: selectorToString($selector);
+
+  @if str-index($selector, ':') {
+    @return true;
+  } @else {
+    @return false;
+  }
+}
+
+@function hitAllSpecialNestRule($selector) {
+  @return containsModifier($selector) or containWhenFlag($selector) or containPseudoClass($selector);
+}
+
+// join var name
+// joinVarName(('button', 'text-color')) => '--cx-button-text-color'
+@function joinVarName($list) {
+  $name: '--' + config.$ns;
+  @each $item in $list {
+    @if $item != '' {
+      $name: $name + '-' + $item;
+    }
+  }
+  @return $name;
+}
+
+// getVarName('button', 'text-color') => '--cx-button-text-color'
+@function getVarName($args...) {
+  @return joinVarName($args);
+}
+
+// getVar('button', 'text-color') => var(--cx-button-text-color)
+@function getVar($args...) {
+  @return var(#{joinVarName($args)});
+}
+
+// bem('block', 'element', 'modifier') => '{$ns}-block__element--modifier'
+@function bem($block, $element: '', $modifier: '') {
+  $name: config.$ns + config.$common-separator + $block;
+
+  @if $element != '' {
+    $name: $name + config.$element-separator + $element;
+  }
+
+  @if $modifier != '' {
+    $name: $name + config.$modifier-separator + $modifier;
+  }
+
+  @return $name;
+}
+
+@function getColor($var, $type: 'primary') {
+  $list: ('fill-color', 'blank');
+  @if $var != false {
+    $list: ('color', $type, #{$var});
+  }
+  @return $list;
+}
+
+@mixin _setVar($var, $gVar) {
+  $varName: joinVarName($var);
+  $gVarName: joinVarName($gVar);
+  #{$varName}: var(#{$gVarName});
+}
+
+$_types: primary, success, warning, danger, error, info;
+
+@mixin typedColor($map) {
+  @each $k, $v in $map {
+    @include _setVar(('tag', $k), getColor($v));
+    @each $type in $_types {
+      &.#{bem('tag', '', $type)} {
+        @include _setVar(('tag', $k), getColor($v, $type));
+      }
+    }
+  }
+}
