@@ -1,0 +1,23 @@
+{
+  "_meta": "本文件由 scripts/generate-mocks.mjs 生成，勿手改；重新生成：pnpm gen:mocks（以运行当日为锚，同日幂等）",
+  "id": "9001",
+  "name": "星云集控平台",
+  "code": "nebula-cloud",
+  "groupAddress": "https://git.example.com/nebula",
+  "created": "2025-03-07 00:00:00",
+  "createdBy": "shenyz",
+  "lastUpdated": "2026-07-17 00:00:00",
+  "lastUpdatedBy": "shenyz",
+  "projectType": "developProjects",
+  "version": 1,
+  "pmProject": "1101,1102",
+  "pmUsers": "1001,1002,1003",
+  "deProject": "1104,1105,1106",
+  "deUsers": "1004,1005,1006,1007",
+  "feProject": "1107,1108,1111",
+  "feUsers": "1008,1009,1010,1011,1012",
+  "beProject": "1109,1110",
+  "beUsers": "1013,1014,1015,1016,1017",
+  "teProject": "1112",
+  "teUsers": "1018,1019,1020"
+}

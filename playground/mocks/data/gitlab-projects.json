@@ -1,0 +1,134 @@
+[
+  {
+    "id": "1101",
+    "name": "pm-hub",
+    "webUrl": "https://git.example.com/nebula/pm-hub",
+    "issueGroup": {
+      "code": "requirement",
+      "name": "需求"
+    },
+    "lastUpdated": "2026-06-20 00:00:00",
+    "lastUpdatedBy": "ouyg"
+  },
+  {
+    "id": "1102",
+    "name": "orbit-requirements",
+    "webUrl": "https://git.example.com/nebula/orbit-requirements",
+    "issueGroup": {
+      "code": "requirement",
+      "name": "需求"
+    },
+    "lastUpdated": "2026-06-21 00:00:00",
+    "lastUpdatedBy": "yinmb"
+  },
+  {
+    "id": "1103",
+    "name": "pulsar-requirements",
+    "webUrl": "https://git.example.com/nebula/pulsar-requirements",
+    "issueGroup": {
+      "code": "requirement",
+      "name": "需求"
+    },
+    "lastUpdated": "2026-06-22 00:00:00",
+    "lastUpdatedBy": "guqr"
+  },
+  {
+    "id": "1104",
+    "name": "aurora-design",
+    "webUrl": "https://git.example.com/nebula/aurora-design",
+    "issueGroup": {
+      "code": "design",
+      "name": "设计"
+    },
+    "lastUpdated": "2026-06-23 00:00:00",
+    "lastUpdatedBy": "jar"
+  },
+  {
+    "id": "1105",
+    "name": "comet-design",
+    "webUrl": "https://git.example.com/nebula/comet-design",
+    "issueGroup": {
+      "code": "design",
+      "name": "设计"
+    },
+    "lastUpdated": "2026-06-24 00:00:00",
+    "lastUpdatedBy": "ouyg"
+  },
+  {
+    "id": "1106",
+    "name": "zenith-design",
+    "webUrl": "https://git.example.com/nebula/zenith-design",
+    "issueGroup": {
+      "code": "design",
+      "name": "设计"
+    },
+    "lastUpdated": "2026-06-25 00:00:00",
+    "lastUpdatedBy": "qinzy"
+  },
+  {
+    "id": "1107",
+    "name": "frontend-hub",
+    "webUrl": "https://git.example.com/nebula/frontend-hub",
+    "issueGroup": {
+      "code": "development",
+      "name": "开发"
+    },
+    "lastUpdated": "2026-06-26 00:00:00",
+    "lastUpdatedBy": "fangjx"
+  },
+  {
+    "id": "1108",
+    "name": "quasar-frontend",
+    "webUrl": "https://git.example.com/nebula/quasar-frontend",
+    "issueGroup": {
+      "code": "development",
+      "name": "开发"
+    },
+    "lastUpdated": "2026-06-27 00:00:00",
+    "lastUpdatedBy": "qinzy"
+  },
+  {
+    "id": "1109",
+    "name": "backend-hub",
+    "webUrl": "https://git.example.com/nebula/backend-hub",
+    "issueGroup": {
+      "code": "development",
+      "name": "开发"
+    },
+    "lastUpdated": "2026-06-28 00:00:00",
+    "lastUpdatedBy": "zhengwt"
+  },
+  {
+    "id": "1110",
+    "name": "meteor-gateway",
+    "webUrl": "https://git.example.com/nebula/meteor-gateway",
+    "issueGroup": {
+      "code": "development",
+      "name": "开发"
+    },
+    "lastUpdated": "2026-06-29 00:00:00",
+    "lastUpdatedBy": "qinzy"
+  },
+  {
+    "id": "1111",
+    "name": "eclipse-console",
+    "webUrl": "https://git.example.com/nebula/eclipse-console",
+    "issueGroup": {
+      "code": "development",
+      "name": "开发"
+    },
+    "lastUpdated": "2026-06-30 00:00:00",
+    "lastUpdatedBy": "muqh"
+  },
+  {
+    "id": "1112",
+    "name": "lyra-mobile",
+    "webUrl": "https://git.example.com/nebula/lyra-mobile",
+    "issueGroup": {
+      "code": "development",
+      "name": "开发"
+    },
+    "lastUpdated": "2026-07-01 00:00:00",
+    "lastUpdatedBy": "sumn"
+  }
+]

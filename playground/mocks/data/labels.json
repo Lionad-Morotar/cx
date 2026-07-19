@@ -1,0 +1,288 @@
+[
+  {
+    "id": "1",
+    "name": "stage: accepted",
+    "description": "已受理",
+    "color": "#8c8c8c",
+    "stepValue": 0,
+    "activeStep": 0,
+    "openIssuesCount": 0,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "2",
+    "name": "stage: planed",
+    "description": "已排期",
+    "color": "#595959",
+    "stepValue": 0,
+    "activeStep": 1,
+    "openIssuesCount": 15,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "3",
+    "name": "stage: func-designing",
+    "description": "功能设计中",
+    "color": "#13c2c2",
+    "stepValue": 1,
+    "activeStep": 1,
+    "openIssuesCount": 5,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "4",
+    "name": "stage: func-designed",
+    "description": "功能设计完成",
+    "color": "#08979c",
+    "stepValue": 1,
+    "activeStep": 2,
+    "openIssuesCount": 4,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "5",
+    "name": "stage: ui-designing",
+    "description": "界面设计中",
+    "color": "#2f54eb",
+    "stepValue": 2,
+    "activeStep": 2,
+    "openIssuesCount": 8,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "6",
+    "name": "stage: ui-designed",
+    "description": "界面设计完成",
+    "color": "#10239e",
+    "stepValue": 2,
+    "activeStep": 3,
+    "openIssuesCount": 4,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "7",
+    "name": "stage: wip",
+    "description": "开发中",
+    "color": "#fa8c16",
+    "stepValue": 3,
+    "activeStep": 3,
+    "openIssuesCount": 20,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "8",
+    "name": "stage: in-review",
+    "description": "代码评审中",
+    "color": "#d48806",
+    "stepValue": 3,
+    "activeStep": 3,
+    "openIssuesCount": 7,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "9",
+    "name": "stage: review-np",
+    "description": "评审未通过",
+    "color": "#cf1322",
+    "stepValue": 3,
+    "activeStep": 3,
+    "openIssuesCount": 0,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "10",
+    "name": "stage: solved",
+    "description": "已解决",
+    "color": "#389e0d",
+    "stepValue": 3,
+    "activeStep": 4,
+    "openIssuesCount": 5,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "11",
+    "name": "stage: testing",
+    "description": "测试中",
+    "color": "#722ed1",
+    "stepValue": 4,
+    "activeStep": 4,
+    "openIssuesCount": 7,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "12",
+    "name": "stage: np",
+    "description": "测试未通过",
+    "color": "#f5222d",
+    "stepValue": 3,
+    "activeStep": 3,
+    "openIssuesCount": 7,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "13",
+    "name": "stage: passed",
+    "description": "测试通过",
+    "color": "#237804",
+    "stepValue": 4,
+    "activeStep": 5,
+    "openIssuesCount": 3,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "14",
+    "name": "stage: ui-checking",
+    "description": "界面验收中",
+    "color": "#eb2f96",
+    "stepValue": 5,
+    "activeStep": 5,
+    "openIssuesCount": 6,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "15",
+    "name": "stage: ui-np",
+    "description": "界面验收未通过",
+    "color": "#c41d7f",
+    "stepValue": 3,
+    "activeStep": 3,
+    "openIssuesCount": 2,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "16",
+    "name": "stage: ui-passed",
+    "description": "界面验收通过",
+    "color": "#531dab",
+    "stepValue": 5,
+    "activeStep": 6,
+    "openIssuesCount": 2,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "17",
+    "name": "stage: pm-checking",
+    "description": "产品验收中",
+    "color": "#0958d9",
+    "stepValue": 6,
+    "activeStep": 6,
+    "openIssuesCount": 5,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "18",
+    "name": "stage: pm-np",
+    "description": "产品验收未通过",
+    "color": "#a8071a",
+    "stepValue": 3,
+    "activeStep": 3,
+    "openIssuesCount": 1,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "19",
+    "name": "stage: pm-passed",
+    "description": "产品验收通过",
+    "color": "#003eb3",
+    "stepValue": 6,
+    "activeStep": 6,
+    "openIssuesCount": 0,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "100",
+    "name": "feat",
+    "description": "新功能",
+    "color": "#52c41a",
+    "openIssuesCount": 69,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "101",
+    "name": "fix",
+    "description": "缺陷修复",
+    "color": "#f5222d",
+    "openIssuesCount": 27,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "102",
+    "name": "docs",
+    "description": "文档",
+    "color": "#8c8c8c",
+    "openIssuesCount": 0,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "103",
+    "name": "refactor",
+    "description": "重构",
+    "color": "#faad14",
+    "openIssuesCount": 3,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "104",
+    "name": "perf",
+    "description": "性能优化",
+    "color": "#722ed1",
+    "openIssuesCount": 2,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "105",
+    "name": "chore",
+    "description": "杂项",
+    "color": "#bfbfbf",
+    "openIssuesCount": 0,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "106",
+    "name": "qa-unable",
+    "description": "无法测试",
+    "color": "#fa541c",
+    "openIssuesCount": 2,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "107",
+    "name": "subtask",
+    "description": "子任务",
+    "color": "#1677ff",
+    "openIssuesCount": 9,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "108",
+    "name": "state: invalid",
+    "description": "无效议题",
+    "color": "#000000",
+    "openIssuesCount": 3,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "109",
+    "name": "duplicate",
+    "description": "重复议题",
+    "color": "#8c8c8c",
+    "openIssuesCount": 0,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "110",
+    "name": "help-wanted",
+    "description": "需要协助",
+    "color": "#13c2c2",
+    "openIssuesCount": 0,
+    "openMergeRequestsCount": 0
+  },
+  {
+    "id": "111",
+    "name": "priority-high",
+    "description": "高优先级",
+    "color": "#cf1322",
+    "openIssuesCount": 0,
+    "openMergeRequestsCount": 0
+  }
+]
