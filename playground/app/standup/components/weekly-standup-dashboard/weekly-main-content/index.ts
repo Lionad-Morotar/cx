@@ -1,0 +1,10 @@
+import { normalize, translate } from '@lionad/cx-definition'
+import component from './weekly-main-content.vue'
+
+export default normalize({
+  name: translate('周会预制标签卡片'),
+  description: translate('用于展示本周和下周的任务统计以及任务表格'),
+  key: 'cx-weekly-main-content',
+  component,
+  async: true,
+})
