@@ -26,15 +26,32 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['packages/*/src/**/*.test.ts', 'packages/*/tests/**/*.test.ts'],
+    include: [
+      'packages/*/src/**/*.test.ts',
+      'packages/*/tests/**/*.test.ts',
+      'playground/tests/**/*.test.ts',
+    ],
+    exclude: ['playground/tests/setup.ts'],
+    setupFiles: ['playground/tests/setup.ts'],
     environment: 'happy-dom',
   },
   lint: {
-    ignorePatterns: ['dist/**', 'packages/components-nuxt-ui-v4/vendor/**'],
+    ignorePatterns: [
+      'dist/**',
+      'packages/components-nuxt-ui-v4/vendor/**',
+      'playground/.output/**',
+      'playground/.nuxt/**',
+    ],
   },
   fmt: {
     semi: false,
     singleQuote: true,
-    ignorePatterns: ['dist/**', 'packages/components-nuxt-ui-v4/vendor/**'],
+    ignorePatterns: [
+      'dist/**',
+      'packages/components-nuxt-ui-v4/vendor/**',
+      'playground/.output/**',
+      'playground/.nuxt/**',
+      'playground/mocks/data/**',
+    ],
   },
 })
