@@ -141,4 +141,3 @@ type Guard<M> = IsEveryTrueThen<
   M
 >
 
-export const toRuntime = 'todo'

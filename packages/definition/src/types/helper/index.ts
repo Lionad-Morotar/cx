@@ -3,8 +3,6 @@
 
 import type { KebabCase, UnionToIntersection } from 'type-fest'
 
-export type TODO = any
-
 export type IsAny<T> = [T] extends [any] ? ([any] extends [T] ? true : false) : false
 
 /* -------------------------------------------------------------------------- */
