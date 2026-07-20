@@ -13,6 +13,7 @@ import cmptLogic from './src/logic.vue'
 import cmptDatas from './src/datas.vue'
 import cmptAction from './src/action.vue'
 import cmptToast from './src/toast.vue'
+import cmptState from './src/state.vue'
 
 const CxText = normalize({
   name: '文本',
@@ -285,6 +286,16 @@ const CxToast = normalize({
   props: {},
 })
 
+const CxState = normalize({
+  key: 'cx-state',
+  name: '状态',
+  description: '把宿主传入的响应式 value 桥接到 schema，供其他物料经数据绑定消费',
+  icon: 'i-tabler-database',
+  component: cmptState,
+  headless: true,
+  props: {},
+})
+
 export default [
   CxText,
   CxHeader,
@@ -299,4 +310,5 @@ export default [
   CxDatas,
   CxAction,
   CxToast,
+  CxState,
 ]
