@@ -12,6 +12,7 @@ import cmptP from './src/p.vue'
 import cmptLogic from './src/logic.vue'
 import cmptDatas from './src/datas.vue'
 import cmptAction from './src/action.vue'
+import cmptToast from './src/toast.vue'
 
 const CxText = normalize({
   name: '文本',
@@ -274,6 +275,16 @@ const CxAction = normalize({
   props: {},
 })
 
+const CxToast = normalize({
+  key: 'cx-toast',
+  name: '反馈',
+  description: '经宿主 toast 服务弹出反馈（成功/失败提示），由其他物料的事件触发',
+  icon: 'i-tabler-message-2',
+  component: cmptToast,
+  headless: true,
+  props: {},
+})
+
 export default [
   CxText,
   CxHeader,
@@ -287,4 +298,5 @@ export default [
   CxLogic,
   CxDatas,
   CxAction,
+  CxToast,
 ]

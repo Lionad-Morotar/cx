@@ -26,6 +26,7 @@ export * from './use-request'
 export * from './use-scoped-css'
 export * from './use-task'
 export * from './use-cx-media'
+export * from './use-cx-toast'
 
 export const useCx = () => {
   return inject<CxLoaderInstance>('cx')!
