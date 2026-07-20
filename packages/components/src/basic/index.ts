@@ -11,6 +11,7 @@ import cmptH5 from './src/h5.vue'
 import cmptP from './src/p.vue'
 import cmptLogic from './src/logic.vue'
 import cmptDatas from './src/datas.vue'
+import cmptAction from './src/action.vue'
 
 const CxText = normalize({
   name: '文本',
@@ -260,4 +261,30 @@ const CxDatas = normalize({
   },
 })
 
-export default [CxText, CxHeader, CxH1, CxH2, CxH3, CxH4, CxH5, CxBlock, CxFigure, CxLogic, CxDatas]
+const CxAction = normalize({
+  key: 'cx-action',
+  name: '动作执行',
+  description:
+    '执行宿主注入的异步函数（如 API 调用），暴露 loading/data/error 供绑定，成功/失败可触发其他物料',
+  icon: 'i-tabler-bolt',
+  component: cmptAction,
+  headless: true,
+  // action 是函数引用、由宿主 view 层注入；args 同理作为运行时参数。
+  // 两者都不在编辑器配置层声明（序列化方案待定），props 元数据暂空。
+  props: {},
+})
+
+export default [
+  CxText,
+  CxHeader,
+  CxH1,
+  CxH2,
+  CxH3,
+  CxH4,
+  CxH5,
+  CxBlock,
+  CxFigure,
+  CxLogic,
+  CxDatas,
+  CxAction,
+]
