@@ -14,6 +14,7 @@ import cmptDatas from './src/datas.vue'
 import cmptAction from './src/action.vue'
 import cmptToast from './src/toast.vue'
 import cmptState from './src/state.vue'
+import cmptComputed from './src/computed.vue'
 
 const CxText = normalize({
   name: '文本',
@@ -296,6 +297,16 @@ const CxState = normalize({
   props: {},
 })
 
+const CxComputed = normalize({
+  key: 'cx-computed',
+  name: '派生状态',
+  description: '用受限表达式对依赖值求值，输出派生值供绑定（如 a || b）',
+  icon: 'i-tabler-calculator',
+  component: cmptComputed,
+  headless: true,
+  props: {},
+})
+
 export default [
   CxText,
   CxHeader,
@@ -311,4 +322,5 @@ export default [
   CxAction,
   CxToast,
   CxState,
+  CxComputed,
 ]
