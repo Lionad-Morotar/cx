@@ -12,5 +12,11 @@ export { default as CxViewIssuesTable } from './view-issues-table'
 export { default as CxViewIssuesBoard } from './view-issues-board'
 export { default as CxViewStandupGithubGrid } from './view-standup-github-grid'
 
+// 站会列表页 schema 化：循环容器（card-tabs 模板 slot 模式）+ 卡片物料
+export { default as CxStandupGroupList } from './standup-group-list'
+export { default as CxStandupGroupHeader } from './standup-group-header'
+export { default as CxStandupCardList } from './standup-card-list'
+export { default as CxStandupCard } from './standup-card'
+
 export * from './weekly-standup-dashboard'
 export * from './daily-standup-dashboard'

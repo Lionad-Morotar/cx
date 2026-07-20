@@ -37,10 +37,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, reactive, ref, useSlots, watch } from 'vue'
+import { computed, nextTick, onMounted, provide, reactive, ref, useSlots, watch } from 'vue'
 import { Minus, Plus, ArrowRight } from '@element-plus/icons-vue'
 import { until, useElementSize } from '@vueuse/core'
 import { useCxNamespace } from '../../../utils/namespace'
+import { FolderContainerCtxKey } from '../../standup-context/keys'
 import type { WatchStopHandle } from 'vue'
 
 const ns = useCxNamespace('folder-container')
@@ -203,6 +204,15 @@ const cmptExpose = {
   fold,
   unFold,
 }
+
+// schema 子节点（如 header slot 里的分组头部）拿不到 slot scope 传出的 toggle，
+// 因此同时把折叠上下文 provide 出去，供其 inject 消费
+provide(FolderContainerCtxKey, {
+  toggle,
+  fold,
+  unFold,
+  isFold: computed(() => states.isFold),
+})
 
 defineExpose(cmptExpose)
 </script>

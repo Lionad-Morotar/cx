@@ -436,14 +436,19 @@ const _cmptSlots = computed(() => {
   }
 
   // 2. 再按照组件元数据定义的 slots 展示页面
-  const metaSlots = cmptMeta.value?._cx_meta?.slots as any
+  // cmptMeta 即 getMeta 的返回值（_cx_meta 本体），直接取 slots；
+  // 此前误写为 cmptMeta.value?._cx_meta?.slots（多套一层），导致元数据声明的
+  // 插槽永不生效、全部回落默认插槽
+  const metaSlots = cmptMeta.value?.slots as any
   if (metaSlots) {
     return (
       isFunction(metaSlots)
         ? metaSlots({ cmpt: readonly(cmpt.value)!, cx: readonly(cx) } as any)
         : isArray(metaSlots)
           ? metaSlots
-          : mapValues(metaSlots, async (v, k) => ({
+          // 此处不能加 async：mapValues 不会 await，async 回调会让每个插槽变成
+          // 未解析的 Promise，slot.key 变 undefined，插槽同样无法渲染
+          : mapValues(metaSlots, (v, k) => ({
               key: k,
               ...(isFunction(v)
                 ? v({ cmpt: readonly(cmpt.value!), cx: readonly(cx) } as any)

@@ -9,4 +9,11 @@ export default normalize({
   key: 'cx-folder-container',
   component,
   async: true,
+  // 声明插槽使 schema 子节点可填入 header / content（此前仅有 SFC 内的 <slot>，
+  // CxRender 只会回落默认插槽，header/content 子节点无法渲染）
+  slots: {
+    header: { key: 'header', name: translate('头部') },
+    content: { key: 'content', name: translate('内容区域') },
+    default: { key: 'default', name: translate('默认插槽') },
+  },
 })
