@@ -32,3 +32,37 @@ const groupByType = computed<'week' | 'month' | 'year'>(
   () => ({ day: 'week', week: 'month', month: 'year' })[meetingType.value] as 'week' | 'month' | 'year',
 )
 </script>
+
+<style lang="less" scoped>
+.group-header {
+  display: grid;
+  grid-template: 24px / auto auto 1fr auto;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+
+  .icon {
+    font-size: 18px;
+  }
+  .group-con-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #262626;
+  }
+  .group-range {
+    display: flex;
+    align-items: center;
+    color: #999;
+
+    .sep {
+      margin: 0 0.2em;
+      font-size: 18px;
+    }
+  }
+  .icon-collapse {
+    font-size: 12px;
+  }
+}
+</style>

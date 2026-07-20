@@ -12,7 +12,12 @@ export { default as CxViewIssuesTable } from './view-issues-table'
 export { default as CxViewIssuesBoard } from './view-issues-board'
 export { default as CxViewStandupGithubGrid } from './view-standup-github-grid'
 
-// 站会列表页 schema 化：循环容器（card-tabs 模板 slot 模式）+ 卡片物料
+// 站会列表页 schema 化：布局/顶栏/主区域/成员区容器 + 循环容器（card-tabs 模板 slot 模式）+ 卡片/弹窗物料
+export { default as CxStandupListLayout } from './standup-list-layout'
+export { default as CxStandupHeaderBar } from './standup-header-bar'
+export { default as CxStandupListMain } from './standup-list-main'
+export { default as CxStandupMemberDraggable } from './standup-member-draggable'
+export { default as CxSelectParticipantsDialog } from './select-participants-dialog'
 export { default as CxStandupGroupList } from './standup-group-list'
 export { default as CxStandupGroupHeader } from './standup-group-header'
 export { default as CxStandupCardList } from './standup-card-list'
