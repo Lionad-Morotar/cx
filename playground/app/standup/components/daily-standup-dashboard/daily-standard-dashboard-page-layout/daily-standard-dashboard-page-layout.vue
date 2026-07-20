@@ -78,4 +78,30 @@ export default defineComponent({
   box-sizing: border-box;
   padding: 0 20px 34px 20px;
 }
+
+/* 区域级补充样式：原胖容器 standard-dashboard-page 承载的全局样式，
+   胖容器 schema 化删除后迁入此 layout 物料（与上方 grid 模板互补），保证视觉零回归 */
+.daily-standup-dashboard-page {
+  .page-header {
+    user-select: none;
+  }
+  .page-content-left {
+    box-sizing: border-box;
+    height: 94%;
+  }
+  .page-content-right {
+    .user-select {
+      width: 94px;
+    }
+  }
+}
+
+/* 代办看板"切换编辑类型"按钮：原胖容器全局样式，被 daily-main-content 引用 */
+.switch-edit-type {
+  border: solid 1px var(--color, currentColor);
+  border-radius: 150%;
+  padding: 4px;
+  transform: scale(0.6);
+  opacity: 0;
+}
 </style>

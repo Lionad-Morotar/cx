@@ -243,4 +243,11 @@ defineExpose({
     }
   }
 }
+
+/* 年度站会网格 popover：el-popover teleport 到 body，需全局样式；
+   原胖容器 standard-dashboard-page 承载，胖容器删除后迁入此物料 */
+.standup-by-year-popover {
+  margin: 0 24px;
+  width: auto !important;
+}
 </style>

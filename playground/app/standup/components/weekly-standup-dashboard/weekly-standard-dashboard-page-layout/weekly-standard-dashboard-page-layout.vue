@@ -101,4 +101,34 @@ export default defineComponent({
     grid-area: boards;
   }
 }
+
+/* 区域级补充样式：原胖容器 standard-dashboard-page 承载的全局样式，
+   胖容器 schema 化删除后迁入此 layout 物料（与上方 grid 模板互补），保证视觉零回归 */
+.weekly-standup-dashboard-page {
+  box-sizing: border-box;
+  padding: 21px 24px 26px;
+
+  .page-header-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  .page-header-right {
+    user-select: none;
+  }
+  .page-main-section {
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  }
+  .page-aside-section {
+    margin-top: 54px;
+  }
+  .page-right-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 54px;
+  }
+}
 </style>
