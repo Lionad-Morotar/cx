@@ -1,5 +1,6 @@
-# flow-dev 运行文档（不入库）
-docs/
+# flow-dev 运行文档（不入库，AI 基建 docs/agents/ 例外）
+docs/*
+!docs/agents/
 
 # 依赖与产物
 node_modules/
