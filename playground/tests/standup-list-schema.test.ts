@@ -10,6 +10,7 @@ import CxStandupGroupHeader from '../app/standup/components/standup-group-header
 import CxStandupGroupList from '../app/standup/components/standup-group-list'
 import { cmpt, createTestCx, installMaterials } from './helpers/cx-render-test'
 
+import type { CxComponentRuntime } from '@lionad/cx-definition'
 import type { GroupOfStandups } from '../app/standup/apis'
 
 /**
@@ -110,7 +111,7 @@ const mountPage = async () => {
     CxStandupGroupHeader,
     CxStandupGroupList,
   })
-  const wrapper = mount(CxRender, { props: { cx, components: schema } })
+  const wrapper = mount(CxRender, { props: { cx: cx as never, components: schema } })
   await flushPromises()
   await flushPromises()
   return wrapper
@@ -143,5 +144,43 @@ describe('站会列表页 schema：模板 slot 循环 + Provider 注入', () => 
     const text = wrapper.text()
     expect(text).toContain('2026/07/14')
     expect(text).toContain('2026/07/07')
+  })
+})
+
+describe('站会列表页 schema 结构（静态骨架）', () => {
+  // CxComponentRuntime 的递归类型在嵌套访问时退化为内层基础类型（与 index.vue 一致，需 cast）
+  const asCmpt = (x: unknown) => x as CxComponentRuntime
+
+  it('根为 page-main，布局容器下挂四区域', async () => {
+    const { standupListSchema } = await import('../app/standup/schemas/standup-list.schema')
+    const root = asCmpt(standupListSchema[0])
+    expect(root.key).toBe('cx-page-main')
+    const layout = asCmpt(root.components?.default?.[0])
+    expect(layout.key).toBe('cx-standup-list-layout')
+    const children = (layout.components?.default ?? []).map((c) => asCmpt(c).key)
+    expect(children).toEqual(
+      expect.arrayContaining([
+        'cx-standup-header-bar',
+        'cx-standup-list-main',
+        'cx-standup-member-draggable',
+        'cx-select-participants-dialog',
+      ]),
+    )
+  })
+
+  it('分组与卡片经模板插槽（group-item / card-item）嵌套', async () => {
+    const { standupListSchema } = await import('../app/standup/schemas/standup-list.schema')
+    const layout = asCmpt(asCmpt(standupListSchema[0]).components?.default?.[0])
+    const listMain = asCmpt((layout.components?.default ?? []).find((c) => asCmpt(c).key === 'cx-standup-list-main'))
+    const groupList = asCmpt(listMain.components?.default?.[0])
+    expect(groupList.key).toBe('cx-standup-group-list')
+
+    const folder = asCmpt(groupList.components?.['group-item']?.[0])
+    expect(folder.key).toBe('cx-folder-container')
+    expect(asCmpt(folder.components?.header?.[0]).key).toBe('cx-standup-group-header')
+
+    const cardList = asCmpt(folder.components?.content?.[0])
+    expect(cardList.key).toBe('cx-standup-card-list')
+    expect(asCmpt(cardList.components?.['card-item']?.[0]).key).toBe('cx-standup-card')
   })
 })
