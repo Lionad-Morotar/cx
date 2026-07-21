@@ -5,26 +5,19 @@ export default defineConfig({
   pack: {
     plugins: [Vue({ isProduction: true })],
     dts: false,
-    // Nuxt 虚拟模块外置：宿主为 Nuxt 时解析真实实现（SSR 语义正确），
-    // 非 Nuxt 消费需自行提供 alias（见 README）
-    alias: {
-      '#ui-colors': './vendor/shims/ui-colors.d.ts',
-      'nuxt/schema': './vendor/shims/nuxt-schema.d.ts',
-    },
-    define: {
-      'import.meta.dev': 'false',
-    },
+    // v4 物料裸用 U* 组件（宿主 @nuxt/ui module 的 auto-import 解析）；
+    // Nuxt 虚拟模块与 vue 外置，dist 不内联 v4 源码
     deps: {
       neverBundle: [
         '#imports',
         '#app',
         '#build/app.config',
+        '#components',
         'vue',
         '@vue/shared',
         '@vueuse/core',
         '@lionad/cx-definition',
         '@lionad/cx-vue',
-        '@lionad/cx-render',
       ],
     },
   },

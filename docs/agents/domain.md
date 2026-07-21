@@ -7,7 +7,7 @@
 - **`CONTEXT.md`**（仓库根）—— 领域语言词汇表（glossary），定义 schema、catalog、renderer 等核心术语的准确含义与边界
 - **`docs/adr/`** —— 架构决策记录（Architecture Decision Records），阅读与你即将工作区域相关的 ADR
 
-cx 采用 **single-context（单上下文）** 布局：6 个子包（definition → vue → renderer → components → components-nuxt-ui-v4 → nuxt）是同一套 schema 驱动渲染系统的分层，共享统一领域语言，故只需一份根 `CONTEXT.md`，而非 multi-context 的每包一份。
+cx 采用 **single-context（单上下文）** 布局：6 个子包（definition → vue → renderer → components → components-nuxt-ui-v2 → nuxt）是同一套 schema 驱动渲染系统的分层，共享统一领域语言，故只需一份根 `CONTEXT.md`，而非 multi-context 的每包一份。
 
 若上述文件尚未创建，**静默继续**——不要提示缺失，也不要主动创建。生产者技能（`/grill-with-docs`）会在术语或决策真正落定时惰性创建它们。
 

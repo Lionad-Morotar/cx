@@ -1,11 +1,9 @@
 {
   "name": "@lionad/cx-components-nuxt-ui-v4",
   "version": "0.1.0",
-  "description": "cx material components based on Nuxt UI",
+  "description": "cx material components based on Nuxt UI v4",
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.mjs",
@@ -16,27 +14,15 @@
       "import": "./dist/index.mjs"
     }
   },
-  "publishConfig": {
-    "access": "public"
-  },
+  "publishConfig": { "access": "public" },
   "scripts": {
     "build": "vp pack && vue-tsc -p tsconfig.build.json",
     "typecheck": "vue-tsgo --tsdk ../../node_modules/.pnpm/typescript@7.0.2/node_modules/typescript --noEmit"
   },
   "dependencies": {
-    "@headlessui/vue": "^1.7.23",
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
-    "@popperjs/core": "^2.11.8",
-    "@vueuse/integrations": "^14.3.0",
-    "defu": "^6.1.7",
-    "fuse.js": "^7.5.0",
-    "lodash-es": "^4.18.1",
-    "ohash": "^2.0.11",
-    "tailwind-merge": "^3.6.0",
-    "v-calendar": "^3.1.2",
-    "vue-demi": "^0.14.10",
-    "zod": "^4.4.3"
+    "lodash-es": "^4.18.1"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
@@ -48,8 +34,7 @@
     "vue-tsc": "^3.3.7"
   },
   "peerDependencies": {
-    "@vue/shared": "^3.5.0",
-    "@vueuse/core": "^13.0.0 || ^14.0.0",
+    "@nuxt/ui": "^4.10.0",
     "vue": "^3.5.0"
   }
 }

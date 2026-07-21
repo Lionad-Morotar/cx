@@ -14,7 +14,7 @@ export default defineConfig({
         '@lionad/cx-vue',
         '@lionad/cx-render',
         '@lionad/cx-components',
-        '@lionad/cx-components-nuxt-ui-v4',
+        '@lionad/cx-components-nuxt-ui-v2',
       ],
     },
   },

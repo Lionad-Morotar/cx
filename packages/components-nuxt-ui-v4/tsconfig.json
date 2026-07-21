@@ -4,12 +4,9 @@
     "rootDir": ".",
     "types": ["node"],
     "paths": {
-      "#imports": ["./vendor/shims/imports.ts"],
-      "#build/app.config": ["./vendor/shims/app.config.ts"],
-      "#ui-colors": ["./vendor/shims/ui-colors.d.ts"],
-      "nuxt/schema": ["./vendor/shims/nuxt-schema.d.ts"],
-      "#app": ["./vendor/shims/imports.ts"]
+      "#imports": ["./src/shims/imports.ts"],
+      "#components": ["./src/shims/components.d.ts"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "vendor/**/*.ts", "vendor/**/*.vue"]
+  "include": ["src/**/*.ts", "src/**/*.vue"]
 }

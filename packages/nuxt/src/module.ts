@@ -2,8 +2,8 @@ import { addComponent, addPlugin, createResolver, defineNuxtModule } from '@nuxt
 
 import type { NuxtModule } from '@nuxt/schema'
 
-/** 物料集开关：render 渲染器物料 + components 基础物料 + nuxt-ui 物料 */
-export type CxMaterialBundle = 'render' | 'components' | 'nuxt-ui'
+/** 物料集开关：render 渲染器物料 + components 基础物料 + nuxt-ui(v2) 物料 + nuxt-ui-v4 物料（动态加载） */
+export type CxMaterialBundle = 'render' | 'components' | 'nuxt-ui' | 'nuxt-ui-v4'
 
 export interface CxNuxtModuleOptions {
   materials?: CxMaterialBundle[]

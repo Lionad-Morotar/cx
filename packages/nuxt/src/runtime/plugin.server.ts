@@ -10,10 +10,10 @@ import { installCxBundles } from './install'
 export default defineNuxtPlugin({
   name: 'cx',
   enforce: 'pre',
-  setup(nuxtApp: any) {
+  async setup(nuxtApp: any) {
     const cx = new CxLoader()
 
-    installCxBundles(cx, nuxtApp)
+    await installCxBundles(cx, nuxtApp)
     nuxtApp.vueApp.provide('cx', cx)
 
     return {

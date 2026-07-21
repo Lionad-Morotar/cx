@@ -13,7 +13,7 @@ export default defineNuxtPlugin({
     const cx = new CxLoader()
     await cx.init(window.location.href, { app: nuxtApp.vueApp })
 
-    installCxBundles(cx, nuxtApp)
+    await installCxBundles(cx, nuxtApp)
     nuxtApp.vueApp.provide('cx', cx)
 
     return {
