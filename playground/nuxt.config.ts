@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   modules: ['@lionad/cx-nuxt'],
   // cx 是客户端渲染系统；站会组件 setup 顶层访问 window/localStorage
   ssr: false,
-  css: ['element-plus/dist/index.css', '~/standup/styles/index.less'],
+  css: ['~/standup/styles/index.less'],
   devServer: {
     port: 3209,
     host: '0.0.0.0',
