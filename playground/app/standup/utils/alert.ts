@@ -1,10 +1,12 @@
+import { useOverlay } from '#imports'
+
+import CxAlertDialog from '../components/cx-alert-dialog.vue'
+
 /**
- * 轻量报错提示（原 ElMessageBox 确认弹窗，清退 element-plus 后暂降级为 console）。
+ * 轻量确认弹窗（ElMessageBox 替代）：经 @nuxt/ui v4 useOverlay 程序化唤起 UModal。
  *
- * 暂降级原因：本 util 在组件 setup 之外被调用，拿不到 UApp 注入的
- * toaster/overlay 上下文，useToast/useOverlay 在此不可用（组件内可用）；
- * useCxToast 的 inject 通道同理。先以 console 保底，确认弹窗待后续接
- * useOverlay 或全局服务。
+ * useOverlay 是全局共享单例（createSharedComposable），util 层可直接调用；
+ * 渲染依赖 app.vue 的 UApp（OverlayProvider），其未挂载时退化为 console 保底。
  */
 export interface CxAlertOptions {
   title: string
@@ -13,7 +15,22 @@ export interface CxAlertOptions {
   confirmButtonText?: string
 }
 
-export function cxAlert(options: CxAlertOptions) {
-  console.warn(`[cxAlert] ${options.title}${options.content ? ': ' + options.content : ''}`)
-  return Promise.resolve()
+let alertModal: ReturnType<ReturnType<typeof useOverlay>['create']> | null = null
+
+/** 确认 resolve(true)；X / ESC / 遮罩关闭 resolve(false) */
+export function cxAlert(options: CxAlertOptions): Promise<boolean> {
+  try {
+    if (!alertModal) {
+      alertModal = useOverlay().create(CxAlertDialog)
+    }
+    return alertModal.open({
+      title: options.title,
+      content: options.content,
+      showClose: options.showClose,
+      confirmButtonText: options.confirmButtonText,
+    })
+  } catch (error) {
+    console.warn(`[cxAlert] ${options.title}${options.content ? ': ' + options.content : ''}`, error)
+    return Promise.resolve(false)
+  }
 }
