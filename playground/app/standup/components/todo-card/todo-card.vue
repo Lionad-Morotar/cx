@@ -2,19 +2,26 @@
   <div :class="kls" v-show="dataState.isInited" @click="handleClick">
     <slot name="header">
       <div :class="ns.e('input-con')">
-        <el-input
+        <UInput
           ref="todoInputRef"
           type="todo-input"
           v-model="input"
           placeholder="请输入问题，按下回车添加"
           :disabled="isDisabled"
         >
-          <template #prefix v-if="inputTag">
-            <el-tag disable-transitions closable @close="() => (inputTag = '')">{{
-              inputTag
-            }}</el-tag>
+          <template #leading v-if="inputTag">
+            <UBadge color="neutral" variant="subtle" class="closable-tag">
+              {{ inputTag }}
+              <button
+                type="button"
+                class="close-btn"
+                aria-label="清除"
+                @click="() => (inputTag = '')"
+                >×</button
+              >
+            </UBadge>
           </template>
-        </el-input>
+        </UInput>
       </div>
     </slot>
     <template v-if="isEmptyContent">
@@ -25,9 +32,8 @@
     </template>
     <template v-else>
       <div :class="ns.e('bg')" />
-      <el-scrollbar
-        :class="ns.e('scroll-area-y')"
-        :view-style="'overflow: hidden'"
+      <CxScrollbar
+        :class="[ns.e('scroll-area-y'), 'cx-todo-scroll-y']"
         ref="scrollAreaRef"
         @scroll="scrollY"
       >
@@ -41,7 +47,10 @@
               </slot>
             </template>
           </div>
-          <el-scrollbar :class="ns.e('scroll-area-x')" @scroll="scrollX">
+          <CxScrollbar
+            :class="[ns.e('scroll-area-x'), 'cx-todo-scroll-x']"
+            @scroll.stop="scrollX"
+          >
             <div :class="ns.e('todo-content')">
               <div
                 v-for="(line, idx) in dataState.value"
@@ -55,10 +64,10 @@
                 <slot name="line-content-prefix" :line="line" :idx="idx">
                   <span :class="[ns.is('checked', line.checked), ns.e('order')]" v-if="isTodoList">
                     <slot name="line-content-prefix-prefix" :line="line" :idx="idx" />
-                    <el-checkbox
+                    <UCheckbox
                       v-model="line.checked"
                       :disabled="isDisabled"
-                      @change="dataState.updateDB"
+                      @update:model-value="dataState.updateDB"
                     />
                     <slot name="line-content-prefix-suffix" :line="line" :idx="idx" />
                   </span>
@@ -79,15 +88,15 @@
                 <slot name="line-content-suffix" :line="line" :idx="idx">
                   <div :class="ns.e('actions')" v-if="isTodoList">
                     <div :class="ns.e('action')" @click="dataState.remove(line)">
-                      <el-icon><Delete /></el-icon>
+                      <UIcon name="i-lucide-trash" />
                     </div>
                   </div>
                 </slot>
               </div>
             </div>
-          </el-scrollbar>
+          </CxScrollbar>
         </div>
-      </el-scrollbar>
+      </CxScrollbar>
     </template>
   </div>
 </template>
@@ -97,7 +106,6 @@ import { computed, watch, ref, nextTick } from 'vue'
 import { useActiveElement, unrefElement, useKeyModifier, useEventListener } from '@vueuse/core'
 import { useCxNamespace } from '../../utils/namespace'
 import deindent from 'deindent'
-import { Delete } from '@element-plus/icons-vue'
 import { useRefs, onKeyStroke } from '../../hooks'
 import RenderContent from './component/render/render-content.vue'
 import EmptyStrImage from '../../assets/empty.svg'
@@ -513,7 +521,10 @@ const addInputToItem = async () => {
 
   await nextTick()
   await nextTick()
-  todoInputRef.value?.focus()
+  const ref = todoInputRef.value as any
+  const inputEl =
+    (ref?.inputRef as HTMLInputElement) || ref?.$el?.querySelector('input')
+  inputEl?.focus?.()
 }
 
 /********************************************************************************** Scroll Interactions */
@@ -521,11 +532,13 @@ const addInputToItem = async () => {
 const scrollAreaRef = ref()
 const scrollYPX = ref('0px')
 const scrollXVal = ref(0)
-const scrollY = ({ scrollTop }: { scrollTop: number }) => {
-  scrollYPX.value = `-${scrollTop || 0}px`
+const scrollY = (e: Event) => {
+  const scrollTop = (e.target as HTMLElement).scrollTop || 0
+  scrollYPX.value = `-${scrollTop}px`
 }
-const scrollX = ({ scrollLeft }: { scrollLeft: number }) => {
-  scrollXVal.value = scrollLeft || 0
+const scrollX = (e: Event) => {
+  const scrollLeft = (e.target as HTMLElement).scrollLeft || 0
+  scrollXVal.value = scrollLeft
 }
 
 const shadowX = computed(() => Math.pow(scrollXVal.value, 0.3))
@@ -537,7 +550,10 @@ const resetScroll = async (item: Content) => {
     el?.scrollLeft && (el.scrollLeft = 0)
   })
   nextTick(() => {
-    scrollAreaRef?.value?.setScrollLeft?.(0)
+    const scrollEl = unrefElement(scrollAreaRef.value) as HTMLElement | null
+    if (scrollEl) {
+      scrollEl.scrollLeft = 0
+    }
   })
 }
 
@@ -561,6 +577,34 @@ defineExpose({
 
 <style lang="scss">
 @import '../../styles/mixins/index.scss';
+
+.cx-todo-scroll-y,
+.cx-todo-scroll-x {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.closable-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  .close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0 2px;
+    color: inherit;
+  }
+}
 
 @include b('todo-card') {
   --line-height: 40px;

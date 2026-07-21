@@ -1,103 +1,98 @@
 <template>
-  <el-dialog
+  <UModal
     class="select-participants-dialog"
-    v-model:visible="visible"
-    full-content
-    :title="'确认与会人'"
-    :width="528"
-    :height="380"
+    v-model:open="visible"
+    title="确认与会人"
   >
-    <div class="dialog-content">
-      <div class="to-select-panel">
-        <div class="input-wrapper">
-          <el-input
-            class="search-input"
-            v-model="filterStr"
-            clearable
-            :placeholder="'输入关键字搜索'"
-          >
-            <template #suffix>
-              <el-icon>
-                <Search></Search>
-              </el-icon>
-            </template>
-          </el-input>
-        </div>
-        <div class="panel">
-          <div class="title-wrapper list-item">
-            <span class="title">参会人员（{{ unSelected.length }}人）</span>
+    <template #body>
+      <div class="dialog-content">
+        <div class="to-select-panel">
+          <div class="input-wrapper">
+            <UInput
+              class="search-input"
+              v-model="filterStr"
+              :placeholder="'输入关键字搜索'"
+              trailing-icon="i-lucide-search"
+            />
           </div>
-          <el-scrollbar class="to-select-scroll-area">
-            <div class="to-select-wrapper">
-              <template v-if="filterStr">
-                <div
-                  v-for="item in filteredList"
-                  :key="item.id"
-                  class="list-item"
-                  :class="isSelected(item) && 'is-selected'"
-                >
-                  <img class="avatar" :src="item.avatarUrl" />
-                  <div class="name">{{ item.name }}</div>
-                  <div class="actions">
-                    <span class="button absent-button" @click="select(item)">缺席</span>
-                  </div>
-                </div>
-              </template>
-              <draggable v-else v-model="users" item-key="id">
-                <template #item="{ element: item }">
-                  <div class="list-item" :class="isSelected(item) && 'is-selected'">
+          <div class="panel">
+            <div class="title-wrapper list-item">
+              <span class="title">参会人员（{{ unSelected.length }}人）</span>
+            </div>
+            <CxScrollbar class="to-select-scroll-area">
+              <div class="to-select-wrapper">
+                <template v-if="filterStr">
+                  <div
+                    v-for="item in filteredList"
+                    :key="item.id"
+                    class="list-item"
+                    :class="isSelected(item) && 'is-selected'"
+                  >
                     <img class="avatar" :src="item.avatarUrl" />
                     <div class="name">{{ item.name }}</div>
                     <div class="actions">
-                      <CxSvgIcon class="button drag-handler" icon-class="drag" />
                       <span class="button absent-button" @click="select(item)">缺席</span>
                     </div>
                   </div>
                 </template>
-              </draggable>
-            </div>
-          </el-scrollbar>
-        </div>
-      </div>
-
-      <div class="selected-panel">
-        <div class="panel">
-          <div class="title-wrapper list-item">
-            <div class="title">
-              <span>缺席人员（{{ selected.length }}人）</span>
-            </div>
-            <div class="actions">
-              <span class="button remove-all-button" @click="clearSelection" v-if="selected.length"
-                >清空</span
-              >
-            </div>
+                <draggable v-else v-model="users" item-key="id">
+                  <template #item="{ element: item }">
+                    <div class="list-item" :class="isSelected(item) && 'is-selected'">
+                      <img class="avatar" :src="item.avatarUrl" />
+                      <div class="name">{{ item.name }}</div>
+                      <div class="actions">
+                        <CxSvgIcon class="button drag-handler" icon-class="drag" />
+                        <span class="button absent-button" @click="select(item)">缺席</span>
+                      </div>
+                    </div>
+                  </template>
+                </draggable>
+              </div>
+            </CxScrollbar>
           </div>
-          <el-scrollbar class="to-select-scroll-area">
-            <div class="to-select-wrapper">
-              <div v-for="item in selected" :key="item.id" class="list-item">
-                <img class="avatar" :src="item.avatarUrl" />
-                <div class="name">{{ item.name }}</div>
-                <div class="actions">
-                  <span class="button remove-button" @click="clear(item)">参会</span>
-                </div>
+        </div>
+
+        <div class="selected-panel">
+          <div class="panel">
+            <div class="title-wrapper list-item">
+              <div class="title">
+                <span>缺席人员（{{ selected.length }}人）</span>
+              </div>
+              <div class="actions">
+                <span
+                  class="button remove-all-button"
+                  @click="clearSelection"
+                  v-if="selected.length"
+                  >清空</span
+                >
               </div>
             </div>
-          </el-scrollbar>
+            <CxScrollbar class="to-select-scroll-area">
+              <div class="to-select-wrapper">
+                <div v-for="item in selected" :key="item.id" class="list-item">
+                  <img class="avatar" :src="item.avatarUrl" />
+                  <div class="name">{{ item.name }}</div>
+                  <div class="actions">
+                    <span class="button remove-button" @click="clear(item)">参会</span>
+                  </div>
+                </div>
+              </div>
+            </CxScrollbar>
+          </div>
         </div>
       </div>
-    </div>
+    </template>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="handleCancel">{{ '取消' }}</el-button>
-        <el-button type="primary" @click="handleConfirm">{{ '确定' }}</el-button>
+        <UButton @click="handleCancel">{{ '取消' }}</UButton>
+        <UButton color="primary" @click="handleConfirm">{{ '确定' }}</UButton>
       </div>
     </template>
-  </el-dialog>
+  </UModal>
 </template>
 
 <script setup lang="ts">
 import { watch, ref, computed, readonly } from 'vue'
-import { Search } from '@element-plus/icons-vue'
 import { useVModel } from '@vueuse/core'
 import { selectedProjectUsersReq } from '../../../states/project'
 

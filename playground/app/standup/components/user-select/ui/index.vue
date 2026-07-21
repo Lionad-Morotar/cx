@@ -1,6 +1,6 @@
 <template>
   <div class="user-select">
-    <el-scrollbar class="scroll-area">
+    <CxScrollbar class="scroll-area">
       <div class="members">
         <template v-for="user in presentUsers" :key="user.id">
           <div v-if="user.id === 'padding'" class="member is-empty" />
@@ -18,7 +18,7 @@
           </div>
         </template>
       </div>
-    </el-scrollbar>
+    </CxScrollbar>
   </div>
 </template>
 
@@ -105,20 +105,12 @@ defineExpose({
 
   .scroll-area {
     width: 100%;
-    overflow: visible;
-
-    :deep(.el-scrollbar__wrap) {
-      overflow: visible;
-    }
-    :deep(.el-scrollbar__view) {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-      width: 100%;
-      height: 100%;
-      padding: calc(40px * 1.5 - 40px) 0;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 100%;
+    padding: calc(40px * 1.5 - 40px) 0;
   }
 }
 .members {

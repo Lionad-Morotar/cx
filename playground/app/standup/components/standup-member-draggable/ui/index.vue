@@ -1,7 +1,7 @@
 <template>
   <div class="project-members-section">
     <div class="member-section-title">项目成员</div>
-    <el-scrollbar>
+    <CxScrollbar>
       <div class="project-members-con">
         <draggable v-model="sortedUsers" item-key="id">
           <template #item="{ element: user }">
@@ -19,7 +19,7 @@
           </template>
         </draggable>
       </div>
-    </el-scrollbar>
+    </CxScrollbar>
   </div>
 </template>
 

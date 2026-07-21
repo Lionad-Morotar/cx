@@ -1,20 +1,19 @@
 <template>
-  <el-button
+  <UButton
     class="fullscreen-button"
     :class="props.icon ? 'is-type-icon' : 'is-type-text'"
-    plain
+    variant="outline"
     ref="fullscreenButtonRef"
-    :icon="!props.icon ? undefined : isFullscreen ? BottomLeft : FullScreen"
+    :icon="!props.icon ? undefined : isFullscreen ? 'i-lucide-minimize-2' : 'i-lucide-maximize'"
     @click="toggle"
   >
     <span v-if="!props.icon">{{ isFullscreen ? '退出全屏' : '全屏' }}</span>
-  </el-button>
+  </UButton>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { unrefElement, useFullscreen, eagerComputed } from '@vueuse/core'
-import { FullScreen, BottomLeft } from '@element-plus/icons-vue'
 
 import type { MaybeElementRef } from '@vueuse/core'
 
@@ -68,7 +67,8 @@ defineExpose({
 </style>
 
 <style>
-.el-button.fullscreen-button [class*='el-icon'] + span {
+.fullscreen-button [class*='icon'] + span,
+.fullscreen-button svg + span {
   margin-left: 0 !important;
 }
 </style>

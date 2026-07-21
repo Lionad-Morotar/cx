@@ -11,9 +11,11 @@
       <img class="switch-icon" :src="IconSwitch" @click="switchTodoDataType" />
     </template>
     <template #icons v-if="isCurStandupInProgress">
-      <el-icon class="switch-edit-type" @click="switchTodoCardEditType">
-        <Switch />
-      </el-icon>
+      <UIcon
+        name="i-lucide-toggle-left"
+        class="switch-edit-type"
+        @click="switchTodoCardEditType"
+      />
     </template>
     <cx-todo-card
       ref="todoCardRef"
@@ -26,7 +28,6 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import { Switch } from '@element-plus/icons-vue'
 import CxDashboardCard from '../../dashboard-card'
 import CxTodoCard from '../../todo-card'
 import { useStandupDetail, useLastStandup } from '../../../states/standups'

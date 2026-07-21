@@ -1,6 +1,6 @@
 <template>
-  <el-form label-position="top" :model="modelValue" label-width="110px">
-    <el-form-item
+  <UForm label-position="top" :model="modelValue" label-width="110px">
+    <UFormField
       v-for="(tab, idx) in modelValue"
       :key="`${idx}-${tab.value}`"
       :rules="tabRule"
@@ -15,10 +15,10 @@
           <span v-else />
         </div>
       </template>
-      <el-input v-model="tab.name" />
-    </el-form-item>
-    <el-button type="primary" @click="addTab">{{ '添加标签' }}</el-button>
-  </el-form>
+      <UInput v-model="tab.name" />
+    </UFormField>
+    <UButton color="primary" @click="addTab">{{ '添加标签' }}</UButton>
+  </UForm>
 </template>
 
 <script setup lang="ts">

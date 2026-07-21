@@ -1,7 +1,7 @@
 <template>
-  <el-form :model="value" label-position="top">
+  <div class="form">
     <template v-for="(group, gIDX) in value">
-      <el-form-item class="item">
+      <UFormGroup class="item">
         <template #label>
           <div class="label">
             <span>菜单分组</span>
@@ -14,11 +14,11 @@
             <span v-else />
           </div>
         </template>
-      </el-form-item>
+      </UFormGroup>
 
       <div class="sub-form">
         <template v-for="(item, iIDX) in group" :key="`${gIDX}-${iIDX}-${item.id}`">
-          <el-form-item :rules="itemLabelRule" :prop="`${gIDX}.${iIDX}`" class="item">
+          <UFormGroup class="item">
             <template #label>
               <div class="label">
                 <span>菜单名称</span>
@@ -29,19 +29,19 @@
                 />
               </div>
             </template>
-            <el-input v-model="item.label" />
-          </el-form-item>
+            <UInput v-model="item.label" />
+          </UFormGroup>
         </template>
-        <el-button class="mt-2 w-full text-center" @click="() => addActionItem(gIDX)">
+        <UButton class="mt-2 w-full text-center" variant="outline" @click="() => addActionItem(gIDX)">
           添加菜单项
-        </el-button>
+        </UButton>
       </div>
     </template>
 
-    <el-button class="mt-4 w-full text-center" type="primary" @click="addGroup">
+    <UButton class="mt-4 w-full text-center" color="primary" @click="addGroup">
       添加菜单分组
-    </el-button>
-  </el-form>
+    </UButton>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -49,20 +49,10 @@ import { useCxPanel } from '@lionad/cx-vue'
 import { createItem } from '../utils'
 import type { ActionItem } from '../types'
 
+import { UButton, UFormGroup, UInput } from '../../../../vendor/bridge'
+
 const { emits, props, value } = useCxPanel<ActionItem[][]>([])
 value.value = value.value || []
-
-const itemLabelRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { label } = item || {}
-      if (label.length <= 0) return cb(new Error('请输入项目标题'))
-      if (label.length >= 20) return cb(new Error('项目标题不能超过 20 个字符'))
-      return cb()
-    },
-  },
-]
 
 const addGroup = () => {
   value.value.push([])
@@ -89,24 +79,13 @@ const removeActionItem = (gIDX: number, iIDX: number) => {
 .sub-form {
   @apply mb-2 p-2 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-md bg-white dark:bg-neutral-800;
 
-  :deep(.el-form-item) {
-    @apply mb-1;
-  }
-  :deep(.el-form-item__label) {
+  .item {
     @apply mb-1;
   }
 }
 
 .item {
   @apply w-full;
-
-  &:has(.el-form-item__content:empty) {
-    @apply mb-0;
-  }
-
-  :deep(.el-form-item__label) {
-    @apply w-full;
-  }
 
   &:hover {
     .delete-text {

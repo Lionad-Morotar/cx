@@ -1,5 +1,5 @@
 <template>
-  <el-scrollbar class="left-scroll-area">
+  <CxScrollbar class="left-scroll-area">
     <!-- 当期分组标题 -->
     <div class="list-section-title is-first">
       本{{ timeRangeMeterStr(groupByType) }}{{ meetingTypeName }}
@@ -14,7 +14,7 @@
     <div class="history-section">
       <StandupByYear class="history-con" :standups="standups" />
     </div>
-  </el-scrollbar>
+  </CxScrollbar>
 </template>
 
 <script lang="ts" setup>
@@ -41,17 +41,14 @@ const groupByType = computed<'week' | 'month' | 'year'>(
 <style lang="less" scoped>
 .left-scroll-area {
   grid-area: left;
-
-  :deep(& > .el-scrollbar__wrap > .el-scrollbar__view) {
-    display: grid;
-    grid-template-rows: 78px auto 78px minmax(0, 1fr);
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'h1'
-      'current-standup-group'
-      'h2'
-      'history-standups';
-  }
+  display: grid;
+  grid-template-rows: 78px auto 78px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'h1'
+    'current-standup-group'
+    'h2'
+    'history-standups';
 }
 
 .list-section-title {

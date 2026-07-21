@@ -50,19 +50,9 @@
       </div>
     </define-remove-rows-button>
 
-    <el-popconfirm
-      v-if="lastRowCmpts.length"
-      :title="`将删除${lastRowCmpts.length}个组件`"
-      @confirm="removeLastRow"
-    >
-      <template #reference>
-        <reuse-remove-rows-button name="reuse-remove-rows-button" />
-      </template>
-    </el-popconfirm>
     <reuse-remove-rows-button
-      v-else
       name="reuse-remove-rows-button"
-      v-bind="{ handleClick: removeLastRow }"
+      v-bind="{ handleClick: confirmRemoveLastRow }"
     />
 
     <define-remove-cols-button v-slot="{ handleClick }" name="define-remove-cols-button">
@@ -81,19 +71,9 @@
       </div>
     </define-remove-cols-button>
 
-    <el-popconfirm
-      v-if="lastColCmpts.length"
-      :title="`将删除${lastColCmpts.length}个组件`"
-      @confirm="removeLastCol"
-    >
-      <template #reference>
-        <reuse-remove-cols-button name="reuse-remove-cols-button" />
-      </template>
-    </el-popconfirm>
     <reuse-remove-cols-button
-      v-else
       name="reuse-remove-cols-button"
-      v-bind="{ handleClick: removeLastCol }"
+      v-bind="{ handleClick: confirmRemoveLastCol }"
     />
 
     <!-- todo: hover on add buttons show virtual blocks to add -->
@@ -332,6 +312,20 @@ const removeLastCol = () => {
     })
   })
   col.value -= 1
+}
+
+// 删除最后一行/列时若会移除组件，用原生 confirm 做二次确认（替代原 el-popconfirm）
+const confirmRemoveLastRow = () => {
+  if (lastRowCmpts.value.length) {
+    if (!window.confirm(`将删除${lastRowCmpts.value.length}个组件`)) return
+  }
+  removeLastRow()
+}
+const confirmRemoveLastCol = () => {
+  if (lastColCmpts.value.length) {
+    if (!window.confirm(`将删除${lastColCmpts.value.length}个组件`)) return
+  }
+  removeLastCol()
 }
 
 /**

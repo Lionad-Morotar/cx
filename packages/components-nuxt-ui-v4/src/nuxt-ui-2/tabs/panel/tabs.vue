@@ -1,10 +1,8 @@
 <template>
-  <el-form :model="value" label-position="top">
-    <el-form-item
+  <div class="form">
+    <UFormGroup
       v-for="(tab, idx) in value"
       :key="`${idx}-${tab.value}`"
-      :rules="tabRule"
-      :prop="`${idx}`"
       class="tab-item"
     >
       <template #label>
@@ -13,13 +11,13 @@
           <span class="delete-text" @click="() => deleteTab(idx)" v-text="'删除'" />
         </div>
       </template>
-      <el-input v-model="tab.name" />
-    </el-form-item>
+      <UInput v-model="tab.name" />
+    </UFormGroup>
 
-    <el-button class="mt-4 w-full text-center" type="primary" @click="addTab">
+    <UButton class="mt-4 w-full text-center" color="primary" @click="addTab">
       添加标签页
-    </el-button>
-  </el-form>
+    </UButton>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -27,19 +25,9 @@ import { useCxPanel } from '@lionad/cx-vue'
 import { createTab } from '../utils'
 import type { Tab } from '../types'
 
-const { emits, props, value } = useCxPanel<Tab[]>([])
+import { UButton, UFormGroup, UInput } from '../../../../vendor/bridge'
 
-const tabRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { name } = item || {}
-      if (name.length <= 0) return cb(new Error('请输入标签页名称'))
-      if (name.length >= 25) return cb(new Error('标签页名称不能超过 25 个字符'))
-      return cb()
-    },
-  },
-]
+const { emits, props, value } = useCxPanel<Tab[]>([])
 
 const addTab = () => {
   const newTabName = `${'标签页'}${((value.value as any[])?.length || 0) + 1}`
@@ -55,10 +43,6 @@ const deleteTab = (idx: number) => {
 @reference "tailwindcss";
 .tab-item {
   @apply w-full;
-
-  :deep(.el-form-item__label) {
-    @apply w-full;
-  }
 
   &:hover {
     .delete-text {

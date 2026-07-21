@@ -23,19 +23,22 @@
       />
       <cx-card class="issues-section is-cx-card" :name="'任务列表'" ref="issueTableWrapperRef">
         <template #action>
-          <el-input
+          <UInput
             class="filter-issue-input"
             v-model="tableFilterStr"
             placeholder="搜索任务列表"
-            clearable
-            :prefix-icon="Search"
+            icon="i-lucide-search"
           />
           <cx-fullscreen-button
             ref="tableFullScreenButtonRef"
             icon
             :target="issueTableWrapperRef"
           />
-          <el-icon class="export-button" @click="exportData"><DocumentCopy /></el-icon>
+          <UIcon
+            name="i-lucide-copy"
+            class="export-button"
+            @click="exportData"
+          />
         </template>
         <cx-view-issues-table
           ref="issueTableRef"
@@ -54,9 +57,7 @@
 <script lang="ts" setup>
 import { ref, watch, computed, watchEffect } from 'vue'
 import { useAsync } from '../../../hooks/use-async'
-import { ElIcon } from 'element-plus'
 import { useMagicKeys } from '@vueuse/core'
-import { Search, DocumentCopy } from '@element-plus/icons-vue'
 // import { standupBus as cx } from "../../../utils/standup-bus";
 import CxCardTabs from '../../card-tabs'
 import { useStandupDetail, useLastStandup } from '../../../states/standups'

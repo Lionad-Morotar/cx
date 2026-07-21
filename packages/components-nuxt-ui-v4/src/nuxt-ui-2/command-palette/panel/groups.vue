@@ -1,7 +1,7 @@
 <template>
-  <el-form :model="value" label-position="top">
+  <div class="form">
     <template v-for="(group, gIDX) in value" :key="`${gIDX}-${group.key}`">
-      <el-form-item :rules="groupKeyRule" :prop="`${gIDX}`" class="item">
+      <UFormGroup class="item">
         <template #label>
           <div class="label">
             <span>分组标识</span>
@@ -14,18 +14,18 @@
             <span v-else />
           </div>
         </template>
-        <el-input v-model="group.key" />
-      </el-form-item>
-      <el-form-item :rule="groupLabelRule" :prop="`${gIDX}`" class="item">
+        <UInput v-model="group.key" />
+      </UFormGroup>
+      <UFormGroup class="item">
         <template #label>
           <span>分组标题</span>
         </template>
-        <el-input v-model="group.label" />
-      </el-form-item>
+        <UInput v-model="group.label" />
+      </UFormGroup>
 
       <div class="sub-form">
         <template v-for="(item, iIDX) in group.commands" :key="`${gIDX}-${iIDX}-${item.id}`">
-          <el-form-item :rules="itemIDRule" :prop="`${gIDX}.commands.${iIDX}`" class="item">
+          <UFormGroup class="item">
             <template #label>
               <div class="label">
                 <span>项目标识</span>
@@ -36,25 +36,25 @@
                 />
               </div>
             </template>
-            <el-input v-model="item.id" />
-          </el-form-item>
-          <el-form-item :rules="itemLabelRule" :prop="`${gIDX}.commands.${iIDX}`" class="item">
+            <UInput v-model="item.id" />
+          </UFormGroup>
+          <UFormGroup class="item">
             <template #label>
               <span>项目标题</span>
             </template>
-            <el-input v-model="item.label" />
-          </el-form-item>
+            <UInput v-model="item.label" />
+          </UFormGroup>
         </template>
-        <el-button class="mt-2 w-full text-center" @click="() => addItem(gIDX)">
+        <UButton class="mt-2 w-full text-center" variant="outline" @click="() => addItem(gIDX)">
           添加一项
-        </el-button>
+        </UButton>
       </div>
     </template>
 
-    <el-button class="mt-4 w-full text-center" type="primary" @click="addGroupItem">
+    <UButton class="mt-4 w-full text-center" color="primary" @click="addGroupItem">
       添加分组
-    </el-button>
-  </el-form>
+    </UButton>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -62,53 +62,10 @@ import { useCxPanel } from '@lionad/cx-vue'
 import { createItem, createGroupItem } from '../utils'
 import type { Item, GroupItem } from '../types'
 
+import { UButton, UFormGroup, UInput } from '../../../../vendor/bridge'
+
 const { emits, props, value } = useCxPanel<GroupItem[]>([])
 value.value = value.value || []
-
-const groupKeyRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { key } = item || {}
-      if (key.length <= 0) return cb(new Error('请输入分组标识'))
-      if (key.length >= 32) return cb(new Error('分组标识不能超过 32 个字符'))
-      return cb()
-    },
-  },
-]
-const groupLabelRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { label } = item || {}
-      if (label.length <= 0) return cb(new Error('请输入分组标题'))
-      if (label.length >= 50) return cb(new Error('分组标题不能超过 50 个字符'))
-      return cb()
-    },
-  },
-]
-const itemIDRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { id } = item || {}
-      if (id.length <= 0) return cb(new Error('请输入标题'))
-      if (id.length >= 32) return cb(new Error('标题不能超过 32 个字符'))
-      return cb()
-    },
-  },
-]
-const itemLabelRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { label } = item || {}
-      if (label.length <= 0) return cb(new Error('请输入项目标题'))
-      if (label.length >= 50) return cb(new Error('项目标题不能超过 50 个字符'))
-      return cb()
-    },
-  },
-]
 
 const addGroupItem = () => {
   const newItemName = `group-${((value.value as any[])?.length || 0) + 1}`
@@ -147,20 +104,13 @@ const deleteItem = (gIDX: number, iIDX: number) => {
 .sub-form {
   @apply mb-2 p-2 ring-1 ring-neutral-200 dark:ring-neutral-700 rounded-md;
 
-  :deep(.el-form-item) {
-    @apply mb-1;
-  }
-  :deep(.el-form-item__label) {
+  .item {
     @apply mb-1;
   }
 }
 
 .item {
   @apply w-full;
-
-  :deep(.el-form-item__label) {
-    @apply w-full;
-  }
 
   &:hover {
     .delete-text {

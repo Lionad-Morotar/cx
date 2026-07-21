@@ -1,7 +1,7 @@
 <template>
-  <el-form :model="value" label-position="top">
+  <div class="form">
     <template v-for="(tab, idx) in value" :key="`${idx}-${tab.id}`">
-      <el-form-item :rules="labelRule" :prop="`${idx}`" class="accordion-item">
+      <UFormGroup class="accordion-item">
         <template #label>
           <div class="label">
             <span>{{ `${'项目'} ${idx + 1}` }}</span>
@@ -14,15 +14,15 @@
             <span v-else />
           </div>
         </template>
-        <el-input v-model="tab.label" />
-      </el-form-item>
-      <el-form-item :rules="contentRule" :prop="`${idx}`" class="accordion-item -mt-2">
-        <el-input v-model="tab.icon" type="textarea" />
-      </el-form-item>
+        <UInput v-model="tab.label" />
+      </UFormGroup>
+      <UFormGroup class="accordion-item -mt-2">
+        <UTextarea v-model="tab.icon" />
+      </UFormGroup>
     </template>
 
-    <el-button class="mt-4 w-full text-center" type="primary" @click="addTab"> 添加项目 </el-button>
-  </el-form>
+    <UButton class="mt-4 w-full text-center" color="primary" @click="addTab"> 添加项目 </UButton>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -30,30 +30,9 @@ import { useCxPanel } from '@lionad/cx-vue'
 import { createItem } from '../utils'
 import type { Item } from '../types'
 
-const { emits, props, value } = useCxPanel<Item[]>([])
+import { UButton, UFormGroup, UInput, UTextarea } from '../../../../vendor/bridge'
 
-const labelRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { label } = item || {}
-      if (label.length <= 0) return cb(new Error('请输入标题'))
-      if (label.length >= 50) return cb(new Error('标题不能超过 50 个字符'))
-      return cb()
-    },
-  },
-]
-const contentRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { icon } = item || {}
-      if (icon.length <= 0) return cb(new Error('请输入图标标识'))
-      if (icon.length >= 50) return cb(new Error('图标标识不能超过 50 个字符'))
-      return cb()
-    },
-  },
-]
+const { emits, props, value } = useCxPanel<Item[]>([])
 
 const addTab = () => {
   const newTabName = `${'标题'}${((value.value as any[])?.length || 0) + 1}`
@@ -73,10 +52,6 @@ const deleteTab = (idx: number) => {
 @reference "tailwindcss";
 .accordion-item {
   @apply w-full;
-
-  :deep(.el-form-item__label) {
-    @apply w-full;
-  }
 
   &:hover {
     .delete-text {

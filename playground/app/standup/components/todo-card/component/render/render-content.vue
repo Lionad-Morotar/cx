@@ -3,12 +3,13 @@
     <!-- maybe refactor with https://www.npmjs.com/package/rich-string-parser -->
     <template v-if="content?.mention?.length">
       <template v-for="tag in content.mention" :key="tag.id">
-        <el-tag
+        <UBadge
           :class="ns.e('mention-tag')"
-          disable-transitions
+          color="neutral"
+          variant="subtle"
           :contenteditable="false"
           @click="handleTagClick(tag)"
-          >{{ getTagDisplayText(tag) }}</el-tag
+          >{{ getTagDisplayText(tag) }}</UBadge
         >
       </template>
     </template>

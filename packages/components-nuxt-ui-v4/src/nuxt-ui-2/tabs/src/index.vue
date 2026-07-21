@@ -17,7 +17,10 @@
       <slot name="default-start" />
 
       <slot v-if="showSlot(tab.value)" :name="tab.value" v-bind="x" />
-      <el-empty v-else :description="`${tab.label || ''}` + '内没有内容'" :image-size="50" />
+      <div v-else class="flex flex-col items-center justify-center py-6 text-sm text-neutral-500 dark:text-neutral-400">
+        <UIcon name="i-lucide-inbox" class="mb-2 size-6 opacity-60" />
+        <span>{{ `${tab.label || ''}` }}内没有内容</span>
+      </div>
 
       <slot name="default-end" v-bind="x" />
     </template>
@@ -27,7 +30,7 @@
 <script setup lang="ts">
 import { inject, useAttrs, useTemplateRef, computed, ref } from 'vue'
 
-import { UTabs } from '../../../../vendor/bridge'
+import { UTabs, UIcon } from '../../../../vendor/bridge'
 
 import { CxEventDisplayCmptKey } from '@lionad/cx-definition'
 import { useCxSlot, useCxBEM, useMountedWatchImmediate } from '@lionad/cx-vue'

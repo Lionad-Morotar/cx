@@ -66,9 +66,9 @@
           <span class="label">结束</span>
         </template>
       </div>
-      <el-tag v-if="standup.state === 'IN_PROGRESS'" type="success">进行中</el-tag>
-      <el-tag v-else-if="standup.state === 'ENDED'">已结束</el-tag>
-      <el-tag v-else type="info" plain>未进行</el-tag>
+      <UBadge v-if="standup.state === 'IN_PROGRESS'" color="success">进行中</UBadge>
+      <UBadge v-else-if="standup.state === 'ENDED'">已结束</UBadge>
+      <UBadge v-else color="info" variant="outline">未进行</UBadge>
     </template>
   </div>
 </template>
@@ -291,10 +291,9 @@ const displayMeetingOrder = (idx: number) => {
     }
   }
 
-  :deep(.el-tag) {
-    .el-tag__content {
-      font-size: 12px;
-    }
+  :deep(.el-tag),
+  :deep([class*='badge']) {
+    font-size: 12px;
   }
 }
 </style>

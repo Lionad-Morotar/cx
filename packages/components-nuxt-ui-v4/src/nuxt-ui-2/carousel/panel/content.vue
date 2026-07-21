@@ -1,7 +1,7 @@
 <template>
-  <el-form :model="value" label-position="top">
+  <div class="form">
     <template v-for="(tab, idx) in value" :key="`${idx}-${tab.id}`">
-      <el-form-item :rules="contentRule" :prop="`${idx}`" class="accordion-item">
+      <UFormGroup class="accordion-item">
         <template #label>
           <div class="content">
             <span>{{ `${'内容'} ${idx + 1}` }}</span>
@@ -14,12 +14,12 @@
             <span v-else />
           </div>
         </template>
-        <el-input v-model="tab.content" />
-      </el-form-item>
+        <UInput v-model="tab.content" />
+      </UFormGroup>
     </template>
 
-    <el-button class="mt-4 w-full text-center" type="primary" @click="addTab"> 添加项目 </el-button>
-  </el-form>
+    <UButton class="mt-4 w-full text-center" color="primary" @click="addTab"> 添加项目 </UButton>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -27,19 +27,9 @@ import { useCxPanel } from '@lionad/cx-vue'
 import { createItem } from '../utils'
 import type { Item } from '../types'
 
-const { emits, props, value } = useCxPanel<Item[]>([])
+import { UButton, UFormGroup, UInput } from '../../../../vendor/bridge'
 
-const contentRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { content } = item || {}
-      if (content.length <= 0) return cb(new Error('请输入内容'))
-      if (content.length >= 100) return cb(new Error('内容不能超过 100 个字符'))
-      return cb()
-    },
-  },
-]
+const { emits, props, value } = useCxPanel<Item[]>([])
 
 const addTab = () => {
   const newTabName = `${'内容'}${((value.value as any[])?.length || 0) + 1}`
@@ -58,10 +48,6 @@ const deleteTab = (idx: number) => {
 @reference "tailwindcss";
 .accordion-item {
   @apply w-full;
-
-  :deep(.el-form-item__label) {
-    @apply w-full;
-  }
 
   &:hover {
     .delete-text {

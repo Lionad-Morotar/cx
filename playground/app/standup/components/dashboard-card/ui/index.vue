@@ -15,9 +15,11 @@
         </div>
         <div class="side-title-con">
           <transition name="el-fade-in">
-            <el-icon class="is-loading" v-if="props.isLoading">
-              <Loading />
-            </el-icon>
+            <UIcon
+              name="i-lucide-loader-circle"
+              class="is-loading animate-spin"
+              v-if="props.isLoading"
+            />
           </transition>
           <slot name="icons" />
           <slot name="side-title">
@@ -46,7 +48,7 @@
             </div>
           </slot>
         </div>
-        <el-scrollbar class="contents-wrapper" v-else>
+        <CxScrollbar class="contents-wrapper" v-else>
           <div class="contents">
             <slot name="default">
               <div class="empty-con" ref="emptySecondRef">
@@ -55,7 +57,7 @@
               </div>
             </slot>
           </div>
-        </el-scrollbar>
+        </CxScrollbar>
       </slot>
     </template>
   </div>
@@ -64,7 +66,6 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useCxNamespace } from '../../../utils/namespace'
-import { Loading } from '@element-plus/icons-vue'
 import EmptyStrImage from '../../../assets/empty.svg'
 import { useDashboardCard } from '../states'
 
@@ -173,11 +174,6 @@ const styles = computed(() => {
       }
     }
   }
-  .contents-wrapper {
-    :deep(.el-scrollbar__view) {
-      min-height: 100%;
-    }
-  }
   .contents {
     position: relative;
     display: flex;
@@ -195,11 +191,6 @@ const styles = computed(() => {
   }
 
   &.is-empty {
-    :deep(.el-scrollbar__view) {
-      display: grid;
-      place-items: center;
-      height: 100%;
-    }
     .contents {
       display: grid;
       place-items: center;

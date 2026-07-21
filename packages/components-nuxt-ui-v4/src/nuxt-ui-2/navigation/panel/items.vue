@@ -1,10 +1,8 @@
 <template>
-  <el-form :model="value" label-position="top">
-    <el-form-item
+  <div class="form">
+    <UFormGroup
       v-for="(tab, idx) in value"
       :key="`${idx}-${tab.value}`"
-      :rules="tabRule"
-      :prop="`${idx}`"
       class="tab-item"
     >
       <template #label>
@@ -13,11 +11,11 @@
           <span class="delete-text" @click="() => remove(idx)" v-text="'删除'" />
         </div>
       </template>
-      <el-input v-model="tab.label" />
-    </el-form-item>
+      <UInput v-model="tab.label" />
+    </UFormGroup>
 
-    <el-button class="mt-4 w-full text-center" type="primary" @click="add"> 添加项目 </el-button>
-  </el-form>
+    <UButton class="mt-4 w-full text-center" color="primary" @click="add"> 添加项目 </UButton>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -25,19 +23,9 @@ import { useCxPanel } from '@lionad/cx-vue'
 import { createItem } from '../utils'
 import type { Item } from '../types'
 
-const { emits, props, value } = useCxPanel<Item[]>([])
+import { UButton, UFormGroup, UInput } from '../../../../vendor/bridge'
 
-const tabRule = [
-  {
-    trigger: ['blur', 'change'],
-    validator(rule: any, item: any, cb: any) {
-      const { label } = item || {}
-      if (label.length <= 0) return cb(new Error('请输入项目名称'))
-      if (label.length >= 25) return cb(new Error('项目名称不能超过 25 个字符'))
-      return cb()
-    },
-  },
-]
+const { emits, props, value } = useCxPanel<Item[]>([])
 
 const add = () => {
   const newTabName = `${'项目'}${((value.value as any[])?.length || 0) + 1}`
@@ -53,10 +41,6 @@ const remove = (idx: number) => {
 @reference "tailwindcss";
 .tab-item {
   @apply w-full;
-
-  :deep(.el-form-item__label) {
-    @apply w-full;
-  }
 
   &:hover {
     .delete-text {

@@ -3,10 +3,9 @@
  *
  * 契约（与旧实现保真，业务代码零感知）：
  * - 响应包络 { code, message, success, data } 原样透传给调用方
- * - 业务码非 "0"/0 时 ElMessage 弹错但 Promise 正常 resolve（调用方自行判 code）
+ * - 业务码非 "0"/0 时 console.error 弹错但 Promise 正常 resolve（调用方自行判 code）
  * - request(url, method?, data?) 默认 POST；也支持 request({ url, method, data }) 配置形态
  */
-import { ElMessage } from 'element-plus'
 import { $fetch } from 'ofetch'
 
 export interface RequestEnvelope<Data = any> {
@@ -37,14 +36,14 @@ async function fetchEnvelope<Data = any>(
     body: config.data,
   }).catch((err: unknown) => {
     // 网络层失败（5xx/断网）才走这里；业务码错误由 server 以 200 + 包络返回
-    ElMessage.error('网络请求异常')
+    console.error('[cyber] 网络请求异常')
     return Promise.reject(err)
   })
 
   // 运行时可脏：历史后端曾混发 number 形态 code，防御性双判
   if (response.code !== '0' && (response.code as unknown) !== 0) {
     const errMsg = response?.message || '网络请求异常'
-    ElMessage.error(errMsg)
+    console.error('[cyber]', errMsg)
   }
   return response
 }

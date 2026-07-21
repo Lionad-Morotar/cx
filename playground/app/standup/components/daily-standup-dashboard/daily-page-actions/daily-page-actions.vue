@@ -1,8 +1,8 @@
 <template>
   <div :class="ns.b()" ref="cmptRef">
-    <el-button ref="goBackBtnRef" @click="router.go(-1)">
+    <UButton ref="goBackBtnRef" @click="router.go(-1)">
       <span>返回</span>
-    </el-button>
+    </UButton>
     <cx-fullscreen-button data-focus-id="full-screen-button" />
   </div>
 </template>
@@ -77,7 +77,8 @@ defineExpose({
 @import '../../../styles/mixins/index.scss';
 
 @include b('daily-page-actions') {
-  .el-button {
+  .el-button,
+  button {
     width: 80px;
     height: 34px;
     line-height: 34px;

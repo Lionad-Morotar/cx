@@ -1,79 +1,72 @@
 <template>
   <div :class="ns.b()" ref="cmptRef">
-    <el-button
+    <UButton
       ref="prevUserButtonRef"
-      link
-      type="primary"
+      variant="link"
+      color="primary"
       :disabled="isDisabledPrevUser"
       @click="selectPrevUser"
-      >上一位</el-button
+      >上一位</UButton
     >
-    <el-icon
+    <UIcon
       ref="prevStandupButtonRef"
+      name="i-lucide-chevron-left"
       class="prev-standup-icon"
       :class="{ ['is-disabled']: !prevStandup }"
       title="上一次会议"
       @click="goPrevStandup"
-    >
-      <ArrowLeftBold />
-    </el-icon>
-    <cx-time-count
-      ref="timeSelectRef"
-      data-focus-id="calendar-select"
-      class="time-count"
-      weekday
-      :run="isCurStandupInProgress"
-      :time="isCurStandupInProgress ? () => dayjs() : standup.meetingDate"
-      :format="isCurStandupInProgress ? 'YYYY/MM/DD HH:mm:ss' : 'YYYY/MM/DD'"
     />
-    <el-icon
+    <UPopover :popper="{ placement: 'bottom' }" class="time-count-popover">
+      <cx-time-count
+        ref="timeSelectRef"
+        data-focus-id="calendar-select"
+        class="time-count"
+        weekday
+        :run="isCurStandupInProgress"
+        :time="isCurStandupInProgress ? () => dayjs() : standup.meetingDate"
+        :format="isCurStandupInProgress ? 'YYYY/MM/DD HH:mm:ss' : 'YYYY/MM/DD'"
+      />
+      <template #content>
+        <div class="standup-by-year-popover">
+          <cx-view-standup-github-grid :monthCount="6" />
+        </div>
+      </template>
+    </UPopover>
+    <UIcon
       ref="nextStandupButtonRef"
+      name="i-lucide-chevron-right"
       class="next-standup-icon"
       :class="{ ['is-disabled']: !nextStandup }"
       title="下一次会议"
       @click="goNextStandup"
-    >
-      <ArrowRightBold />
-    </el-icon>
+    />
     <template v-if="isCurStandupInProgress && isDisabledNextUser">
-      <el-button
+      <UButton
         ref="stopStandupButtonRef"
-        link
-        type="success"
+        variant="link"
+        color="success"
         :loading="stopStandupReq.isLoading"
         @click="stopStandupReq.exec"
-        >结束会议</el-button
+        >结束会议</UButton
       >
     </template>
     <template v-else>
-      <el-button
+      <UButton
         ref="nextUserButtonRef"
-        link
-        type="primary"
+        variant="link"
+        color="primary"
         :disabled="isDisabledNextUser"
         @click="selectNextUser"
-        >下一位</el-button
+        >下一位</UButton
       >
     </template>
   </div>
-
-  <el-popover
-    ref="popoverRef"
-    popper-class="standup-by-year-popover"
-    trigger="click"
-    virtual-triggering
-    :virtual-ref="timeSelectRef"
-  >
-    <cx-view-standup-github-grid :monthCount="6" />
-  </el-popover>
 </template>
 
 <script lang="ts" setup>
 /* NPM Depends */
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons-vue'
 import { useRouteQuery } from '@vueuse/router'
 /* Project Depends */
 import { standupBus as cx } from '../../../utils/standup-bus'
@@ -95,6 +88,7 @@ import type { Standup } from '../../../apis'
 defineOptions({ name: 'daily-standup-header-info' })
 
 const router = useRouter()
+const toast = useToast()
 const standupID = useRouteQuery<string>('standupID')
 
 const ns = useCxNamespace('daily-standup-header-info')
@@ -160,7 +154,7 @@ const stopStandupReq = useAsync(async () => {
     type: meetingType.value,
   })
   if (res.success) {
-    ElMessage.success('会议已结束')
+    toast.add({ title: '会议已结束', color: 'success' })
     await new Promise((resolve) => setTimeout(resolve, 500))
     router.go(-1)
   }
@@ -205,7 +199,8 @@ defineExpose({
     }
   }
 
-  .el-button {
+  .el-button,
+  button {
     align-self: end;
 
     &.is-disabled {

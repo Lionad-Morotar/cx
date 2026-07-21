@@ -8,7 +8,7 @@
         v-text="weekdayStrIDX(weekday)"
       />
     </div>
-    <el-scrollbar class="scroll-area">
+    <CxScrollbar class="scroll-area">
       <div class="months">
         <div
           v-for="month in showMonthInYear"
@@ -43,7 +43,7 @@
         />
         <div class="empty" ref="containerRightRef" />
       </div>
-    </el-scrollbar>
+    </CxScrollbar>
     <div class="legends">
       <div class="legend">
         <div class="day is-IN_PROGRESS"></div>
@@ -216,8 +216,6 @@ const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
   }
   .scroll-area {
     grid-area: scroll-area;
-  }
-  .scroll-area > .el-scrollbar__wrap > .el-scrollbar__view {
     display: grid;
     gap: 0.5em;
     grid-template-rows: 12px auto auto;

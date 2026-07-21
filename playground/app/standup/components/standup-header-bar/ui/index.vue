@@ -2,31 +2,31 @@
   <div class="header-section">
     <TimeCount weekday />
     <div class="buttons-con">
-      <el-button class="manual-sync" type="primary" @mousedown="apiSyncIssues">
+      <UButton class="manual-sync" color="primary" @mousedown="apiSyncIssues">
         <span>手动同步</span>
-      </el-button>
+      </UButton>
       <template v-if="isTodayStandupInProgress">
-        <el-button
-          type="success"
+        <UButton
+          color="success"
           :loading="handleContinueOrStarNewStandup.isLoading"
           @mousedown="handleContinueOrStarNewStandup.exec"
         >
           <span>继续会议</span>
-        </el-button>
-        <el-button @mousedown="resetParticipantsReq.exec">
+        </UButton>
+        <UButton @mousedown="resetParticipantsReq.exec">
           <span>设置参会人</span>
-        </el-button>
+        </UButton>
       </template>
       <template v-else>
-        <el-button
-          type="primary"
+        <UButton
+          color="primary"
           :loading="handleContinueOrStarNewStandup.isLoading"
           :disabled="isTodayStandupDone || handleContinueOrStarNewStandup.isLoading"
           :title="isTodayStandupDone ? '今日站会已结束' : ''"
           @mousedown="handleContinueOrStarNewStandup.exec"
         >
           <span>开会</span>
-        </el-button>
+        </UButton>
       </template>
       <FullscreenButton />
     </div>
@@ -36,7 +36,6 @@
 <script lang="ts" setup>
 import { computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 
 import FullscreenButton from '../../fullscreen-button/fullscreen-button.vue'
 import TimeCount from '../../time-count/time-count.vue'
@@ -54,6 +53,7 @@ import { dayjs, timeStr } from '../../../utils'
 import type { Standup, User } from '../../../apis'
 
 const router = useRouter()
+const toast = useToast()
 // meetingType 由页面（view）依据 route.query 同步到全局，这里直接消费全局状态
 const meetingType = useStandupType()
 const standups = useStandups()
@@ -93,7 +93,7 @@ const getSelectedParticipants = async (selected?: User['id'][], notSelected?: Us
 
 const resetParticipantsReq = useAsync(async () => {
   if (!todayStandup.value?.id) {
-    return ElMessage.error('未找到今日会议')
+    return toast.add({ title: '未找到今日会议', color: 'error' })
   }
   const detail = (await apiGetStandupDetail({ id: todayStandup.value.id })).data || {}
   const participants = await getSelectedParticipants([], detail.participants)
@@ -105,9 +105,9 @@ const resetParticipantsReq = useAsync(async () => {
       id: todayStandup.value.id,
       participants: participants.map((x) => String(x.id)),
     })
-    return ElMessage.success('设置成功')
+    return toast.add({ title: '设置成功', color: 'success' })
   } catch {
-    return ElMessage.error('设置失败')
+    return toast.add({ title: '设置失败', color: 'error' })
   }
 })
 
@@ -142,7 +142,7 @@ const handleContinueOrStarNewStandup = useAsync(async () => {
       router?.push(`/standup/dashboard/${page}?standupID=${target.id}`)
     })
   } else {
-    ElMessage.error('创建失败')
+    toast.add({ title: '创建失败', color: 'error' })
   }
 })
 </script>
@@ -155,7 +155,7 @@ const handleContinueOrStarNewStandup = useAsync(async () => {
   align-items: center;
 
   .buttons-con {
-    :deep(.el-button) {
+    :deep(button) {
       width: 76px;
       height: 36px;
       line-height: 36px;

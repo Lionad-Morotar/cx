@@ -10,21 +10,26 @@
         :toggle="toggle"
       >
         <template v-if="props.defaultIconPreset === 'default'">
-          <el-icon v-if="states.isFold" class="icon-preset icon-plus" @click.stop="toggle">
-            <Plus />
-          </el-icon>
-          <el-icon v-else class="icon-preset icon-minus" @click.stop="toggle">
-            <Minus />
-          </el-icon>
+          <UIcon
+            v-if="states.isFold"
+            name="i-lucide-plus"
+            class="icon-preset icon-plus"
+            @click.stop="toggle"
+          />
+          <UIcon
+            v-else
+            name="i-lucide-minus"
+            class="icon-preset icon-minus"
+            @click.stop="toggle"
+          />
         </template>
         <template v-if="props.defaultIconPreset === 'arrow'">
-          <el-icon
+          <UIcon
+            name="i-lucide-arrow-right"
             class="icon-preset icon-arrow"
             :class="ns.is('rotate', !states.isFold)"
             @click.stop="toggle"
-          >
-            <ArrowRight />
-          </el-icon>
+          />
         </template>
       </slot>
       <slot name="header-right" :isFold="states.isFold" :fn="cmptExpose" :toggle="toggle" />
@@ -38,7 +43,6 @@
 
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, provide, reactive, ref, useSlots, watch } from 'vue'
-import { Minus, Plus, ArrowRight } from '@element-plus/icons-vue'
 import { until, useElementSize } from '@vueuse/core'
 import { useCxNamespace } from '../../../utils/namespace'
 import { FolderContainerCtxKey } from '../../standup-context/keys'

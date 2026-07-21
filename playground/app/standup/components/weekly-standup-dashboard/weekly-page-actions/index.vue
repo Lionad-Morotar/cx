@@ -6,18 +6,18 @@
       <cx-time-tick v-else :time="meetingDurationMS" format="HH:mm:ss" />
     </div>
 
-    <el-button
+    <UButton
       v-if="isCurStandupInProgress"
       ref="stopStandupButtonRef"
-      link
-      type="success"
+      variant="link"
+      color="success"
       :loading="stopStandupReq.isLoading"
       @click="stopStandupReq.exec"
-      >结束会议</el-button
+      >结束会议</UButton
     >
-    <el-button ref="goBackBtnRef" @click="router.go(-1)">
+    <UButton ref="goBackBtnRef" @click="router.go(-1)">
       <span>返回</span>
-    </el-button>
+    </UButton>
     <cx-fullscreen-button />
   </div>
 </template>
@@ -25,7 +25,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { useAsync } from '../../../hooks/use-async'
 import { apiStopStandup } from '../../../apis'
 import CxTimeTick from '../../time-tick'
@@ -36,6 +35,7 @@ import { dayjs } from '../../../utils'
 import IconTime from '../../../assets/time.svg'
 
 const router = useRouter()
+const toast = useToast()
 const stopStandupButtonRef = ref<HTMLButtonElement>()
 const goBackBtnRef = ref<HTMLButtonElement>()
 
@@ -65,7 +65,7 @@ const stopStandupReq = useAsync(async () => {
     type: 'week',
   })
   if (res.success) {
-    ElMessage.success('会议已结束')
+    toast.add({ title: '会议已结束', color: 'success' })
     await new Promise((resolve) => setTimeout(resolve, 500))
     router.go(-1)
   }
@@ -104,7 +104,8 @@ const stopStandupReq = useAsync(async () => {
     }
   }
 
-  .el-button {
+  .el-button,
+  button {
     width: 80px;
     height: 34px;
     line-height: 34px;

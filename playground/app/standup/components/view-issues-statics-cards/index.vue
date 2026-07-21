@@ -10,7 +10,7 @@
       </div>
     </template>
     <template #content>
-      <el-scrollbar>
+      <CxScrollbar>
         <div class="card-content-section">
           <div
             v-for="item in userMetrics"
@@ -29,7 +29,7 @@
             </div>
           </div>
         </div>
-      </el-scrollbar>
+      </CxScrollbar>
     </template>
   </cx-folder-container>
 </template>

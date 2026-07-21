@@ -8,7 +8,11 @@
         </div>
       </div>
     </div>
-    <el-scrollbar class="table-content" v-cx-skeleton="props.isLoading" cx-skeleton-delay="150">
+    <CxScrollbar
+      class="table-content"
+      v-cx-skeleton="props.isLoading"
+      cx-skeleton-delay="150"
+    >
       <template v-if="!displayIssues?.length">
         <div class="empty-con" ref="emptyFirstRef">
           <img class="image" :src="EmptyStrImage" />
@@ -39,7 +43,7 @@
 
             <template v-if="column.key === 'name'">
               <template v-if="titleEditState.target === issue.id">
-                <el-input
+                <UInput
                   v-model="titleEditState.value"
                   :autofocus="true"
                   :disabled="titleEditState.isLoading"
@@ -52,9 +56,11 @@
                 <a :href="issue.webUrl" target="_blank" rel="noopener noreferrer">{{
                   issue.name
                 }}</a>
-                <el-icon class="edit-icon" @click="titleEditState.edit(issue, column)">
-                  <Edit />
-                </el-icon>
+                <UIcon
+                  name="i-lucide-pencil"
+                  class="edit-icon"
+                  @click="titleEditState.edit(issue, column)"
+                />
               </template>
             </template>
 
@@ -90,7 +96,7 @@
           </div>
         </div>
       </template>
-    </el-scrollbar>
+    </CxScrollbar>
   </div>
 </template>
 
@@ -98,7 +104,6 @@
 import { getCurrentInstance, computed, ref, onMounted, nextTick } from 'vue'
 import { standupBus as cx } from '../../utils/standup-bus'
 import { unrefElement } from '@vueuse/core'
-import { Edit } from '@element-plus/icons-vue'
 import { isNil } from 'lodash-es'
 import { useRefs } from '../../hooks'
 import { useCurrentUser } from '../../states/users'
@@ -417,12 +422,6 @@ defineExpose({
   .table-content {
     padding-right: 16px;
     width: 100%;
-
-    .el-scrollbar__view.el-scrollbar__view {
-      height: unset;
-      min-height: unset;
-      max-height: unset;
-    }
   }
 
   .table-header .columns,

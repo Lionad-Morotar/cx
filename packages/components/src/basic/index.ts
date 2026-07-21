@@ -16,6 +16,7 @@ import cmptToast from './src/toast.vue'
 import cmptState from './src/state.vue'
 import cmptComputed from './src/computed.vue'
 import cmptNavigate from './src/navigate.vue'
+import cmptScrollbar from './src/scrollbar.vue'
 
 const CxText = normalize({
   name: '文本',
@@ -318,6 +319,21 @@ const CxNavigate = normalize({
   props: {},
 })
 
+const CxScrollbar = normalize({
+  key: 'cx-scrollbar',
+  name: '滚动容器',
+  description: '可滚动的内容容器，提供自定义滚动条样式，替代 el-scrollbar',
+  icon: 'i-tabler-scroll',
+  component: cmptScrollbar,
+  props: {},
+  slots: {
+    default: {
+      key: 'default',
+      name: '内容区',
+    },
+  },
+})
+
 export default [
   CxText,
   CxHeader,
@@ -335,4 +351,5 @@ export default [
   CxState,
   CxComputed,
   CxNavigate,
+  CxScrollbar,
 ]
