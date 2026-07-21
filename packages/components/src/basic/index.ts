@@ -15,6 +15,7 @@ import cmptAction from './src/action.vue'
 import cmptToast from './src/toast.vue'
 import cmptState from './src/state.vue'
 import cmptComputed from './src/computed.vue'
+import cmptNavigate from './src/navigate.vue'
 
 const CxText = normalize({
   name: '文本',
@@ -307,6 +308,16 @@ const CxComputed = normalize({
   props: {},
 })
 
+const CxNavigate = normalize({
+  key: 'cx-navigate',
+  name: '导航',
+  description: '经宿主路由服务跳转页面（push/replace），由其他物料的事件触发',
+  icon: 'i-tabler-arrow-right',
+  component: cmptNavigate,
+  headless: true,
+  props: {},
+})
+
 export default [
   CxText,
   CxHeader,
@@ -323,4 +334,5 @@ export default [
   CxToast,
   CxState,
   CxComputed,
+  CxNavigate,
 ]
