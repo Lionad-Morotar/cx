@@ -3,7 +3,6 @@
     <slot v-if="showSlot('trigger')" name="trigger" />
     <UButton
       v-else
-      v-cx="{ text: 'label', cmpt: props.cmpt.id }"
       color="neutral"
       variant="outline"
       :label="props.label"

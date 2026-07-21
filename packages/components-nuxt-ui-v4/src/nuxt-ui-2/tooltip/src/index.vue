@@ -8,7 +8,7 @@
         <template #default="x">
           <slot v-if="showSlot('default')" name="default" v-bind="x" />
           <UButton v-else color="neutral" variant="outline">
-            <span v-cx="{ text: 'label', cmpt: props.cmpt.id }">{{ props.label }}</span>
+            <span>{{ props.label }}</span>
           </UButton>
         </template>
 

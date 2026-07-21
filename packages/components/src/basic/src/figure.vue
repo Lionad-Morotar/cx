@@ -9,7 +9,7 @@
         :alt="enableCaption ? caption : ''"
         :class="isEditMode ? 'select-none' : ''"
       />
-      <figcaption v-if="enableCaption" v-cx="{ text: 'content' }">
+      <figcaption v-if="enableCaption">
         {{ caption }}
       </figcaption>
     </template>

@@ -17,7 +17,7 @@
       />
       <slot v-else name="leading" v-bind="x" />
     </template>
-    <span v-if="props.label" v-cx="{ text: 'label' }">{{ props.label }}</span>
+    <span v-if="props.label">{{ props.label }}</span>
     <template #trailing="x">
       <CxIcon
         v-if="isShowIconTrailing"

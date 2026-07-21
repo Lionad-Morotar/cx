@@ -8,7 +8,6 @@
         <slot v-if="showSlot('default')" name="default" v-bind="x" />
         <UButton
           v-else
-          v-cx="{ text: 'label', cmpt: props.cmpt.id }"
           color="neutral"
           variant="outline"
           :label="props.label"

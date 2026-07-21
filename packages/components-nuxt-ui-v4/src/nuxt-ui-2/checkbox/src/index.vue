@@ -10,11 +10,11 @@
   >
     <template #label="x">
       <slot v-if="showSlot('label')" name="label" v-bind="x" />
-      <span v-else v-cx="{ text: 'label', cmpt: props.cmpt.id }">{{ props.label }}</span>
+      <span v-else>{{ props.label }}</span>
     </template>
     <template #help="x">
       <slot v-if="showSlot('help')" name="help" v-bind="x" />
-      <span v-else v-cx="{ text: 'help', cmpt: props.cmpt.id }">{{ props.help }}</span>
+      <span v-else>{{ props.help }}</span>
     </template>
   </UCheckbox>
 </template>

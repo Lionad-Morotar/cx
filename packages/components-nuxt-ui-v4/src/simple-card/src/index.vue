@@ -5,7 +5,7 @@
       <slot name="header">
         <div :class="ns.e('info-con')">
           <div :class="ns.e('name-con')">
-            <h4 v-if="name" v-cx="{ text: 'name' }" :class="ns.e('name')">
+            <h4 v-if="name" :class="ns.e('name')">
               {{ name }}
             </h4>
 
@@ -29,7 +29,7 @@
               </template>
             </UPopover>
           </div>
-          <div v-if="description" v-cx="{ text: 'description' }" :class="ns.e('description')">
+          <div v-if="description" :class="ns.e('description')">
             {{ description }}
           </div>
         </div>
@@ -46,7 +46,6 @@
 </template>
 
 <script setup lang="ts">
-import { useTranslator } from '@lionad/cx-definition'
 import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { useCxBEM } from '@lionad/cx-vue'
@@ -57,9 +56,6 @@ import { UPopover } from '../../../vendor/bridge'
 
 defineOptions({ name: 'CxSimpleCard' })
 
-const { t } = useTranslator()
-// 宿主的异步翻译预热能力：库内降级为 no-op（t 通道仍生效）
-const apiTrans = (_x: any) => {}
 const ns = useCxBEM('simple-card')
 const attrs = useAttrs()
 const props = withDefaults(
@@ -77,11 +73,9 @@ const props = withDefaults(
 
 const cmptRef = useTemplateRef('cmpt')
 
-apiTrans(computed(() => [props.name, props.tip, props.description]) as any)
-
-const name = computed(() => t(props.name))
-const tip = computed(() => t(props.tip))
-const description = computed(() => t(props.description))
+const name = computed(() => props.name)
+const tip = computed(() => props.tip)
+const description = computed(() => props.description)
 </script>
 
 <style lang="scss">

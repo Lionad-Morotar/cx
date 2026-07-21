@@ -15,11 +15,11 @@
   >
     <template #title>
       <slot v-if="showSlot('title')" name="title" />
-      <span v-else v-cx="{ text: 'title' }">{{ props.title }}</span>
+      <span v-else>{{ props.title }}</span>
     </template>
     <template #description>
       <slot v-if="showSlot('description')" name="description" />
-      <span v-else v-cx="{ text: 'description' }">{{ props.description }}</span>
+      <span v-else>{{ props.description }}</span>
     </template>
     <template #icon>
       <slot v-if="showSlot('icon')" name="icon" />
