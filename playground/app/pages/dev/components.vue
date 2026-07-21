@@ -12,7 +12,7 @@
         <span class="count">{{ group.items.length }}</span>
       </h2>
       <div class="grid">
-        <article v-for="item in group.items" :key="item.meta.key" class="card">
+        <article v-for="item in group.items" :key="item.meta.key" class="card" @dblclick="log(item.meta, item.node)">
           <header class="card-head">
             <span class="card-name">{{ item.meta.name }}</span>
             <code class="card-key">{{ item.meta.key }}</code>
@@ -38,15 +38,18 @@ interface CxMeta {
   name: string
   description?: string
   headless?: boolean
-  props?: Record<string, { initial?: unknown }>
+  props?: Record<string, { initial?: unknown; type?: string }>
   slots?: unknown
 }
 
-// 从物料 props 的 initial 构造默认 data，供 CxRender 渲染示例
+// 从物料 props 的 initial 构造默认 data，供 CxRender 渲染示例；
+// 文本类（short）初始为空串时回填示例文本，否则 preview 只渲染出一个占位空格
 function buildDefaultData(meta: CxMeta): Record<string, unknown> {
   const data: Record<string, unknown> = {}
   for (const [k, p] of Object.entries(meta.props || {})) {
-    if (p?.initial !== undefined) data[k] = p.initial
+    if (p?.initial !== undefined) {
+      data[k] = p.initial === '' && p.type === 'short' ? `${meta.name}示例` : p.initial
+    }
   }
   return data
 }
@@ -99,13 +102,20 @@ const groups: { name: string; items: ReturnType<typeof toItem>[] }[] = [
       .map(toItem),
   },
 ]
+
+const log = (meta: CxMeta, item: CxComponentRuntime) => console.log(meta, item)
+
 </script>
 
 <style scoped>
 .page {
-  max-width: 1200px;
-  margin: 32px auto;
-  padding: 0 16px;
+  /* 全局样式把 #__nuxt 钉死为 height:100% + overflow:hidden（站会布局契约），
+     页面须自携滚动容器，否则内容超出视口会被直接裁剪 */
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 32px 24px;
 }
 .page-header {
   margin-bottom: 24px;
