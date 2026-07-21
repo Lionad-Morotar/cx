@@ -1,7 +1,6 @@
 <template>
   <component
     :is="props.type"
-    v-cx="{ text: 'content' }"
     :class="[ns.b(), ns.e('content'), ns.is('truncate', props.truncate)]"
   >
     {{ displayText }}

@@ -2,7 +2,7 @@
   <button ref="cmpt" :class="ns.b()" v-bind="attrs" @click="openToast">
     <slot v-if="showSlot('trigger')" name="trigger" />
     <UButton v-else color="neutral" variant="outline">
-      <span v-cx="buttonBind">{{ props.label }}</span>
+      <span>{{ props.label }}</span>
     </UButton>
 
     <teleport v-if="showRegion" to=".cx-notifications-placeholder">
@@ -24,11 +24,11 @@
       >
         <template #title="x">
           <slot v-if="showSlot('title')" name="title" v-bind="x" />
-          <span v-else v-cx="{ text: 'title', cmpt: props.cmpt.id }">{{ props.title }}</span>
+          <span v-else>{{ props.title }}</span>
         </template>
         <template #description="x">
           <slot v-if="showSlot('description')" name="description" v-bind="x" />
-          <span v-else v-cx="{ text: 'description', cmpt: props.cmpt.id }">{{
+          <span v-else>{{
             props.description
           }}</span>
         </template>
@@ -71,8 +71,6 @@ const cmptRef = useTemplateRef('cmpt')
 const ui = computed(() => {})
 
 const attrs = computed(() => ({}) as const)
-
-const buttonBind = computed(() => ({ text: 'label', cmpt: props.cmpt.id }))
 
 const toast = useToast()
 const findExistRegion = document.querySelector('.cx-toast-region')

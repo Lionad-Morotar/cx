@@ -137,15 +137,12 @@ import { useTemplateRef, computed } from 'vue'
 
 import { CxIcon, CxEmptyImage } from '@lionad/cx-vue'
 import { useCxPanel } from '@lionad/cx-vue'
-import { useTranslator } from '@lionad/cx-definition'
 import type { CxComponentRuntime } from '@lionad/cx-definition'
 import { defaultDatas } from '../config'
 import { getPosByTurn } from '../utils'
 
 const [DefineRemoveColsButton, ReuseRemoveColsButton] = createReusableTemplate()
 const [DefineRemoveRowsButton, ReuseRemoveRowsButton] = createReusableTemplate()
-
-const { t } = useTranslator()
 
 const { emits, props } = useCxPanel()
 

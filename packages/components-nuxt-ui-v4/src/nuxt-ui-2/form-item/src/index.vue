@@ -11,19 +11,19 @@
     </template>
     <template #label="x">
       <slot v-if="showSlot('label')" name="label" v-bind="x" />
-      <span v-else v-cx="{ text: 'label' }">{{ props.label }}</span>
+      <span v-else>{{ props.label }}</span>
     </template>
     <template #description="x">
       <slot v-if="showSlot('description')" name="description" v-bind="x" />
-      <span v-else v-cx="{ text: 'description' }">{{ props.description }}</span>
+      <span v-else>{{ props.description }}</span>
     </template>
     <template #hint="x">
       <slot v-if="showSlot('hint')" name="hint" v-bind="x" />
-      <span v-else v-cx="{ text: 'hint' }">{{ props.hint }}</span>
+      <span v-else>{{ props.hint }}</span>
     </template>
     <template #help="x">
       <slot v-if="showSlot('help')" name="help" v-bind="x" />
-      <span v-else v-cx="{ text: 'help' }">{{ props.help }}</span>
+      <span v-else>{{ props.help }}</span>
     </template>
     <template v-if="showSlot('error')" #error="x">
       <slot name="error" v-bind="x" />

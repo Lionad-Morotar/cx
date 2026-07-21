@@ -6,8 +6,6 @@ import CxCard from '~/standup/components/cx-card.vue'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.directive('cx-skeleton', vCxSkeleton)
-  // v-cx 内联编辑指令：物料模板里的遗留指令，宿主无编辑器语境时注册 no-op 消除警告
-  nuxtApp.vueApp.directive('cx', {})
   nuxtApp.vueApp.component('CxSvgIcon', CxSvgIcon)
   nuxtApp.vueApp.component('CxCard', CxCard)
   // NuxtLink 在 Nuxt 4 为按需自动导入（非全局注册），vendored 预构建组件

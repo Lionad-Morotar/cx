@@ -9,15 +9,15 @@
   >
     <template #leading>
       <slot v-if="showSlot('leading')" name="leading" />
-      <span v-else v-cx="{ text: 'prefix' }">{{ inner.prefix || '' }}</span>
+      <span v-else>{{ inner.prefix || '' }}</span>
     </template>
     <template #default>
       <slot v-if="showSlot('default')" name="default" />
-      <span v-else v-cx="{ text: 'label' }">{{ props.label || '' }}</span>
+      <span v-else>{{ props.label || '' }}</span>
     </template>
     <template #trailing>
       <slot v-if="showSlot('trailing')" name="trailing" />
-      <span v-else v-cx="{ text: 'postfix' }">{{ props.postfix || '' }}</span>
+      <span v-else>{{ props.postfix || '' }}</span>
     </template>
   </UBadge>
 </template>

@@ -7,7 +7,7 @@
       <template #default="x">
         <slot v-if="showSlot('trigger')" name="trigger" v-bind="x" />
         <UButton v-else color="neutral" variant="outline">
-          <span v-cx="{ text: 'label', cmpt: props.cmpt.id }">{{ props.label }}</span>
+          <span>{{ props.label }}</span>
         </UButton>
       </template>
 
