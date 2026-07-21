@@ -9,10 +9,12 @@
     "gen:mocks": "node scripts/generate-mocks.mjs"
   },
   "dependencies": {
+    "@lionad/cx-components": "workspace:*",
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-nuxt": "workspace:*",
     "@lionad/cx-render": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
+    "@nuxt/ui": "^4.10.0",
     "@unhead/vue": "^3.1.8",
     "@vueuse/core": "^13.9.0",
     "@vueuse/router": "^13.9.0",
@@ -24,6 +26,7 @@
     "mitt": "^3.0.1",
     "number-to-chinese-words": "^1.0.20",
     "nuxt": "^4.5.0",
+    "tailwindcss": "^4.3.3",
     "uuid": "^9.0.1",
     "vue": "^3.5.40",
     "vuedraggable": "^4.1.0"

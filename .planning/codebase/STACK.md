@@ -103,7 +103,7 @@ allowBuilds:
 
 **playground 特有：**
 - `nuxt@^4.5.0` — 宿主框架
-- `element-plus@^2.13.6`（实际安装 2.14.3） + `@element-plus/icons-vue@^2.3.2` — 站会遗留 UI 物料（迁移保真，后续替换为 Nuxt UI）
+- `@nuxt/ui@^4.10.0` + `tailwindcss@^4.3.3` — 站会业务组件（模板按 v4 API 裸用 U* 组件与 `useToast`）；与 vendored nuxt-ui v2 物料共存，`app.config.ts` 的 `ui.colors` 用 v4 对象 schema（v2 validator 经 `Object.keys` 兼容读取）
 - `vuedraggable@^4.1.0` — 拖拽（参会人排序）
 - `chinese-workday@^1.10.0` — 中国法定工作日 / 调休 / 节假日判断（周会「最后工作日」逻辑）
 - `number-to-chinese-words@^1.0.20` + `deindent@^0.1.0` + `html-escaper@^3.0.3` — 文案/缩进/转义工具（无类型，`playground/modules.d.ts` 自补 ambient 声明）
@@ -128,7 +128,7 @@ allowBuilds:
 - `tsconfig.base.json` — 全仓基准 TS 配置：`target: ES2023`、`module: ESNext`、`moduleResolution: bundler`、`strict: true`、`noUncheckedIndexedAccess: true`、`verbatimModuleSyntax: true`、`noEmit: true`
 - `tsconfig.json`（每个子包） — 继承 base，加入 `rootDir` / `types` / `include`
 - `tsconfig.build.json`（vue / renderer / components / components-nuxt-ui-v4） — 在子包 tsconfig 之上开启 `emitDeclarationOnly`，输出 `.d.ts` 到 `dist/`
-- `playground/nuxt.config.ts` — 单一 module 注册 `@lionad/cx-nuxt`；`ssr: false`；css 引入 `element-plus/dist/index.css` 与 `~/standup/styles/index.less`；`devServer.port: 3209` + `host: '0.0.0.0'`（LAN 暴露）；`compatibilityDate: '2026-07-19'`
+- `playground/nuxt.config.ts` — modules 注册 `@nuxt/ui`（须先于 `@lionad/cx-nuxt`）与 `@lionad/cx-nuxt`；`ssr: false`；css 引入 `~/assets/css/main.css`（tailwindcss + @nuxt/ui）、`@lionad/cx-components/style.css` 与 `~/standup/styles/index.less`；`devServer.port: 3209` + `host: '0.0.0.0'`（LAN 暴露）；`compatibilityDate: '2026-07-19'`
 
 **npm 脚本（root `package.json`）：**
 ```bash
