@@ -18,7 +18,7 @@ import { preIndex, nextIndex, insertIndex } from './number'
 import { pick } from 'lodash-es'
 import { has } from './guard'
 import { genUseHooks } from './use-fn'
-import { v4 as uuidv4 } from 'uuid'
+import { createCxID } from './create-id'
 import { isFunction, isString } from '@vue/shared'
 
 const metaKeys = readonly([
@@ -172,7 +172,7 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
     const cmpt: CxComponentRuntime = {
       key: utils.getKey(key, data),
       data,
-      id: uuidv4(),
+      id: createCxID(),
       name: name || utils.getName(key),
       props: utils.getProps(key),
       emits: utils.getEmits(key),

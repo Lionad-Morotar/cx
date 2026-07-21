@@ -14,7 +14,7 @@ import NPromise from 'nativebird'
 
 import { createCxEmitter } from '../events/cx-emitter'
 import { useRefs } from '../utils/refs'
-import { createCxUtils, createCxDatas } from '../utils'
+import { createCxUtils, createCxDatas, createCxID } from '../utils'
 import { cxLoaderHooks } from '../events'
 import { normalize } from '../normalize'
 import getURL from './script-manager'
@@ -24,7 +24,6 @@ import { getDefaultExportFromModule } from './module'
 import type { ComputedRef, DeepReadonly } from 'vue'
 import type { CxUtils, CxDatas } from '../utils'
 import type { CxRefs, CxEmitter, CxComponentMetaDefined, CxLoaderConfig } from '../types'
-import { v4 as uuidv4 } from 'uuid'
 
 const getArray = <T>(x: T | T[]) => (Array.isArray(x) ? x : x ? [x] : [])
 
@@ -108,7 +107,7 @@ export class CxLoader {
     // console.log('[INFO] cx-loader created', this)
     // console.log('[info] current env', nodeEnv)
 
-    this.id = uuidv4()
+    this.id = createCxID()
     this.hooks = readonly(cxLoaderHooks)
     this.utils = readonly(createCxUtils(this))
     this.refs = useRefs() as CxRefs
@@ -137,7 +136,7 @@ export class CxLoader {
   async getClone() {
     const cx = new CxLoader()
 
-    cx.id = uuidv4()
+    cx.id = createCxID()
     cx.hooks = this.hooks
     cx.utils = readonly(createCxUtils(cx))
     cx.refs = useRefs() as CxRefs

@@ -1,5 +1,5 @@
 import { unref } from 'vue'
-import { v4 as uuidv4 } from 'uuid'
+import { createCxID } from '../utils/create-id'
 
 import type { CxComponentRuntime } from '../types/runtime/cx-component'
 import type { CxEmitter, CxEvent, CxSubEvent } from '../types/runtime/cx-event'
@@ -15,7 +15,7 @@ export const isValidSubEvent = (evt: CxSubEvent) => {
 // 创建组件触发的事件
 export const createEvent = (key?: string): CxEvent => {
   return {
-    id: uuidv4(),
+    id: createCxID(),
     key: key || '',
     subs: [],
   }

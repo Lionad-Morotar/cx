@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import { createCxID } from '../utils/create-id'
 import type { AnyFn } from '@vueuse/core'
 
 type getURLOptions = Partial<{
@@ -15,7 +15,7 @@ type getURLOptions = Partial<{
  * @todo 不重复添加，defineAsyncCmpt 应该是做了优化所以现在不会有问题
  */
 export const getURL = (url: string, _opts?: getURLOptions) => {
-  const uuid = uuidv4()
+  const uuid = createCxID()
   const uuidKey = 'data-cx-script-id'
   const opts = Object.assign({}, _opts || {})
 
