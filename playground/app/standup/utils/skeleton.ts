@@ -19,10 +19,13 @@ import {
   withCtx,
   withDirectives,
 } from 'vue'
-import { ElSkeleton } from 'element-plus'
 import type { Directive } from 'vue'
+import { CxBasics } from '@lionad/cx-components'
 
 const INSTANCE_KEY = Symbol('cx-skeleton-instance')
+
+// CxSkeleton 物料（components 包，shimmer 动画 SFC 自带样式），替代 ElSkeleton
+const CxSkeleton = (CxBasics as readonly any[]).find((x) => x?._cx_meta?.key === 'cx-skeleton')!
 
 interface SkeletonElement extends HTMLElement {
   [INSTANCE_KEY]?: { close: () => void }
@@ -58,7 +61,7 @@ function createSkeletonMask(delay: number) {
           { name: 'fade', onAfterLeave: destroy },
           {
             default: withCtx(() => [
-              withDirectives(createVNode(ElSkeleton, { class: 'cx-v-skeleton', animated: true }), [
+              withDirectives(createVNode(CxSkeleton), [
                 [vShow, displayVisible.value],
               ]),
             ]),

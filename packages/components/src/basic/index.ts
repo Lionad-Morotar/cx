@@ -17,6 +17,7 @@ import cmptState from './src/state.vue'
 import cmptComputed from './src/computed.vue'
 import cmptNavigate from './src/navigate.vue'
 import cmptScrollbar from './src/scrollbar.vue'
+import cmptSkeleton from './src/skeleton.vue'
 
 const CxText = normalize({
   name: '文本',
@@ -334,6 +335,16 @@ const CxScrollbar = normalize({
   },
 })
 
+const CxSkeleton = normalize({
+  key: 'cx-skeleton',
+  name: '骨架屏',
+  description: '加载骨架遮罩，shimmer 动画，替代 ElSkeleton',
+  icon: 'i-tabler-loader-2',
+  component: cmptSkeleton,
+  headless: true,
+  props: {},
+})
+
 export default [
   CxText,
   CxHeader,
@@ -352,4 +363,5 @@ export default [
   CxComputed,
   CxNavigate,
   CxScrollbar,
+  CxSkeleton,
 ]
