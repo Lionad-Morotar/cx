@@ -1,4 +1,4 @@
-import type { CxComponentRuntime } from '@lionad/cx-definition'
+import { cxNode, type CxComponentRuntime } from '@lionad/cx-definition'
 
 /**
  * 日会详情页的页面结构 schema（静态骨架）。
@@ -11,31 +11,12 @@ import type { CxComponentRuntime } from '@lionad/cx-definition'
  * 已移除——其分配职责由本 schema 的父子嵌套表达，standupID 校验迁入 view。
  */
 
-const node = (
-  id: string,
-  key: string,
-  children: Record<string, CxComponentRuntime[]> = {},
-  data: Record<string, unknown> = {},
-): CxComponentRuntime =>
-  ({
-    id,
-    key,
-    name: id,
-    data,
-    components: children,
-    parents: [],
-    aliasKeys: [],
-    props: {},
-    emits: {},
-    exposes: {},
-  }) as CxComponentRuntime
-
 export const dailyStandupDashboardSchema: CxComponentRuntime[] = [
-  node('daily-page-root', 'cx-daily-standard-dashboard-page-layout', {
-    'page-header': [node('header-info', 'cx-daily-standup-header-info')],
-    'page-header-right': [node('page-actions', 'cx-daily-page-actions')],
-    'page-content-left': [node('filter', 'cx-daily-standup-filter')],
-    'page-content-main': [node('main-content', 'cx-daily-main-content')],
-    'page-content-right': [node('user-select', 'cx-user-select', {}, { enableKeyboardControl: true })],
+  cxNode('daily-page-root', 'cx-daily-standard-dashboard-page-layout', {
+    'page-header': [cxNode('header-info', 'cx-daily-standup-header-info')],
+    'page-header-right': [cxNode('page-actions', 'cx-daily-page-actions')],
+    'page-content-left': [cxNode('filter', 'cx-daily-standup-filter')],
+    'page-content-main': [cxNode('main-content', 'cx-daily-main-content')],
+    'page-content-right': [cxNode('user-select', 'cx-user-select', {}, { enableKeyboardControl: true })],
   }),
 ]

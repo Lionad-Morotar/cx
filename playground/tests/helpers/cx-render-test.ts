@@ -1,8 +1,6 @@
 import { createApp } from 'vue'
 
-import { CxLoader } from '@lionad/cx-definition'
-
-import type { CxComponentRuntime } from '@lionad/cx-definition'
+import { CxLoader, cxNode, type CxComponentRuntime } from '@lionad/cx-definition'
 
 /**
  * 构造测试可用的最小 CxLoader。
@@ -50,16 +48,9 @@ export function cmpt(
   components: Record<string, CxComponentRuntime[]> = {},
   parents: string[] = [],
 ): CxComponentRuntime {
-  return {
-    id,
-    key,
-    name: id,
-    data,
-    components,
-    parents,
-    aliasKeys: [],
-    props: {},
-    emits: {},
-    exposes: {},
-  } as CxComponentRuntime
+  // 委托平台工厂 cxNode 填充标准字段。parents 是测试断言树关系用的，
+  // schema 层不需要，故不在 cxNode 主签名，由本适配层补回。
+  const c = cxNode(id, key, components, data)
+  c.parents = parents
+  return c
 }

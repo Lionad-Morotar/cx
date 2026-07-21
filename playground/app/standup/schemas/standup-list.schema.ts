@@ -1,4 +1,4 @@
-import type { CxComponentRuntime } from '@lionad/cx-definition'
+import { cxNode, type CxComponentRuntime } from '@lionad/cx-definition'
 
 /**
  * 站会列表页的页面结构 schema（静态骨架）。
@@ -8,40 +8,21 @@ import type { CxComponentRuntime } from '@lionad/cx-definition'
  * 动态数量（分组数/卡片数）经 card-tabs 式模板插槽循环展开，schema 本身保持静态。
  */
 
-const node = (
-  id: string,
-  key: string,
-  children: Record<string, CxComponentRuntime[]> = {},
-  data: Record<string, unknown> = {},
-): CxComponentRuntime =>
-  ({
-    id,
-    key,
-    name: id,
-    data,
-    components: children,
-    parents: [],
-    aliasKeys: [],
-    props: {},
-    emits: {},
-    exposes: {},
-  }) as CxComponentRuntime
-
 export const standupListSchema: CxComponentRuntime[] = [
-  node('page-root', 'cx-page-main', {
+  cxNode('page-root', 'cx-page-main', {
     default: [
-      node('list-layout', 'cx-standup-list-layout', {
+      cxNode('list-layout', 'cx-standup-list-layout', {
         default: [
-          node('header-bar', 'cx-standup-header-bar'),
-          node('list-main', 'cx-standup-list-main', {
+          cxNode('header-bar', 'cx-standup-header-bar'),
+          cxNode('list-main', 'cx-standup-list-main', {
             default: [
-              node('group-list', 'cx-standup-group-list', {
+              cxNode('group-list', 'cx-standup-group-list', {
                 'group-item': [
-                  node('folder', 'cx-folder-container', {
-                    header: [node('group-header', 'cx-standup-group-header')],
+                  cxNode('folder', 'cx-folder-container', {
+                    header: [cxNode('group-header', 'cx-standup-group-header')],
                     content: [
-                      node('card-list', 'cx-standup-card-list', {
-                        'card-item': [node('standup-card', 'cx-standup-card')],
+                      cxNode('card-list', 'cx-standup-card-list', {
+                        'card-item': [cxNode('standup-card', 'cx-standup-card')],
                       }),
                     ],
                   }),
@@ -49,8 +30,8 @@ export const standupListSchema: CxComponentRuntime[] = [
               }),
             ],
           }),
-          node('member-draggable', 'cx-standup-member-draggable'),
-          node('participants-dialog', 'cx-select-participants-dialog'),
+          cxNode('member-draggable', 'cx-standup-member-draggable'),
+          cxNode('participants-dialog', 'cx-select-participants-dialog'),
         ],
       }),
     ],
