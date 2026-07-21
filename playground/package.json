@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@lionad/cx-components": "workspace:*",
+    "@lionad/cx-components-nuxt-ui-v2": "workspace:*",
+    "@lionad/cx-components-nuxt-ui-v4": "workspace:*",
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-nuxt": "workspace:*",
     "@lionad/cx-render": "workspace:*",
