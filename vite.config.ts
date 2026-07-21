@@ -39,6 +39,7 @@ export default defineConfig({
     ignorePatterns: [
       'dist/**',
       'packages/components-nuxt-ui-v4/vendor/**',
+      'packages/components/src/calendar/vendor/el-calendar/**',
       'playground/.output/**',
       'playground/.nuxt/**',
     ],
@@ -49,6 +50,7 @@ export default defineConfig({
     ignorePatterns: [
       'dist/**',
       'packages/components-nuxt-ui-v4/vendor/**',
+      'packages/components/src/calendar/vendor/el-calendar/**',
       'playground/.output/**',
       'playground/.nuxt/**',
       'playground/mocks/data/**',

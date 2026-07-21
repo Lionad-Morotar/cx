@@ -110,6 +110,12 @@ import { useVModel, createReusableTemplate } from '@vueuse/core'
 
 import { useSlots, ref, computed, unref, watch, useTemplateRef, onMounted } from 'vue'
 
+import { ElCalendar } from '../../vendor'
+import { Time, useCxBEM } from '@lionad/cx-vue'
+import { createCxID } from '@lionad/cx-definition'
+// 让 Dayjs.weekday() 类型可见：Time 已 extend weekday 插件，此处仅补类型增强
+import 'dayjs/plugin/weekday'
+
 import type { Dayjs } from 'dayjs'
 import type { MaybeRef } from 'vue'
 
@@ -118,12 +124,6 @@ const [DefineSingleCalendarTemplate, ReuseSingleCalendarTemplate] = createReusab
 type ViewType = 'day' | 'week' | 'month' | 'year' | 'compact'
 type ViewTypeMeter = Omit<ViewType, 'compact'>
 
-// @ts-ignore
-const Time = dayjs
-// @ts-ignore
-const getDayStr = dayStr
-
-// @ts-ignore
 const ns = useCxBEM('calendar')
 const slots = useSlots()
 const emits = defineEmits(['update:modelValue', 'click-day'])
@@ -152,10 +152,12 @@ const props = withDefaults(
     validSelect: true,
   },
 )
-// @ts-ignore
-const id = uuidv4()
+const id = createCxID()
 const value = props.modelValue == null ? ref(Time()) : useVModel(props, 'modelValue', emits)
 const viewType = computed(() => props.viewType)
+
+// 格式化为 'YYYY-MM-DD'（原为全局 dayStr；其第二参数 'cn' 为历史死参数，已移除）
+const getDayStr = (value: MaybeRef<string | Dayjs>) => Time(unref(value)).format('YYYY-MM-DD')
 
 const getFormattedCalendarHeader = (value: MaybeRef<string | Dayjs>, viewType: ViewType) => {
   const date = unref(value)
@@ -167,35 +169,28 @@ const getFormattedCalendarHeader = (value: MaybeRef<string | Dayjs>, viewType: V
   switch (unref(viewType)) {
     case 'compact':
     case 'day':
-      // console.log('date', date, getDayStr(date, 'cn'))
-      return getDayStr(date, 'cn')
+      return getDayStr(date)
     case 'week':
-      return `${getDayStr(Time(date).startOf('week'), 'cn')}-${getDayStr(
-        Time(date).endOf('week'),
-        'cn',
-      )}`
+      return `${getDayStr(Time(date).startOf('week'))}-${getDayStr(Time(date).endOf('week'))}`
     case 'month':
-      return `${getDayStr(Time(date).startOf('month'), 'cn')}-${getDayStr(
-        Time(date).endOf('month'),
-        'cn',
-      )}`
+      return `${getDayStr(Time(date).startOf('month'))}-${getDayStr(Time(date).endOf('month'))}`
     case 'year':
       return Time(date).format('YYYY年MM月')
     default:
       return date
   }
 }
-const getFormattedCalendarCell = (value: MaybeRef<string | Dayjs>) => {
+const getFormattedCalendarCell = (value: MaybeRef<string | Dayjs | Date>) => {
   if (props.cellDateFormat !== 'auto') {
     const format =
       props.cellDateFormat === 'custom' ? props.cellDateFormatCustom : props.cellDateFormat
-    return Time(value).format(format)
+    return Time(unref(value)).format(format)
   }
-  return Time(value).format('DD')
+  return Time(unref(value)).format('DD')
 }
 
 watch(value, (n) => {
-  cmptRef.value.pickDay(n)
+  cmptRef.value?.pickDay(n)
 })
 
 const checkIsDisabled = (day: string) => {
