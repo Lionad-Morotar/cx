@@ -10,7 +10,7 @@ defineOptions({ name: 'CxSkeleton' })
 const ns = useCxBEM('skeleton')
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .cx-skeleton {
   position: absolute;
   inset: 0;
