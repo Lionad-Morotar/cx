@@ -1,11 +1,6 @@
 <!-- CxNuxtUIV4Progress: 包装 Nuxt UI v4 UProgress；cx 层 value 映射至 v4 的 modelValue（v-model） -->
 <template>
-  <UProgress
-    :model-value="props.value"
-    :max="props.max"
-    :size="props.size"
-    :color="props.color"
-  >
+  <UProgress :model-value="props.value" :max="props.max" :size="props.size" :color="props.color">
     <template #status="{ percent }"><slot name="status" :percent="percent" /></template>
   </UProgress>
 </template>

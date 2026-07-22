@@ -3,7 +3,8 @@ import component from './src/index.vue'
 
 export default normalize({
   name: '进度条',
-  description: 'Nuxt UI v4 进度条；value 经 .vue 映射至 v4 的 modelValue（v-model），slots 以 v4 为准仅暴露 status（spec 的 indicator/complete/incomplete 在 v4 不存在）',
+  description:
+    'Nuxt UI v4 进度条；value 经 .vue 映射至 v4 的 modelValue（v-model），slots 以 v4 为准仅暴露 status（spec 的 indicator/complete/incomplete 在 v4 不存在）',
   key: 'cx-nuxt-ui-v4-progress',
   icon: 'i-tabler-progress',
   component,

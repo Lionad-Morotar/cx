@@ -3,7 +3,8 @@ import component from './src/index.vue'
 
 export default normalize({
   name: '键盘按键',
-  description: 'Nuxt UI v4 键盘按键，展示快捷键；prop 名 value（v4 真实 API，spec 的 content 已按 v4 源码对齐为 value）',
+  description:
+    'Nuxt UI v4 键盘按键，展示快捷键；prop 名 value（v4 真实 API，spec 的 content 已按 v4 源码对齐为 value）',
   key: 'cx-nuxt-ui-v4-kbd',
   icon: 'i-tabler-keyboard',
   component,

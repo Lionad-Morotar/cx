@@ -2,7 +2,7 @@ import { normalize } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
 export default normalize({
-  key: 'cx-nuxt-ui-v4-dropdown',
+  key: 'cx-nuxt-ui-v4-dropdown-menu',
   name: '下拉菜单',
   description: 'Nuxt UI v4 下拉菜单，点击触发展示可选项列表',
   icon: 'i-heroicons-chevron-down-20-solid',

@@ -14,16 +14,20 @@ const COLOR_OPTIONS = [
 
 export default normalize({
   name: '日期选择',
-  description: 'Nuxt UI v4 日期输入，v2 date-picker 在 v4 对应 InputDate',
-  key: 'cx-nuxt-ui-v4-date-picker',
+  description:
+    'Nuxt UI v4 日期输入；物料层将 YYYY-MM-DD 字符串映射为 default-value（CalendarDate）',
+  key: 'cx-nuxt-ui-v4-input-date',
   icon: 'i-ri-calendar-line',
   component,
   props: {
-    placeholder: {
-      name: '占位符',
+    value: {
+      name: '当前日期',
       type: 'short',
-      initial: '选择日期',
+      initial: '2026-01-01',
     },
+    // 不提供 placeholder prop：UInputDate 透传 placeholder 会在 mount 时触发
+    // reka-ui 2.10.1 DateFieldRoot 的 segment 查询崩溃（querySelectorAll of null），
+    // 已用三种 props 组合裸挂复现确认是上游缺陷
     size: {
       name: '尺寸',
       type: 'card-selector',

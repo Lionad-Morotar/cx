@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "description": "cx material components based on Nuxt UI v4",
   "license": "MIT",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.mjs",
@@ -14,12 +16,15 @@
       "import": "./dist/index.mjs"
     }
   },
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "vp pack && vue-tsc -p tsconfig.build.json",
     "typecheck": "vue-tsgo --tsdk ../../node_modules/.pnpm/typescript@7.0.2/node_modules/typescript --noEmit"
   },
   "dependencies": {
+    "@internationalized/date": "^3.12.2",
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
     "lodash-es": "^4.18.1"

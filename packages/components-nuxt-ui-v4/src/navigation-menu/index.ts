@@ -2,7 +2,7 @@ import { normalize } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
 export default normalize({
-  key: 'cx-nuxt-ui-v4-navigation',
+  key: 'cx-nuxt-ui-v4-navigation-menu',
   name: '导航菜单',
   description: 'Nuxt UI v4 导航菜单，支持多级菜单与子项展开',
   icon: 'i-material-symbols-menu-book-outline-sharp',

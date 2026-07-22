@@ -1,12 +1,9 @@
 <!-- CxNuxtUIV4Kbd: 包装 Nuxt UI v4 UKbd；value 经 default slot 直接渲染，绕过 getKbdKey 的键名转换以保真显示 -->
 <template>
-  <UKbd
-    :value="props.value"
-    :color="props.color"
-    :variant="props.variant"
-    :size="props.size"
-  >
-    <template #default><slot>{{ props.value }}</slot></template>
+  <UKbd :value="props.value" :color="props.color" :variant="props.variant" :size="props.size">
+    <template #default
+      ><slot>{{ props.value }}</slot></template
+    >
   </UKbd>
 </template>
 

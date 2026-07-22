@@ -4,7 +4,7 @@ import component from './src/index.vue'
 export default normalize({
   name: '表单项',
   description: 'Nuxt UI v4 表单字段，v2 form-item 在 v4 对应 FormField，承载 label/校验/帮助文本',
-  key: 'cx-nuxt-ui-v4-form-item',
+  key: 'cx-nuxt-ui-v4-form-field',
   icon: 'i-tabler-forms',
   component,
   props: {

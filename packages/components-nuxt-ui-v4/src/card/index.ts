@@ -3,7 +3,8 @@ import component from './src/index.vue'
 
 export default normalize({
   name: '卡片',
-  description: 'Nuxt UI v4 卡片容器；v4 Card 无 header-leading/header-trailing slot（spec 所列已按 v4 源码去除）',
+  description:
+    'Nuxt UI v4 卡片容器；v4 Card 无 header-leading/header-trailing slot（spec 所列已按 v4 源码去除）',
   key: 'cx-nuxt-ui-v4-card',
   icon: 'i-tabler-credit-card',
   component,

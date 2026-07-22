@@ -3,7 +3,8 @@ import component from './src/index.vue'
 
 export default normalize({
   name: '折叠面板',
-  description: 'Nuxt UI v4 折叠面板；cx 层 multiple 布尔映射到 v4 type（single/multiple）；items 为展开项数据源（v4 必需，spec 未列已按 v4 能力补齐）；v4 无 item slot（spec 所列已去除），default/leading/trailing/content 透传',
+  description:
+    'Nuxt UI v4 折叠面板；cx 层 multiple 布尔映射到 v4 type（single/multiple）；items 为展开项数据源（v4 必需，spec 未列已按 v4 能力补齐）；v4 无 item slot（spec 所列已去除），default/leading/trailing/content 透传',
   key: 'cx-nuxt-ui-v4-accordion',
   icon: 'i-tabler-layout-list',
   component,

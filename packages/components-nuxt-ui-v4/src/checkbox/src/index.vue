@@ -1,10 +1,6 @@
 <!-- CxNuxtUIV4Checkbox: 包装 Nuxt UI v4 UCheckbox，透传核心 props 与 label slot -->
 <template>
-  <UCheckbox
-    :label="props.label"
-    :color="props.color"
-    :disabled="props.disabled"
-  >
+  <UCheckbox :label="props.label" :color="props.color" :disabled="props.disabled">
     <template #label><slot name="label" /></template>
   </UCheckbox>
 </template>

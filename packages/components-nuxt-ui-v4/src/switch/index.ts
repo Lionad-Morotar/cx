@@ -14,7 +14,7 @@ const COLOR_OPTIONS = [
 export default normalize({
   name: '开关',
   description: 'Nuxt UI v4 开关，v2 toggle 在 v4 对应 Switch，用于开启/关闭状态',
-  key: 'cx-nuxt-ui-v4-toggle',
+  key: 'cx-nuxt-ui-v4-switch',
   icon: 'i-ri-toggle-line',
   component,
   props: {

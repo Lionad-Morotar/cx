@@ -1,11 +1,6 @@
 <!-- CxNuxtUIV4Badge: 包装 Nuxt UI v4 UBadge，透传核心 props 与 slots -->
 <template>
-  <UBadge
-    :label="props.label"
-    :color="props.color"
-    :variant="props.variant"
-    :size="props.size"
-  >
+  <UBadge :label="props.label" :color="props.color" :variant="props.variant" :size="props.size">
     <template #leading><slot name="leading" /></template>
     <template #default><slot /></template>
     <template #trailing><slot name="trailing" /></template>

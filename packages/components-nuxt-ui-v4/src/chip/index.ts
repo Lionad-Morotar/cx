@@ -3,7 +3,8 @@ import component from './src/index.vue'
 
 export default normalize({
   name: '标签',
-  description: 'Nuxt UI v4 Chip 角标，附在子元素上的标记；v4 Chip 无 variant prop（spec 的 variant 已按 v4 源码去除），由 color/size/position 控制',
+  description:
+    'Nuxt UI v4 Chip 角标，附在子元素上的标记；v4 Chip 无 variant prop（spec 的 variant 已按 v4 源码去除），由 color/size/position 控制',
   key: 'cx-nuxt-ui-v4-chip',
   icon: 'i-tabler-pin',
   component,

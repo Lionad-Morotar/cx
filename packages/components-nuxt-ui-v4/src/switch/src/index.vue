@@ -1,10 +1,6 @@
 <!-- CxNuxtUIV4Switch: 包装 Nuxt UI v4 USwitch，透传核心 props 与 label slot -->
 <template>
-  <USwitch
-    :label="props.label"
-    :color="props.color"
-    :disabled="props.disabled"
-  >
+  <USwitch :label="props.label" :color="props.color" :disabled="props.disabled">
     <template #label><slot name="label" /></template>
   </USwitch>
 </template>

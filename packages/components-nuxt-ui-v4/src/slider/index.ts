@@ -14,7 +14,7 @@ const COLOR_OPTIONS = [
 export default normalize({
   name: '滑块',
   description: 'Nuxt UI v4 滑块，v2 range 在 v4 对应 Slider，在区间内拖动取值',
-  key: 'cx-nuxt-ui-v4-range',
+  key: 'cx-nuxt-ui-v4-slider',
   icon: 'i-ri-slider-h-line',
   component,
   props: {

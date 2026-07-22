@@ -4,7 +4,7 @@ import component from './src/index.vue'
 export default normalize({
   name: '分割线',
   description: 'Nuxt UI v4 分割线（v2 divider 对应 v4 Separator）',
-  key: 'cx-nuxt-ui-v4-divider',
+  key: 'cx-nuxt-ui-v4-separator',
   icon: 'i-tabler-minus',
   component,
   props: {

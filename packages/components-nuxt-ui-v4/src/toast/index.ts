@@ -2,10 +2,13 @@ import { normalize } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
 export default normalize({
-  key: 'cx-nuxt-ui-v4-notification',
+  key: 'cx-nuxt-ui-v4-toast',
   name: '通知',
   description: 'Nuxt UI v4 单条通知（UToast）；完整通知流需配合 useToast API 与 UToaster 容器',
   icon: 'i-ant-design-notification-outlined',
+  // 编程式物料：UToast 依赖 useToast 创建的通知实例上下文，画布静态渲染为空，
+  // 标 headless 让验收页以"逻辑型物料"占位而非呈现空卡片
+  headless: true,
   component,
   props: {
     title: {
