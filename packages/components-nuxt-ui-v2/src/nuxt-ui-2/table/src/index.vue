@@ -23,11 +23,11 @@ import type { Column, Data } from '../types'
 
 defineOptions({ name: 'CxTable' })
 
-type UMeterProps = ComponentProps<typeof UTable>
+type UTableProps = ComponentProps<typeof UTable>
 
 const ns = useCxBEM('table')
 const inner = defineProps<{}>()
-const props = useAttrs() as UMeterProps & {
+const props = useAttrs() as UTableProps & {
   cmpt: CxComponentRuntime
   datas?: Data[]
   columns?: UseTableReturn['colsVisible']
