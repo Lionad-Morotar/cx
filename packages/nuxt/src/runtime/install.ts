@@ -1,43 +1,21 @@
-import { CxRenderCmpts } from '@lionad/cx-render'
-import { CxBasics, CxCalendar, CxGrid, CxPage, CxUserStyle } from '@lionad/cx-components'
-import { CxNuxtUI, CxSimpleCard } from '@lionad/cx-components-nuxt-ui-v2'
-
-import type { CxLoaderInstance } from '@lionad/cx-definition'
+import type { CxLoaderInstance, CxMaterialBundle } from '@lionad/cx-definition'
 import type { NuxtApp } from '#app'
 
-// 静态 bundle：v2 物料 vendor 自包含，不依赖宿主 @nuxt/ui
-const STATIC_BUNDLES: Record<string, any[]> = {
-  render: [...CxRenderCmpts],
-  components: [CxPage, CxGrid, CxCalendar, CxUserStyle, ...CxBasics],
-  'nuxt-ui': [...CxNuxtUI, CxSimpleCard],
-}
-
-// 动态 bundle：v4 物料依赖宿主 @nuxt/ui（物料 .vue import { U* } from '#components'），
-// 仅在 materials 启用 nuxt-ui-v4 时按需加载，避免未装 @nuxt/ui 的宿主在静态 import
-// 解析 #components 时 build/dev 报错（真 opt-in，非配置开关）
-const DYNAMIC_BUNDLES: Record<string, () => Promise<any[]>> = {
-  'nuxt-ui-v4': async () => {
-    const { CxNuxtUIV4 } = await import('@lionad/cx-components-nuxt-ui-v4')
-    return [...CxNuxtUIV4]
-  },
-}
+// 装配清单由 module 按宿主启用声明生成（#build/cx-bundles.mjs）：
+// 未启用的物料包不出现在清单中，也不会被构建期解析
+import { cxBundles } from '#build/cx-bundles.mjs'
 
 /**
- * 按模块选项安装物料集（与 p-ray 编辑器相同的装配形态）。
- * async：v4 bundle 经动态 import 按需加载。
+ * 安装宿主启用的物料 bundle 到 cx 实例（与 p-ray 编辑器相同的装配形态）。
+ * async 签名保留以兼容既有调用方。
  */
-export const installCxBundles = async (cx: CxLoaderInstance, nuxtApp: NuxtApp) => {
-  const enabled = (nuxtApp.$config.public.cx as any)?.materials || [
-    'render',
-    'components',
-    'nuxt-ui',
-  ]
-  for (const key of enabled) {
-    const cmpts =
-      STATIC_BUNDLES[key] ?? (DYNAMIC_BUNDLES[key] ? await DYNAMIC_BUNDLES[key]() : [])
-    for (const cmpt of cmpts) {
+export const installCxBundles = async (cx: CxLoaderInstance, _nuxtApp: NuxtApp) => {
+  for (const bundle of cxBundles as CxMaterialBundle[]) {
+    for (const cmpt of bundle.materials) {
       cmpt._cx_meta.type = 'local'
-      cx.installComponent(cmpt._cx_meta.key, cmpt)
+      // normalize 产物（组件对象挂 _cx_meta）与 installComponent 的 meta 形态签名不符，
+      // 运行时行为与历史一致（该调用自始以宽松类型通过）
+      cx.installComponent(cmpt._cx_meta.key, cmpt as any)
     }
   }
 }

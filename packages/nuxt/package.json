@@ -26,12 +26,8 @@
     "prepublishOnly": "nuxt-module-build build"
   },
   "dependencies": {
-    "@lionad/cx-components": "workspace:*",
-    "@lionad/cx-components-nuxt-ui-v2": "workspace:*",
-    "@lionad/cx-components-nuxt-ui-v4": "workspace:*",
     "@lionad/cx-definition": "workspace:*",
-    "@lionad/cx-render": "workspace:*",
-    "@lionad/cx-vue": "workspace:*"
+    "@lionad/cx-render": "workspace:*"
   },
   "devDependencies": {
     "@nuxt/kit": "^4.5.0",

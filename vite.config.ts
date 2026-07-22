@@ -17,6 +17,12 @@ export default defineConfig({
         '/Users/lionad/Github/Lionad-Morotar/cx/packages/components-nuxt-ui-v2/vendor/shims/imports.ts',
       '#imports':
         '/Users/lionad/Github/Lionad-Morotar/cx/packages/components-nuxt-ui-v2/vendor/shims/imports.ts',
+      // v4 物料的 U* 组件离线 stub（宿主环境由 @nuxt/ui 提供真实实现）
+      '#components':
+        '/Users/lionad/Github/Lionad-Morotar/cx/packages/components-nuxt-ui-v4/src/shims/components.ts',
+      // cx-nuxt 装配清单虚拟模块（playground nuxi prepare 生成物）
+      '#build/cx-bundles.mjs':
+        '/Users/lionad/Github/Lionad-Morotar/cx/playground/.nuxt/cx-bundles.mjs',
       '#build/app.config':
         '/Users/lionad/Github/Lionad-Morotar/cx/packages/components-nuxt-ui-v2/vendor/shims/app.config.ts',
       '#ui-colors':
