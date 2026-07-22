@@ -1,19 +1,24 @@
 <template>
-  <!-- /dev/components-nuxt-ui-v2：@lionad/cx-components-nuxt-ui-v2 物料 schema 驱动渲染验收 -->
+  <!-- /dev/components-nuxt-ui-v2：@lionad/cx-components-nuxt-ui-v2 物料 schema 驱动渲染验收。
+       按 Nuxt UI 官方分类（Elements / Form / Data / Layout / Navigation / Overlay）分组展示，
+       分类骨架来自 vendored 源码 vendor/src/runtime/components/ 的 6 大目录。 -->
   <main class="page">
     <header class="page-header">
       <h1 class="title">cx components · nuxt-ui v2</h1>
-      <p class="subtitle">/dev/components-nuxt-ui-v2 · Nuxt UI v2 物料 schema 驱动渲染验收</p>
+      <p class="subtitle">
+        /dev/components-nuxt-ui-v2 · 按 Nuxt UI 官方分类组织的物料 schema 驱动渲染验收
+      </p>
+      <DevPagesNav />
     </header>
 
-    <section class="group">
+    <section v-for="group in groups" :key="group.name" class="group">
       <h2 class="group-title">
-        Nuxt UI v2 物料
-        <span class="count">{{ items.length }}</span>
+        {{ group.name }}
+        <span class="count">{{ group.items.length }}</span>
       </h2>
       <div class="grid">
         <article
-          v-for="item in items"
+          v-for="item in group.items"
           :key="item.meta.key"
           class="card"
           @dblclick="log(item.meta, item.node)"
@@ -36,11 +41,13 @@
 
 <script setup lang="ts">
 import { CxNuxtUI, CxSimpleCard } from '@lionad/cx-components-nuxt-ui-v2'
-import { toItem, type CxMeta, type DevItem } from '~/dev/material-utils'
+import { toItem, type CxMeta } from '~/dev/material-utils'
+import { groupByCategory, type CategoryGroup } from '~/dev/nuxt-ui-v2-categories'
 
-// v2 包物料（CxNuxtUI 数组 + CxSimpleCard），经 cx-nuxt 的 nuxt-ui bundle 注册到全局 $cx
+// v2 包物料（CxNuxtUI 数组 + CxSimpleCard），经 cx-nuxt 的 nuxt-ui bundle 注册到全局 $cx；
+// groupByCategory 按官方分类装配成 6 组，未映射 key 会抛错强制补全映射
 const materials = [...CxNuxtUI, CxSimpleCard] as unknown as { _cx_meta: CxMeta }[]
-const items: DevItem[] = materials.map(toItem)
+const groups: CategoryGroup[] = groupByCategory(materials.map(toItem))
 
 const log = (meta: CxMeta, node: unknown) => console.log(meta, node)
 </script>
