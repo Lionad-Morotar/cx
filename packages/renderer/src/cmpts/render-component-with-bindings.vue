@@ -556,7 +556,10 @@ export default defineComponent({
                 // @ts-ignore
                 ref: props.setRef,
                 cmpt: markRaw(cmpt.value),
-                style: styles.value,
+                // 空样式不下传：styles 由 _cx_style（编辑器样式）驱动，默认空对象；
+                // 空的响应式 style 进入组件链会在 Reka Primitive 的 vnode 归一化阶段
+                // 触发只读代理写入异常（'set' on proxy），仅在有实际样式时传 style
+                ...(Object.keys(styles.value).length > 0 ? { style: styles.value } : {}),
                 class: kls.value,
                 ['data-is-cx-cmpt']: true,
                 ['data-cx-cmpt-id']: cmpt.value?.id,
