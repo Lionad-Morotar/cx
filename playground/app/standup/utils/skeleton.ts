@@ -61,9 +61,7 @@ function createSkeletonMask(delay: number) {
           { name: 'fade', onAfterLeave: destroy },
           {
             default: withCtx(() => [
-              withDirectives(createVNode(CxSkeleton), [
-                [vShow, displayVisible.value],
-              ]),
+              withDirectives(createVNode(CxSkeleton), [[vShow, displayVisible.value]]),
             ]),
           },
         )

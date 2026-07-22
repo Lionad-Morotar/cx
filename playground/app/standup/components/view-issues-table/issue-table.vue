@@ -8,11 +8,7 @@
         </div>
       </div>
     </div>
-    <CxScrollbar
-      class="table-content"
-      v-cx-skeleton="props.isLoading"
-      cx-skeleton-delay="150"
-    >
+    <CxScrollbar class="table-content" v-cx-skeleton="props.isLoading" cx-skeleton-delay="150">
       <template v-if="!displayIssues?.length">
         <div class="empty-con" ref="emptyFirstRef">
           <img class="image" :src="EmptyStrImage" />

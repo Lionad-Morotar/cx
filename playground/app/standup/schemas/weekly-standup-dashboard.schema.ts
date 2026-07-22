@@ -15,6 +15,8 @@ export const weeklyStandupDashboardSchema: CxComponentRuntime[] = [
     'page-header-right': [cxNode('page-actions', 'cx-weekly-page-actions')],
     'page-main-section': [cxNode('main-content', 'cx-weekly-main-content')],
     'page-aside-section': [cxNode('todo-card', 'cx-weekly-todo-card')],
-    'page-right-section': [cxNode('user-select', 'cx-user-select', {}, { enableKeyboardControl: true })],
+    'page-right-section': [
+      cxNode('user-select', 'cx-user-select', {}, { enableKeyboardControl: true }),
+    ],
   }),
 ]

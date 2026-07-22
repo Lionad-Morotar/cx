@@ -265,4 +265,4 @@ import type { CxComponentRuntime, ComponentProps, ... } from '../types'
 
 ---
 
-*约定分析：2026-07-20*
+_约定分析：2026-07-20_

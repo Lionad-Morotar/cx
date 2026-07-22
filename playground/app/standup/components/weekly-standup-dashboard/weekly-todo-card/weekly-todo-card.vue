@@ -11,11 +11,7 @@
       <img class="switch-icon" :src="IconSwitch" @click="switchTodoDataType" />
     </template>
     <template #icons v-if="isCurStandupInProgress">
-      <UIcon
-        name="i-lucide-toggle-left"
-        class="switch-edit-type"
-        @click="switchTodoCardEditType"
-      />
+      <UIcon name="i-lucide-toggle-left" class="switch-edit-type" @click="switchTodoCardEditType" />
     </template>
     <cx-todo-card
       ref="todoCardRef"

@@ -17,6 +17,8 @@ export const dailyStandupDashboardSchema: CxComponentRuntime[] = [
     'page-header-right': [cxNode('page-actions', 'cx-daily-page-actions')],
     'page-content-left': [cxNode('filter', 'cx-daily-standup-filter')],
     'page-content-main': [cxNode('main-content', 'cx-daily-main-content')],
-    'page-content-right': [cxNode('user-select', 'cx-user-select', {}, { enableKeyboardControl: true })],
+    'page-content-right': [
+      cxNode('user-select', 'cx-user-select', {}, { enableKeyboardControl: true }),
+    ],
   }),
 ]

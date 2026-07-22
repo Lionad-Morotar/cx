@@ -1,9 +1,5 @@
 <template>
-  <UModal
-    class="select-participants-dialog"
-    v-model:open="visible"
-    title="确认与会人"
-  >
+  <UModal class="select-participants-dialog" v-model:open="visible" title="确认与会人">
     <template #body>
       <div class="dialog-content">
         <div class="to-select-panel">

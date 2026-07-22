@@ -204,7 +204,9 @@ const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
   padding-bottom: 16px;
 
   --gap: 5px;
-  --height: calc(var(--days-per-week, 7) * var(--item-size) + (var(--days-per-week, 7) - 1) * var(--gap));
+  --height: calc(
+    var(--days-per-week, 7) * var(--item-size) + (var(--days-per-week, 7) - 1) * var(--gap)
+  );
 
   .months {
     grid-area: months;

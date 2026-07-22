@@ -39,8 +39,7 @@ describe('Nuxt UI v2 物料分类', () => {
 
   it('关键归属与 vendored 源码目录一致（抽样）', () => {
     const groups = groupByCategory(items)
-    const find = (key: string) =>
-      groups.find((g) => g.items.some((i) => i.meta.key === key))!.name
+    const find = (key: string) => groups.find((g) => g.items.some((i) => i.meta.key === key))!.name
 
     // Elements
     expect(find('cx-button')).toBe('Elements')

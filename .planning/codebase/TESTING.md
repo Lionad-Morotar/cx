@@ -55,20 +55,20 @@ pnpm check             # fmt + lint + 类型检查（= vp check）
 
 **当前测试清单（12 个测试文件）：**
 
-| 文件 | 类型 | 被测对象 |
-| --- | --- | --- |
-| `packages/definition/tests/normalize.test.ts` | 单元 | `normalize` / `toJSON` schema 装配 |
-| `packages/definition/tests/runtime-algorithms.test.ts` | 单元（算法表征） | `cloneComponent` / `makeTree` |
-| `packages/vue/tests/use-request.test.ts` | 单元（行为） | `useRequest` 注入栈 + 数据合并 |
-| `packages/components/tests/materials.test.ts` | smoke | `CxBasics` 物料挂载与 normalize |
-| `packages/components-nuxt-ui-v4/tests/materials.test.ts` | smoke | `CxNuxtUI` vendored 物料挂载 |
-| `playground/tests/cyber-envelope.test.ts` | 契约 | `request` 包络处理（ofetch/ElMessage mock） |
-| `playground/tests/mock-contract.test.ts` | 契约 | `mocks/data/*.json` 数据层契约 |
-| `playground/tests/server-write-routes.test.ts` | 集成 | server 写路由全链路（mock-event + mock-store） |
-| `playground/tests/materials-smoke.test.ts` | smoke | 站会 25 个 normalize 物料 |
-| `playground/tests/utils-date.test.ts` | 单元 | `generateDay` / `getDayRange` / dayjs 配置 |
-| `playground/tests/utils-formatter.test.ts` | 单元 | `isEmpty` / `fallback` / `toCNNumber` |
-| `playground/tests/utils-label.test.ts` | 单元 | `StageLabels` / `getTaskStepsSpendSeconds` |
+| 文件                                                     | 类型             | 被测对象                                       |
+| -------------------------------------------------------- | ---------------- | ---------------------------------------------- |
+| `packages/definition/tests/normalize.test.ts`            | 单元             | `normalize` / `toJSON` schema 装配             |
+| `packages/definition/tests/runtime-algorithms.test.ts`   | 单元（算法表征） | `cloneComponent` / `makeTree`                  |
+| `packages/vue/tests/use-request.test.ts`                 | 单元（行为）     | `useRequest` 注入栈 + 数据合并                 |
+| `packages/components/tests/materials.test.ts`            | smoke            | `CxBasics` 物料挂载与 normalize                |
+| `packages/components-nuxt-ui-v4/tests/materials.test.ts` | smoke            | `CxNuxtUI` vendored 物料挂载                   |
+| `playground/tests/cyber-envelope.test.ts`                | 契约             | `request` 包络处理（ofetch/ElMessage mock）    |
+| `playground/tests/mock-contract.test.ts`                 | 契约             | `mocks/data/*.json` 数据层契约                 |
+| `playground/tests/server-write-routes.test.ts`           | 集成             | server 写路由全链路（mock-event + mock-store） |
+| `playground/tests/materials-smoke.test.ts`               | smoke            | 站会 25 个 normalize 物料                      |
+| `playground/tests/utils-date.test.ts`                    | 单元             | `generateDay` / `getDayRange` / dayjs 配置     |
+| `playground/tests/utils-formatter.test.ts`               | 单元             | `isEmpty` / `fallback` / `toCNNumber`          |
+| `playground/tests/utils-label.test.ts`                   | 单元             | `StageLabels` / `getTaskStepsSpendSeconds`     |
 
 **目录结构：**
 
@@ -246,7 +246,14 @@ const standups = read('standups') as any[]
 ```typescript
 // 来自 playground/tests/server-write-routes.test.ts:23-40
 const seedStandups = [
-  { id: '9001', type: 'day', name: '2026-07-18', meetingDate: '2026-07-18', state: 'ENDED', participants: '["1001"]' },
+  {
+    id: '9001',
+    type: 'day',
+    name: '2026-07-18',
+    meetingDate: '2026-07-18',
+    state: 'ENDED',
+    participants: '["1001"]',
+  },
 ]
 const seedMemos: unknown[] = []
 const seedIssues = [{ id: 'i1', name: '旧标题', title: '旧标题' }]
@@ -276,7 +283,7 @@ const mountMaterial = (cmpt, props = {}, opts = {}) =>
   mount(cmpt, {
     props: { cmpt: fakeCmpt(cmpt._cx_meta?.key || 'x'), ...props },
     global: {
-      directives: { cx: { mounted() {} } },   // 编辑器指令 no-op
+      directives: { cx: { mounted() {} } }, // 编辑器指令 no-op
       provide: {
         cx: undefined,
         'is-cx-edit': false,
@@ -461,4 +468,4 @@ pnpm check                 # fmt + lint + 类型检查（vp check）
 
 ---
 
-*测试分析：2026-07-20*
+_测试分析：2026-07-20_

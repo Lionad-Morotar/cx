@@ -37,9 +37,14 @@ const CxTracerB = makeTracerContent('b')
 describe('机制验证：page-layout 具名 slot 经 schema 填充', () => {
   it('日会 page-layout 的 page-header slot 渲染占位物料到对应 wrapper div', async () => {
     const schema = [
-      cmpt('daily-layout', 'cx-daily-standard-dashboard-page-layout', {}, {
-        'page-header': [cmpt('tracer-a', 'cx-tracer-a')],
-      }),
+      cmpt(
+        'daily-layout',
+        'cx-daily-standard-dashboard-page-layout',
+        {},
+        {
+          'page-header': [cmpt('tracer-a', 'cx-tracer-a')],
+        },
+      ),
     ]
     const cx = createTestCx()
     installMaterials(cx, { CxDailyStandardDashboardPageLayout, CxTracerA })
@@ -55,9 +60,14 @@ describe('机制验证：page-layout 具名 slot 经 schema 填充', () => {
 
   it('周会 page-layout 的 page-header-center slot 经 schema 填充（slot 名与日会不同）', async () => {
     const schema = [
-      cmpt('weekly-layout', 'cx-weekly-standup-dashboard-page-layout', {}, {
-        'page-header-center': [cmpt('tracer-b', 'cx-tracer-b')],
-      }),
+      cmpt(
+        'weekly-layout',
+        'cx-weekly-standup-dashboard-page-layout',
+        {},
+        {
+          'page-header-center': [cmpt('tracer-b', 'cx-tracer-b')],
+        },
+      ),
     ]
     const cx = createTestCx()
     installMaterials(cx, { CxWeeklyStandardDashboardPageLayout, CxTracerB })
@@ -76,9 +86,8 @@ describe('日会 schema 静态骨架', () => {
   const asCmpt = (x: unknown) => x as CxComponentRuntime
 
   it('根为 daily page-layout，5 个具名 slot 各填正确内容物料', async () => {
-    const { dailyStandupDashboardSchema } = await import(
-      '../app/standup/schemas/daily-standup-dashboard.schema'
-    )
+    const { dailyStandupDashboardSchema } =
+      await import('../app/standup/schemas/daily-standup-dashboard.schema')
     const root = asCmpt(dailyStandupDashboardSchema[0])
     expect(root.key).toBe('cx-daily-standard-dashboard-page-layout')
 
@@ -95,9 +104,8 @@ describe('周会 schema 静态骨架', () => {
   const asCmpt = (x: unknown) => x as CxComponentRuntime
 
   it('根为 weekly page-layout，5 个具名 slot（名与日会不同）各填正确内容物料', async () => {
-    const { weeklyStandupDashboardSchema } = await import(
-      '../app/standup/schemas/weekly-standup-dashboard.schema'
-    )
+    const { weeklyStandupDashboardSchema } =
+      await import('../app/standup/schemas/weekly-standup-dashboard.schema')
     const root = asCmpt(weeklyStandupDashboardSchema[0])
     expect(root.key).toBe('cx-weekly-standup-dashboard-page-layout')
 

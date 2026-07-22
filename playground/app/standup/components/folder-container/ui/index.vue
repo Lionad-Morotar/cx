@@ -16,12 +16,7 @@
             class="icon-preset icon-plus"
             @click.stop="toggle"
           />
-          <UIcon
-            v-else
-            name="i-lucide-minus"
-            class="icon-preset icon-minus"
-            @click.stop="toggle"
-          />
+          <UIcon v-else name="i-lucide-minus" class="icon-preset icon-minus" @click.stop="toggle" />
         </template>
         <template v-if="props.defaultIconPreset === 'arrow'">
           <UIcon

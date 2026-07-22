@@ -30,7 +30,10 @@ export function cxAlert(options: CxAlertOptions): Promise<boolean> {
       confirmButtonText: options.confirmButtonText,
     })
   } catch (error) {
-    console.warn(`[cxAlert] ${options.title}${options.content ? ': ' + options.content : ''}`, error)
+    console.warn(
+      `[cxAlert] ${options.title}${options.content ? ': ' + options.content : ''}`,
+      error,
+    )
     return Promise.resolve(false)
   }
 }

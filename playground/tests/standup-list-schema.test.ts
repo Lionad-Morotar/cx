@@ -171,7 +171,9 @@ describe('站会列表页 schema 结构（静态骨架）', () => {
   it('分组与卡片经模板插槽（group-item / card-item）嵌套', async () => {
     const { standupListSchema } = await import('../app/standup/schemas/standup-list.schema')
     const layout = asCmpt(asCmpt(standupListSchema[0]).components?.default?.[0])
-    const listMain = asCmpt((layout.components?.default ?? []).find((c) => asCmpt(c).key === 'cx-standup-list-main'))
+    const listMain = asCmpt(
+      (layout.components?.default ?? []).find((c) => asCmpt(c).key === 'cx-standup-list-main'),
+    )
     const groupList = asCmpt(listMain.components?.default?.[0])
     expect(groupList.key).toBe('cx-standup-group-list')
 

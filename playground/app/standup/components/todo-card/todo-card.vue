@@ -17,8 +17,9 @@
                 class="close-btn"
                 aria-label="清除"
                 @click="() => (inputTag = '')"
-                >×</button
               >
+                ×
+              </button>
             </UBadge>
           </template>
         </UInput>
@@ -47,10 +48,7 @@
               </slot>
             </template>
           </div>
-          <CxScrollbar
-            :class="[ns.e('scroll-area-x'), 'cx-todo-scroll-x']"
-            @scroll.stop="scrollX"
-          >
+          <CxScrollbar :class="[ns.e('scroll-area-x'), 'cx-todo-scroll-x']" @scroll.stop="scrollX">
             <div :class="ns.e('todo-content')">
               <div
                 v-for="(line, idx) in dataState.value"
@@ -522,8 +520,7 @@ const addInputToItem = async () => {
   await nextTick()
   await nextTick()
   const ref = todoInputRef.value as any
-  const inputEl =
-    (ref?.inputRef as HTMLInputElement) || ref?.$el?.querySelector('input')
+  const inputEl = (ref?.inputRef as HTMLInputElement) || ref?.$el?.querySelector('input')
   inputEl?.focus?.()
 }
 

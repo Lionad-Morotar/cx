@@ -30,11 +30,11 @@ const meetingType = useStandupType()
 const standups = useStandups()
 
 const meetingTypeName = computed(
-  () =>
-    ({ day: '站会', week: '周会', month: '月会' })[meetingType.value] as string,
+  () => ({ day: '站会', week: '周会', month: '月会' })[meetingType.value] as string,
 )
 const groupByType = computed<'week' | 'month' | 'year'>(
-  () => ({ day: 'week', week: 'month', month: 'year' })[meetingType.value] as 'week' | 'month' | 'year',
+  () =>
+    ({ day: 'week', week: 'month', month: 'year' })[meetingType.value] as 'week' | 'month' | 'year',
 )
 </script>
 

@@ -34,11 +34,7 @@
             icon
             :target="issueTableWrapperRef"
           />
-          <UIcon
-            name="i-lucide-copy"
-            class="export-button"
-            @click="exportData"
-          />
+          <UIcon name="i-lucide-copy" class="export-button" @click="exportData" />
         </template>
         <cx-view-issues-table
           ref="issueTableRef"

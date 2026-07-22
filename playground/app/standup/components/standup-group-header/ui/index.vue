@@ -29,7 +29,8 @@ const toggle = () => folderCtx?.toggle()
 
 const meetingType = useStandupType()
 const groupByType = computed<'week' | 'month' | 'year'>(
-  () => ({ day: 'week', week: 'month', month: 'year' })[meetingType.value] as 'week' | 'month' | 'year',
+  () =>
+    ({ day: 'week', week: 'month', month: 'year' })[meetingType.value] as 'week' | 'month' | 'year',
 )
 </script>
 
