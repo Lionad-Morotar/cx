@@ -20,6 +20,7 @@ const links = [
   { to: '/dev/components', label: '基础物料' },
   { to: '/dev/components-nuxt-ui-v2', label: 'nuxt-ui v2' },
   { to: '/dev/components-nuxt-ui-v4', label: 'nuxt-ui v4' },
+  { to: '/dev/components-vtu', label: 'vtu' },
 ] as const
 </script>
 

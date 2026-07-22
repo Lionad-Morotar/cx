@@ -1,5 +1,5 @@
 <template>
-  <!-- /dev：物料验收页索引，聚合三类 cx 物料的 schema 驱动渲染验收入口 -->
+  <!-- /dev：物料验收页索引，聚合四类 cx 物料的 schema 驱动渲染验收入口 -->
   <main class="page">
     <header class="page-header">
       <h1 class="title">dev · 物料验收</h1>
@@ -34,6 +34,11 @@ const links = [
     to: '/dev/components-nuxt-ui-v4',
     name: 'cx components · nuxt-ui v4',
     desc: 'Nuxt UI v4 物料，按官方分类（Layout / Element / Form / Data / Navigation / Overlay）组织',
+  },
+  {
+    to: '/dev/components-vtu',
+    name: 'cx components · vtu',
+    desc: 'tool-ui-vue 工具组件物料，按官方分类（Data Display / Code & Terminal / Media / Social / Forms & Input / Workflow）组织',
   },
 ] as const
 </script>
