@@ -70,7 +70,7 @@ cx/
 
 - **用途：** Nuxt 模块入口，零配置集成。
 - **包含：** `src/module.ts`（`defineNuxtModule`）、`src/runtime/install.ts`、`src/runtime/plugin.server.ts`、`src/runtime/plugin.client.ts`；`dist/` 产物。
-- **关键文件：** `src/module.ts`（CxMaterialBundle 选项与默认值）、`src/runtime/install.ts`（installCxBundles 装配逻辑）。
+- **关键文件：** `src/module.ts`（`bundles` / `materials` 选项与 `#build/cx-bundles.mjs` 虚拟模块生成）、`src/runtime/install.ts`（installCxBundles 装配逻辑）。
 
 ### `playground/`
 
@@ -241,4 +241,4 @@ cx/
 
 - 用户调试第三方库与参考资料的暂存区，被全局 gitignore 屏蔽，与项目本体无关。
 
-*结构分析：2026-07-20*
+_结构分析：2026-07-20_

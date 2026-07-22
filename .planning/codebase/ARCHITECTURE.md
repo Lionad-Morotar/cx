@@ -1,4 +1,5 @@
 <!-- refreshed: 2026-07-20 -->
+
 # 架构（Architecture）
 
 **分析日期：** 2026-07-20
@@ -68,19 +69,19 @@ definition ──▶ vue ──▶ renderer ──▶ components ──▶ compo
 
 ## 组件职责
 
-| 组件 | 职责 | 文件 |
-|------|------|------|
-| `CxLoader` | 物料注册中心、事件总线、refs / utils / datas 持有者，整个系统的运行时单例 | `packages/definition/src/loader/index.ts` |
-| `normalize` | 把 Vue SFC + 元信息描述符转换为带 `_cx_meta` / `_cx_install` 的标准化组件 | `packages/definition/src/normalize/component.ts` |
-| `createCxEmitter` | mitt 风格事件广播器，按 `CxSubEvent.target` 路由到目标组件 ref | `packages/definition/src/events/cx-emitter.ts` |
-| `createCxUtils` | 物料查找、运行时名称计算、树操作等工具集（`metadataUtils` + `runtimeUtils`） | `packages/definition/src/utils/index.ts`、`packages/definition/src/utils/metadata.ts`、`packages/definition/src/utils/runtime.ts` |
-| `CxRender` | 顶层渲染组件；提供上下文（`cx` / `is-cx-edit` / `cx-render-parent` 等）并挂 `Suspense` | `packages/renderer/src/cmpts/render.vue` |
-| `CxRenderComponent` | 单节点渲染器；解析 `cmpt.key` 为 Vue 组件、合并 `data` / `events` / `slots` | `packages/renderer/src/cmpts/render-component.vue` |
-| `CxRenderComponents` | 插槽集合渲染器；按 `slot.key` 拉子组件并递归 | `packages/renderer/src/cmpts/render-components.vue` |
-| `CxRenderComponentWithBindings` | 把 cx-styles（margin/padding/border/font/round/cosom/breakpoint）与指令绑到具体组件上 | `packages/renderer/src/cmpts/render-component-with-bindings.vue` |
-| Nuxt module | `defineNuxtModule` 入口；注册 `CxRender`、注入 server/client plugin | `packages/nuxt/src/module.ts` |
-| `installCxBundles` | 按选项 `materials: ['render','components','nuxt-ui']` 安装物料集 | `packages/nuxt/src/runtime/install.ts` |
-| Vendored shim | 离线化 Nuxt 虚拟模块（`#imports` / `#app` / `useState` / `useId`） | `packages/components-nuxt-ui-v4/vendor/shims/imports.ts` |
+| 组件                            | 职责                                                                                   | 文件                                                                                                                              |
+| ------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `CxLoader`                      | 物料注册中心、事件总线、refs / utils / datas 持有者，整个系统的运行时单例              | `packages/definition/src/loader/index.ts`                                                                                         |
+| `normalize`                     | 把 Vue SFC + 元信息描述符转换为带 `_cx_meta` / `_cx_install` 的标准化组件              | `packages/definition/src/normalize/component.ts`                                                                                  |
+| `createCxEmitter`               | mitt 风格事件广播器，按 `CxSubEvent.target` 路由到目标组件 ref                         | `packages/definition/src/events/cx-emitter.ts`                                                                                    |
+| `createCxUtils`                 | 物料查找、运行时名称计算、树操作等工具集（`metadataUtils` + `runtimeUtils`）           | `packages/definition/src/utils/index.ts`、`packages/definition/src/utils/metadata.ts`、`packages/definition/src/utils/runtime.ts` |
+| `CxRender`                      | 顶层渲染组件；提供上下文（`cx` / `is-cx-edit` / `cx-render-parent` 等）并挂 `Suspense` | `packages/renderer/src/cmpts/render.vue`                                                                                          |
+| `CxRenderComponent`             | 单节点渲染器；解析 `cmpt.key` 为 Vue 组件、合并 `data` / `events` / `slots`            | `packages/renderer/src/cmpts/render-component.vue`                                                                                |
+| `CxRenderComponents`            | 插槽集合渲染器；按 `slot.key` 拉子组件并递归                                           | `packages/renderer/src/cmpts/render-components.vue`                                                                               |
+| `CxRenderComponentWithBindings` | 把 cx-styles（margin/padding/border/font/round/cosom/breakpoint）与指令绑到具体组件上  | `packages/renderer/src/cmpts/render-component-with-bindings.vue`                                                                  |
+| Nuxt module                     | `defineNuxtModule` 入口；注册 `CxRender`、注入 server/client plugin                    | `packages/nuxt/src/module.ts`                                                                                                     |
+| `installCxBundles`              | 按选项 `materials: ['render','components','nuxt-ui']` 安装物料集                       | `packages/nuxt/src/runtime/install.ts`                                                                                            |
+| Vendored shim                   | 离线化 Nuxt 虚拟模块（`#imports` / `#app` / `useState` / `useId`）                     | `packages/components-nuxt-ui-v4/vendor/shims/imports.ts`                                                                          |
 
 ## 模式概览
 
@@ -216,10 +217,10 @@ definition ──▶ vue ──▶ renderer ──▶ components ──▶ compo
 - **用途：** 把 `CxRender`、`CxRenderComponent`、`CxInfo` 等本身作为物料暴露给编辑器，方便 p-ray 在画布里嵌套使用。
 - **位置：** `packages/renderer/src/cmpts/index.ts`
 
-### `CxMaterialBundle`（物料集开关）
+### `CxMaterialBundle`（物料包自描述协议）
 
-- **用途：** Nuxt 模块选项 `materials: ('render' | 'components' | 'nuxt-ui')[]`，按需装配。
-- **定义：** `packages/nuxt/src/module.ts`
+- **用途：** 物料包自描述单元（`{ name, materials }`），装配方（cx-nuxt 等）按 bundle 装配物料、不感知包内结构；Nuxt 模块选项 `bundles`（插件化形态）/ `materials`（兼容形态）声明启用集，经 `addTemplate` 生成 `#build/cx-bundles.mjs` 虚拟模块完成运行时装配——未启用的物料包不被构建期解析（真 opt-in）。
+- **定义：** `packages/definition/src/types/defined/cx-material-bundle.ts`
 
 ## 入口点
 
@@ -320,4 +321,4 @@ definition ──▶ vue ──▶ renderer ──▶ components ──▶ compo
 
 **构建：** `vp pack`（基于 tsdown / rolldown 的 `vite-plus` pack）作为库构建；`packages/nuxt` 用 `nuxt-module-build`。
 
-*架构分析：2026-07-20*
+_架构分析：2026-07-20_
