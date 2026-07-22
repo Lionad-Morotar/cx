@@ -136,6 +136,10 @@ const log = (meta: CxMeta, node: unknown) => console.log(meta, node)
   border: 1px dashed #e5e7eb;
   border-radius: 6px;
   min-height: 48px;
+  /* 有界预览高度：error/main 等页面级布局物料带 min-h-[calc(100vh-...)] 视口高假设，
+     流内高度受祖先约束，故用 max-height 收口、overflow 滚动，避免撑高 grid 行；
+     sidebar 等 fixed 类逃逸不受祖先约束，已在物料层用 ui replacer 解除视口定位 */
+  max-height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
