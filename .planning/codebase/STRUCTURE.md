@@ -6,13 +6,15 @@
 
 ```text
 cx/
-├── packages/                       # 6 个子包，单向依赖链
+├── packages/                       # 8 个子包，单向依赖链
 │   ├── definition/                 # schema 与 loader 核心（底层）
 │   ├── vue/                        # Vue 运行时 composables 与共享组件
 │   ├── renderer/                   # 渲染器（递归 schema → Vue 树）
 │   ├── components/                 # 自研基础物料（block / text / grid …）
+│   ├── components-nuxt-ui-v2/      # Nuxt UI v2 物料库
 │   ├── components-nuxt-ui-v4/      # vendored Nuxt UI v2 物料库
 │   │   └── vendor/                 # vendored 第三方源码 + 离线 shim（不参与 lint/fmt）
+│   ├── components-vtu/             # tool-ui-vue（vtu）工具调用组件物料库
 │   └── nuxt/                       # Nuxt 模块入口（顶层）
 ├── playground/                     # 开发沙箱 + EAP 站会迁移 demo
 │   ├── app/                        # Nuxt app 目录（页面、插件、standup 业务）

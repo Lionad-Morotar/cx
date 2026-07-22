@@ -6,7 +6,7 @@
 
 ## 系统概览
 
-cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：消费方以 `CxComponentRuntime` 树描述界面结构，`CxRender` 把它递归渲染成真实的 Vue 组件树。整个仓库为 monorepo，由 6 个子包构成一条严格分层的依赖链，外加一个用于验收的 `playground` 沙箱。
+cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：消费方以 `CxComponentRuntime` 树描述界面结构，`CxRender` 把它递归渲染成真实的 Vue 组件树。整个仓库为 monorepo，由 8 个子包构成一条严格分层的依赖链，外加一个用于验收的 `playground` 沙箱。
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -57,7 +57,7 @@ cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：�
 依赖链（单向，从下往上读）：
 
 ```text
-definition ──▶ vue ──▶ renderer ──▶ components ──▶ components-nuxt-ui-v4 ──▶ nuxt
+definition ──▶ vue ──▶ renderer ──▶ components ──▶ components-nuxt-ui-v2 / components-nuxt-ui-v4 / components-vtu ──▶ nuxt
 ```
 
 - `@lionad/cx-definition`：最底层、零 Vue 渲染依赖（仅 peer dep vue / `@vueuse/core`），定义 `CxLoader`、`normalize`、事件总线、`CxComponentRuntime` 类型系统。
@@ -65,6 +65,7 @@ definition ──▶ vue ──▶ renderer ──▶ components ──▶ compo
 - `@lionad/cx-render`：消费 schema、递归调用 Vue `<component :is>`。
 - `@lionad/cx-components`：cx 自研基础物料（block / text / header / grid / calendar / page / user-style）。
 - `@lionad/cx-components-nuxt-ui-v4`：vendored Nuxt UI v2 物料，配合离线 shim，脱离 Nuxt 运行时也可打包。
+- `@lionad/cx-components-vtu`：包装 [tool-ui-vue（vtu）](https://github.com/Lionad-Morotar/tool-ui-vue) 的 29 个 AI 工具调用组件为 cx 物料；vtu 为纯 npm Vue 库，无需 vendor/shim，样式经 cx-nuxt 条件注入 `@lionad/vtu-components/style.css`（其 `@source` 由宿主 Tailwind v4 处理）。
 - `@lionad/cx-nuxt`：Nuxt 模块入口，把上述所有能力零配置注入宿主。
 
 ## 组件职责
