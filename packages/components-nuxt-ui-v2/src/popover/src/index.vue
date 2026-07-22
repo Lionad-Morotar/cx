@@ -12,7 +12,7 @@
       </template>
 
       <template #panel="x">
-        <div :class="ns.e('panel')" class="p-2" v-bind="editModeModalHandlers">
+        <div :class="ns.e('panel')" class="px-2 py-1 pointer-events-auto" v-bind="editModeModalHandlers">
           <slot v-if="showSlot('panel')" name="panel" v-bind="x" />
           <CxEmpty v-else :text="'弹出层没有内容'" class="w-48" />
         </div>
@@ -147,9 +147,7 @@ defineExpose({
 
 @layer cx {
   @include b('popover') {
-    .cx-popover__panel {
-      @apply px-2 py-1 pointer-events-auto;
-    }
+    /* 静态样式已上提至模板 class */
   }
 }
 </style>

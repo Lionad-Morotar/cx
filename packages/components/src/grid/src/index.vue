@@ -1,10 +1,11 @@
 <template>
-  <div :class="ns.b()" :style="cssVars">
+  <div :class="ns.b()" :style="cssVars" class="box-border p-0 w-full break-all">
     <!-- todo perf -->
     <template v-for="(_row, rIdx) in row" :key="`row-${rIdx + 1}`">
       <template v-for="(_col, cIdx) in col" :key="`row-${rIdx + 1}-col-${cIdx + 1}`">
         <div
           :class="[`row-${rIdx + 1}-col-${cIdx + 1}`, ns.e('block')]"
+          class="w-full h-full"
           :style="getSlotArea(rIdx, cIdx)"
         >
           <slot :name="`row-${rIdx + 1}-col-${cIdx + 1}`" />
@@ -83,11 +84,9 @@ const getSlotArea = (rIdx: number, cIdx: number) => {
     display: grid;
     grid-template: repeat(var(--rows, 1), auto) / repeat(var(--cols, 1), minmax(0, 1fr));
     gap: var(--gap, 0);
-    @apply box-border p-0 w-full break-all;
     min-height: var(--gap, 4px);
 
     @include e('block') {
-      @apply w-full h-full;
       z-index: 1;
     }
   }

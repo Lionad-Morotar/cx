@@ -1,5 +1,5 @@
 <template>
-  <div :class="[ns.b()]">
+  <div :class="ns.b()" class="relative min-h-6">
     <slot />
   </div>
 </template>
@@ -20,7 +20,7 @@ const ns = useCxBEM('block')
 
 @layer cx {
   @include b('block') {
-    @apply relative min-h-6;
+    /* 静态样式已上提至模板 class */
   }
 }
 </style>

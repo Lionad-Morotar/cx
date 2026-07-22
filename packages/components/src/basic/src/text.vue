@@ -1,5 +1,9 @@
 <template>
-  <component :is="props.type" :class="[ns.b(), ns.e('content'), ns.is('truncate', props.truncate)]">
+  <component
+    :is="props.type"
+    class="relative min-h-6 leading-6 text-sm text-neutral-700 dark:text-neutral-300 max-w-full"
+    :class="[ns.b(), ns.e('content'), ns.is('truncate', props.truncate)]"
+  >
     {{ displayText }}
   </component>
 </template>
@@ -36,17 +40,10 @@ const displayText = computed(() => {
 
 @layer cx {
   @include b('text') {
-    @apply relative min-h-6;
-    @apply text-sm text-neutral-700 dark:text-neutral-300;
-    @apply max-w-full;
     line-height: inherit;
 
     @include when('truncate') {
       @apply truncate;
-    }
-
-    @include e('content') {
-      @apply min-h-6 leading-6;
     }
 
     &:is(h1) {

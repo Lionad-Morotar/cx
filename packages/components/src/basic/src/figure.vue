@@ -1,5 +1,5 @@
 <template>
-  <figure :class="[ns.b()]">
+  <figure :class="ns.b()" class="relative min-h-6">
     <template v-if="!src">
       <CxEmptyImage />
     </template>
@@ -9,7 +9,7 @@
         :alt="enableCaption ? caption : ''"
         :class="isEditMode ? 'select-none' : ''"
       />
-      <figcaption v-if="enableCaption">
+      <figcaption v-if="enableCaption" class="text-center text-sm">
         {{ caption }}
       </figcaption>
     </template>
@@ -67,11 +67,7 @@ const caption = computed(() => {
 
 @layer cx {
   @include b('figure') {
-    @apply relative min-h-6;
-
-    figcaption {
-      @apply text-center text-sm;
-    }
+    /* 静态样式已上提至模板 class */
   }
 }
 </style>

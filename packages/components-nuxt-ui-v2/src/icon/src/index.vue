@@ -1,5 +1,6 @@
 <template>
   <div
+    class="inline-flex justify-center items-center min-w-1 min-h-1 leading-none align-top text-inherit overflow-hidden select-none"
     :class="[
       ns.b(),
       ns.is('quick-center', props.center),
@@ -63,8 +64,7 @@ defineExpose({})
 
 @layer cx {
   @include b('icon') {
-    @apply inline-flex justify-center items-center;
-    @apply min-w-1 min-h-1 leading-none align-top text-inherit overflow-hidden select-none;
+    /* 静态样式已上提至模板 class */
 
     /** quick align with text when not in a flex container */
     @include when('quick-center') {

@@ -2,6 +2,7 @@
   <UFormGroup
     ref="cmpt"
     :class="ns.b()"
+    class="space-y-2"
     :required="has(props.required)"
     :eager-validation="has(props.eagerValidation)"
   >
@@ -65,7 +66,7 @@ defineExpose({})
 
 @layer cx {
   @include b('form-item') {
-    @apply space-y-2;
+    /* 静态样式已上提至模板 class */
   }
 }
 </style>

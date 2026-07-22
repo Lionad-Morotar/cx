@@ -1,6 +1,6 @@
 <template>
   <!-- 暂时放一个 div 以便编辑页面选中 -->
-  <div :id="cssID" :class="[ns.b()]">
+  <div :id="cssID" :class="ns.b()" class="min-h-6">
     <slot />
   </div>
 </template>
@@ -47,8 +47,7 @@ useScopedCSS(
 
 @layer cx {
   @include b('user-style') {
-    // * 暂时放置一个高度以便选中。
-    @apply min-h-6;
+    /* 静态样式已上提至模板 class */
   }
 }
 </style>

@@ -2,6 +2,7 @@
   <UForm
     ref="cmpt"
     :class="ns.b()"
+    class="space-y-2"
     :schema="schema"
     :state="state"
     @submit="$emit('submit', $event)"
@@ -74,7 +75,7 @@ defineExpose({
 
 @layer cx {
   @include b('form') {
-    @apply space-y-2;
+    /* 静态样式已上提至模板 class */
   }
 }
 </style>

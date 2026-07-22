@@ -1,6 +1,7 @@
 <template>
   <UAvatarGroup
     v-if="isGroup"
+    class="inline-block align-middle"
     :class="[ns.b(), ns.is('group'), ns.is(props.size as string)]"
     :size="props.size as any"
     :max="safeNum(inner.max, 5)"
@@ -10,6 +11,7 @@
   <UAvatar
     v-else
     ref="cmpt"
+    class="inline-block align-middle"
     :class="[ns.b(), ns.is('sub', props.isInGroup), ns.is(props.index as string)]"
     v-bind="{ ...avatarAttrs, ...chipAttrs }"
   />
@@ -93,7 +95,7 @@ defineExpose({
 
 @layer cx {
   @include b('avatar') {
-    @apply inline-block align-middle;
+    /* 静态样式已上提至模板 class */
 
     @include when('group') {
       @apply relative;
