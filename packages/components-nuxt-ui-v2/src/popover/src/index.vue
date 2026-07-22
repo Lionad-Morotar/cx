@@ -12,7 +12,11 @@
       </template>
 
       <template #panel="x">
-        <div :class="ns.e('panel')" class="px-2 py-1 pointer-events-auto" v-bind="editModeModalHandlers">
+        <div
+          :class="ns.e('panel')"
+          class="px-2 py-1 pointer-events-auto"
+          v-bind="editModeModalHandlers"
+        >
           <slot v-if="showSlot('panel')" name="panel" v-bind="x" />
           <CxEmpty v-else :text="'弹出层没有内容'" class="w-48" />
         </div>

@@ -29,6 +29,7 @@ cx 的 BEM 由 JS 与 SCSS 两侧共享同一命名空间 `cx`，生成 `cx-<blo
 ### 1. 分析现有代码
 
 读取目标文件，了解：
+
 - 组件结构和层级关系
 - 现有 class 命名方式
 - 所属包（`components` 基础组件 vs `components-nuxt-ui-v2` 薄包装层）
@@ -37,11 +38,11 @@ cx 的 BEM 由 JS 与 SCSS 两侧共享同一命名空间 `cx`，生成 `cx-<blo
 
 直接使用组件语义词作为 block 名，**不加前缀**：
 
-| 组件 | block 名 | 生成类名 |
-|------|---------|---------|
-| CxBlock | `block` | `cx-block` |
-| CxText | `text` | `cx-text` |
-| CxBadge | `badge` | `cx-badge` |
+| 组件    | block 名 | 生成类名   |
+| ------- | -------- | ---------- |
+| CxBlock | `block`  | `cx-block` |
+| CxText  | `text`   | `cx-text`  |
+| CxBadge | `badge`  | `cx-badge` |
 
 ### 3. 重构 Script
 
@@ -53,17 +54,17 @@ const ns = useCxBEM('block-name')
 
 JS 侧 API：
 
-| 方法 | 用途 | 输出示例 |
-|------|------|---------|
-| `ns.b()` | block 类名 | `cx-block` |
-| `ns.b('suffix')` | block + 后缀 | `cx-block-suffix` |
-| `ns.e('el')` | element | `cx-block__el` |
-| `ns.m('mod')` | modifier | `cx-block--mod` |
-| `ns.is('state', cond)` | 条件状态类 | `is-active` 或 `''` |
-| `ns.be('suffix', 'el')` | block 后缀 + element | `cx-block-suffix__el` |
-| `ns.em('el', 'mod')` | element + modifier | `cx-block__el--mod` |
-| `ns.cssVar({ k: v })` | CSS 变量 | `--cx-k: v` |
-| `ns.cssVarBlock({ k: v })` | block 级 CSS 变量 | `--cx-block-k: v` |
+| 方法                       | 用途                 | 输出示例              |
+| -------------------------- | -------------------- | --------------------- |
+| `ns.b()`                   | block 类名           | `cx-block`            |
+| `ns.b('suffix')`           | block + 后缀         | `cx-block-suffix`     |
+| `ns.e('el')`               | element              | `cx-block__el`        |
+| `ns.m('mod')`              | modifier             | `cx-block--mod`       |
+| `ns.is('state', cond)`     | 条件状态类           | `is-active` 或 `''`   |
+| `ns.be('suffix', 'el')`    | block 后缀 + element | `cx-block-suffix__el` |
+| `ns.em('el', 'mod')`       | element + modifier   | `cx-block__el--mod`   |
+| `ns.cssVar({ k: v })`      | CSS 变量             | `--cx-k: v`           |
+| `ns.cssVarBlock({ k: v })` | block 级 CSS 变量    | `--cx-block-k: v`     |
 
 ### 4. 重构 Template
 
@@ -89,10 +90,10 @@ JS 侧 API：
 
 样式分三层放置，原则是 **能用模板 `class` 就不用 SCSS**：
 
-| 层 | 放哪 | 内容 |
-|---|------|------|
-| 静态工具类 | 模板 `class` | 布局、间距、颜色等不依赖状态的样式 |
-| BEM 语义类 | 模板 `:class` | `ns.b()` / `ns.e()` / `ns.is()` — 作为钩子 |
+| 层         | 放哪           | 内容                                       |
+| ---------- | -------------- | ------------------------------------------ |
+| 静态工具类 | 模板 `class`   | 布局、间距、颜色等不依赖状态的样式         |
+| BEM 语义类 | 模板 `:class`  | `ns.b()` / `ns.e()` / `ns.is()` — 作为钩子 |
 | 结构性 CSS | `<style>` SCSS | 状态组合、伪类、动画、CSS 变量、第三方覆盖 |
 
 `class` 与 `:class` 共存是正常模式——Vue 会自动合并两者。
@@ -117,14 +118,14 @@ SCSS 仅在模板做不到时使用 `@apply`（状态组合、伪类等）：
 
 SCSS 侧 mixin：
 
-| mixin | 用途 | 生成选择器 |
-|-------|------|-----------|
-| `@include b('name')` | block | `.cx-name` |
-| `@include e('el')` | element | `.cx-name__el` |
-| `@include m('mod')` | modifier | `.cx-name--mod` |
-| `@include when('state')` | 状态 | `.cx-name.is-state` |
-| `@include not('state')` | 非状态 | `.cx-name:not(.is-state)` |
-| `@include pseudo('hover')` | 伪类 | `.cx-name:hover` |
+| mixin                      | 用途     | 生成选择器                |
+| -------------------------- | -------- | ------------------------- |
+| `@include b('name')`       | block    | `.cx-name`                |
+| `@include e('el')`         | element  | `.cx-name__el`            |
+| `@include m('mod')`        | modifier | `.cx-name--mod`           |
+| `@include when('state')`   | 状态     | `.cx-name.is-state`       |
+| `@include not('state')`    | 非状态   | `.cx-name:not(.is-state)` |
+| `@include pseudo('hover')` | 伪类     | `.cx-name:hover`          |
 
 > 薄包装组件 style block 通常为空占位，样式依赖上游 Nuxt UI。
 

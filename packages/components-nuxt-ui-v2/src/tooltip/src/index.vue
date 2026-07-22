@@ -13,7 +13,11 @@
         </template>
 
         <template #text>
-          <div :class="ns.e('text')" class="px-2 py-1 pointer-events-auto" v-bind="editModeModalHandlers">
+          <div
+            :class="ns.e('text')"
+            class="px-2 py-1 pointer-events-auto"
+            v-bind="editModeModalHandlers"
+          >
             <slot v-if="showSlot('text')" name="text" />
             <CxEmpty v-else show-empty text-only text="弹出层没有内容" />
           </div>
