@@ -1,0 +1,51 @@
+import { normalize } from '@lionad/cx-definition'
+
+import component from './src/index.vue'
+
+export default normalize({
+  name: '审批卡',
+  description: '审批确认卡，含标题、描述、元数据与确认/取消动作，支持破坏性变体。',
+  key: 'cx-vtu-approval-card',
+  icon: 'i-tabler-shield-check',
+  component,
+  props: {
+    title: {
+      name: '标题',
+      type: 'short',
+      initial: '确认部署到生产环境？',
+    },
+    description: {
+      name: '描述',
+      type: 'textarea',
+      initial: '此操作将把 v1.2.0 发布到生产集群。',
+    },
+    variant: {
+      name: '变体',
+      type: 'card-selector',
+      isPreview: true,
+      initial: 'default',
+      options: [
+        { label: '默认', value: 'default' },
+        { label: '破坏性', value: 'destructive' },
+      ],
+    },
+    confirmLabel: {
+      name: '确认文案',
+      type: 'short',
+      initial: '确认',
+    },
+    cancelLabel: {
+      name: '取消文案',
+      type: 'short',
+      initial: '取消',
+    },
+    metadata: {
+      name: '元数据',
+      type: 'json',
+      initial: () => [
+        { label: '环境', value: 'production' },
+        { label: '版本', value: 'v1.2.0' },
+      ],
+    },
+  },
+})
