@@ -9,7 +9,7 @@ export interface CxBundleSpec {
 }
 
 /** 内置物料集名称（兼容形态）：映射到对应物料包的 bundle 声明，不 import 物料包本体 */
-export type CxBuiltinMaterialSet = 'render' | 'components' | 'nuxt-ui-v2' | 'nuxt-ui-v4'
+export type CxBuiltinMaterialSet = 'render' | 'components' | 'nuxt-ui-v2' | 'nuxt-ui-v4' | 'vtu'
 
 export interface CxNuxtModuleOptions {
   /** 物料 bundle 声明列表（插件化形态）；与 materials 同时提供时 bundles 优先 */
@@ -26,6 +26,7 @@ const BUILTIN_BUNDLES: Record<CxBuiltinMaterialSet, CxBundleSpec> = {
   components: { package: '@lionad/cx-components', namedExport: 'CxComponentsBundle' },
   'nuxt-ui-v2': { package: '@lionad/cx-components-nuxt-ui-v2', namedExport: 'CxNuxtUIV2Bundle' },
   'nuxt-ui-v4': { package: '@lionad/cx-components-nuxt-ui-v4', namedExport: 'CxNuxtUIV4Bundle' },
+  vtu: { package: '@lionad/cx-components-vtu', namedExport: 'CxVtuBundle' },
 }
 
 /**
@@ -91,6 +92,13 @@ const module: NuxtModule<CxNuxtModuleOptions> = defineNuxtModule<CxNuxtModuleOpt
       specs.some((s) => s.package === '@lionad/cx-components-nuxt-ui-v2')
     ) {
       nuxt.options.css.push('v-calendar/dist/style.css')
+    }
+
+    // vtu 样式仅 vtu bundle 启用时注入：style.css 自带 `@source "."` 指令，须经宿主
+    // Tailwind v4 处理以扫描 vtu dist 生成工具类（tokens + 结构 CSS 已内联其中）；
+    // 该依赖归属 vtu 物料包，无条件注入会对未装 vtu 的宿主产生解析负担
+    if (options.injectStyles && specs.some((s) => s.package === '@lionad/cx-components-vtu')) {
+      nuxt.options.css.push('@lionad/vtu-components/style.css')
     }
 
     // 虚拟模块桥接：仅启用的包出现在 import 语句中——未启用的物料包不会被构建期
