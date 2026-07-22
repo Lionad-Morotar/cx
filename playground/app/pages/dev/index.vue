@@ -33,7 +33,7 @@ const links = [
   {
     to: '/dev/components-nuxt-ui-v4',
     name: 'cx components · nuxt-ui v4',
-    desc: 'Nuxt UI v4 物料验收（宿主依赖型，需消费方注册 @nuxt/ui v4）',
+    desc: 'Nuxt UI v4 物料，按官方分类（Layout / Element / Form / Data / Navigation / Overlay）组织',
   },
 ] as const
 </script>
