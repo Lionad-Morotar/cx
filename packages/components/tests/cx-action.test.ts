@@ -13,7 +13,10 @@ import { CxBasics } from '../src/index'
 const byKey = (key: string) => CxBasics.find((x: any) => x._cx_meta.key === key)!
 
 const makeCmpt = (data: Record<string, any> = {}) =>
-  ({ id: 'cx-action-test', data: reactive({ loading: false, data: null, error: null, ...data }) }) as any
+  ({
+    id: 'cx-action-test',
+    data: reactive({ loading: false, data: null, error: null, ...data }),
+  }) as any
 
 const mountAction = (props: Record<string, any>) =>
   mount(byKey('cx-action'), {

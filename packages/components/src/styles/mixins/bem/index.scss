@@ -46,8 +46,7 @@ $state-prefix: 'is-' !default;
 }
 
 @function hitAllSpecialNestRule($selector) {
-  @return containsModifier($selector) or containWhenFlag($selector) or
-    containPseudoClass($selector);
+  @return containsModifier($selector) or containWhenFlag($selector) or containPseudoClass($selector);
 }
 
 // BEM

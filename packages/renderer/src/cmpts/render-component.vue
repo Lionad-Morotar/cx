@@ -446,9 +446,9 @@ const _cmptSlots = computed(() => {
         ? metaSlots({ cmpt: readonly(cmpt.value)!, cx: readonly(cx) } as any)
         : isArray(metaSlots)
           ? metaSlots
-          // 此处不能加 async：mapValues 不会 await，async 回调会让每个插槽变成
-          // 未解析的 Promise，slot.key 变 undefined，插槽同样无法渲染
-          : mapValues(metaSlots, (v, k) => ({
+          : // 此处不能加 async：mapValues 不会 await，async 回调会让每个插槽变成
+            // 未解析的 Promise，slot.key 变 undefined，插槽同样无法渲染
+            mapValues(metaSlots, (v, k) => ({
               key: k,
               ...(isFunction(v)
                 ? v({ cmpt: readonly(cmpt.value!), cx: readonly(cx) } as any)

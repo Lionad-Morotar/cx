@@ -1,8 +1,5 @@
 <template>
-  <component
-    :is="props.type"
-    :class="[ns.b(), ns.e('content'), ns.is('truncate', props.truncate)]"
-  >
+  <component :is="props.type" :class="[ns.b(), ns.e('content'), ns.is('truncate', props.truncate)]">
     {{ displayText }}
   </component>
 </template>

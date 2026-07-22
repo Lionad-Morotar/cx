@@ -13,7 +13,12 @@
         <span class="count">{{ group.items.length }}</span>
       </h2>
       <div class="grid">
-        <article v-for="item in group.items" :key="item.meta.key" class="card" @dblclick="log(item.meta, item.node)">
+        <article
+          v-for="item in group.items"
+          :key="item.meta.key"
+          class="card"
+          @dblclick="log(item.meta, item.node)"
+        >
           <header class="card-head">
             <span class="card-name">{{ item.meta.name }}</span>
             <code class="card-key">{{ item.meta.key }}</code>
@@ -105,7 +110,6 @@ const groups: { name: string; items: ReturnType<typeof toItem>[] }[] = [
 ]
 
 const log = (meta: CxMeta, item: CxComponentRuntime) => console.log(meta, item)
-
 </script>
 
 <style scoped>
