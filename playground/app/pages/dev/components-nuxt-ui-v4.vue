@@ -4,6 +4,7 @@
     <header class="page-header">
       <h1 class="title">cx components · nuxt-ui v4</h1>
       <p class="subtitle">/dev/components-nuxt-ui-v4 · Nuxt UI v4 物料 schema 驱动渲染验收</p>
+      <DevPagesNav />
     </header>
 
     <section class="group">
