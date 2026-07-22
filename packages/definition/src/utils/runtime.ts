@@ -163,7 +163,7 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
     const { key, name } = input
     if (!key) {
       console.error('[debug]', input, initialData)
-      throw new Error('needs component key, eg "cx-simple-card"')
+      throw new Error('needs component key, eg "cx-button"')
     }
 
     const data = utils.getData(key, initialData)

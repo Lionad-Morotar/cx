@@ -9,7 +9,7 @@ export interface CxBundleSpec {
 }
 
 /** 内置物料集名称（兼容形态）：映射到对应物料包的 bundle 声明，不 import 物料包本体 */
-export type CxBuiltinMaterialSet = 'render' | 'components' | 'nuxt-ui' | 'nuxt-ui-v4'
+export type CxBuiltinMaterialSet = 'render' | 'components' | 'nuxt-ui-v2' | 'nuxt-ui-v4'
 
 export interface CxNuxtModuleOptions {
   /** 物料 bundle 声明列表（插件化形态）；与 materials 同时提供时 bundles 优先 */
@@ -24,7 +24,7 @@ export interface CxNuxtModuleOptions {
 const BUILTIN_BUNDLES: Record<CxBuiltinMaterialSet, CxBundleSpec> = {
   render: { package: '@lionad/cx-render', namedExport: 'CxRenderBundle' },
   components: { package: '@lionad/cx-components', namedExport: 'CxComponentsBundle' },
-  'nuxt-ui': { package: '@lionad/cx-components-nuxt-ui-v2', namedExport: 'CxNuxtUIBundle' },
+  'nuxt-ui-v2': { package: '@lionad/cx-components-nuxt-ui-v2', namedExport: 'CxNuxtUIV2Bundle' },
   'nuxt-ui-v4': { package: '@lionad/cx-components-nuxt-ui-v4', namedExport: 'CxNuxtUIV4Bundle' },
 }
 
@@ -74,7 +74,7 @@ const module: NuxtModule<CxNuxtModuleOptions> = defineNuxtModule<CxNuxtModuleOpt
       options.bundles ??
       [
         ...new Set(
-          options.materials ?? (['render', 'components', 'nuxt-ui'] as CxBuiltinMaterialSet[]),
+          options.materials ?? (['render', 'components', 'nuxt-ui-v2'] as CxBuiltinMaterialSet[]),
         ),
       ].map((name) => {
         const spec = BUILTIN_BUNDLES[name]

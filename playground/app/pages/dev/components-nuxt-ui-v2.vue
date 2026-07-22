@@ -40,13 +40,13 @@
 </template>
 
 <script setup lang="ts">
-import { CxNuxtUI, CxSimpleCard } from '@lionad/cx-components-nuxt-ui-v2'
+import { CxNuxtUIV2 } from '@lionad/cx-components-nuxt-ui-v2'
 import { toItem, type CxMeta } from '~/dev/material-utils'
 import { groupByCategory, type CategoryGroup } from '~/dev/nuxt-ui-v2-categories'
 
-// v2 包物料（CxNuxtUI 数组 + CxSimpleCard），经 cx-nuxt 的 nuxt-ui bundle 注册到全局 $cx；
+// v2 包物料经 cx-nuxt 的 nuxt-ui-v2 bundle 注册到全局 $cx；
 // groupByCategory 按官方分类装配成 6 组，未映射 key 会抛错强制补全映射
-const materials = [...CxNuxtUI, CxSimpleCard] as unknown as { _cx_meta: CxMeta }[]
+const materials = [...CxNuxtUIV2] as unknown as { _cx_meta: CxMeta }[]
 const groups: CategoryGroup[] = groupByCategory(materials.map(toItem))
 
 const log = (meta: CxMeta, node: unknown) => console.log(meta, node)

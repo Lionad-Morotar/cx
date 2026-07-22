@@ -17,8 +17,7 @@ export const NUTS_UI_V2_CATEGORY_ORDER: readonly NuxtUIv2Category[] = [
 ] as const
 
 // cx 物料 key → 官方分类。归属以 vendored 源码目录为准；
-// date-picker 虽依赖 v-calendar 而非 vendor/bridge，但语义属表单输入，归 Form；
-// simple-card 是 cx 独立容器（非 nuxt-ui），按布局容器语义归 Layout。
+// date-picker 虽依赖 v-calendar 而非 vendor/bridge，但语义属表单输入，归 Form。
 const CATEGORY_BY_KEY: Record<string, NuxtUIv2Category> = {
   // Elements
   'cx-accordion': 'Elements',
@@ -58,7 +57,6 @@ const CATEGORY_BY_KEY: Record<string, NuxtUIv2Category> = {
   'cx-card': 'Layout',
   'cx-container': 'Layout',
   'cx-divider': 'Layout',
-  'cx-simple-card': 'Layout',
   'cx-skeleton': 'Layout',
 
   // Navigation

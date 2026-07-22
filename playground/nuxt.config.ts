@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   // cx-nuxt 内联 module options：dev 验收启用 v2(cx-*) + v4(cx-nuxt-ui-v4-*) 两套物料
   modules: [
     '@nuxt/ui',
-    ['@lionad/cx-nuxt', { materials: ['render', 'components', 'nuxt-ui', 'nuxt-ui-v4'] }],
+    ['@lionad/cx-nuxt', { materials: ['render', 'components', 'nuxt-ui-v2', 'nuxt-ui-v4'] }],
   ],
   // cx 是客户端渲染系统；站会组件 setup 顶层访问 window/localStorage
   ssr: false,

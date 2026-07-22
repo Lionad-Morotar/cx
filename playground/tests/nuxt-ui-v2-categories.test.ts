@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { CxNuxtUI, CxSimpleCard } from '@lionad/cx-components-nuxt-ui-v2'
+import { CxNuxtUIV2 } from '@lionad/cx-components-nuxt-ui-v2'
 
 import { toItem, type CxMeta } from '../app/dev/material-utils'
 import { groupByCategory, NUTS_UI_V2_CATEGORY_ORDER } from '../app/dev/nuxt-ui-v2-categories'
 
-// 验收页实际装配的物料集合（CxNuxtUI 数组 + CxSimpleCard）
-const materials = [...CxNuxtUI, CxSimpleCard] as unknown as { _cx_meta: CxMeta }[]
+// 验收页实际装配的物料集合（CxNuxtUIV2 数组）
+const materials = [...CxNuxtUIV2] as unknown as { _cx_meta: CxMeta }[]
 const items = materials.map(toItem)
 
 describe('Nuxt UI v2 物料分类', () => {
@@ -53,7 +53,6 @@ describe('Nuxt UI v2 物料分类', () => {
     expect(find('cx-table')).toBe('Data')
     // Layout
     expect(find('cx-card')).toBe('Layout')
-    expect(find('cx-simple-card')).toBe('Layout')
     // Navigation
     expect(find('cx-tabs')).toBe('Navigation')
     expect(find('cx-navigation')).toBe('Navigation')

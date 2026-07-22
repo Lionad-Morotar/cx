@@ -176,10 +176,10 @@ onErrorCaptured((err) => {
 })
 
 // 兼容一下 key 字符串形式的组件，在模板中传 key 要比造数据体验好不少，
-// <cx-render-component component="cx-simple-card" />
+// <cx-render-component component="cx-button" />
 // 但是由于是先下载异步组件再到 app 里注册的，所以如果不做特殊处理，
 // 以下写法暂时行不通，以及 ref、key 等属性在模板中无法使用，
-// <cx-render-component component="cx-simple-card" />
+// <cx-render-component component="cx-button" />
 const model = isString(props.component)
   ? ref(
       cxUtils.cloneComponent({

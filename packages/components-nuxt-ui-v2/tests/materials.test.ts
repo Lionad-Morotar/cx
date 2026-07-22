@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { h } from 'vue'
 
-import { CxNuxtUI } from '../src/index'
+import { CxNuxtUIV2 } from '../src/index'
 import { UMeter } from '../vendor/bridge'
 
 /**
- * nuxt-ui 物料 smoke：代表性物料可挂载（vendored v2 组件经 shim 离线工作）。
+ * nuxt-ui-v2 物料 smoke：代表性物料可挂载（vendored v2 组件经 shim 离线工作）。
  */
-const byKey = (key: string) => CxNuxtUI.find((x: any) => x._cx_meta.key === key)!
+const byKey = (key: string) => CxNuxtUIV2.find((x: any) => x._cx_meta.key === key)!
 
 /** 物料运行于 cx-render 时会收到运行时组件上下文，smoke 以最小桩注入 */
 const fakeCmpt = (key: string) => ({ id: `test-${key}`, key, data: {}, components: {} })
@@ -31,10 +31,10 @@ const mountMaterial = (
     },
   })
 
-describe('nuxt-ui 物料 smoke', () => {
+describe('nuxt-ui-v2 物料 smoke', () => {
   it('物料数量与 normalize 装配（补 button-group/meter-group 后 >= 42）', () => {
-    expect(CxNuxtUI.length).toBeGreaterThanOrEqual(42)
-    for (const meta of CxNuxtUI) {
+    expect(CxNuxtUIV2.length).toBeGreaterThanOrEqual(42)
+    for (const meta of CxNuxtUIV2) {
       expect(meta._cx_meta).toBeTruthy()
       expect(typeof (meta as any)._cx_install).toBe('function')
     }
