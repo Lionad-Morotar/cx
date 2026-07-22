@@ -3,6 +3,7 @@ import CxAlert from './alert'
 import CxAvatar from './avatar'
 import CxBadge from './badge'
 import CxButton from './button'
+import CxButtonGroup from './button-group'
 import CxBreadcrumb from './breadcrumb'
 import CxCard from './card'
 import CxCarousel from './carousel'
@@ -22,6 +23,7 @@ import CxInputMenu from './input-menu'
 import CxKbd from './kbd'
 import CxLink from './link'
 import CxMeter from './meter'
+import CxMeterGroup from './meter-group'
 import CxModal from './modal'
 import CxNavigation from './navigation'
 import CxNotification from './notification'
@@ -46,6 +48,7 @@ export {
   CxAvatar,
   CxBadge,
   CxButton,
+  CxButtonGroup,
   CxBreadcrumb,
   CxCard,
   CxCarousel,
@@ -65,6 +68,7 @@ export {
   CxKbd,
   CxLink,
   CxMeter,
+  CxMeterGroup,
   CxModal,
   CxNavigation,
   CxNotification,
@@ -90,6 +94,7 @@ export default [
   CxAvatar,
   CxBadge,
   CxButton,
+  CxButtonGroup,
   CxBreadcrumb,
   CxCard,
   CxCarousel,
@@ -109,6 +114,7 @@ export default [
   CxKbd,
   CxLink,
   CxMeter,
+  CxMeterGroup,
   CxModal,
   CxNavigation,
   CxNotification,
