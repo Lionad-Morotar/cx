@@ -75,4 +75,24 @@ describe('nuxt-ui 物料 smoke', () => {
     })
     expect(wrapper.exists()).toBe(true)
   })
+
+  it('cx-table 挂载（useTable/useAnysort 在 anysort@2 下不崩）', () => {
+    const cmpt = byKey('cx-table')
+    const wrapper = mountMaterial(cmpt, {
+      datas: [{ id: 1, name: 'a' }],
+      columns: [],
+      sorts: [],
+    })
+    expect(wrapper.exists()).toBe(true)
+  })
+
+  it('cx-navigation 挂载（divideFromMultiple 数组安全）', () => {
+    const cmpt = byKey('cx-navigation')
+    const wrapper = mountMaterial(cmpt, {
+      items: [{ label: '项目1', value: 'p1' }],
+      orientation: 'horizontal',
+      divideFromMultiple: [],
+    })
+    expect(wrapper.exists()).toBe(true)
+  })
 })

@@ -33,7 +33,7 @@ export default normalize({
     divideFromMultiple: {
       type: 'select',
       name: '分隔',
-      initial: '',
+      initial: () => [],
       help: '从选中的分隔项开始，将导航项分隔为多个部分。',
       multiple: true,
       hidden: ({ cmpt }: any) => {
