@@ -8,7 +8,7 @@
 defineOptions({ name: 'cx-standup-list-layout' })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .standup-list-page {
   display: grid;
   grid-template-rows: 30px minmax(0, 1fr);

@@ -75,7 +75,7 @@ const content = useStandupContents(todoCardStandupID, userID, isTodoDisabled, (x
 })
 </script>
 
-<style lang="scss">
+<style>
 .cmpt-weekly-todo-card {
   width: 100%;
   height: 100%;

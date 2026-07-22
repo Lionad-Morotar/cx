@@ -47,7 +47,7 @@ onMounted(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .project-members-section {
   grid-area: project-members;
   position: relative;

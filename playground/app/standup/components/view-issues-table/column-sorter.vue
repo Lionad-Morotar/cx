@@ -41,7 +41,7 @@ const active = (sort: string) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .sorter {
   display: flex;
   flex-direction: column;

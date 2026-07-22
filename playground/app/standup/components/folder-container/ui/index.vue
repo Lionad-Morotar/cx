@@ -221,35 +221,31 @@ provide(FolderContainerCtxKey, {
 defineExpose(cmptExpose)
 </script>
 
-<style lang="scss">
-@import '../../../styles/mixins/index.scss';
-
-@include b('folder-container') {
+<style>
+.cx-folder-container {
   position: relative;
 
-  // 没有内容时隐藏缩放的 icon
+  /* 没有内容时隐藏缩放的 icon */
   &:has(> .c-folder-container__content-wrapper:empty) {
-    @include e('header') {
+    .cx-folder-container__header {
       .icon-preset {
         display: none;
       }
     }
   }
 
-  @include e('header') {
+  &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     white-space: nowrap;
 
     .icon-preset {
-      // * width height 23x23
       padding: 5px;
       border-radius: 2px;
       cursor: pointer;
       transition: 0.2s;
       user-select: none;
-      cursor: pointer;
 
       &:hover {
         opacity: 0.92;
@@ -268,7 +264,7 @@ defineExpose(cmptExpose)
     }
   }
 
-  @include e('content-wrapper') {
+  &__content-wrapper {
     height: unset;
     overflow: hidden;
     transition:

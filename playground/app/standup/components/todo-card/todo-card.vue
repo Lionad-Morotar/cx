@@ -575,9 +575,7 @@ defineExpose({
 })
 </script>
 
-<style lang="scss">
-@import '../../styles/mixins/index.scss';
-
+<style>
 .cx-todo-scroll-y,
 .cx-todo-scroll-x {
   &::-webkit-scrollbar {
@@ -606,7 +604,7 @@ defineExpose({
   }
 }
 
-@include b('todo-card') {
+.cx-todo-card {
   --line-height: 40px;
 
   position: relative;
@@ -623,37 +621,37 @@ defineExpose({
   transition: 0.15s;
   color: #262626;
 
-  @include when('disabled') {
+  &.is-disabled {
     background: #eff2fb;
 
-    @include e('actions') {
+    .cx-todo-card__actions {
       display: none;
     }
 
-    @include e('bg') {
+    .cx-todo-card__bg {
       background: none;
     }
 
     &:hover {
       background: #e4e7f1;
 
-      @include e('bg') {
+      .cx-todo-card__bg {
         background: none;
       }
     }
   }
-  @include when('empty') {
+  &.is-empty {
     background: transparent;
 
     &:not(is-disabled):hover {
       background: rgba(255, 255, 255, 0.38);
     }
   }
-  @include when('compact') {
-    @include e('todo-content') {
+  &.is-compact {
+    .cx-todo-card__todo-content {
       max-width: 100%;
 
-      @include e('line-content-wrapper') {
+      .cx-todo-card__line-content-wrapper {
         text-overflow: ellipsis;
         overflow: hidden;
         word-break: break-all;
@@ -661,7 +659,7 @@ defineExpose({
     }
   }
 
-  @include e('empty-con') {
+  &__empty-con {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -671,19 +669,18 @@ defineExpose({
     height: 100%;
     text-align: center;
 
-    @include e('image') {
+    /* 保留原 BEM 全名：template 实际用 class="image"/"title"，二者历史上不匹配 */
+    .cx-todo-card__image {
       width: 200px;
     }
-    @include e('title') {
+    .cx-todo-card__title {
       font-size: 18px;
       color: #373737;
     }
   }
 
-  // 滚动超出一定距离后，背景就失效了，
-  // 可能是受到了浏览器的渲染策略限制，
-  // 所以 line 也需要单独设置背景
-  @include e('bg') {
+  /* 滚动超出一定距离后背景失效（浏览器渲染策略），line 也需单独设置背景 */
+  &__bg {
     position: absolute;
     left: 14px;
     top: 12px;
@@ -698,12 +695,12 @@ defineExpose({
     transform: translateY(v-bind(scrollYPX));
   }
 
-  @include e('scroll-area-y') {
+  &__scroll-area-y {
     box-sizing: border-box;
     width: calc(100% + 12px);
     padding-right: 12px;
   }
-  @include e('scroll-area-x') {
+  &__scroll-area-x {
     flex: 1;
 
     .el-scrollbar__bar {
@@ -711,75 +708,18 @@ defineExpose({
     }
   }
 
-  @include e('content-wrapper') {
+  &__content-wrapper {
     display: flex;
   }
 
-  @include e('orders') {
+  &__orders {
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 calc(6px * v-bind(shadowX)) -4px rgba(0, 0, 0, 0.18);
     transition: 0.2s;
-
-    @include e('order') {
-      position: sticky;
-      left: 0;
-      display: grid;
-      place-items: center;
-      padding: 0 0.5em;
-      width: auto;
-      min-width: 1em;
-      height: calc(var(--line-height) + 1px);
-
-      @include e('order-number') {
-        position: relative;
-        top: -0.5px;
-        font-size: 15px;
-        color: #999;
-      }
-    }
   }
 
-  @include e('todo-content') {
-    display: flex;
-    flex-direction: column;
-    width: max-content;
-    padding: 0;
-    min-width: 100%;
-
-    @include e('line-content-wrapper') {
-      display: grid;
-      grid-template: repeat(auto-fill, var(--line-height)) / minmax(0, 1fr);
-      gap: 0 4px;
-      align-items: center;
-      box-sizing: border-box;
-      height: calc(var(--line-height) + 1px);
-
-      @include when('highlighted') {
-        animation: highlight 0.7s cubic-bezier(0, 0.99, 0.97, 0.82);
-
-        @keyframes highlight {
-          0% {
-            background: #ff4c4f00;
-            border-radius: 4px;
-            z-index: 2;
-          }
-          20% {
-            background: #ff4c4f43;
-          }
-          99% {
-            background: #ff4c4f00;
-            border-radius: 4px;
-          }
-          100% {
-            background: white;
-            border-radius: 0;
-          }
-        }
-      }
-    }
-  }
-  @include e('actions') {
+  &__actions {
     display: grid;
     place-items: center;
     padding: 0 0.5em;
@@ -789,7 +729,7 @@ defineExpose({
     height: var(--line-height);
     line-height: calc(var(--line-height) - 1px);
   }
-  @include e('line-content') {
+  &__line-content {
     box-sizing: border-box;
     margin: 0px;
     padding: 0;
@@ -818,19 +758,19 @@ defineExpose({
       display: none !important;
     }
 
-    @include when('first-mark') {
+    &.is-first-mark {
       text-indent: -0.35em;
     }
   }
 
   /* --------------------------- styles by edit-type -------------------------- */
 
-  @include when('text') {
-    @include e('input-con') {
+  &.is-text {
+    .cx-todo-card__input-con {
       display: none;
     }
   }
-  @include when('todo') {
+  &.is-todo {
     .el-checkbox__inner {
       width: 18px;
       height: 18px;
@@ -853,7 +793,7 @@ defineExpose({
       }
     }
 
-    @include e('input-con') {
+    .cx-todo-card__input-con {
       margin-top: 4px;
       margin-bottom: 12px;
 
@@ -871,10 +811,10 @@ defineExpose({
         }
       }
     }
-    @include e('bg') {
+    .cx-todo-card__bg {
       display: none;
     }
-    @include e('line-content') {
+    .cx-todo-card__line-content {
       height: fit-content;
       min-height: calc(var(--line-height) + 1px);
       line-height: calc(var(--line-height) + 1px);
@@ -883,7 +823,7 @@ defineExpose({
       white-space: normal;
     }
 
-    @include e('order') {
+    .cx-todo-card__order {
       display: flex;
       align-items: center;
       padding: 0 1em;
@@ -892,7 +832,7 @@ defineExpose({
     }
 
     &:not(.is-disabled) {
-      @include e('line-content-wrapper') {
+      .cx-todo-card__line-content-wrapper {
         &:hover {
           background: rgba(255, 76, 79, 0.05);
           border-radius: 4px;
@@ -900,19 +840,17 @@ defineExpose({
         }
       }
     }
-    @include e('todo-content') {
-      @include e('line-content-wrapper') {
+    .cx-todo-card__todo-content {
+      .cx-todo-card__line-content-wrapper {
         grid-template: auto / auto minmax(0, 1fr) auto;
         align-items: flex-start;
         width: 100%;
         height: fit-content;
         transition: background 0.2s;
         border-bottom: solid 1px #eff2fb;
-        // word-break: break-all;
-        // white-space: normal;
 
         &:hover {
-          @include e('action') {
+          .cx-todo-card__action {
             .el-icon {
               opacity: 1;
             }
@@ -927,15 +865,15 @@ defineExpose({
           border-color: transparent;
         }
 
-        @include when('checked') {
-          @include e('line-content') {
+        &.is-checked {
+          .cx-todo-card__line-content {
             color: #b4b4b4;
             text-decoration: line-through;
           }
         }
       }
 
-      @include e('action') {
+      .cx-todo-card__action {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -958,6 +896,66 @@ defineExpose({
         }
       }
     }
+  }
+}
+
+/* 以下 element 经 SCSS @at-root 从嵌套提升为扁平选择器，此处保持等价独立 */
+.cx-todo-card__order {
+  position: sticky;
+  left: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 0.5em;
+  width: auto;
+  min-width: 1em;
+  height: calc(var(--line-height) + 1px);
+}
+
+.cx-todo-card__order-number {
+  position: relative;
+  top: -0.5px;
+  font-size: 15px;
+  color: #999;
+}
+
+.cx-todo-card__todo-content {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  padding: 0;
+  min-width: 100%;
+}
+
+.cx-todo-card__line-content-wrapper {
+  display: grid;
+  grid-template: repeat(auto-fill, var(--line-height)) / minmax(0, 1fr);
+  gap: 0 4px;
+  align-items: center;
+  box-sizing: border-box;
+  height: calc(var(--line-height) + 1px);
+
+  &.is-highlighted {
+    animation: highlight 0.7s cubic-bezier(0, 0.99, 0.97, 0.82);
+  }
+}
+
+/* @keyframes 必须置于顶层：Lightning CSS minify 不接受嵌套在选择器内的 at-rule */
+@keyframes highlight {
+  0% {
+    background: #ff4c4f00;
+    border-radius: 4px;
+    z-index: 2;
+  }
+  20% {
+    background: #ff4c4f43;
+  }
+  99% {
+    background: #ff4c4f00;
+    border-radius: 4px;
+  }
+  100% {
+    background: white;
+    border-radius: 0;
   }
 }
 </style>

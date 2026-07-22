@@ -1,16 +1,13 @@
-@import url('./theme.less');
-@import url('./atomic.less');
-
 /* Reset：全局字号契约 13px（站会组件密度依赖此基准） */
 
 * {
-  font-size: @font-size--normal;
+  font-size: 13px;
 }
 :root {
-  --el-font-size-base: @font-size--normal;
+  --el-font-size-base: 13px;
 }
 body {
-  color: @font-color--normal;
+  color: #262626;
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
@@ -92,5 +89,16 @@ body {
     color: white;
     fill: currentColor;
     overflow: hidden;
+  }
+}
+
+/* atomic：聚焦描边（outline 不受 overflow:hidden 裁切） */
+.is-focus__useFocus {
+  outline: 2px solid #000;
+  outline-offset: -2px;
+  transition: 0.15s;
+
+  &.is-disabled {
+    outline: 2px solid currentColor;
   }
 }

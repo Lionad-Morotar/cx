@@ -35,7 +35,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss">
+<style>
 /* -------------------------------------------------------------------------- */
 /*                               page structure                               */
 /* -------------------------------------------------------------------------- */
@@ -52,7 +52,7 @@ export default defineComponent({
   grid-template-areas: 'boards todo users';
   gap: calc(36px - var(--shrink--gap, 0px));
 
-  // 小屏收缩由 --shrink 变量分档处理
+  /* 小屏收缩由 --shrink 变量分档处理 */
   @media (max-width: 1688px) {
     --shrink--gap: 4px;
     --shrink--todo: 40px;

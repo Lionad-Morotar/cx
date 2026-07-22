@@ -137,7 +137,7 @@ const displayMeetingOrder = (idx: number) => {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .standup-card {
   position: relative;
 }

@@ -235,7 +235,7 @@ defineExpose({
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .select-participants-dialog {
   :deep(.el-dialog__footer) {
     background: unset;

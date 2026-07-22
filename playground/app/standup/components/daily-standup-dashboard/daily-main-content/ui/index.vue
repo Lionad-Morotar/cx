@@ -288,10 +288,8 @@ defineExpose({
 })
 </script>
 
-<style lang="scss">
-@import '../../../../styles/mixins/index.scss';
-
-@include b('daily-main-content') {
+<style>
+.cx-daily-main-content {
   display: flex;
   justify-content: center;
   gap: 20px;

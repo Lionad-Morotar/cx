@@ -49,7 +49,7 @@ onErrorCaptured(() => {
 })
 </script>
 
-<style lang="scss">
+<style>
 .layout-content-main {
   width: 100%;
   height: 100%;

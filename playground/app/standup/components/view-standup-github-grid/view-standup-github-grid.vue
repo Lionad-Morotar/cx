@@ -185,14 +185,13 @@ const hasToday = computed(() => calendarItems.value.some((x) => isToday(x.day)))
 const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
 </script>
 
-<style lang="less">
-@item-size: 15px;
-
+<style>
 .standup-by-year {
+  --item-size: 15px;
   --days-per-week: v-bind(daysPerWeek);
   --months-per-year: v-bind(monthsPerYear);
 
-  @header: calc(1em + 12px);
+  --header: calc(1em + 12px);
 
   display: grid;
   gap: 0.35em 1em;
@@ -201,18 +200,18 @@ const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
   grid-template-areas:
     'weekdays scroll-area'
     '.        legends';
-  // for scrollbar
+  /* for scrollbar */
   padding-bottom: 16px;
 
-  @gap: 5px;
-  @height: calc(var(--days-per-week, 7) * @item-size + (var(--days-per-week, 7) - 1) * @gap);
+  --gap: 5px;
+  --height: calc(var(--days-per-week, 7) * var(--item-size) + (var(--days-per-week, 7) - 1) * var(--gap));
 
   .months {
     grid-area: months;
   }
   .weekdays {
     grid-area: weekdays;
-    margin-top: @header;
+    margin-top: var(--header);
   }
   .scroll-area {
     grid-area: scroll-area;
@@ -255,7 +254,7 @@ const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: @height;
+    height: var(--height);
 
     .weekday-name {
       font-size: 12px;
@@ -265,7 +264,7 @@ const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
   .calendar-col-pointer {
     display: grid;
     grid-template: 0 / repeat(auto-fill, 15px);
-    gap: @gap;
+    gap: var(--gap);
 
     .today-col-pointer {
       grid-area: 1 / var(--col);
@@ -287,17 +286,17 @@ const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
   }
   .calendar {
     display: grid;
-    grid-template: repeat(auto-fit, @item-size) / repeat(auto-fit, @item-size);
+    grid-template: repeat(auto-fit, var(--item-size)) / repeat(auto-fit, var(--item-size));
     grid-auto-flow: column;
-    gap: @gap;
+    gap: var(--gap);
     width: fit-content;
-    height: @height;
+    height: var(--height);
   }
 
   .day {
     box-sizing: border-box;
-    width: @item-size;
-    height: @item-size;
+    width: var(--item-size);
+    height: var(--item-size);
     border: solid 2px transparent;
     background: currentColor;
     color: #ececef;

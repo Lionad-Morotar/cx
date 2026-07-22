@@ -174,7 +174,7 @@ const checkBlink = (gitlabID: string) => {
 emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .issue-card {
   display: grid;
   grid-template: 20px auto auto auto / auto minmax(0, 1fr);
@@ -216,25 +216,6 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
 
   &.anim-blink {
     animation: blink 0.7s cubic-bezier(0, 0.99, 0.97, 0.82);
-
-    @keyframes blink {
-      0% {
-        background: white;
-        border-radius: 4px;
-        z-index: 2;
-      }
-      20% {
-        background: #fae08f;
-      }
-      99% {
-        background: white;
-        border-radius: 4px;
-      }
-      100% {
-        background: white;
-        border-radius: 0;
-      }
-    }
   }
 
   &.is-closed {
@@ -501,6 +482,25 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
       color: #f5222d;
       font-size: 13px;
     }
+  }
+}
+
+@keyframes blink {
+  0% {
+    background: white;
+    border-radius: 4px;
+    z-index: 2;
+  }
+  20% {
+    background: #fae08f;
+  }
+  99% {
+    background: white;
+    border-radius: 4px;
+  }
+  100% {
+    background: white;
+    border-radius: 0;
   }
 }
 </style>

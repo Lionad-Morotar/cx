@@ -114,10 +114,8 @@ const styles = computed(() => {
 })
 </script>
 
-<style lang="scss">
-@import '../../../styles/mixins/index.scss';
-
-@include b('dashboard-card') {
+<style>
+.cx-dashboard-card {
   position: relative;
   display: grid;
   grid-template: 70px minmax(0, 1fr) / minmax(0, 1fr);

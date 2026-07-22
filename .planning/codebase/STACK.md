@@ -9,8 +9,7 @@
 - Vue 3.5.26 SFC（单文件组件） — 渲染器、物料、playground 全部以 `.vue` 编写
 
 **次语言：**
-- SCSS / Sass（`sass-embedded@^1.100.0`） — `packages/renderer/src/styles`、`packages/components/src/styles`、`packages/components-nuxt-ui-v4/src/styles` 通过 `import './styles/index.scss'` 副作用引入；产物输出 `dist/style.css`
-- Less（`less@^4.4.2`） — 仅 `playground/app/standup/styles/*.less` 使用，由 Nuxt 内置 less 加载器编译
+- 原生 CSS（CSS Nesting） — `playground/app/standup` 全部组件样式为 `<style>` 原生 CSS，以 CSS nesting 表达 BEM 与状态层级；历史 SCSS BEM mixin 系统（`styles/mixins/`）与全局 Less（`index.less`/`theme.less`/`atomic.less`）已移除并合并为 `styles/index.css`。`sass-embedded`/`less` 仍在 devDependencies 但已无源码消费
 - Shell / Node.js 脚本 — `scripts/codemod-imports.mjs`、`playground/scripts/generate-mocks.mjs`、`scripts/aliases/`
 
 ## 运行时（Runtime）

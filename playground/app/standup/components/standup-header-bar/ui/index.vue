@@ -147,7 +147,7 @@ const handleContinueOrStarNewStandup = useAsync(async () => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .header-section {
   grid-area: time;
   display: flex;

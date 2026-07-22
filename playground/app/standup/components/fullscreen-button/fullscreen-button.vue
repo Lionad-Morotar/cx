@@ -54,7 +54,7 @@ defineExpose({
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .fullscreen-button.is-type-icon {
   flex-shrink: 0;
   gap: 0;

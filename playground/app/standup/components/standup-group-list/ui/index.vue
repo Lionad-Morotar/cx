@@ -37,7 +37,7 @@ const meetingTypeName = computed(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .list-con {
   display: flex;
   flex-direction: column;
@@ -52,8 +52,8 @@ const meetingTypeName = computed(
     color: #666;
   }
 
-  // 折叠/展开态样式：is-fold/is-unfold 在 folder-container 根上，
-  // 其视觉（背景、卡片与图标显隐）经 :deep 跨物料作用到后代
+  /* 折叠/展开态样式：is-fold/is-unfold 在 folder-container 根上，
+     其视觉（背景、卡片与图标显隐）经 :deep 跨物料作用到后代 */
   :deep(.cx-folder-container) {
     display: flex;
     flex-direction: column;

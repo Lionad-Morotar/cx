@@ -93,7 +93,7 @@ defineExpose({
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .user-select {
   display: flex;
   align-items: center;
@@ -169,7 +169,7 @@ defineExpose({
     opacity: 0;
   }
   &.is-current {
-    // border: solid 0.5px #1890ff;
+    /* border: solid 0.5px #1890ff; */
     box-shadow: 0 6px 26px rgba(0, 0, 0, 0.2);
     transform: scale(1.5);
     z-index: 1;

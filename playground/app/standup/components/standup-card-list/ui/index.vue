@@ -48,7 +48,7 @@ const countClass = computed(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .days-con {
   --count: 7;
   --gap-offset: 0px;

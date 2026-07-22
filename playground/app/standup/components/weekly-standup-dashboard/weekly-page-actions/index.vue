@@ -72,7 +72,7 @@ const stopStandupReq = useAsync(async () => {
 })
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .buttons-con {
   display: flex;
   align-items: center;

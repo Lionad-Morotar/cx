@@ -74,22 +74,20 @@ defineExpose({
 })
 </script>
 
-<style lang="scss">
-@import '../../../../styles/mixins/index.scss';
-
-@include b('todo-card') {
-  @include e('line-content') {
+<style>
+.cx-todo-card {
+  &__line-content {
     display: inline;
     cursor: text;
   }
-  @include e('mention-tag') {
+  &__mention-tag {
     display: inline-block;
     margin-right: 4px;
     height: 25px;
     line-height: 24px;
     cursor: pointer;
   }
-  @include e('line-content-text') {
+  &__line-content-text {
     display: inline;
     width: fit-content;
     height: 100%;

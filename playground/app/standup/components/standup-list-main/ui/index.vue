@@ -38,7 +38,7 @@ const groupByType = computed<'week' | 'month' | 'year'>(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .left-scroll-area {
   grid-area: left;
   display: grid;

@@ -405,7 +405,7 @@ defineExpose({
 })
 </script>
 
-<style lang="less">
+<style>
 .standup-issue-table {
   display: grid;
   grid-template: minmax(min-content, max-content) minmax(0, 1fr) / minmax(0, 1fr);
@@ -442,25 +442,6 @@ defineExpose({
 
     &.anim-blink {
       animation: blink 1.3s cubic-bezier(0, 0.99, 0.97, 0.82);
-
-      @keyframes blink {
-        0% {
-          background: white;
-          border-radius: 4px;
-          z-index: 2;
-        }
-        20% {
-          background: #fae08f;
-        }
-        99% {
-          background: white;
-          border-radius: 4px;
-        }
-        100% {
-          background: white;
-          border-radius: 0;
-        }
-      }
     }
 
     .column-item,
@@ -530,10 +511,10 @@ defineExpose({
 
       a {
         text-decoration: none;
-        // display: inline-block;
-        // overflow: hidden;
-        // text-overflow: ellipsis;
-        // white-space: nowrap;
+        /* display: inline-block; */
+        /* overflow: hidden; */
+        /* text-overflow: ellipsis; */
+        /* white-space: nowrap; */
         display: -webkit-box;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -625,6 +606,25 @@ defineExpose({
   .title {
     font-size: 18px;
     color: #373737;
+  }
+}
+
+@keyframes blink {
+  0% {
+    background: white;
+    border-radius: 4px;
+    z-index: 2;
+  }
+  20% {
+    background: #fae08f;
+  }
+  99% {
+    background: white;
+    border-radius: 4px;
+  }
+  100% {
+    background: white;
+    border-radius: 0;
   }
 }
 </style>

@@ -56,7 +56,7 @@ const deleteTab = (idx: number) => {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .label {
   display: flex;
   justify-content: space-between;

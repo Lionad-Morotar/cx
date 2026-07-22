@@ -45,7 +45,7 @@ watchEffect(() => {
 })
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .time-stamp {
   display: flex;
   align-items: center;

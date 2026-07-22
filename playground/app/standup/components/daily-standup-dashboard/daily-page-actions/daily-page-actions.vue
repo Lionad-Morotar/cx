@@ -73,10 +73,8 @@ defineExpose({
 })
 </script>
 
-<style lang="scss">
-@import '../../../styles/mixins/index.scss';
-
-@include b('daily-page-actions') {
+<style>
+.cx-daily-page-actions {
   .el-button,
   button {
     width: 80px;

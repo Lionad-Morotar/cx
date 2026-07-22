@@ -195,7 +195,7 @@ const userMetrics = computed(() => {
 })
 </script>
 
-<style lang="scss">
+<style>
 .issues-view-statics {
   background: white;
 

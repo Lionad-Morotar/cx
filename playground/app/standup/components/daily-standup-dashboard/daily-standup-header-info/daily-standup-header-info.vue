@@ -179,10 +179,8 @@ defineExpose({
 })
 </script>
 
-<style lang="scss">
-@import '../../../styles/mixins/index.scss';
-
-@include b('daily-standup-header-info') {
+<style>
+.cx-daily-standup-header-info {
   display: grid;
   grid-template-columns: 160px 30px 330px 30px 160px;
   place-items: center;

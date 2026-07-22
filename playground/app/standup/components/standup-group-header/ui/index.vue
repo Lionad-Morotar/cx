@@ -33,7 +33,7 @@ const groupByType = computed<'week' | 'month' | 'year'>(
 )
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .group-header {
   display: grid;
   grid-template: 24px / auto auto 1fr auto;

@@ -28,7 +28,7 @@ const standup = useStandupDetail()
 const isCurStandupInProgress = computed(() => standup.value.state === 'IN_PROGRESS')
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .user-tag {
   display: flex;
   justify-content: center;

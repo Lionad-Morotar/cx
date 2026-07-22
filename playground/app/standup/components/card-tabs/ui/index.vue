@@ -64,49 +64,48 @@ const props = withDefaults(
 const { isSelected, isDisabled, select } = useCardTabs(props, emits)
 </script>
 
-<style lang="scss">
-@import '../../../styles/mixins/index.scss';
-
-@include b('card-tabs') {
+<style>
+.cx-card-tabs {
   display: grid;
   grid-template: 54px minmax(0, 1fr) / minmax(0, 1fr);
 
-  @include e('tabs') {
+  &__tabs {
     display: flex;
     gap: 0;
     z-index: 1;
+  }
+}
 
-    @include e('item') {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      width: 138px;
-      height: 54px;
-      border-radius: 8px 8px 0 0;
-      background: transparent;
-      transition: 0.2s;
-      cursor: pointer;
-      flex-shrink: 0;
+/* item 原本嵌在 e('tabs') 内，SCSS 经 @at-root 提升为扁平选择器，此处等价独立 */
+.cx-card-tabs__item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: 138px;
+  height: 54px;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  transition: 0.2s;
+  cursor: pointer;
+  flex-shrink: 0;
 
-      &:hover {
-        background: #f9f9f9;
-      }
+  &:hover {
+    background: #f9f9f9;
+  }
 
-      @include when('active') {
-        background: #f0f2fb;
-        color: #337cfb;
-      }
+  &.is-active {
+    background: #f0f2fb;
+    color: #337cfb;
+  }
 
-      .text {
-        font-size: 17px;
-      }
+  .text {
+    font-size: 17px;
+  }
 
-      .icon {
-        width: 22px;
-        height: 22px;
-      }
-    }
+  .icon {
+    width: 22px;
+    height: 22px;
   }
 }
 </style>

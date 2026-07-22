@@ -185,10 +185,8 @@ defineExpose({
 })
 </script>
 
-<style lang="scss">
-@import '../../../styles/mixins/index.scss';
-
-@include b('daily-standup-filter') {
+<style>
+.cx-daily-standup-filter {
   display: grid;
   place-items: center;
   place-content: center;
@@ -197,7 +195,7 @@ defineExpose({
   width: 100%;
   height: 100%;
 
-  @include e('button') {
+  &__button {
     display: flex;
     justify-content: center;
     align-items: center;
