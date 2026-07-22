@@ -62,9 +62,7 @@ function onDayClick(_: any, event: MouseEvent) {
 </script>
 
 <style lang="scss">
-@use '../../styles/index.scss' as *;
-
-$ns: 'cx';
+@use '@lionad/cx-vue/styles' as *;
 
 @layer cx {
   :root {

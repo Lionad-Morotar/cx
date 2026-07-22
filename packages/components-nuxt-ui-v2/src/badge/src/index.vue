@@ -51,9 +51,7 @@ const ui = computed(() => (props.round ? { rounded: 'rounded-full' } : {}))
 </script>
 
 <style lang="scss">
-@use '../../styles/index.scss' as *;
-
-$ns: 'cx';
+@use '@lionad/cx-vue/styles' as *;
 
 @layer cx {
   @include b('badge') {

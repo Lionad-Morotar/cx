@@ -28,9 +28,7 @@
         </template>
         <template #description="x">
           <slot v-if="showSlot('description')" name="description" v-bind="x" />
-          <span v-else>{{
-            props.description
-          }}</span>
+          <span v-else>{{ props.description }}</span>
         </template>
       </UNotification>
     </teleport>
@@ -198,9 +196,7 @@ defineExpose({
 </script>
 
 <style lang="scss">
-@use '../../styles/index.scss' as *;
-
-$ns: 'cx';
+@use '@lionad/cx-vue/styles' as *;
 
 @layer cx {
   @include b('meter') {

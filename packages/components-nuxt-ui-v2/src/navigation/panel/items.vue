@@ -1,10 +1,6 @@
 <template>
   <div class="form">
-    <UFormGroup
-      v-for="(tab, idx) in value"
-      :key="`${idx}-${tab.value}`"
-      class="tab-item"
-    >
+    <UFormGroup v-for="(tab, idx) in value" :key="`${idx}-${tab.value}`" class="tab-item">
       <template #label>
         <div class="label">
           <span>{{ `${'项目'} ${idx + 1}` }}</span>

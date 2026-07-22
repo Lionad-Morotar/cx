@@ -17,7 +17,10 @@
       <slot name="default-start" />
 
       <slot v-if="showSlot(tab.value)" :name="tab.value" v-bind="x" />
-      <div v-else class="flex flex-col items-center justify-center py-6 text-sm text-neutral-500 dark:text-neutral-400">
+      <div
+        v-else
+        class="flex flex-col items-center justify-center py-6 text-sm text-neutral-500 dark:text-neutral-400"
+      >
         <UIcon name="i-lucide-inbox" class="mb-2 size-6 opacity-60" />
         <span>{{ `${tab.label || ''}` }}内没有内容</span>
       </div>
@@ -117,9 +120,7 @@ defineExpose({
 </script>
 
 <style lang="scss">
-@use '../../styles/index.scss' as *;
-
-$ns: 'cx';
+@use '@lionad/cx-vue/styles' as *;
 
 @layer cx {
   @include b('tabs') {

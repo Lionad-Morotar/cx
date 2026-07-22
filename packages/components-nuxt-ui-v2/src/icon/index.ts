@@ -1,7 +1,6 @@
 import { normalize } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-// same with p-icon, todo, merge them into one
 export default normalize({
   key: 'cx-icon',
   name: '图标',

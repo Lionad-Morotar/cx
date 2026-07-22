@@ -32,7 +32,11 @@
             <UInput v-model="item.label" />
           </UFormGroup>
         </template>
-        <UButton class="mt-2 w-full text-center" variant="outline" @click="() => addActionItem(gIDX)">
+        <UButton
+          class="mt-2 w-full text-center"
+          variant="outline"
+          @click="() => addActionItem(gIDX)"
+        >
           添加菜单项
         </UButton>
       </div>

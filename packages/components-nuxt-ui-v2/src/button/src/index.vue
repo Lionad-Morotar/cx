@@ -70,9 +70,7 @@ const iconPos = computed(() => props.iconPos || 'leading')
 </script>
 
 <style lang="scss">
-@use '../../styles/index.scss' as *;
-
-$ns: 'cx';
+@use '@lionad/cx-vue/styles' as *;
 
 @layer cx {
   @include b('button') {
@@ -81,9 +79,9 @@ $ns: 'cx';
 }
 @include b('button') {
   &:has(> span:empty + .iconify),
-  &:has(> span:empty + .p-icon),
+  &:has(> span:empty + .cx-icon),
   &:has(> .iconify + span:empty),
-  &:has(> .p-icon + span:empty) {
+  &:has(> .cx-icon + span:empty) {
     gap: 0;
   }
 }

@@ -1,12 +1,7 @@
 <template>
   <!-- cx-button-group：包装 vendored UButtonGroup，default slot 透传子按钮；
        UButtonGroup 通过 useProvideButtonGroup 向子按钮注入尺寸/方向/圆角上下文 -->
-  <UButtonGroup
-    ref="cmpt"
-    :class="ns.b()"
-    :orientation="props.orientation"
-    :size="props.size"
-  >
+  <UButtonGroup ref="cmpt" :class="ns.b()" :orientation="props.orientation" :size="props.size">
     <slot />
   </UButtonGroup>
 </template>
@@ -31,9 +26,7 @@ const cmptRef = useTemplateRef('cmpt')
 </script>
 
 <style lang="scss">
-@use '../../styles/index.scss' as *;
-
-$ns: 'cx';
+@use '@lionad/cx-vue/styles' as *;
 
 @layer cx {
   @include b('button-group') {

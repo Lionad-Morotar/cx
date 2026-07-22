@@ -62,17 +62,25 @@ describe('nuxt-ui-v2 物料 smoke', () => {
   // 子节点透传受 @vue/test-utils slot 注入与 getSlotsChildren 交互影响，留待验收页验证
   it('cx-button-group 挂载（vendored UButtonGroup 离线渲染）', () => {
     const cmpt = byKey('cx-button-group')
-    const wrapper = mountMaterial(cmpt, { orientation: 'horizontal' }, {
-      slots: { default: () => h('span', '保存') },
-    })
+    const wrapper = mountMaterial(
+      cmpt,
+      { orientation: 'horizontal' },
+      {
+        slots: { default: () => h('span', '保存') },
+      },
+    )
     expect(wrapper.exists()).toBe(true)
   })
 
   it('cx-meter-group 挂载（UMeterGroup 严格要求 Meter 子节点）', () => {
     const cmpt = byKey('cx-meter-group')
-    const wrapper = mountMaterial(cmpt, { min: 0, max: 100 }, {
-      slots: { default: () => h(UMeter, { value: 60, label: 'a' }) },
-    })
+    const wrapper = mountMaterial(
+      cmpt,
+      { min: 0, max: 100 },
+      {
+        slots: { default: () => h(UMeter, { value: 60, label: 'a' }) },
+      },
+    )
     expect(wrapper.exists()).toBe(true)
   })
 

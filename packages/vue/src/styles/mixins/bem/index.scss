@@ -1,7 +1,7 @@
 @use 'sass:meta';
 @use 'sass:string';
 
-$ns: 'p' !default;
+$ns: 'cx' !default;
 $common-separator: '-' !default;
 $element-separator: '__' !default;
 $modifier-separator: '--' !default;
@@ -46,8 +46,7 @@ $state-prefix: 'is-' !default;
 }
 
 @function hitAllSpecialNestRule($selector) {
-  @return containsModifier($selector) or containWhenFlag($selector) or
-    containPseudoClass($selector);
+  @return containsModifier($selector) or containWhenFlag($selector) or containPseudoClass($selector);
 }
 
 // BEM

@@ -4,7 +4,8 @@
   "description": "cx Vue runtime: composables and shared runtime components",
   "license": "MIT",
   "files": [
-    "dist"
+    "dist",
+    "src/styles"
   ],
   "type": "module",
   "sideEffects": false,
@@ -15,7 +16,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs"
     },
-    "./style": "./dist/style.css"
+    "./style": "./dist/style.css",
+    "./styles": "./src/styles/index.scss"
   },
   "publishConfig": {
     "access": "public"

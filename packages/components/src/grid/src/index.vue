@@ -76,9 +76,7 @@ const getSlotArea = (rIdx: number, cIdx: number) => {
 </script>
 
 <style lang="scss">
-@use '../../styles/index.scss' as *;
-
-$ns: 'cx';
+@use '@lionad/cx-vue/styles' as *;
 
 @layer cx {
   @include b('grid') {

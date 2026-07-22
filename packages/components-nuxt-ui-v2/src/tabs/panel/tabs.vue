@@ -1,10 +1,6 @@
 <template>
   <div class="form">
-    <UFormGroup
-      v-for="(tab, idx) in value"
-      :key="`${idx}-${tab.value}`"
-      class="tab-item"
-    >
+    <UFormGroup v-for="(tab, idx) in value" :key="`${idx}-${tab.value}`" class="tab-item">
       <template #label>
         <div class="label">
           <span>{{ `${'标签页'} ${idx + 1}` }}</span>
@@ -14,9 +10,7 @@
       <UInput v-model="tab.name" />
     </UFormGroup>
 
-    <UButton class="mt-4 w-full text-center" color="primary" @click="addTab">
-      添加标签页
-    </UButton>
+    <UButton class="mt-4 w-full text-center" color="primary" @click="addTab"> 添加标签页 </UButton>
   </div>
 </template>
 

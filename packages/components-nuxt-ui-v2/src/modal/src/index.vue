@@ -1,12 +1,7 @@
 <template>
   <button ref="cmpt" :class="ns.b()" v-bind="attrs">
     <slot v-if="showSlot('trigger')" name="trigger" />
-    <UButton
-      v-else
-      color="neutral"
-      variant="outline"
-      :label="props.label"
-    />
+    <UButton v-else color="neutral" variant="outline" :label="props.label" />
 
     <UModal
       v-if="isOpen"
@@ -205,9 +200,7 @@ defineExpose({
 </script>
 
 <style lang="scss">
-@use '../../styles/index.scss' as *;
-
-$ns: 'cx';
+@use '@lionad/cx-vue/styles' as *;
 
 @layer cx {
   @include b('modal') {
