@@ -1,2 +1,22 @@
 @import 'tailwindcss';
+/* VTU 文档化安装契约：紧跟 @import "tailwindcss" 之后 @import 其 style.css，
+   使内置 @theme 注册 shadcn 颜色 token、@source 扫描 dist 生成全部工具类（含颜色）。
+   放在 @nuxt/ui 之前：vtu 用 shadcn 命名(--color-muted/card/foreground/border)，与 Nuxt UI 的
+   --ui-* 及 primary/neutral 命名几乎不重叠，故全局合并不互覆盖；万一同名，让 Nuxt UI(在后) 取胜以保护框架外观 */
+@import '@lionad/vtu-components/style.css';
 @import '@nuxt/ui';
+
+/* 站会布局契约：文档层钉死视口并禁滚，由各页 .page（height:100% + overflow-y:auto）充当唯一滚动容器，
+   消除双滚动。components.vue 的同名注释此前只是契约声明、并未真正在全局实现，故直开某页时 #__nuxt
+   会塌成内容高度、回退到文档滚动；此处补齐全局一侧（.page 的直接父级即 #__nuxt，UApp 为 fragment 无包裹层） */
+html,
+body {
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+#__nuxt {
+  height: 100%;
+  overflow: hidden;
+}

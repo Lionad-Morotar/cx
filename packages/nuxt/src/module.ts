@@ -94,12 +94,10 @@ const module: NuxtModule<CxNuxtModuleOptions> = defineNuxtModule<CxNuxtModuleOpt
       nuxt.options.css.push('v-calendar/dist/style.css')
     }
 
-    // vtu 样式仅 vtu bundle 启用时注入：style.css 自带 `@source "."` 指令，须经宿主
-    // Tailwind v4 处理以扫描 vtu dist 生成工具类（tokens + 结构 CSS 已内联其中）；
-    // 该依赖归属 vtu 物料包，无条件注入会对未装 vtu 的宿主产生解析负担
-    if (options.injectStyles && specs.some((s) => s.package === '@lionad/cx-components-vtu')) {
-      nuxt.options.css.push('@lionad/vtu-components/style.css')
-    }
+    // vtu 样式不在模块侧注入：按 VTU 安装契约（见 tool-ui-vue skill），消费者须在入口 css 的
+    // `@import "tailwindcss"` 之后 `@import "@lionad/vtu-components/style.css"`，由其内置 @theme 注册颜色
+    // token、@source 扫描 dist 生成工具类。模块侧自行扫描会因缺 @theme 致颜色工具类不生成（边框回退
+    // currentColor 发黑、bg/text 色丢失），故弃用扫描方案，交还宿主入口 css 负责。
 
     // 虚拟模块桥接：仅启用的包出现在 import 语句中——未启用的物料包不会被构建期
     // 解析（v4 物料依赖宿主 @nuxt/ui 的 #components，未启用即不解析，维持真 opt-in）

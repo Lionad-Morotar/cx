@@ -136,7 +136,9 @@ const log = (meta: CxMeta, node: unknown) => console.log(meta, node)
   border: 1px dashed #e5e7eb;
   border-radius: 6px;
   min-height: 48px;
-  /* 有界预览高度：vtu 组件自包含样式，流内高度受祖先约束，max-height 收口 + overflow 滚动 */
+  /* 有界预览高度：vtu 组件自包含样式，流内高度受祖先约束，max-height 收口 + overflow 滚动。
+     注：geo-map 画布高度由 vtu 自身的 h-[320px] 工具类提供（经入口 css @import vtu style.css 后，
+     其内置 @source 扫描 dist 生成），故此处的 min/max + flex 既能贴合短组件、又能为 320 画布撑出确定高度，无需固定 height */
   max-height: 320px;
   display: flex;
   align-items: center;
