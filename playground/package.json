@@ -16,6 +16,7 @@
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-nuxt": "workspace:*",
     "@lionad/cx-render": "workspace:*",
+    "@lionad/cx-stream": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
     "@nuxt/ui": "^4.10.0",
     "@unhead/vue": "^3.1.8",

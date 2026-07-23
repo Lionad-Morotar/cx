@@ -544,6 +544,9 @@ importers:
       '@lionad/cx-render':
         specifier: workspace:*
         version: link:../packages/renderer
+      '@lionad/cx-stream':
+        specifier: workspace:*
+        version: link:../packages/stream
       '@lionad/cx-vue':
         specifier: workspace:*
         version: link:../packages/vue

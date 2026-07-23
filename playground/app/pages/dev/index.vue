@@ -40,6 +40,11 @@ const links = [
     name: 'cx components · vtu',
     desc: 'tool-ui-vue 工具组件物料，按官方分类（Data Display / Code & Terminal / Media / Social / Forms & Input / Workflow）组织',
   },
+  {
+    to: '/dev/stream',
+    name: 'cx stream · 流式结构化渲染',
+    desc: '流式管线验收：模拟 LLM 输出不完整 JSON，演示三态检测、Route Z 增量渲染、打字机预览与多策略切分',
+  },
 ] as const
 </script>
 
