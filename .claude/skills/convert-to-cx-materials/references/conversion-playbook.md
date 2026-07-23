@@ -5,7 +5,7 @@
 
 ## §1 包骨架
 
-目录形态（每物料一个目录，**必有** `index.ts` + `src/index.vue`；按需加 `slots/`/`types/`/`panel/`）：
+目录形态（每物料一个目录，必有 `index.ts` + `src/index.vue`；按需加 `slots/`/`types/`/`panel/`）：
 
 ```
 packages/components-<lib>/
@@ -50,7 +50,7 @@ packages/components-<lib>/
 }
 ```
 
-> 仅当本包自己有 `<style>` 产物时才加 `"./style.css": "./dist/style.css"` 到 exports；纯薄包装层（样式来自被包装库）**不要**加。
+> 仅当本包自己有 `<style>` 产物时才加 `"./style.css": "./dist/style.css"` 到 exports；纯薄包装层（样式来自被包装库）不要加。
 
 `tsconfig.json`：
 
@@ -62,7 +62,7 @@ packages/components-<lib>/
 
 `tsconfig.build.json`：在上面基础上加 `"noEmit": false, "declaration": true, "emitDeclarationOnly": true, "outDir": "dist"`。
 
-`vite.config.ts`（`neverBundle` 外置 vue/cx 包/**被包装库**——保持共享、减小体积）：
+`vite.config.ts`（`neverBundle` 外置 vue/cx 包/被包装库——保持共享、减小体积）：
 
 ```ts
 import { defineConfig } from 'vite-plus'
@@ -104,7 +104,7 @@ const vtuProps = useVtuProps<LibComponentProps>(useAttrs(), 'cx-lib-name')
 
 - `inheritAttrs: false` + 显式 `v-bind`：阻止 cx 内部键自动 fallthrough 到被包装组件根 DOM。
 - 块顺序遵循 cx 约定 `<template>` → `<script setup lang="ts">` → `<style>`；`defineOptions.name` 与 key 的 PascalCase 一致。
-- **不要** `defineProps` 声明业务 props（cx 把 data 当 attrs 灌入，用 `useAttrs` 接；且 Guard 恒真，见 system §2）。
+- 不要 `defineProps` 声明业务 props（cx 把 data 当 attrs 灌入，用 `useAttrs` 接；且 Guard 恒真，见 system §2）。
 
 ## §3 normalize 定义 + props 映射策略
 
@@ -122,7 +122,7 @@ export default normalize({
 })
 ```
 
-**映射哲学**：可 authored 的**标量** → 编辑器控件；**结构化数据**（数组/嵌套对象）→ `type: 'json'` + **函数** initial。
+映射哲学：可 authored 的标量 → 编辑器控件；结构化数据（数组/嵌套对象）→ `type: 'json'` + 函数 initial。
 
 | 被包装库 prop 形态 | cx 控件 | 备注 |
 |---|---|---|
@@ -131,14 +131,14 @@ export default normalize({
 | number | `number` | `initial: 0` 合法（非 undefined 即纳入） |
 | boolean | `switch` | |
 | 枚举字面量 | `card-selector`（带 `isPreview:true` + `options:[{label,value}]`）或 `select` | |
-| 数组/对象 | `json` | **`initial: () => [...]`**（必须函数） |
+| 数组/对象 | `json` | `initial: () => [...]`（必须函数） |
 | icon 名 | `icon` | |
 | 颜色 | `color` | |
 | 需 bespoke 编辑器 | `custom`（配 `component` 面板） | 复杂才用 |
 
-**避免键名冲突**：若编辑器专用键与被包装组件同名 prop 冲突，用 `_` 前缀（composable 会剥离 `_` 前缀键，不透传）。
+避免键名冲突：若编辑器专用键与被包装组件同名 prop 冲突，用 `_` 前缀（composable 会剥离 `_` 前缀键，不透传）。
 
-**emits**：v1 可暂不声明（wrapper 无 `defineEmits` 时 Guard 的 emits 子检查不恒真，声明反而可能编译报错）。需要事件能力时，wrapper 加 `defineEmits([...])` 并在模板桥接被包装库事件，再在 meta 声明对应 emits（schema 用 zod）。
+emits：v1 可暂不声明（wrapper 无 `defineEmits` 时 Guard 的 emits 子检查不恒真，声明反而可能编译报错）。需要事件能力时，wrapper 加 `defineEmits([...])` 并在模板桥接被包装库事件，再在 meta 声明对应 emits（schema 用 zod）。
 
 ## §4 通用 attrs 提纯 composable
 
@@ -173,19 +173,19 @@ export function useVtuProps<T extends object>(
 }
 ```
 
-> 命名 `useVtuProps` 是 vtu 案例的；换库时改成 `use<Lib>Props`。若你的库**没有**必填 id，可去掉 id 回退分支。
-> 若你想让 cx 编辑器选区标记也落到 DOM（编辑器集成场景），则**不要**剥离 `data-cx-cmpt-*`——按需调整剥离集合。
+> 命名 `useVtuProps` 是 vtu 案例的；换库时改成 `use<Lib>Props`。若你的库没有必填 id，可去掉 id 回退分支。
+> 若你想让 cx 编辑器选区标记也落到 DOM（编辑器集成场景），则不要剥离 `data-cx-cmpt-*`——按需调整剥离集合。
 
 ## §5 逐类型组件配方（json initial 样本必须满足目标库 zod）
 
-为每个组件构造 initial 前，**读目标库该组件的 schema**，特别注意 `superRefine`/判别联合/范围约束。常见坑：
+为每个组件构造 initial 前，读目标库该组件的 schema，特别注意 `superRefine`/判别联合/范围约束。常见坑：
 
 - **判别联合 format**：如 `{ kind: 'currency', currency: 'CNY' }`、`{ kind: 'boolean' }`——`kind` 字面量必须对，缺字段会校验失败。
 - **范围/不变量**：slider 的 `max > min` 且 `value ∈ [min,max]`；地图 `lat∈[-90,90]`、`lng∈[-180,180]`；图库 item `width>0 && height>0`；图表 data 行须含 `xKey` + 各 series key 且为有限数；选项列表 `minSelections ≤ maxSelections`。
 - **url 字段**：用合法 `https://...`（picsum.photos 等占位图可用）；有的库 url 还 refine 必须 http(s)。
 - **嵌套必填**：如天气 `location.name` + `units.temperature` + `current{conditionCode,temperature,tempMin,tempMax}` + `forecast[]{label,conditionCode,tempMin,tempMax}` 全必填。
 
-样本目标：**最小但有效**，让验收卡渲染出有意义的真实内容。
+样本目标：最小但有效，让验收卡渲染出有意义的真实内容。
 
 ## §6 cx-nuxt 注册
 
@@ -201,13 +201,13 @@ if (options.injectStyles && specs.some((s) => s.package === '@lionad/cx-componen
 }
 ```
 
-> 改完 module.ts **必须** `pnpm -F @lionad/cx-nuxt build`（playground 消费 dist）。
+> 改完 module.ts 必须 `pnpm -F @lionad/cx-nuxt build`（playground 消费 dist）。
 
 ## §7 playground 接入 + 验收页 + 分类契约
 
-1. `playground/package.json` dependencies 加 `"@lionad/cx-components-<lib>": "workspace:*"`（**必须**——虚拟模块在宿主上下文解析）。
+1. `playground/package.json` dependencies 加 `"@lionad/cx-components-<lib>": "workspace:*"`（必须——虚拟模块在宿主上下文解析）。
 2. `playground/nuxt.config.ts` 的 `materials` 数组加 `'<lib>'`。
-3. `playground/app/dev/<lib>-categories.ts`：`CATEGORY_ORDER` + `OFFICIAL_KEYS`（目标库官方分类清单）+ `CATEGORY_BY_KEY`（**一次性建全所有 key 映射**，增量安全）+ `groupByCategory`（未映射 key **抛错**）。
+3. `playground/app/dev/<lib>-categories.ts`：`CATEGORY_ORDER` + `OFFICIAL_KEYS`（目标库官方分类清单）+ `CATEGORY_BY_KEY`（一次性建全所有 key 映射，增量安全）+ `groupByCategory`（未映射 key 抛错）。
 4. `playground/app/pages/dev/components-<lib>.vue`：复刻 v4 页——`import { CxLib }` → `materials.map(toItem)` → `groupByCategory` → 每组 `<CxRender v-if="!item.meta.headless" :components="[item.node]" />`。预览容器加 `max-height + overflow:auto` 收口高物料。
 5. `app/pages/dev/index.vue` + `app/components/dev-pages-nav.vue` 各加一条链接。
 6. `playground/tests/<lib>-categories.test.ts`：
@@ -230,24 +230,24 @@ it('groupByCategory 全覆盖不抛错', () => {
 被包装库样式分三类，处理不同：
 
 - **自带编译好的 css**（utility 已内含）：cx-nuxt 条件注入即可，浏览器直接看效果。
-- **Tailwind v4 `@source` 形态**（utility 由消费方扫描生成，如 vtu）：cx-nuxt 注入其 `style.css`，**依赖宿主 Tailwind v4 处理 `@source`** 扫描被包装库 dist 生成 utility。必须在浏览器实证——看不到样式 = utility 没生成，备选在宿主 `main.css` 显式 `@source "<被包装库 dist 路径>"`。
+- **Tailwind v4 `@source` 形态**（utility 由消费方扫描生成，如 vtu）：cx-nuxt 注入其 `style.css`，依赖宿主 Tailwind v4 处理 `@source` 扫描被包装库 dist 生成 utility。必须在浏览器实证——看不到样式 = utility 没生成，备选在宿主 `main.css` 显式 `@source "<被包装库 dist 路径>"`。
 - **依赖运行时 JS 注入样式**：按被包装库要求，必要时在物料包运行时注入（参考 v4 的 ui replacer 经验）。
 
-> 验收页**截图**是唯一可信证据；curl 200 只证明壳，不证明样式。
+> 验收页截图是唯一可信证据；curl 200 只证明壳，不证明样式。
 
 ## §9 构建/验证工作流（含 dev server 时序竞态）
 
 - 新建/改物料包后：`pnpm install`（链接）→ 改完源码 `pnpm -F @lionad/cx-components-<lib> build`（playground 吃 dist）。
 - 改 materials 开关后：`pnpm -C playground exec nuxi prepare`（刷新 `#build/cx-bundles.mjs`）。
-- **dev server 时序竞态**：重启 dev server 后，Vite 首次请求才触发依赖预优化（重依赖库优化耗时长）；**优化完成前**访问页面会 `Failed to fetch dynamically imported module ...entry.js` 或整页 500。
-  自动化截图前**轮询 dev log 的 `dependencies optimized`** 再导航；导航前可先 `navigate about:blank` 丢弃旧 module graph 避免粘住失效 `?v=` hash。
+- **dev server 时序竞态**：重启 dev server 后，Vite 首次请求才触发依赖预优化（重依赖库优化耗时长）；优化完成前访问页面会 `Failed to fetch dynamically imported module ...entry.js` 或整页 500。
+  自动化截图前轮询 dev log 的 `dependencies optimized` 再导航；导航前可先 `navigate about:blank` 丢弃旧 module graph 避免粘住失效 `?v=` hash。
 - 验证顺序：包测试 → 全量 `pnpm test`（加超时）→ `pnpm typecheck` → `pnpm check --fix` → 浏览器实证 → 重建 dist。
 
 ## §10 git：macOS 大小写陷阱
 
 case-insensitive FS 上 `git add WRONGCASE.md`（磁盘为 `RightCase.md`）会触发 case-rename 混淆：编辑不进 commit、工作树「假 modified」。
 诊断：`git ls-files | rg -i '^rightcase.md$'` 看索引真实大小写；`git show HEAD:<file>` 看已提交内容是否含你的编辑。
-修复：用**磁盘一致的大小写** `git add RightCase.md` 后 `git commit --amend --no-edit`。
+修复：用磁盘一致的大小写 `git add RightCase.md` 后 `git commit --amend --no-edit`。
 
 ## §11 分批提交（垂直切片，每 commit 可独立构建/测试）
 
