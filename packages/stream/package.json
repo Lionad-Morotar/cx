@@ -1,0 +1,37 @@
+{
+  "name": "@lionad/cx-stream",
+  "version": "0.1.0",
+  "description": "Streaming structured-render pipeline: incrementally parse incomplete LLM JSON into renderable cx component trees",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "typecheck": "tsgo --noEmit"
+  },
+  "dependencies": {
+    "jsonrepair": "^3.15.0",
+    "remove-markdown": "^0.6.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "vue": "^3.5.40"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  }
+}

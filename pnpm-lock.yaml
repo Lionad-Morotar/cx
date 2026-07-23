@@ -450,6 +450,22 @@ importers:
         specifier: ^3.3.7
         version: 3.3.7(typescript@6.0.3)
 
+  packages/stream:
+    dependencies:
+      jsonrepair:
+        specifier: ^3.15.0
+        version: 3.15.0
+      remove-markdown:
+        specifier: ^0.6.4
+        version: 0.6.4
+    devDependencies:
+      '@types/node':
+        specifier: ^26.1.1
+        version: 26.1.1
+      vue:
+        specifier: 3.5.26
+        version: 3.5.26(typescript@7.0.2)
+
   packages/vue:
     dependencies:
       '@iconify/vue':
@@ -5085,6 +5101,10 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
+  jsonrepair@3.15.0:
+    resolution: {integrity: sha512-wy8OTjwsJwQRnQJkKnMJJ9vcytRdBPAgIF/Hy6+s1dAj42BHMKiyL8JzEieIl3JY7idt8eyHwBWTO8mh/+mtwA==}
+    hasBin: true
+
   kareem@2.6.3:
     resolution: {integrity: sha512-C3iHfuGUXK2u8/ipq9LfjFfXFxAZMQJJq7vLS45r3D9Y2xQ/m4S8zaR4zMLFWh9AsNPXmcFfUDhTEO8UIC/V6Q==}
     engines: {node: '>=12.0.0'}
@@ -6165,6 +6185,9 @@ packages:
     resolution: {integrity: sha512-drcOQ4rQtDYAcGCsyQBqQg8QQ+H3B+zDaMJU0h8KPEPMa7g9BHu3zcOi4OB39XJSWizceFoNO0Z9tctSGLOXqg==}
     peerDependencies:
       vue: 3.5.26
+
+  remove-markdown@0.6.4:
+    resolution: {integrity: sha512-BompiLClzjfh46irZmzv+1Q61jZYlKN3iq/hzae9EOUwf7ctr/5wpD4qwgn/FWDAYE18RORO7z/yr+HXZJCY8Q==}
 
   resolve-from@5.0.0:
     resolution: {integrity: sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==}
@@ -12450,6 +12473,8 @@ snapshots:
 
   json5@2.2.3: {}
 
+  jsonrepair@3.15.0: {}
+
   kareem@2.6.3: {}
 
   kdbush@4.1.0: {}
@@ -14100,6 +14125,8 @@ snapshots:
       vue: 3.5.26(typescript@7.0.2)
     transitivePeerDependencies:
       - '@vue/composition-api'
+
+  remove-markdown@0.6.4: {}
 
   resolve-from@5.0.0: {}
 
