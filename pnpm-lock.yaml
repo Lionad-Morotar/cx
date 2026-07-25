@@ -601,13 +601,6 @@ importers:
       vuedraggable:
         specifier: ^4.1.0
         version: 4.1.0(vue@3.5.26(typescript@7.0.2))
-    devDependencies:
-      less:
-        specifier: ^4.4.2
-        version: 4.7.0(supports-color@10.2.2)
-      sass-embedded:
-        specifier: ^1.100.0
-        version: 1.100.0
 
 packages:
 
@@ -11739,6 +11732,7 @@ snapshots:
   copy-anything@3.0.5:
     dependencies:
       is-what: 4.1.16
+    optional: true
 
   core-util-is@1.0.3: {}
 
@@ -12608,7 +12602,8 @@ snapshots:
 
   is-stream@3.0.0: {}
 
-  is-what@4.1.16: {}
+  is-what@4.1.16:
+    optional: true
 
   is-wsl@3.1.1:
     dependencies:
@@ -12689,6 +12684,7 @@ snapshots:
       source-map: 0.6.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   lib0@0.2.117:
     dependencies:
@@ -13790,7 +13786,8 @@ snapshots:
 
   package-manager-detector@1.8.0: {}
 
-  parse-node-version@1.0.1: {}
+  parse-node-version@1.0.1:
+    optional: true
 
   parseurl@1.3.3: {}
 
