@@ -1,5 +1,5 @@
 <template>
-  <button ref="cmpt" :class="ns.b()" v-bind="attrs" @click="openToast">
+  <button ref="comp" :class="ns.b()" v-bind="attrs" @click="openToast">
     <slot v-if="showSlot('trigger')" name="trigger" />
     <UButton v-else color="neutral" variant="outline">
       <span>{{ props.label }}</span>
@@ -44,7 +44,7 @@ import { useAttrs, useTemplateRef, computed, ref, watch, watchEffect } from 'vue
 
 import { UButton, UNotification } from '../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey, has, useCleanups, safeNum } from '@lionad/cx-definition'
+import { CxEventDisplayCompKey, has, useCleanups, safeNum } from '@lionad/cx-definition'
 import { useCxSlot, useCxEditMode, useCxBEM, safeIcon, useQueryCached } from '@lionad/cx-vue'
 import { useToast } from '../hooks/use-toast'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
@@ -58,14 +58,14 @@ const ns = useCxBEM('meter')
 const emits = defineEmits(['update:value'])
 const inner = defineProps<{}>()
 const props = useAttrs() as UToastProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   label?: string
 }
-// console.log('[info] cmpt meter -> ', props, inner)
+// console.log('[info] comp meter -> ', props, inner)
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const attrs = computed(() => ({}) as const)
@@ -78,7 +78,7 @@ const findRegionPlaceholder = useQueryCached('.cx-notifications-placeholder')
 const showRegion = computed(() => !findExistRegion && has(findRegionPlaceholder.value))
 
 const notifications = computed(() => {
-  return toast.notifications.value.filter((x) => x.id.startsWith(props.cmpt.id))
+  return toast.notifications.value.filter((x) => x.id.startsWith(props.comp.id))
 })
 
 const cxToastRegionStyle = ref({
@@ -128,7 +128,7 @@ if (!findExistRegion) {
 
 const openToast = () =>
   toast.add({
-    id: props.cmpt.id + '-' + String(props.id || new Date().getTime().toString()),
+    id: props.comp.id + '-' + String(props.id || new Date().getTime().toString()),
     title: props.title || '通知',
     description: props.description || '',
     icon: safeIcon(props.icon),
@@ -138,14 +138,14 @@ const removeToast = (_id: string) => {
   toast.remove(_id)
 }
 const isOpen = computed(() => {
-  return has(toast.notifications.value.find((x) => x.id.startsWith(props.cmpt.id)))
+  return has(toast.notifications.value.find((x) => x.id.startsWith(props.comp.id)))
 })
 
 // 当 props 变化时，重新打开通知
 const stopReOpen = watch(
   () => [props.title, props.description, props.icon, props.timeout],
   () => {
-    const find = toast.notifications.value.find((x) => x.id.startsWith(props.cmpt.id))
+    const find = toast.notifications.value.find((x) => x.id.startsWith(props.comp.id))
     if (find) {
       removeToast(find.id)
       openToast()
@@ -171,7 +171,7 @@ const notificationHandlers = computed(() => {
             clientX: e.clientX,
             clientY: e.clientY,
           })
-          const elm = unrefElement(cmptRef)
+          const elm = unrefElement(compRef)
           if (!elm?.dispatchEvent) return
           elm.dispatchEvent(fakeEvt)
         },
@@ -181,13 +181,13 @@ const notificationHandlers = computed(() => {
 
 defineExpose({
   isOpen,
-  [CxEventDisplayCmptKey]: (toDisplayCmpt: CxComponentRuntime) => {
-    if (!toDisplayCmpt) return
-    const cmptsInModal = [
-      ...(props.cmpt?.components?.title || []),
-      ...(props.cmpt?.components?.description || []),
+  [CxEventDisplayCompKey]: (toDisplayComp: CxComponentRuntime) => {
+    if (!toDisplayComp) return
+    const compsInModal = [
+      ...(props.comp?.components?.title || []),
+      ...(props.comp?.components?.description || []),
     ]
-    const isFind = cmptsInModal.some((cmpt) => cmpt.id === toDisplayCmpt.id)
+    const isFind = compsInModal.some((comp) => comp.id === toDisplayComp.id)
     if (isFind) {
       openToast()
     }

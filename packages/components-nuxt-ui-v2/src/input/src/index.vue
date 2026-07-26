@@ -1,6 +1,6 @@
 <template>
   <UInput
-    ref="cmpt"
+    ref="comp"
     v-bind="attrs"
     v-model="value"
     :class="ns.b()"
@@ -43,13 +43,13 @@ const inner = defineProps<{
   type?: UInputProps['type']
 }>()
 const props = useAttrs() as UInputProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   dftQuery?: string
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const value = ref(props.dftQuery || '')

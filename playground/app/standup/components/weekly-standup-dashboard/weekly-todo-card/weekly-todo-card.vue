@@ -1,6 +1,6 @@
 <template>
   <cx-dashboard-card
-    class="cmpt-weekly-todo-card"
+    class="comp-weekly-todo-card"
     :title="todoCardWeekType === 'curWeek' ? '问题' : '上周问题'"
     :side-title="dayStr()"
     full-content
@@ -72,7 +72,7 @@ const content = useStandupContents(todoCardStandupID, userID, isTodoDisabled, (x
 </script>
 
 <style>
-.cmpt-weekly-todo-card {
+.comp-weekly-todo-card {
   width: 100%;
   height: 100%;
 

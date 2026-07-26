@@ -4,7 +4,7 @@
   </template>
   <UCarousel
     v-else
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     :ui="ui"
     v-bind="{ ...arrowProps, ...indicatorProps }"
@@ -79,7 +79,7 @@ const ns = useCxBEM('carousel')
 const emits = defineEmits(['prev', 'next', 'select'])
 const inner = defineProps<{}>()
 const props = useAttrs() as UCarouselProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   snap?: 'l' | 'c' | 'r'
   size?: '1' | '1/2' | '1/3' | '1/4'
   single?: boolean
@@ -88,11 +88,11 @@ const props = useAttrs() as UCarouselProps & {
   autoplay?: boolean
   autoplayTime?: number
 }
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef: any = useTemplateRef('cmpt')
-// const $cmpt = computed(() => unrefElement(cmptRef))
-const isHover = useElementHover(cmptRef)
+const compRef: any = useTemplateRef('comp')
+// const $comp = computed(() => unrefElement(compRef))
+const isHover = useElementHover(compRef)
 
 const ui = computed(() => {
   return {
@@ -117,12 +117,12 @@ const indicatorProps = computed(() => {
 })
 
 const interval = useIntervalFn(() => {
-  if (!cmptRef.value) return
-  if (cmptRef.value.page === cmptRef.value.pages) {
-    return cmptRef.value.select(0)
+  if (!compRef.value) return
+  if (compRef.value.page === compRef.value.pages) {
+    return compRef.value.select(0)
   }
   // console.log('[debug] carousel autoplay')
-  cmptRef.value.next()
+  compRef.value.next()
 }, props.autoplayTime || 3000)
 
 useMountedWatchImmediate(
@@ -144,14 +144,14 @@ const onSelect = (page: number) => {
   emits('select', page)
 }
 
-const { isReRendering, size } = useCxReRender(cmptRef, () => props.autoplayTime)
+const { isReRendering, size } = useCxReRender(compRef, () => props.autoplayTime)
 
 defineExpose({
-  pages: computed(() => cmptRef.value?.pages),
-  page: computed(() => cmptRef.value?.page),
-  prev: () => cmptRef.value?.prev(),
-  next: () => cmptRef.value?.next(),
-  select: (page: number) => cmptRef.value?.select(page),
+  pages: computed(() => compRef.value?.pages),
+  page: computed(() => compRef.value?.page),
+  prev: () => compRef.value?.prev(),
+  next: () => compRef.value?.next(),
+  select: (page: number) => compRef.value?.select(page),
 })
 </script>
 

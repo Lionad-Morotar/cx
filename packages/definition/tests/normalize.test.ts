@@ -5,35 +5,35 @@ import { normalize, toJSON } from '../src/index'
 import type { Component } from 'vue'
 
 /** 最小 Vue 组件桩：normalize 只读写属性，不要求真实渲染 */
-const stubCmpt = { render: () => null } as unknown as Component
+const stubComp = { render: () => null } as unknown as Component
 
 describe('normalize', () => {
   it('key 转 PascalCase 作为组件 name', () => {
-    const cmpt = normalize({
+    const comp = normalize({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
       key: 'cx-text',
-      component: stubCmpt,
+      component: stubComp,
     }) as any
 
-    expect(cmpt.name).toBe('CxText')
-    expect(cmpt.key).toBe('cx-text')
+    expect(comp.name).toBe('CxText')
+    expect(comp.key).toBe('cx-text')
   })
 
   it('挂载 _cx_meta 并填充默认值', () => {
-    const cmpt = normalize({
+    const comp = normalize({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
       key: 'cx-text',
-      component: stubCmpt,
+      component: stubComp,
       props: {
         content: { name: '文本内容', type: 'short' },
       },
     }) as any
 
-    const meta = cmpt._cx_meta
+    const meta = comp._cx_meta
     expect(meta).toBeTruthy()
     expect(meta.headless).toBe(false)
     expect(meta.async).toBe(false)
@@ -44,30 +44,30 @@ describe('normalize', () => {
   })
 
   it('显式声明的 headless 保留', () => {
-    const cmpt = normalize({
+    const comp = normalize({
       name: '逻辑',
       icon: 'i-tabler-box',
       description: '逻辑组件',
       key: 'cx-logic',
       headless: true,
-      component: stubCmpt,
+      component: stubComp,
     }) as any
 
-    expect(cmpt._cx_meta.headless).toBe(true)
+    expect(comp._cx_meta.headless).toBe(true)
   })
 
   it('_cx_install 以 kebab-case 名注册组件', () => {
-    const cmpt = normalize({
+    const comp = normalize({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
       key: 'cx-text',
-      component: stubCmpt,
+      component: stubComp,
     }) as any
 
     const registered: [string, any][] = []
     const app = { component: (k: string, c: any) => registered.push([k, c]) }
-    cmpt._cx_install(app)
+    comp._cx_install(app)
 
     expect(registered).toHaveLength(1)
     expect(registered[0]![0]).toBe('cx-text')
@@ -76,15 +76,15 @@ describe('normalize', () => {
 
 describe('toJSON', () => {
   it('剥离 component 并生成默认 type/url/exports', () => {
-    const cmpt = normalize({
+    const comp = normalize({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
       key: 'cx-text',
-      component: stubCmpt,
+      component: stubComp,
     }) as any
 
-    const json = toJSON(cmpt._cx_meta) as any
+    const json = toJSON(comp._cx_meta) as any
     expect(json.component).toBeUndefined()
     expect(json.type).toBe('umd')
     expect(json.url).toBe('text.js')
@@ -92,12 +92,12 @@ describe('toJSON', () => {
   })
 
   it('props 中的函数 default/initial 被剥离', () => {
-    const cmpt = normalize({
+    const comp = normalize({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
       key: 'cx-text',
-      component: stubCmpt,
+      component: stubComp,
       props: {
         content: {
           name: '文本内容',
@@ -108,18 +108,18 @@ describe('toJSON', () => {
       },
     }) as any
 
-    const json = toJSON(cmpt._cx_meta) as any
+    const json = toJSON(comp._cx_meta) as any
     expect(json.props.content.default).toBeUndefined()
     expect(json.props.content.initial).toBeUndefined()
   })
 
   it('props.options 嵌套的函数 default/initial 同样被剥离', () => {
-    const cmpt = normalize({
+    const comp = normalize({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
       key: 'cx-text',
-      component: stubCmpt,
+      component: stubComp,
       props: {
         content: {
           name: '文本内容',
@@ -132,7 +132,7 @@ describe('toJSON', () => {
       },
     }) as any
 
-    const json = toJSON(cmpt._cx_meta) as any
+    const json = toJSON(comp._cx_meta) as any
     expect(json.props.content.options.default).toBeUndefined()
     expect(json.props.content.options.initial).toBeUndefined()
     // 产物必须可 JSON 序列化

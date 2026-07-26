@@ -2,7 +2,7 @@ import { has, genUseHooks } from '@lionad/cx-definition'
 import type { CxComponentRuntime, CxComponentSlot } from '@lionad/cx-definition'
 import { computed, unref, inject } from 'vue'
 
-export const useCxSlot = (cmpt: CxComponentRuntime) => {
+export const useCxSlot = (comp: CxComponentRuntime) => {
   const isEditMode = computed(() => unref(inject('is-cx-edit', false)))
 
   /**
@@ -23,8 +23,8 @@ export const useCxSlot = (cmpt: CxComponentRuntime) => {
    * 之后可能要批量对接其他组件库，所以目前不太确信此类写法是否需要重构
    */
   const showSlot = (slotName: CxComponentSlot['key']) => {
-    // console.log('[info] showSlot', slotName, cmpt?.components?.[slotName]?.length ?? 0)
-    return has(cmpt?.components?.[slotName]?.length)
+    // console.log('[info] showSlot', slotName, comp?.components?.[slotName]?.length ?? 0)
+    return has(comp?.components?.[slotName]?.length)
   }
   // ?
   const showDefault = () => {

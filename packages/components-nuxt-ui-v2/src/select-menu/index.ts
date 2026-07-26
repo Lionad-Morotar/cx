@@ -118,9 +118,9 @@ export default normalize({
       schema: z.union([zItem, z.array(zItem)]),
     },
   },
-  slots: ({ cmpt }: any) => {
-    const canSearch = cmpt.data?.searchable
-    const canCreate = cmpt.data?.creatable
+  slots: ({ comp }: any) => {
+    const canSearch = comp.data?.searchable
+    const canCreate = comp.data?.creatable
     return [
       {
         key: 'leading',

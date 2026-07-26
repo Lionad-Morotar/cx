@@ -17,7 +17,7 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
    * 从 CX 实例中查找到组件元数据
    * 当新安装组件时，会重置缓存
    */
-  const findCmptFromCX = useMemoize(
+  const findCompFromCX = useMemoize(
     (_key: CxComponentRuntime['key'] | CxComponentRuntime) => {
       let key = _key ? toRaw(_key) : ''
       if (isCxComponent(key)) {
@@ -38,16 +38,16 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
         return keys.includes(key)
       }
 
-      const syncCmpts = Object.values(cx.installed || {})
-      const asyncCmpts = Object.values(cx.installedAsync || {})
+      const syncComps = Object.values(cx.installed || {})
+      const asyncComps = Object.values(cx.installedAsync || {})
 
       // * 本地开发时，async 组件不会异步加载
-      // const target = isAsyncCmpt
-      //   ? (asyncCmpts.find((x: any) => isSameKey(x._cx_meta)) as any)
-      //   : (syncCmpts.find((x: any) => isSameKey(x._cx_meta)) as any)
+      // const target = isAsyncComp
+      //   ? (asyncComps.find((x: any) => isSameKey(x._cx_meta)) as any)
+      //   : (syncComps.find((x: any) => isSameKey(x._cx_meta)) as any)
       const target =
-        (asyncCmpts.find((x: any) => isSameKey(x._cx_meta)) as any) ||
-        (syncCmpts.find((x: any) => isSameKey(x._cx_meta)) as any)
+        (asyncComps.find((x: any) => isSameKey(x._cx_meta)) as any) ||
+        (syncComps.find((x: any) => isSameKey(x._cx_meta)) as any)
 
       // console.log('@findFromCX', key, target)
       return target
@@ -70,16 +70,16 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     if (isCxComponent(key)) {
       key = key.key
     }
-    const cxCmpt = findCmptFromCX(key)
-    return cxCmpt ? cxCmpt._cx_meta : {}
+    const cxComp = findCompFromCX(key)
+    return cxComp ? cxComp._cx_meta : {}
   }
 
   // 获取组件初始化信息
-  const getCmpt = (_key: CxComponentRuntime['key'] | CxComponentRuntime) => {
+  const getComp = (_key: CxComponentRuntime['key'] | CxComponentRuntime) => {
     let key = _key ? toRaw(_key) : ''
     key = isCxComponent(key) ? key.key : key
-    const cmpt = findCmptFromCX(key)
-    return cmpt as CxComponentRuntime | null
+    const comp = findCompFromCX(key)
+    return comp as CxComponentRuntime | null
   }
 
   /**
@@ -91,9 +91,9 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     if (isCxComponent(key)) {
       key = key.key
     }
-    const cxCmpt = findCmptFromCX(key)
-    // console.log(cxCmpt)
-    const name = cxCmpt ? cxCmpt._cx_meta?.name : ''
+    const cxComp = findCompFromCX(key)
+    // console.log(cxComp)
+    const name = cxComp ? cxComp._cx_meta?.name : ''
     return name.startsWith('-') ? `${key}-${name}` : name
   }
 
@@ -106,8 +106,8 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     if (isCxComponent(key)) {
       key = key.key
     }
-    const cxCmpt = findCmptFromCX(key)
-    const description = cxCmpt ? cxCmpt._cx_meta?.description : ''
+    const cxComp = findCompFromCX(key)
+    const description = cxComp ? cxComp._cx_meta?.description : ''
     return description
   }
   /**
@@ -120,9 +120,9 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
       key = key.key
     }
     // console.log('[debug] key', key)
-    const cxCmpt = findCmptFromCX(key)
-    // console.log('[debug] cxCmpt', cxCmpt)
-    return cxCmpt ? cxCmpt._cx_meta?.props : {}
+    const cxComp = findCompFromCX(key)
+    // console.log('[debug] cxComp', cxComp)
+    return cxComp ? cxComp._cx_meta?.props : {}
   }
 
   /**
@@ -148,14 +148,14 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     }
   }
 
-  // * todo cmpt.getName
-  const getDataName = (_cmpt: CxComponentRuntime): string => {
-    const cmpt = toRaw(_cmpt)
-    return cmpt.data?._cx_name || cmpt.name || ''
+  // * todo comp.getName
+  const getDataName = (_comp: CxComponentRuntime): string => {
+    const comp = toRaw(_comp)
+    return comp.data?._cx_name || comp.name || ''
   }
-  const getDataEvents = (_cmpt: CxComponentRuntime): CxEvent[] => {
-    const cmpt = toRaw(_cmpt)
-    return cmpt.data?._cx_events || []
+  const getDataEvents = (_comp: CxComponentRuntime): CxEvent[] => {
+    const comp = toRaw(_comp)
+    return comp.data?._cx_events || []
   }
 
   // 获取组件初始数据
@@ -195,9 +195,9 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     if (isCxComponent(key)) {
       key = key.key
     }
-    const cxCmpt = findCmptFromCX(key)
-    // console.log('[debug] key', key, cxCmpt._cx_meta)
-    return cxCmpt ? cxCmpt._cx_meta?.emits : {}
+    const cxComp = findCompFromCX(key)
+    // console.log('[debug] key', key, cxComp._cx_meta)
+    return cxComp ? cxComp._cx_meta?.emits : {}
   }
 
   /**
@@ -209,8 +209,8 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     if (isCxComponent(key)) {
       key = key.key
     }
-    const cxCmpt = findCmptFromCX(key)
-    return cxCmpt ? cxCmpt._cx_meta?.exposes : {}
+    const cxComp = findCompFromCX(key)
+    return cxComp ? cxComp._cx_meta?.exposes : {}
   }
 
   const getSlots = (
@@ -220,8 +220,8 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     if (isCxComponent(key) || isCxComponentMeta(key)) {
       key = key.key
     }
-    const cxCmpt = findCmptFromCX(key)
-    const slots = cxCmpt?._cx_meta?.slots
+    const cxComp = findCompFromCX(key)
+    const slots = cxComp?._cx_meta?.slots
     return slots || {}
   }
 
@@ -236,10 +236,10 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
 
   return {
     touch,
-    findFromCX: findCmptFromCX,
-    findFromCXByKey: findCmptFromCX,
+    findFromCX: findCompFromCX,
+    findFromCXByKey: findCompFromCX,
     getMeta,
-    getCmpt,
+    getComp,
     getName,
     getDescription,
     getDesc: getDescription,

@@ -24,7 +24,7 @@ export interface RefsManager<
   getData: (x: { id: string } | string) => Data | undefined
   clear: () => void
   getAll: () => Data[]
-  checkCmptsInited: (countNameInRef?: string) => Ref<boolean>
+  checkCompsInited: (countNameInRef?: string) => Ref<boolean>
 }
 
 export type CxRefs<

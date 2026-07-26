@@ -11,15 +11,15 @@ import { UMeter } from '../vendor/bridge'
 const byKey = (key: string) => CxNuxtUIV2.find((x: any) => x._cx_meta.key === key)!
 
 /** 物料运行于 cx-render 时会收到运行时组件上下文，smoke 以最小桩注入 */
-const fakeCmpt = (key: string) => ({ id: `test-${key}`, key, data: {}, components: {} })
+const fakeComp = (key: string) => ({ id: `test-${key}`, key, data: {}, components: {} })
 
 const mountMaterial = (
-  cmpt: any,
+  comp: any,
   props: Record<string, any> = {},
   opts: Record<string, any> = {},
 ) =>
-  mount(cmpt, {
-    props: { cmpt: fakeCmpt(cmpt._cx_meta?.key || 'x'), ...props },
+  mount(comp, {
+    props: { comp: fakeComp(comp._cx_meta?.key || 'x'), ...props },
     global: {
       directives: { cx: { mounted() {} } },
       provide: {
@@ -41,29 +41,29 @@ describe('nuxt-ui-v2 物料 smoke', () => {
   })
 
   it('cx-button 挂载（vendored UButton 离线渲染）', () => {
-    const cmpt = byKey('cx-button')
-    const wrapper = mountMaterial(cmpt, { label: '按钮', color: 'primary' })
+    const comp = byKey('cx-button')
+    const wrapper = mountMaterial(comp, { label: '按钮', color: 'primary' })
     expect(wrapper.text()).toContain('按钮')
   })
 
   it('cx-badge 挂载', () => {
-    const cmpt = byKey('cx-badge')
-    const wrapper = mountMaterial(cmpt, {})
+    const comp = byKey('cx-badge')
+    const wrapper = mountMaterial(comp, {})
     expect(wrapper.exists()).toBe(true)
   })
 
   it('cx-alert 挂载', () => {
-    const cmpt = byKey('cx-alert')
-    const wrapper = mountMaterial(cmpt, { title: '提示' })
+    const comp = byKey('cx-alert')
+    const wrapper = mountMaterial(comp, { title: '提示' })
     expect(wrapper.exists()).toBe(true)
   })
 
   // smoke 仅验证物料挂载 + vendored UButtonGroup 离线渲染；
   // 子节点透传受 @vue/test-utils slot 注入与 getSlotsChildren 交互影响，留待验收页验证
   it('cx-button-group 挂载（vendored UButtonGroup 离线渲染）', () => {
-    const cmpt = byKey('cx-button-group')
+    const comp = byKey('cx-button-group')
     const wrapper = mountMaterial(
-      cmpt,
+      comp,
       { orientation: 'horizontal' },
       {
         slots: { default: () => h('span', '保存') },
@@ -73,9 +73,9 @@ describe('nuxt-ui-v2 物料 smoke', () => {
   })
 
   it('cx-meter-group 挂载（UMeterGroup 严格要求 Meter 子节点）', () => {
-    const cmpt = byKey('cx-meter-group')
+    const comp = byKey('cx-meter-group')
     const wrapper = mountMaterial(
-      cmpt,
+      comp,
       { min: 0, max: 100 },
       {
         slots: { default: () => h(UMeter, { value: 60, label: 'a' }) },
@@ -85,8 +85,8 @@ describe('nuxt-ui-v2 物料 smoke', () => {
   })
 
   it('cx-table 挂载（useTable/useAnysort 在 anysort@2 下不崩）', () => {
-    const cmpt = byKey('cx-table')
-    const wrapper = mountMaterial(cmpt, {
+    const comp = byKey('cx-table')
+    const wrapper = mountMaterial(comp, {
       datas: [{ id: 1, name: 'a' }],
       columns: [],
       sorts: [],
@@ -95,8 +95,8 @@ describe('nuxt-ui-v2 物料 smoke', () => {
   })
 
   it('cx-navigation 挂载（divideFromMultiple 数组安全）', () => {
-    const cmpt = byKey('cx-navigation')
-    const wrapper = mountMaterial(cmpt, {
+    const comp = byKey('cx-navigation')
+    const wrapper = mountMaterial(comp, {
       items: [{ label: '项目1', value: 'p1' }],
       orientation: 'horizontal',
       divideFromMultiple: [],

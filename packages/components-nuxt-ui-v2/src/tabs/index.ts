@@ -44,9 +44,9 @@ export default normalize({
       description: '切换标签页',
       schema: z.number(),
     },
-    ...CxEvents.displaySubCmpt.define,
+    ...CxEvents.displaySubComp.define,
   },
-  slots: ({ cmpt }: any) => {
+  slots: ({ comp }: any) => {
     const res: any[] = [
       {
         key: 'default',
@@ -59,7 +59,7 @@ export default normalize({
         binds: bindTab,
       },
     ]
-    const tabs = (cmpt?.data?.tabs || []) as Tab[]
+    const tabs = (comp?.data?.tabs || []) as Tab[]
     if (!tabs.length) {
       return res
     }

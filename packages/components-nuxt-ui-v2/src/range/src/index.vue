@@ -1,6 +1,6 @@
 <template>
   <URange
-    ref="cmpt"
+    ref="comp"
     v-model="value"
     :class="ns.b()"
     v-bind="attrs"
@@ -30,13 +30,13 @@ const inner = defineProps<{
   step?: number | string
 }>()
 const props = useAttrs() as USliderProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
-// console.log('[info] cmpt range -> ', props, inner)
+// console.log('[info] comp range -> ', props, inner)
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const value = ref(0)

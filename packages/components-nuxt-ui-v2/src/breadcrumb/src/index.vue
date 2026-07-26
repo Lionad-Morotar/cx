@@ -1,6 +1,6 @@
 <template>
   <UBreadcrumb
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     :links="props.links || []"
     :divider="props.divider || '/'"
@@ -33,13 +33,13 @@ type UBadgeProps = ComponentProps<typeof UBreadcrumb>
 const ns = useCxBEM('breadcrumb')
 const inner = defineProps<{}>()
 const props = useAttrs() as UBadgeProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
-const showSlotDefault = computed(() => props.cmpt?.components?.['default']?.length)
-const showSlotDivider = computed(() => props.cmpt?.components?.['divider']?.length)
-const showSlotIcon = computed(() => props.cmpt?.components?.['icon']?.length)
+const showSlotDefault = computed(() => props.comp?.components?.['default']?.length)
+const showSlotDivider = computed(() => props.comp?.components?.['divider']?.length)
+const showSlotIcon = computed(() => props.comp?.components?.['icon']?.length)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 </script>
 

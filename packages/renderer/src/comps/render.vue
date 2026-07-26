@@ -5,12 +5,12 @@
     <template #fallback> Loading </template>
     <template #default>
       <cx-render-component
-        v-if="cmpts[0]"
-        :key="`${cmpts[0].id}-${cmpts[0].key}-${renderKey}`"
-        ref="cxRenderCmptRef"
-        :component="cmpts[0] as CxComponentRuntime"
+        v-if="comps[0]"
+        :key="`${comps[0].id}-${comps[0].key}-${renderKey}`"
+        ref="cxRenderCompRef"
+        :component="comps[0] as CxComponentRuntime"
       >
-        <!-- @dblclick="logCmpt" -->
+        <!-- @dblclick="logComp" -->
         <template v-for="(_, key) in $slots" #[key]="slotData">
           <slot :name="key as unknown as string" v-bind="slotData" />
         </template>
@@ -36,26 +36,26 @@ import type {
 
 defineOptions({ name: 'CxRender' })
 
-type PropCmpt = CxComponentRuntime | CxComponentStructured
+type PropComp = CxComponentRuntime | CxComponentStructured
 
 const emits = defineEmits(['data', 'update:components', 'update:component'])
 const props = withDefaults(
   defineProps<{
     isLazy?: boolean
-    components?: MaybeRef<PropCmpt[]>
-    component?: MaybeRef<PropCmpt>
+    components?: MaybeRef<PropComp[]>
+    component?: MaybeRef<PropComp>
     cx?: CxLoaderInstance
     isDebug?: boolean
     isEdit?: boolean
-    renderCmptWrapper?: Component
-    renderErrorCmptWrapper?: Component
-    renderCmptsWrapper?: Component
+    renderCompWrapper?: Component
+    renderErrorCompWrapper?: Component
+    renderCompsWrapper?: Component
   }>(),
   {
     isDebug: false,
     isEdit: false,
-    // renderCmptWrapper: CxTransparentRender,
-    renderCmptsWrapper: CxTransparentRender,
+    // renderCompWrapper: CxTransparentRender,
+    renderCompsWrapper: CxTransparentRender,
   },
 )
 const cx = props.cx || inject<CxLoaderInstance>('cx')!
@@ -83,7 +83,7 @@ watchEffect(async () => {
 })
 
 const cxRenderRef = ref()
-const cxRenderCmptRef = ref()
+const cxRenderCompRef = ref()
 const $cxRenderParent = computed(() => {
   if (!cxRenderRef.value) {
     return null
@@ -98,29 +98,29 @@ provide('cx', cx)
 
 // console.log('[debug] cx-context', props.context)
 
-const renderCmptWrapper = computed(() => useMarkRaw(props.renderCmptWrapper))
-const renderErrorCmptWrapper = computed(() => useMarkRaw(props.renderErrorCmptWrapper))
-const renderCmptsWrapper = computed(() => useMarkRaw(props.renderCmptsWrapper))
+const renderCompWrapper = computed(() => useMarkRaw(props.renderCompWrapper))
+const renderErrorCompWrapper = computed(() => useMarkRaw(props.renderErrorCompWrapper))
+const renderCompsWrapper = computed(() => useMarkRaw(props.renderCompsWrapper))
 
 provide('cx-render-ref', cxRenderRef)
 provide('cx-render-parent', $cxRenderParent)
-provide('cx-render-component-wrapper', renderCmptWrapper)
+provide('cx-render-component-wrapper', renderCompWrapper)
 provide('cx-render-transparent-wrapper', CxTransparentRender)
-provide('cx-render-error-component-wrapper', renderErrorCmptWrapper)
-provide('cx-render-slot-wrapper', renderCmptsWrapper)
+provide('cx-render-error-component-wrapper', renderErrorCompWrapper)
+provide('cx-render-slot-wrapper', renderCompsWrapper)
 
-// 三态来源统一断言为 Ref<PropCmpt[]>（useVModel 各分支与 ref 空数组的联合类型过宽）
-const cmpts = (
+// 三态来源统一断言为 Ref<PropComp[]>（useVModel 各分支与 ref 空数组的联合类型过宽）
+const comps = (
   props.components
     ? useVModel(props, 'components', emits)
     : props.component
       ? useVModel(props, 'component', emits)
       : ref([])
-) as Ref<PropCmpt[]>
+) as Ref<PropComp[]>
 // watchEffect(() => {
-//   console.log('[info] props.cmpts', cmpts.value, cmpts.value[0]?.id, cmpts.value[0]?.key)
+//   console.log('[info] props.comps', comps.value, comps.value[0]?.id, comps.value[0]?.key)
 // })
-const logCmpt = () => console.log('[debug] cx-render', cmpts.value?.[0])
+const logComp = () => console.log('[debug] cx-render', comps.value?.[0])
 
 onMounted(() => {
   if (!props.components && !props.component) {
@@ -128,11 +128,11 @@ onMounted(() => {
       if (!cx?.id) {
         return
       }
-      // console.trace('@@props', cx.datas, cx.datas.cmpts, cx.datas.cmpts.value?.length)
-      // console.log('[info] cx.datas.renderCmptList.value._cx_inited', cx.datas.renderCmptList.value._cx_inited)
-      if (unref(cx.datas.cmpts)._cx_inited) {
-        if (cmpts.value[0] !== unref(cx.datas.root)) {
-          cmpts.value = [unref(cx.datas.root)].filter(Boolean) as PropCmpt[]
+      // console.trace('@@props', cx.datas, cx.datas.comps, cx.datas.comps.value?.length)
+      // console.log('[info] cx.datas.renderCompList.value._cx_inited', cx.datas.renderCompList.value._cx_inited)
+      if (unref(cx.datas.comps)._cx_inited) {
+        if (comps.value[0] !== unref(cx.datas.root)) {
+          comps.value = [unref(cx.datas.root)].filter(Boolean) as PropComp[]
         }
       }
     })
@@ -142,10 +142,10 @@ onMounted(() => {
 const _isMounted = useMounted()
 const isMounted = ref(false)
 watchEffect(async () => {
-  if (unref(cxRenderCmptRef.value?.isMounted)) {
+  if (unref(cxRenderCompRef.value?.isMounted)) {
     // await useSleep(1000)
     isMounted.value = true
-    // console.log('[info] cx-render-component isMounted', isMounted.value, cmpts.value[0].id, cmpts.value[0].key)
+    // console.log('[info] cx-render-component isMounted', isMounted.value, comps.value[0].id, comps.value[0].key)
   }
 })
 

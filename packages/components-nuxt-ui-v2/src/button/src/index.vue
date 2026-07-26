@@ -1,6 +1,6 @@
 <template>
   <UButton
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     :variant="props.variant"
     :size="props.size"
@@ -48,14 +48,14 @@ type UButtonProps = ComponentProps<typeof UButton>
 const ns = useCxBEM('button')
 const inner = defineProps<{}>()
 const props = useAttrs() as UButtonProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   round?: boolean
   iconPos?: 'leading' | 'trailing'
   // 'icon' is conflicting with 'UButton' props
   _icon?: string
 }
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 
 const ui = computed(() => (props.round ? { rounded: 'rounded-full' } : {}))
 

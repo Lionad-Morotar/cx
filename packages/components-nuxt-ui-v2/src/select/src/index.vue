@@ -4,7 +4,7 @@
   </template>
   <USelect
     v-else
-    ref="cmpt"
+    ref="comp"
     v-bind="attrs"
     v-model="value"
     :class="ns.b()"
@@ -48,14 +48,14 @@ const inner = defineProps<{
   trailingIcon?: string
 }>()
 const props = useAttrs() as USelectProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   dftValue?: string
   direction?: Placement
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef: any = useTemplateRef('cmpt')
+const compRef: any = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const value = ref(props.dftValue || '')
@@ -81,7 +81,7 @@ const attrs = computed(
     }) as const,
 )
 
-const { isReRendering, size } = useCxReRender(cmptRef, () => props.direction)
+const { isReRendering, size } = useCxReRender(compRef, () => props.direction)
 
 defineExpose({})
 </script>

@@ -35,7 +35,7 @@ export default normalize({
     //   type: 'boolean',
     //   name: '按 ESC 键关闭弹窗',
     //   initial: false,
-    //   hidden: ({ cmpt }: any) => !cmpt.data?.notPreventClose,
+    //   hidden: ({ comp }: any) => !comp.data?.notPreventClose,
     // },
   },
   emits: {
@@ -53,9 +53,9 @@ export default normalize({
     },
   },
   exposes: {
-    ...CxEvents.displaySubCmpt.define,
+    ...CxEvents.displaySubComp.define,
   },
-  slots: ({ cmpt, cx }: any) => {
+  slots: ({ comp, cx }: any) => {
     const res = [
       {
         key: 'trigger',
@@ -66,7 +66,7 @@ export default normalize({
         name: '弹窗内容',
       },
     ]
-    const ref = (cx?.refs?.get?.(cmpt.id) || {}).ref
+    const ref = (cx?.refs?.get?.(comp.id) || {}).ref
     if (unref(ref?.isOpen)) {
       return res.reverse()
     } else {

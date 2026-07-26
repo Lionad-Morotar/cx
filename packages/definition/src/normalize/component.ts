@@ -32,7 +32,7 @@ import type {
  * TODO 类似 defineOptions 之类的语法也许可以使 normalize 更加简化
  */
 export const normalize = <
-  VueCmpt extends Component,
+  VueComp extends Component,
   CnName extends string,
   VKey extends string,
   M extends {
@@ -40,7 +40,7 @@ export const normalize = <
     name: CnName
     getName?: (opts: {
       cx: CxLoaderInstance
-      cmpt: CxComponentRuntime
+      comp: CxComponentRuntime
       data?: Record<string, any>
     }) => string
     // example: 'i-ant-design-layout-outlined'
@@ -52,7 +52,7 @@ export const normalize = <
     // 组件别名，用于注册组件
     aliasKeys?: string | string[]
     // Vue 组件
-    component: VueCmpt
+    component: VueComp
     // 组件是否有真实 DOM 结构
     headless?: boolean
     // 标记为异步组件
@@ -75,7 +75,7 @@ export const normalize = <
 >(
   m: GM,
 ) => {
-  const component = m.component as VueCmpt & NormalizeKey<Required<M>>
+  const component = m.component as VueComp & NormalizeKey<Required<M>>
   // @ts-ignore
   const meta = withDefaultMeta(m)
   // console.log('[debug] meta', meta)

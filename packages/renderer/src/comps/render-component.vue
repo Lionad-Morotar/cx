@@ -1,51 +1,51 @@
 <template>
-  <template v-if="cmpt?.key">
-    <component :is="showCmptErrorWrapper" v-if="showCmptErrorWrapper" name="showCmptErrorWrapper" />
+  <template v-if="comp?.key">
+    <component :is="showCompErrorWrapper" v-if="showCompErrorWrapper" name="showCompErrorWrapper" />
     <component
-      :is="cmptWrapper"
-      v-else-if="cmptWrapper"
+      :is="compWrapper"
+      v-else-if="compWrapper"
       :key="renderKey"
-      name="cmptWrapper"
-      :cmpt-i-d="cmpt.id"
-      :cmpt-key="cmpt.key"
+      name="compWrapper"
+      :comp-i-d="comp.id"
+      :comp-key="comp.key"
       :data-render-key="renderKey"
     >
       <cx-render-component-with-bindings
-        v-if="cmpt"
+        v-if="comp"
         :set-ref="(ref: any) => setRef(ref)"
-        :component-type="cmptType"
+        :component-type="compType"
         :component-directives="directives"
-        :cmpt-i-d="cmpt.id"
-        v-bind="cmptDatas"
-        v-on="cmptEvents"
+        :comp-i-d="comp.id"
+        v-bind="compDatas"
+        v-on="compEvents"
       >
         <template
-          v-for="slot in cmptSlots"
+          v-for="slot in compSlots"
           #[slot.key!]="data"
-          :key="`render-${cmpt.id}-area-${slot.key}`"
+          :key="`render-${comp.id}-area-${slot.key}`"
         >
-          <cx-render-components :slot="slot" :cmpt-i-d="cmpt.id" :slot-wrapper="slotWrapper" />
+          <cx-render-components :slot="slot" :comp-i-d="comp.id" :slot-wrapper="slotWrapper" />
         </template>
       </cx-render-component-with-bindings>
     </component>
     <cx-render-component-with-bindings
-      v-else-if="cmpt"
-      :key="`${cmpt.id}-${cmpt.key}`"
+      v-else-if="comp"
+      :key="`${comp.id}-${comp.key}`"
       :set-ref="(ref: any) => setRef(ref)"
-      :component-type="cmptType"
+      :component-type="compType"
       :component-directives="directives"
-      :cmpt-i-d="cmpt.id"
-      v-bind="cmptDatas"
-      v-on="cmptEvents"
+      :comp-i-d="comp.id"
+      v-bind="compDatas"
+      v-on="compEvents"
     >
       <template
-        v-for="slot in cmptSlots"
+        v-for="slot in compSlots"
         #[slot.key!]="data"
-        :key="`render-${cmpt.id}-area-${slot.key}`"
+        :key="`render-${comp.id}-area-${slot.key}`"
       >
         <cx-render-components
           :slot="slot"
-          :cmpt-i-d="cmpt.id"
+          :comp-i-d="comp.id"
           :slot-wrapper="slotWrapper"
           :data="data"
         />
@@ -108,7 +108,7 @@ defineOptions({
 })
 
 // * simplified template, but hard to debug, so mute it
-// const [DefineCmptRender, ReuseCmptRender] = createReusableTemplate()
+// const [DefineCompRender, ReuseCompRender] = createReusableTemplate()
 
 const _isMounted = useMounted()
 const isMounted = ref(false)
@@ -130,20 +130,20 @@ const setRef = async (ref: any) => {
     clearTimeout(setRefTick)
   }
   setRefTick = setTimeout(() => {
-    const lastRef = refs.get(unref(cmpt)!.id) || ({} as any)
+    const lastRef = refs.get(unref(comp)!.id) || ({} as any)
     lastRef.ref = ref
     if (!lastRef.data) {
-      lastRef.data = cmpt.value
+      lastRef.data = comp.value
     }
-    refs.set(unref(cmpt)!.id, lastRef)
+    refs.set(unref(comp)!.id, lastRef)
     isMounted.value = true
   }, 0)
 }
 
 const cxEmitter = cx.emitter
 const cxUtils = cx.utils
-const cmptWrapper = readonly(inject<Component>('cx-render-component-wrapper')!)
-const cmptErrorWrapper = readonly(inject<Component>('cx-render-error-component-wrapper')!)
+const compWrapper = readonly(inject<Component>('cx-render-component-wrapper')!)
+const compErrorWrapper = readonly(inject<Component>('cx-render-error-component-wrapper')!)
 const slotWrapper = readonly(inject<Component>('cx-render-slot-wrapper')!)
 
 const attrs = useAttrs()
@@ -167,10 +167,10 @@ const states = reactive({
   // 模块内部错误
   isSyncError: false,
 })
-const showCmptErrorWrapper = computed(() => states.isSyncError && unref(cmptErrorWrapper))
+const showCompErrorWrapper = computed(() => states.isSyncError && unref(compErrorWrapper))
 
 onErrorCaptured((err) => {
-  console.error(`[ERR] cx error capturer, on component ${unref(cmpt)?.key}`, err)
+  console.error(`[ERR] cx error capturer, on component ${unref(comp)?.key}`, err)
   states.isSyncError = true
   return false
 })
@@ -189,25 +189,25 @@ const model = isString(props.component)
     )
   : computed(() => props.component)
 
-const cmpt = shallowRef<CxComponentRuntime>()
-watchImmediate(model, (x) => (cmpt.value = x as CxComponentRuntime))
-provide('cx-cmpt', cmpt)
+const comp = shallowRef<CxComponentRuntime>()
+watchImmediate(model, (x) => (comp.value = x as CxComponentRuntime))
+provide('cx-comp', comp)
 
 const renderKey = ref(1)
 const reRender = async () => (renderKey.value += 1)
 
-const cmptMeta = computed(() => cxUtils?.getMeta?.(unref(cmpt)!))
-provide('cx-cmpt-meta', cmptMeta)
+const compMeta = computed(() => cxUtils?.getMeta?.(unref(comp)!))
+provide('cx-comp-meta', compMeta)
 provide('cx-reloader', async (condition: boolean | CallableFunction) => {
-  const shouldReRender = isFunction(condition) ? await condition.call(null, unref(cmpt)) : condition
+  const shouldReRender = isFunction(condition) ? await condition.call(null, unref(comp)) : condition
   console.log('[info] check cx-reload due to:', condition, shouldReRender)
   if (shouldReRender) {
     reRender()
   }
 })
 
-const cmptType = computed(() => {
-  const k = cmpt.value?.key || ''
+const compType = computed(() => {
+  const k = comp.value?.key || ''
   // * 调试模式时，组件名 cx-dialog 会被转换为 cx-dialog-debug
   const postFix = k.startsWith('cx-') ? (isDebug ? '-debug' : '') : ''
   const patchedK = k
@@ -216,42 +216,42 @@ const cmptType = computed(() => {
 
 // 异步组件创建时，还没有加载到元数据，
 // 所以等加载完毕后重新初始化一下 data
-cx.hooks.on('cmpt:async-cmpt:loaded', resetAsyncComponentInitialData)
-onBeforeUnmount(() => cx.hooks.off('cmpt:async-cmpt:loaded', resetAsyncComponentInitialData))
-async function resetAsyncComponentInitialData({ cmpt: loadedCmpt }: any) {
-  if (!cmpt.value) {
-    return // console.error('[ERR] skip async-cmpt:loaded, no cmpt value found')
+cx.hooks.on('comp:async-comp:loaded', resetAsyncComponentInitialData)
+onBeforeUnmount(() => cx.hooks.off('comp:async-comp:loaded', resetAsyncComponentInitialData))
+async function resetAsyncComponentInitialData({ comp: loadedComp }: any) {
+  if (!comp.value) {
+    return // console.error('[ERR] skip async-comp:loaded, no comp value found')
   }
-  if (loadedCmpt.key === cmpt.value.key) {
+  if (loadedComp.key === comp.value.key) {
     await nextTick()
     try {
-      if (isObject(cmpt.value?.data) && cmpt.value?.data) {
+      if (isObject(comp.value?.data) && comp.value?.data) {
         const initial = cloneDeep(
-          await cxUtils.getData(loadedCmpt.key, {}, {
-            component: readonly(cmpt.value),
-            data: readonly(cmpt.value.data),
+          await cxUtils.getData(loadedComp.key, {}, {
+            component: readonly(comp.value),
+            data: readonly(comp.value.data),
           } as any),
         )
-        const sourceData = cloneDeep(cmpt.value.data)
-        deepMerge(cmpt.value.data, deepMerge(initial, sourceData))
+        const sourceData = cloneDeep(comp.value.data)
+        deepMerge(comp.value.data, deepMerge(initial, sourceData))
       }
     } catch (e) {
-      console.log('[verbose] error on cmpt:async-cmpt:loaded', e)
+      console.log('[verbose] error on comp:async-comp:loaded', e)
     } finally {
       await nextTick()
-      cx!.hooks.emit('cmpt:async-cmpt-data:loaded', { cmpt: loadedCmpt })
+      cx!.hooks.emit('comp:async-comp-data:loaded', { comp: loadedComp })
     }
     // console.log(
-    //   '[event] cmpt:async-cmpt:loaded data',
+    //   '[event] comp:async-comp:loaded data',
     //   initial,
     //   sourceData,
-    //   cmpt.value.data
+    //   comp.value.data
     // )
   }
 }
 
 const directives = computed(() => {
-  const _datas = cmpt.value?.data || {}
+  const _datas = comp.value?.data || {}
   // console.log('Object.entries({ ..._datas })', Object.entries({ ..._datas }))
   const res = Object.entries({ ..._datas }).reduce(
     (h, [k, v]) => {
@@ -262,14 +262,14 @@ const directives = computed(() => {
     },
     {} as Record<string, any>,
   )
-  // console.log('[debug] directives', cmpt.value.key, res)
+  // console.log('[debug] directives', comp.value.key, res)
   return res
 })
 
 // watch(
-//   () => unref(cmpt).data,
+//   () => unref(comp).data,
 //   (newData) => {
-//     console.log('[debug] ret', cmpt.value.key, newData)
+//     console.log('[debug] ret', comp.value.key, newData)
 //   },
 //   {
 //     deep: true,
@@ -280,24 +280,24 @@ const directives = computed(() => {
 /** *********************************************** events handlers */
 /**********************************************************/
 
-const cmptEmitNames = computed(() => {
-  if (!cmpt.value) {
+const compEmitNames = computed(() => {
+  if (!comp.value) {
     return []
   }
-  const eventData = cmpt.value?.data?._cx_events || []
-  const isCxEvent = cxUtils.findFromCX(cmpt.value.key)
+  const eventData = comp.value?.data?._cx_events || []
+  const isCxEvent = cxUtils.findFromCX(comp.value.key)
   if (isCxEvent) {
-    const metaEmits = cxUtils.getEmits(cmpt.value.key)
+    const metaEmits = cxUtils.getEmits(comp.value.key)
     const names = Object.keys(metaEmits).filter((x) => eventData.find((y) => x === y.key))
-    // console.info('[debug] event names', cmpt.value.key, names)
+    // console.info('[debug] event names', comp.value.key, names)
     return names
   }
   const names = eventData.map((x) => x.key)
-  // console.info('[debug] event names', cmpt.value.key, names)
+  // console.info('[debug] event names', comp.value.key, names)
   return names
 })
 const nativeEmitNames = computed(() => {
-  const eventData = cmpt.value?.data?._cx_events || []
+  const eventData = comp.value?.data?._cx_events || []
   const metaEmits = nativeEvents
   const names = Object.keys(metaEmits).filter((x) => eventData.find((y) => x === y.key))
   return names
@@ -305,9 +305,9 @@ const nativeEmitNames = computed(() => {
 
 const dataConfig = ref({ binds: {} })
 watchImmediate(
-  () => cmpt.value?.data?._cx_data_config,
+  () => comp.value?.data?._cx_data_config,
   () => {
-    dataConfig.value = cx.utils.calcDataConfigs(cmpt.value!) || {
+    dataConfig.value = cx.utils.calcDataConfigs(comp.value!) || {
       binds: {},
     }
   },
@@ -323,12 +323,12 @@ useMountedWatchImmediate(
     const binds = unref(dataConfig)?.binds || {}
     Object.entries(binds).map((bind) => {
       const parsed = cx.utils.parseDataBind(bind[1] as string)
-      const [mainCate, cmptID, subCate, propKey] = parsed
-      const targetCmptData = unref(cx.datas.cmptsIdMap)?.[cmptID!]?.data || {}
-      Object.entries(targetCmptData).map(([k, value]) => {
+      const [mainCate, compID, subCate, propKey] = parsed
+      const targetCompData = unref(cx.datas.compsIdMap)?.[compID!]?.data || {}
+      Object.entries(targetCompData).map(([k, value]) => {
         if (k !== propKey) return
         const stop = watch(
-          () => targetCmptData[k],
+          () => targetCompData[k],
           (newVal) => {
             bindDatas.value[k] = newVal
           },
@@ -349,24 +349,24 @@ useMountedWatchImmediate(
   },
 )
 
-const cmptDatas = computed(() => {
-  if (!cmpt.value) {
+const compDatas = computed(() => {
+  if (!comp.value) {
     return {}
   }
-  const rawData = cmpt.value.data
+  const rawData = comp.value.data
   const data = {
     ...rawData,
     ...bindDatas.value,
   } as Record<string, any>
 
   return useOmit(data, [
-    // vue cmpt props
+    // vue comp props
     'class',
     // cx meta props
     '_cx_name',
     '_cx_events',
     '_cx_style',
-    'cmpt',
+    'comp',
     // TODO move to other place
     '_config',
     '_dataConfig',
@@ -376,24 +376,24 @@ const cmptDatas = computed(() => {
   ])
 })
 
-const cmptEvents = computed(() => {
-  if (!cmpt.value) {
+const compEvents = computed(() => {
+  if (!comp.value) {
     return {}
   }
-  const id = cmpt.value.id
+  const id = comp.value.id
   // 这里监听的所有定义事件和原生事件，不知道会不会有性能问题
-  const keys = [...cmptEmitNames.value, ...nativeEmitNames.value]
+  const keys = [...compEmitNames.value, ...nativeEmitNames.value]
   const eventsMap = {} as Record<string | CxEventKey, () => void>
   try {
     keys.forEach((k) => {
       const broadcast = (...args: any[]) => {
-        unref(cx).hooks.emit('cmpt:cx-event:emit', {
+        unref(cx).hooks.emit('comp:cx-event:emit', {
           id,
           event: k,
           args,
         })
         return cxEmitter({
-          cmpt: unref(cmpt)!,
+          comp: unref(comp)!,
           // FIXME type
           eventKey: k as any,
           args,
@@ -410,13 +410,13 @@ const cmptEvents = computed(() => {
 /** *********************************************** slots */
 /*********************************************************/
 
-const _cmptSlots = computed(() => {
-  if (!_isMounted.value || !cmpt.value) {
+const _compSlots = computed(() => {
+  if (!_isMounted.value || !comp.value) {
     return []
   }
-  fakeTouch(cmpt.value.key)
+  fakeTouch(comp.value.key)
 
-  // console.log('[debug] cmptSlots', cmpt.value.key, cmpt.value, cmptMeta.value?._cx_meta)
+  // console.log('[debug] compSlots', comp.value.key, comp.value, compMeta.value?._cx_meta)
 
   // await nextTick()
   // await macroTask()
@@ -424,26 +424,26 @@ const _cmptSlots = computed(() => {
   // await macroTask()
   // await nextTick()
 
-  // console.log('[debug] cmptSlots', cmpt.value.key, cmpt.value, cmptMeta.value?._cx_meta)
+  // console.log('[debug] compSlots', comp.value.key, comp.value, compMeta.value?._cx_meta)
 
   // 1. 优先按照组件运行时的 slots 属性展示页面
-  if (cmpt.value.slots) {
+  if (comp.value.slots) {
     return (
-      isFunction(cmpt.value.slots)
-        ? cmpt.value.slots({ cmpt: readonly(cmpt.value)!, cx: readonly(cx) } as any)
-        : cmpt.value.slots
+      isFunction(comp.value.slots)
+        ? comp.value.slots({ comp: readonly(comp.value)!, cx: readonly(cx) } as any)
+        : comp.value.slots
     ) as CxComponentSlot[]
   }
 
   // 2. 再按照组件元数据定义的 slots 展示页面
-  // cmptMeta 即 getMeta 的返回值（_cx_meta 本体），直接取 slots；
-  // 此前误写为 cmptMeta.value?._cx_meta?.slots（多套一层），导致元数据声明的
+  // compMeta 即 getMeta 的返回值（_cx_meta 本体），直接取 slots；
+  // 此前误写为 compMeta.value?._cx_meta?.slots（多套一层），导致元数据声明的
   // 插槽永不生效、全部回落默认插槽
-  const metaSlots = cmptMeta.value?.slots as any
+  const metaSlots = compMeta.value?.slots as any
   if (metaSlots) {
     return (
       isFunction(metaSlots)
-        ? metaSlots({ cmpt: readonly(cmpt.value)!, cx: readonly(cx) } as any)
+        ? metaSlots({ comp: readonly(comp.value)!, cx: readonly(cx) } as any)
         : isArray(metaSlots)
           ? metaSlots
           : // 此处不能加 async：mapValues 不会 await，async 回调会让每个插槽变成
@@ -451,7 +451,7 @@ const _cmptSlots = computed(() => {
             mapValues(metaSlots, (v, k) => ({
               key: k,
               ...(isFunction(v)
-                ? v({ cmpt: readonly(cmpt.value!), cx: readonly(cx) } as any)
+                ? v({ comp: readonly(comp.value!), cx: readonly(cx) } as any)
                 : {
                     name: v.name || k,
                     description: v.description || '',
@@ -465,46 +465,46 @@ const _cmptSlots = computed(() => {
   return [{ key: 'default', name: '默认插槽' }] as CxComponentSlot[]
 })
 
-const cmptSlots = ref(_cmptSlots.value)
+const compSlots = ref(_compSlots.value)
 watchEffect(() => {
-  // 就算 meta.slots 计算结果为空数组，也会触发 cmptSlots.value 及模版更新，
+  // 就算 meta.slots 计算结果为空数组，也会触发 compSlots.value 及模版更新，
   // 所以这里做一次浅比较再赋值，不然开发过程中会出现组件热更新时死循环现象
-  if (isEqual(_cmptSlots.value, cmptSlots.value)) {
+  if (isEqual(_compSlots.value, compSlots.value)) {
     return
   } else {
-    cmptSlots.value = _cmptSlots.value
+    compSlots.value = _compSlots.value
   }
 })
 
 // watchEffect(() => {
-//   console.log('[debug] cmptSlots', cmpt.value?.name, cmpt.value?.id?.slice(-4), cmptSlots.value)
+//   console.log('[debug] compSlots', comp.value?.name, comp.value?.id?.slice(-4), compSlots.value)
 // })
 
 onBeforeMount(() => {
-  if (cmpt.value) {
-    cx.hooks.emit('cmpt:before-mount', {
-      cmpt: markRaw(unref(cmpt)!) as CxComponentRuntime,
+  if (comp.value) {
+    cx.hooks.emit('comp:before-mount', {
+      comp: markRaw(unref(comp)!) as CxComponentRuntime,
     })
   }
 })
 onMounted(() => {
-  if (cmpt.value) {
-    cx.hooks.emit('cmpt:mounted', {
-      cmpt: markRaw(unref(cmpt)!) as CxComponentRuntime,
+  if (comp.value) {
+    cx.hooks.emit('comp:mounted', {
+      comp: markRaw(unref(comp)!) as CxComponentRuntime,
     })
   }
 })
 onBeforeUnmount(() => {
-  if (cmpt.value) {
-    cx.hooks.emit('cmpt:unmounted', {
-      cmpt: markRaw(unref(cmpt)!) as CxComponentRuntime,
+  if (comp.value) {
+    cx.hooks.emit('comp:unmounted', {
+      comp: markRaw(unref(comp)!) as CxComponentRuntime,
     })
   }
 })
 onUnmounted(() => {
-  if (cmpt.value) {
-    cx.hooks.emit('cmpt:unmounted', {
-      cmpt: markRaw(unref(cmpt)!) as CxComponentRuntime,
+  if (comp.value) {
+    cx.hooks.emit('comp:unmounted', {
+      comp: markRaw(unref(comp)!) as CxComponentRuntime,
     })
   }
 })

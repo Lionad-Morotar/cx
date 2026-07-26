@@ -1,5 +1,5 @@
 import { normalize, not } from '@lionad/cx-definition'
-import { cmptColorNames, positionOptions, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames, positionOptions, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 import { unref } from 'vue'
 
@@ -14,8 +14,8 @@ export default normalize({
       type: 'number',
       name: '最大数量',
       initial: 5,
-      hidden: ({ cmpt, cx }: any) => {
-        const ref = (cx.refs?.get?.(cmpt.id) || {}).ref
+      hidden: ({ comp, cx }: any) => {
+        const ref = (cx.refs?.get?.(comp.id) || {}).ref
         return unref(ref?.isInGroup)
       },
     },
@@ -37,8 +37,8 @@ export default normalize({
       name: '尺寸',
       options: useSizeOptions('3xs', '3xl'),
       isPreview: true,
-      hidden: ({ cmpt, cx }: any) => {
-        const ref = (cx.refs?.get?.(cmpt.id) || {}).ref
+      hidden: ({ comp, cx }: any) => {
+        const ref = (cx.refs?.get?.(comp.id) || {}).ref
         return unref(ref?.isInGroup)
       },
     },
@@ -49,25 +49,25 @@ export default normalize({
     chipText: {
       type: 'short',
       name: '标记文本',
-      hidden: ({ cmpt }: any) => not(cmpt.data?.enableChip),
+      hidden: ({ comp }: any) => not(comp.data?.enableChip),
     },
     chipColor: {
       type: 'card-selector',
       name: '标记颜色',
-      hidden: ({ cmpt }: any) => not(cmpt.data?.enableChip),
+      hidden: ({ comp }: any) => not(comp.data?.enableChip),
       isPreview: true,
-      options: cmptColorNames,
+      options: compColorNames,
     },
     chipPosition: {
       type: 'card-selector',
       name: '标记位置',
-      hidden: ({ cmpt }: any) => not(cmpt.data?.enableChip),
+      hidden: ({ comp }: any) => not(comp.data?.enableChip),
       isPreview: true,
       options: positionOptions,
     },
   },
-  slots: (({ cmpt, cx }: any) => {
-    const ref = (cx.refs?.get?.(cmpt.id) || {}).ref
+  slots: (({ comp, cx }: any) => {
+    const ref = (cx.refs?.get?.(comp.id) || {}).ref
     const isGroup = not(unref(ref?.isInGroup))
     return [
       isGroup && {

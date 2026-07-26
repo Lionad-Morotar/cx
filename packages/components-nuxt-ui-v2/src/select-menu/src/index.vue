@@ -4,7 +4,7 @@
   </template>
   <div v-else :class="ns.b()">
     <USelectMenu
-      ref="cmpt"
+      ref="comp"
       v-bind="attrs"
       v-model="value"
       v-model:query="query"
@@ -40,7 +40,7 @@ import { useAttrs, useTemplateRef, computed, ref, watch } from 'vue'
 
 import { USelectMenu } from '../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey, has } from '@lionad/cx-definition'
+import { CxEventDisplayCompKey, has } from '@lionad/cx-definition'
 import { useCxSlot, useCxReRender, useCxBEM, safeIcon } from '@lionad/cx-vue'
 import type { Placement } from '@popperjs/core'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
@@ -55,15 +55,15 @@ const inner = defineProps<{
   trailingIcon?: string
 }>()
 const props = useAttrs() as USelectMenuProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   dftValue?: string
   dftQuery?: string
   direction?: Placement
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef: any = useTemplateRef('cmpt')
+const compRef: any = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const value = ref()
@@ -106,16 +106,16 @@ const attrs = computed(
     }) as const,
 )
 
-const { isReRendering, size } = useCxReRender(cmptRef, () => props.direction)
+const { isReRendering, size } = useCxReRender(compRef, () => props.direction)
 
 defineExpose({
-  [CxEventDisplayCmptKey]: (toDisplayCmpt: CxComponentRuntime) => {
-    if (!toDisplayCmpt) return
-    const cmptsInOptionPanel = [
-      ...(props.cmpt?.components?.default || []),
-      ...(props.cmpt?.components?.empty || []),
+  [CxEventDisplayCompKey]: (toDisplayComp: CxComponentRuntime) => {
+    if (!toDisplayComp) return
+    const compsInOptionPanel = [
+      ...(props.comp?.components?.default || []),
+      ...(props.comp?.components?.empty || []),
     ]
-    const isFind = cmptsInOptionPanel.some((cmpt) => cmpt.id === toDisplayCmpt.id)
+    const isFind = compsInOptionPanel.some((comp) => comp.id === toDisplayComp.id)
     if (isFind) {
       // todo
       // openToast()

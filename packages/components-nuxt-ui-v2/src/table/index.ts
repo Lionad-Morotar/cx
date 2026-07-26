@@ -84,7 +84,7 @@ export default normalize({
       type: 'switch',
       name: '单选',
       initial: false,
-      hidden: ({ cmpt }: any) => not(cmpt.data?.showSelect),
+      hidden: ({ comp }: any) => not(comp.data?.showSelect),
     },
   },
   emits: {
@@ -94,10 +94,10 @@ export default normalize({
       schema: z.boolean(),
     },
   },
-  slots: ({ cmpt, cx }: any) => {
-    const ref = (cx?.refs?.get?.(cmpt.id) || {}).ref
+  slots: ({ comp, cx }: any) => {
+    const ref = (cx?.refs?.get?.(comp.id) || {}).ref
     const columns = unref(ref?.columns) || []
-    const data = cmpt.data || {}
+    const data = comp.data || {}
     const showSelect = has(data?.showSelect) && not(data?.singleSelect)
     return [
       {

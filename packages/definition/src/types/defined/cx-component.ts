@@ -28,14 +28,14 @@ export type SFCExtended<T> = Plugin &
   }
 
 // 在 normalize 需要中补全不完整的元信息
-export type CxComponentMetaDefined<VueCmpt extends Component = Component> = {
+export type CxComponentMetaDefined<VueComp extends Component = Component> = {
   name: string
   key: string
-  component: VueCmpt
+  component: VueComp
   headless?: boolean
   // 是否是异步组件
   async?: boolean
-  props?: ComponentProps<VueCmpt>
+  props?: ComponentProps<VueComp>
   emits?: Record<string, any>
   exposes?: Record<string, any>
   slots?: Record<string, CxComponentSlot>
@@ -48,8 +48,8 @@ export type CxComponentMetaDefined<VueCmpt extends Component = Component> = {
 }
 
 /* 运行时元信息（挂在组件属性上，传输时可序列化） */
-export type Meta<VueCmpt extends Component = Component> = Omit<
-  Required<CxComponentMetaDefined<VueCmpt>>,
+export type Meta<VueComp extends Component = Component> = Omit<
+  Required<CxComponentMetaDefined<VueComp>>,
   'component'
 > & {
   // 目前只有 UMD 组件，所以需要声明向外暴露的名字

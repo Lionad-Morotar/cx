@@ -1,5 +1,5 @@
 <template>
-  <UCard ref="cmpt" :class="ns.b()">
+  <UCard ref="comp" :class="ns.b()">
     <template #header>
       <slot name="header" />
     </template>
@@ -28,10 +28,10 @@ type UCardProps = ComponentProps<typeof UCard>
 const ns = useCxBEM('card')
 const inner = defineProps<{}>()
 const props = useAttrs() as UCardProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 </script>
 

@@ -39,18 +39,18 @@ cx 是 schema 驱动渲染系统：消费方给一棵 `CxComponentRuntime` 树�
 
 1. **调研目标库**：枚举全部组件、每个组件的 props/slots/emits、是否 zod 契约、样式如何分发（自带 css？Tailwind？token？）、
    重依赖（地图/图表/高亮）是否 external、发布形态（npm 版本 vs 本地 link）。
-   *决策点*：依赖用 npm 发布版（干净、可发布）还是本地 link（跟踪实时改动）。
+   _决策点_：依赖用 npm 发布版（干净、可发布）还是本地 link（跟踪实时改动）。
 2. **建包骨架**：`packages/components-<lib>/` 复刻 `packages/components` 的形态（package.json / tsconfig / tsconfig.build / vite.config）。
    物料 key 用版本化前缀 `cx-<lib>-<name>`，避开既有 `cx-*` / `cx-nuxt-ui-v4-*` 命名空间。
-   *模板*：[`references/conversion-playbook.md` §1-2](references/conversion-playbook.md)
+   _模板_：[`references/conversion-playbook.md` §1-2](references/conversion-playbook.md)
 3. **S1 地基（端到端单组件，含样式实证）**：挑一个简单且标志性的组件，做完包装 SFC + normalize + bundle + cx-nuxt 注册 +
    playground 接线 + 验收页骨架，并在浏览器看到它带样式渲染。样式集成是首要风险，必须在此实证，不通过不铺量。
 4. **批量铺量（按目标库官方分类切 Slice）**：每个组件 = 包装 SFC（复用同一 composable）+ normalize（props 映射 + 合规 initial 样本）。
    结构化数据 props 的样本必须满足目标库 zod 的全部不变量（否则预览空白/DEV 告警）。
-   *props 映射策略 + 包装 composable + 逐类型配方*：[`references/conversion-playbook.md` §3-5](references/conversion-playbook.md)
+   _props 映射策略 + 包装 composable + 逐类型配方_：[`references/conversion-playbook.md` §3-5](references/conversion-playbook.md)
 5. **接入宿主**：cx-nuxt 注册（联合类型 + bundle 映射 + 样式条件注入）+ playground（workspace 依赖 + materials 启用 + 验收页 +
    分类文件 + 分类完备性测试）。分类用「未映射 key 抛错」+「官方清单 ↔ 物料 key 双向差集」两道契约锁死。
-   *模板*：[`references/conversion-playbook.md` §6-7](references/conversion-playbook.md)
+   _模板_：[`references/conversion-playbook.md` §6-7](references/conversion-playbook.md)
 6. **验证**：包测试（契约 + 可干净挂载者的 smoke）→ 全量 `pnpm test` → 全仓 `pnpm typecheck` → `pnpm check`（含 `--fix`）→
    浏览器实证全量物料带样式渲染 → 重建 dist。
 
@@ -73,11 +73,11 @@ cx 是 schema 驱动渲染系统：消费方给一棵 `CxComponentRuntime` 树�
 
 ## 渐进披露地图（按需读，勿全读）
 
-| 你需要 | 读 |
-|---|---|
-| cx 物料契约、运行时数据流、Guard 原理、bundle 装配机制、测试范式 | [`references/cx-material-system.md`](references/cx-material-system.md) |
-| 包骨架/包装 SFC/normalize/composable/cx-nuxt/验收页/分类/测试的可复制模板 + props 映射配方 + 构建/验证命令 | [`references/conversion-playbook.md`](references/conversion-playbook.md) |
-| 把 tool-ui-vue(vtu) 转成 `components-vtu` 的实战案例：useVtuProps 设计、@source 样式集成、json 函数坑、dev server 时序竞态、SSR 边界、事件桥接取舍 | [`references/vtu-case-study.md`](references/vtu-case-study.md) |
+| 你需要                                                                                                                                             | 读                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| cx 物料契约、运行时数据流、Guard 原理、bundle 装配机制、测试范式                                                                                   | [`references/cx-material-system.md`](references/cx-material-system.md)   |
+| 包骨架/包装 SFC/normalize/composable/cx-nuxt/验收页/分类/测试的可复制模板 + props 映射配方 + 构建/验证命令                                         | [`references/conversion-playbook.md`](references/conversion-playbook.md) |
+| 把 tool-ui-vue(vtu) 转成 `components-vtu` 的实战案例：useVtuProps 设计、@source 样式集成、json 函数坑、dev server 时序竞态、SSR 边界、事件桥接取舍 | [`references/vtu-case-study.md`](references/vtu-case-study.md)           |
 
 > 转换非 vtu 库时，`vtu-case-study.md` 当作「别人踩过的坑」的清单快速扫一遍即可，不必照搬其 composable 命名。
 

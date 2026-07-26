@@ -1,7 +1,7 @@
 // @ts-nocheck —— vendored nuxt-ui v2 第三方源码（MIT），按原版携带，不参与类型质量门
 /**
  * Nuxt UI v2 桥接文件
- * 为 cx-cmpts/nuxt-ui-2 封装组件提供显式导入 v2 组件的入口
+ * 为 cx-comps/nuxt-ui-2 封装组件提供显式导入 v2 组件的入口
  *
  * 用法：
  *   import { UCarousel, UButton } from '~/vendor/nuxt-ui-v2/bridge'

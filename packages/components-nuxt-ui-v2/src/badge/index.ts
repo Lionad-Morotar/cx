@@ -1,5 +1,5 @@
 import { normalize } from '@lionad/cx-definition'
-import { cmptColorNames, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
 export default normalize({
@@ -13,19 +13,19 @@ export default normalize({
       name: '前缀',
       type: 'short',
       initial: '#',
-      hidden: ({ cmpt }: any) => cmpt.components?.['leading']?.length > 0,
+      hidden: ({ comp }: any) => comp.components?.['leading']?.length > 0,
     },
     label: {
       name: '文本',
       type: 'short',
       initial: '标签',
-      hidden: ({ cmpt }: any) => cmpt.components?.['default']?.length > 0,
+      hidden: ({ comp }: any) => comp.components?.['default']?.length > 0,
     },
     postfix: {
       name: '后缀',
       type: 'short',
       initial: '',
-      hidden: ({ cmpt }: any) => cmpt.components?.['trailing']?.length > 0,
+      hidden: ({ comp }: any) => comp.components?.['trailing']?.length > 0,
     },
     variant: {
       type: 'card-selector',
@@ -54,7 +54,7 @@ export default normalize({
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
-      options: cmptColorNames,
+      options: compColorNames,
     },
     size: {
       type: 'card-selector',

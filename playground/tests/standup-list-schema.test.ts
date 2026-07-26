@@ -8,7 +8,7 @@ import CxStandupCard from '../app/standup/components/standup-card'
 import CxStandupCardList from '../app/standup/components/standup-card-list'
 import CxStandupGroupHeader from '../app/standup/components/standup-group-header'
 import CxStandupGroupList from '../app/standup/components/standup-group-list'
-import { cmpt, createTestCx, installMaterials } from './helpers/cx-render-test'
+import { comp, createTestCx, installMaterials } from './helpers/cx-render-test'
 
 import type { CxComponentRuntime } from '@lionad/cx-definition'
 import type { GroupOfStandups } from '../app/standup/apis'
@@ -73,24 +73,24 @@ const groups: GroupOfStandups = [
 
 // group-list 下挂一个 folder-container 模板；folder 的 header/content 各挂模板子节点
 const schema = [
-  cmpt(
+  comp(
     'group-list',
     'cx-standup-group-list',
     { groups },
     {
       'group-item': [
-        cmpt(
+        comp(
           'folder',
           'cx-folder-container',
           {},
           {
-            header: [cmpt('group-header', 'cx-standup-group-header', {}, {}, ['folder'])],
+            header: [comp('group-header', 'cx-standup-group-header', {}, {}, ['folder'])],
             content: [
-              cmpt(
+              comp(
                 'card-list',
                 'cx-standup-card-list',
                 {},
-                { 'card-item': [cmpt('card', 'cx-standup-card', {}, {}, ['card-list'])] },
+                { 'card-item': [comp('card', 'cx-standup-card', {}, {}, ['card-list'])] },
                 ['folder'],
               ),
             ],
@@ -120,13 +120,13 @@ const mountPage = async () => {
 describe('站会列表页 schema：模板 slot 循环 + Provider 注入', () => {
   it('group-item 模板渲染出与 groups 数量一致的 folder-container', async () => {
     const wrapper = await mountPage()
-    const folders = wrapper.findAll('[data-cx-cmpt-key="cx-folder-container"]')
+    const folders = wrapper.findAll('[data-cx-comp-key="cx-folder-container"]')
     expect(folders.length).toBe(groups.length)
   })
 
   it('card-item 模板渲染出与各组 standups 数量一致的卡片，且各卡片拿到自己的 standup', async () => {
     const wrapper = await mountPage()
-    const cards = wrapper.findAll('[data-cx-cmpt-key="cx-standup-card"]')
+    const cards = wrapper.findAll('[data-cx-comp-key="cx-standup-card"]')
     const totalStandups = groups.reduce((n, g) => n + g.standups.length, 0)
     expect(cards.length).toBe(totalStandups)
 
@@ -139,7 +139,7 @@ describe('站会列表页 schema：模板 slot 循环 + Provider 注入', () => 
 
   it('分组头部经 Provider 拿到 group 数据（日期范围渲染正确）', async () => {
     const wrapper = await mountPage()
-    const headers = wrapper.findAll('[data-cx-cmpt-key="cx-standup-group-header"]')
+    const headers = wrapper.findAll('[data-cx-comp-key="cx-standup-group-header"]')
     expect(headers.length).toBe(groups.length)
     const text = wrapper.text()
     expect(text).toContain('2026/07/14')
@@ -149,15 +149,15 @@ describe('站会列表页 schema：模板 slot 循环 + Provider 注入', () => 
 
 describe('站会列表页 schema 结构（静态骨架）', () => {
   // CxComponentRuntime 的递归类型在嵌套访问时退化为内层基础类型（与 index.vue 一致，需 cast）
-  const asCmpt = (x: unknown) => x as CxComponentRuntime
+  const asComp = (x: unknown) => x as CxComponentRuntime
 
   it('根为 page-main，布局容器下挂四区域', async () => {
     const { standupListSchema } = await import('../app/standup/schemas/standup-list.schema')
-    const root = asCmpt(standupListSchema[0])
+    const root = asComp(standupListSchema[0])
     expect(root.key).toBe('cx-page-main')
-    const layout = asCmpt(root.components?.default?.[0])
+    const layout = asComp(root.components?.default?.[0])
     expect(layout.key).toBe('cx-standup-list-layout')
-    const children = (layout.components?.default ?? []).map((c) => asCmpt(c).key)
+    const children = (layout.components?.default ?? []).map((c) => asComp(c).key)
     expect(children).toEqual(
       expect.arrayContaining([
         'cx-standup-header-bar',
@@ -170,19 +170,19 @@ describe('站会列表页 schema 结构（静态骨架）', () => {
 
   it('分组与卡片经模板插槽（group-item / card-item）嵌套', async () => {
     const { standupListSchema } = await import('../app/standup/schemas/standup-list.schema')
-    const layout = asCmpt(asCmpt(standupListSchema[0]).components?.default?.[0])
-    const listMain = asCmpt(
-      (layout.components?.default ?? []).find((c) => asCmpt(c).key === 'cx-standup-list-main'),
+    const layout = asComp(asComp(standupListSchema[0]).components?.default?.[0])
+    const listMain = asComp(
+      (layout.components?.default ?? []).find((c) => asComp(c).key === 'cx-standup-list-main'),
     )
-    const groupList = asCmpt(listMain.components?.default?.[0])
+    const groupList = asComp(listMain.components?.default?.[0])
     expect(groupList.key).toBe('cx-standup-group-list')
 
-    const folder = asCmpt(groupList.components?.['group-item']?.[0])
+    const folder = asComp(groupList.components?.['group-item']?.[0])
     expect(folder.key).toBe('cx-folder-container')
-    expect(asCmpt(folder.components?.header?.[0]).key).toBe('cx-standup-group-header')
+    expect(asComp(folder.components?.header?.[0]).key).toBe('cx-standup-group-header')
 
-    const cardList = asCmpt(folder.components?.content?.[0])
+    const cardList = asComp(folder.components?.content?.[0])
     expect(cardList.key).toBe('cx-standup-card-list')
-    expect(asCmpt(cardList.components?.['card-item']?.[0]).key).toBe('cx-standup-card')
+    expect(asComp(cardList.components?.['card-item']?.[0]).key).toBe('cx-standup-card')
   })
 })

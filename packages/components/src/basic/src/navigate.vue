@@ -9,7 +9,7 @@ import type { CxNavigateTarget } from '@lionad/cx-vue'
 
 defineOptions({ name: 'CxNavigate' })
 
-defineProps<{ cmpt: CxComponentRuntime }>()
+defineProps<{ comp: CxComponentRuntime }>()
 
 const navigate = useCxNavigate()
 

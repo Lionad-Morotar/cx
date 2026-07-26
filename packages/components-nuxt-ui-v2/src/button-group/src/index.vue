@@ -1,7 +1,7 @@
 <template>
   <!-- cx-button-group：包装 vendored UButtonGroup，default slot 透传子按钮；
        UButtonGroup 通过 useProvideButtonGroup 向子按钮注入尺寸/方向/圆角上下文 -->
-  <UButtonGroup ref="cmpt" :class="ns.b()" :orientation="props.orientation" :size="props.size">
+  <UButtonGroup ref="comp" :class="ns.b()" :orientation="props.orientation" :size="props.size">
     <slot />
   </UButtonGroup>
 </template>
@@ -20,9 +20,9 @@ type UButtonGroupProps = ComponentProps<typeof UButtonGroup>
 
 const ns = useCxBEM('button-group')
 const props = useAttrs() as UButtonGroupProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 </script>
 
 <style lang="scss">

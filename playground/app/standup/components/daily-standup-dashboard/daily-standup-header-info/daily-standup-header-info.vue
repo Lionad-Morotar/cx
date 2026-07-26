@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.b()" ref="cmptRef">
+  <div :class="ns.b()" ref="compRef">
     <UButton
       ref="prevUserButtonRef"
       variant="link"
@@ -102,7 +102,7 @@ cx.on('pass:instance:CxUserSelectRef', (instance) => {
 /*                                   states                                   */
 /* -------------------------------------------------------------------------- */
 
-const cmptRef = ref()
+const compRef = ref()
 const timeSelectRef = ref(null)
 
 const userSelectRef = ref()

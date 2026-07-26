@@ -66,11 +66,11 @@ export function useRefs<T = Element | ComponentPublicInstance | Record<string, a
    *  1. 组件长度和组件ref需要放到 T 中，并且其属性名是固定的（isInited）
    *  2. 组件需要在 beforeMount 的时候调用 removeRef
    */
-  const checkCmptsInited = (countNameInRef: string = 'total') => {
+  const checkCompsInited = (countNameInRef: string = 'total') => {
     const result = ref(false)
     watchImmediate(
       () => {
-        // console.log('[debug] checkCmptsInited getter', refs.value.length, refs.value.map(x => {
+        // console.log('[debug] checkCompsInited getter', refs.value.length, refs.value.map(x => {
         //   return (x as { ref: any }).ref?.isInited
         // }))
         return (
@@ -82,7 +82,7 @@ export function useRefs<T = Element | ComponentPublicInstance | Record<string, a
       },
       async () => {
         // console.log(
-        //   '[debug] checkCmptsInited result',
+        //   '[debug] checkCompsInited result',
         //   refs.value.length,
         //   refs.value.map(x => {
         //     return (x as { ref: any }).ref?.isInited
@@ -125,7 +125,7 @@ export function useRefs<T = Element | ComponentPublicInstance | Record<string, a
     getData,
     clear,
     getAll: () => refs.value,
-    checkCmptsInited,
+    checkCompsInited,
   }
 
   return states

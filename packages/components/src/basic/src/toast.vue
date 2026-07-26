@@ -9,7 +9,7 @@ import type { CxToastOptions } from '@lionad/cx-vue'
 
 defineOptions({ name: 'CxToast' })
 
-defineProps<{ cmpt: CxComponentRuntime }>()
+defineProps<{ comp: CxComponentRuntime }>()
 
 const toast = useCxToast()
 

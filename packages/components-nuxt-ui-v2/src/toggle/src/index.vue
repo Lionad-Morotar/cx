@@ -2,7 +2,7 @@
   <template v-if="isReRendering">
     <div :class="ns.e('placeholder-box')" :style="size" />
   </template>
-  <button v-else ref="cmpt" :class="ns.b()" class="flex">
+  <button v-else ref="comp" :class="ns.b()" class="flex">
     <UToggle v-model="value" v-bind="attrs" @change="$emit('change', $event)" />
   </button>
 </template>
@@ -24,13 +24,13 @@ type USwitchProps = ComponentProps<typeof UToggle>
 const ns = useCxBEM('toggle')
 const inner = defineProps<{}>()
 const props = useAttrs() as USwitchProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   dftValue?: boolean
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const value = ref(has(props.dftValue))
@@ -47,9 +47,10 @@ const attrs = computed(
     }) as const,
 )
 
-const { isReRendering, size } = useCxReRender(cmptRef, () => {
+const { isReRendering, size } = useCxReRender(compRef, () => {
   return [
     // props.dftValue,
+
   ]
 })
 

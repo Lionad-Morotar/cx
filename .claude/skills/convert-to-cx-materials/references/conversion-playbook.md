@@ -55,9 +55,11 @@ packages/components-<lib>/
 `tsconfig.json`：
 
 ```json
-{ "extends": "../../tsconfig.base.json",
+{
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": { "rootDir": "src", "types": ["node"] },
-  "include": ["src/**/*.ts", "src/**/*.vue"] }
+  "include": ["src/**/*.ts", "src/**/*.vue"]
+}
 ```
 
 `tsconfig.build.json`：在上面基础上加 `"noEmit": false, "declaration": true, "emitDeclarationOnly": true, "outDir": "dist"`。
@@ -71,8 +73,16 @@ export default defineConfig({
   pack: {
     plugins: [Vue({ isProduction: true })],
     dts: false,
-    deps: { neverBundle: ['vue', '@vue/shared', '@vueuse/core',
-      '@lionad/cx-definition', '@lionad/cx-vue', '<被包装库 npm 名>'] },
+    deps: {
+      neverBundle: [
+        'vue',
+        '@vue/shared',
+        '@vueuse/core',
+        '@lionad/cx-definition',
+        '@lionad/cx-vue',
+        '<被包装库 npm 名>',
+      ],
+    },
   },
 })
 ```
@@ -118,23 +128,23 @@ export default normalize({
   key: 'cx-lib-name',
   icon: 'i-tabler-xxx',
   component,
-  props: { /* 见下 */ },
+  props: {/* 见下 */},
 })
 ```
 
 映射哲学：可 authored 的标量 → 编辑器控件；结构化数据（数组/嵌套对象）→ `type: 'json'` + 函数 initial。
 
-| 被包装库 prop 形态 | cx 控件 | 备注 |
-|---|---|---|
-| string（短） | `short` | `initial: '示例'` |
-| string（长/代码） | `textarea` / `code` | |
-| number | `number` | `initial: 0` 合法（非 undefined 即纳入） |
-| boolean | `switch` | |
-| 枚举字面量 | `card-selector`（带 `isPreview:true` + `options:[{label,value}]`）或 `select` | |
-| 数组/对象 | `json` | `initial: () => [...]`（必须函数） |
-| icon 名 | `icon` | |
-| 颜色 | `color` | |
-| 需 bespoke 编辑器 | `custom`（配 `component` 面板） | 复杂才用 |
+| 被包装库 prop 形态 | cx 控件                                                                       | 备注                                     |
+| ------------------ | ----------------------------------------------------------------------------- | ---------------------------------------- |
+| string（短）       | `short`                                                                       | `initial: '示例'`                        |
+| string（长/代码）  | `textarea` / `code`                                                           |                                          |
+| number             | `number`                                                                      | `initial: 0` 合法（非 undefined 即纳入） |
+| boolean            | `switch`                                                                      |                                          |
+| 枚举字面量         | `card-selector`（带 `isPreview:true` + `options:[{label,value}]`）或 `select` |                                          |
+| 数组/对象          | `json`                                                                        | `initial: () => [...]`（必须函数）       |
+| icon 名            | `icon`                                                                        |                                          |
+| 颜色               | `color`                                                                       |                                          |
+| 需 bespoke 编辑器  | `custom`（配 `component` 面板）                                               | 复杂才用                                 |
 
 避免键名冲突：若编辑器专用键与被包装组件同名 prop 冲突，用 `_` 前缀（composable 会剥离 `_` 前缀键，不透传）。
 
@@ -214,7 +224,9 @@ if (options.injectStyles && specs.some((s) => s.package === '@lionad/cx-componen
 
 ```ts
 it('官方清单与物料 key 集双向相等', () => {
-  const materialKeys = new Set((CxLib as any[]).map((m) => m._cx_meta.key.replace(/^cx-<lib>-/, '')))
+  const materialKeys = new Set(
+    (CxLib as any[]).map((m) => m._cx_meta.key.replace(/^cx-<lib>-/, '')),
+  )
   const officialKeys = new Set<string>(OFFICIAL_KEYS) // 注意 Set<string> 否则 .has(string) 类型报错
   expect([...materialKeys].filter((k) => !officialKeys.has(k))).toEqual([])
   expect([...officialKeys].filter((k) => !materialKeys.has(k))).toEqual([])

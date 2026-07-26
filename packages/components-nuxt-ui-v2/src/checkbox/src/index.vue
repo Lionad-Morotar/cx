@@ -1,6 +1,6 @@
 <template>
   <UCheckbox
-    ref="cmpt"
+    ref="comp"
     v-model="value"
     :class="ns.b()"
     :color="props.color"
@@ -35,11 +35,11 @@ type UCheckboxProps = ComponentProps<typeof UCheckbox>
 const ns = useCxBEM('checkbox')
 const inner = defineProps<{}>()
 const props = useAttrs() as UCheckboxProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const value = ref(false)
 </script>
 

@@ -3,7 +3,7 @@
     <template v-if="isReRendering">
       <div :class="ns.e('placeholder-box')" :style="size" />
     </template>
-    <div v-else ref="cmpt" v-bind="mouseHandlers">
+    <div v-else ref="comp" v-bind="mouseHandlers">
       <UTooltip ref="tooltipRef" v-bind="attrs" style="pointer-events: none">
         <template #default="x">
           <slot v-if="showSlot('default')" name="default" v-bind="x" />
@@ -35,7 +35,7 @@ import { useAttrs, useTemplateRef, ref, computed, watch, unref } from 'vue'
 
 import { UButton, UTooltip } from '../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey, safeNum, useMacroTask } from '@lionad/cx-definition'
+import { CxEventDisplayCompKey, safeNum, useMacroTask } from '@lionad/cx-definition'
 import { useCxSlot, useCxReRender, useCxEditMode, useCxBEM } from '@lionad/cx-vue'
 import type { Placement } from '@popperjs/core'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
@@ -49,14 +49,14 @@ const ns = useCxBEM('tooltip')
 const emits = defineEmits(['update:value'])
 const inner = defineProps<{}>()
 const props = useAttrs() as UTooltipProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   label?: string
   direction?: Placement
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const tooltipRef = ref()
 const ui = computed(() => {})
 
@@ -110,7 +110,7 @@ const mouseHandlers = computed(() => {
   return evts
 })
 
-const { isReRendering, size } = useCxReRender(cmptRef, () => {
+const { isReRendering, size } = useCxReRender(compRef, () => {
   return props.direction
 })
 watch(
@@ -135,7 +135,7 @@ const editModeModalHandlers = computed(() => {
             clientX: e.clientX,
             clientY: e.clientY,
           })
-          const elm = unrefElement(cmptRef)
+          const elm = unrefElement(compRef)
           if (!elm?.dispatchEvent) return
           elm.dispatchEvent(fakeEvt)
         },
@@ -150,7 +150,7 @@ const editModeModalHandlers = computed(() => {
             clientX: e.clientX,
             clientY: e.clientY,
           })
-          const elm = unrefElement(cmptRef)
+          const elm = unrefElement(compRef)
           if (!elm?.dispatchEvent) return
           elm.dispatchEvent(fakeEvt)
         },
@@ -166,10 +166,10 @@ const editModeModalHandlers = computed(() => {
 
 defineExpose({
   dblClickMode,
-  [CxEventDisplayCmptKey]: (toDisplayCmpt: CxComponentRuntime) => {
-    if (!toDisplayCmpt) return
-    const cmptsInModal = props.cmpt?.components?.text || []
-    const isFind = cmptsInModal.some((cmpt) => cmpt.id === toDisplayCmpt.id)
+  [CxEventDisplayCompKey]: (toDisplayComp: CxComponentRuntime) => {
+    if (!toDisplayComp) return
+    const compsInModal = props.comp?.components?.text || []
+    const isFind = compsInModal.some((comp) => comp.id === toDisplayComp.id)
     if (isFind) {
       open()
     }

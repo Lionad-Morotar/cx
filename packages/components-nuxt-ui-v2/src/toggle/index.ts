@@ -1,7 +1,7 @@
 import z from 'zod'
 import { normalize } from '@lionad/cx-definition'
 import component from './src/index.vue'
-import { cmptColorNames3, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 
 export default normalize({
   key: 'cx-toggle',
@@ -43,7 +43,7 @@ export default normalize({
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
-      options: cmptColorNames3,
+      options: compColorNames3,
       pickData: ({ data }: any) => ({ ...data, dftValue: true }),
     },
   },

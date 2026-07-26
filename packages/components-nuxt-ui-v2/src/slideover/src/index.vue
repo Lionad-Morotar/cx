@@ -1,5 +1,5 @@
 <template>
-  <button ref="cmpt" :class="ns.b()" v-bind="attrs">
+  <button ref="comp" :class="ns.b()" v-bind="attrs">
     <slot v-if="showSlot('trigger')" name="trigger" />
     <UButton v-else color="neutral" variant="outline" :label="props.label" />
 
@@ -28,7 +28,7 @@ import { useAttrs, useTemplateRef, ref, computed, watchEffect } from 'vue'
 
 import { UButton, USlideover } from '../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey, not, useHooks, useMacroTask } from '@lionad/cx-definition'
+import { CxEventDisplayCompKey, not, useHooks, useMacroTask } from '@lionad/cx-definition'
 import {
   useCxSlot,
   useCxEditMode,
@@ -46,15 +46,15 @@ type USlideoverProps = ComponentProps<typeof USlideover>
 const ns = useCxBEM('slideover')
 const inner = defineProps<{}>()
 const props = useAttrs() as USlideoverProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   label?: string
   notPreventClose?: boolean
   escClose?: boolean
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const slideoverRef = ref<any>()
 const ui = computed(() => {})
 
@@ -135,7 +135,7 @@ const editModeModalHandlers = {
       clientX: e.clientX,
       clientY: e.clientY,
     })
-    const elm = unrefElement(cmptRef)
+    const elm = unrefElement(compRef)
     if (!elm?.dispatchEvent) return
     elm.dispatchEvent(fakeEvt)
   },
@@ -150,7 +150,7 @@ const editModeModalHandlers = {
       clientX: e.clientX,
       clientY: e.clientY,
     })
-    const elm = unrefElement(cmptRef)
+    const elm = unrefElement(compRef)
     if (!elm?.dispatchEvent) return
     elm.dispatchEvent(fakeEvt)
   },
@@ -162,7 +162,7 @@ const editModeModalHandlers = {
         .startsWith('headlessui-dialog-panel-v-')
     ) {
       closeModal()
-      // todo select(props.cmpt)
+      // todo select(props.comp)
     }
   },
 }
@@ -187,10 +187,10 @@ const slideoverAttrs = computed(() => {
 
 defineExpose({
   isOpen,
-  [CxEventDisplayCmptKey]: (toDisplayCmpt: CxComponentRuntime) => {
-    if (!toDisplayCmpt) return
-    const cmptsInModal = props.cmpt?.components?.slideover || []
-    const isFind = cmptsInModal.some((cmpt) => cmpt.id === toDisplayCmpt.id)
+  [CxEventDisplayCompKey]: (toDisplayComp: CxComponentRuntime) => {
+    if (!toDisplayComp) return
+    const compsInModal = props.comp?.components?.slideover || []
+    const isFind = compsInModal.some((comp) => comp.id === toDisplayComp.id)
     if (isFind) {
       openModal()
     }

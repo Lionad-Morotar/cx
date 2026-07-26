@@ -1,6 +1,6 @@
 import z from 'zod'
 import { normalize } from '@lionad/cx-definition'
-import { cmptColorNames3, positionOptions, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames3, positionOptions, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 import type { CxComponentSlot } from '@lionad/cx-definition'
 
@@ -22,7 +22,7 @@ export default normalize({
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
-      options: cmptColorNames3,
+      options: compColorNames3,
       pickComponent: () => ({}),
     },
     position: {
@@ -45,7 +45,7 @@ export default normalize({
       initial: false,
     },
   },
-  slots: ({ cmpt }: any) => {
+  slots: ({ comp }: any) => {
     const res = [] as CxComponentSlot[]
     res.push(
       {
@@ -53,7 +53,7 @@ export default normalize({
         name: '被标记内容',
       },
       // 防止没有内容时往标记内容添加一个很宽很长的组件导致样式错乱
-      cmpt.components?.['default']?.length && {
+      comp.components?.['default']?.length && {
         key: 'content',
         name: '标记文字',
         binds: {

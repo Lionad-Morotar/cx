@@ -24,7 +24,7 @@ defineOptions({ name: 'CxLogic' })
 
 const props = withDefaults(
   defineProps<{
-    cmpt: CxComponentRuntime
+    comp: CxComponentRuntime
     type?: 'none' | 'hide' | 'for'
     value?: number | string
     dangerLoop?: boolean

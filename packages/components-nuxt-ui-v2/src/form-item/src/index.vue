@@ -1,6 +1,6 @@
 <template>
   <UFormGroup
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     class="space-y-2"
     :required="has(props.required)"
@@ -49,13 +49,13 @@ type UFormFieldProps = ComponentProps<typeof UFormGroup>
 const ns = useCxBEM('form-item')
 const inner = defineProps<{}>()
 const props = useAttrs() as UFormFieldProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
-const showEmptyTip = inject(`cx-form-empty-tip-${props.cmpt.id}`, true)
+const showEmptyTip = inject(`cx-form-empty-tip-${props.comp.id}`, true)
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 defineExpose({})

@@ -11,7 +11,7 @@ import type { CxComponentData, CxComponentRuntime } from '../types'
  * 形参类型严格收口（data 为 CxComponentData），替代业务方手写时用
  * `as CxComponentRuntime` 强转规避类型检查的旧习。
  */
-export function createCxCmptRuntime(
+export function createCxCompRuntime(
   id: string,
   key: string,
   children: Record<string, CxComponentRuntime[]> = {},
@@ -36,4 +36,4 @@ export function createCxCmptRuntime(
  *
  * schema 文件迁移时作机械替换（node(...) → cxNode(...)），签名与位置参数顺序一致。
  */
-export { createCxCmptRuntime as cxNode }
+export { createCxCompRuntime as cxNode }

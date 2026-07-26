@@ -49,7 +49,7 @@ export const colorNameOptions = [
   { value: 'stone', label: '石', strength: bgColorStrengths },
 ] as const
 
-export const cmptColorNames = [
+export const compColorNames = [
   { label: '主色', value: 'primary' },
   ...colorNameOptions
     .filter(
@@ -59,7 +59,7 @@ export const cmptColorNames = [
     .map((x) => usePick(x, ['label', 'value'])),
 ]
 
-export const cmptColorNames3 = [
+export const compColorNames3 = [
   { label: '主色', value: 'primary' },
   ...colorNameOptions
     .filter(
@@ -71,9 +71,9 @@ export const cmptColorNames3 = [
     .map((x) => usePick(x, ['label', 'value'])),
 ]
 
-// cmptColorNames with black and white
+// compColorNames with black and white
 // TODO better name
-export const cmptColorNames2 = [
+export const compColorNames2 = [
   { label: '主色', value: 'primary' },
   ...colorNameOptions
     .filter((x) => !['transparent', 'slate', 'zinc', 'neutral', 'stone'].includes(x.value))

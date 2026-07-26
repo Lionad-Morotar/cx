@@ -47,8 +47,8 @@ export function textNode(content: string): CxComponentRuntime {
   } as CxComponentRuntime
 }
 
-export function toItem(cmpt: { _cx_meta: CxMeta }): DevItem {
-  const meta = cmpt._cx_meta
+export function toItem(comp: { _cx_meta: CxMeta }): DevItem {
+  const meta = comp._cx_meta
   const node = {
     id: `dev-${meta.key}`,
     key: meta.key,

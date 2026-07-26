@@ -70,7 +70,7 @@ type MakeNet<Recur> = Recur & {
           description?: string
         }
       >
-    | ((cmpt: Recur) => Record<string, any>)
+    | ((comp: Recur) => Record<string, any>)
     | null
   // 子模块数据，
   // 有些模块如文本、详情模块没有子模块数据，

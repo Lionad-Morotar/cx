@@ -1,6 +1,6 @@
 <template>
   <UChip
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     :color="props.color"
     :size="props.size"
@@ -34,11 +34,11 @@ type UChipProps = ComponentProps<typeof UChip>
 const ns = useCxBEM('chip')
 const inner = defineProps<{}>()
 const props = useAttrs() as UChipProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
-const showSlotContent = computed(() => props.cmpt?.components?.['content']?.length)
+const showSlotContent = computed(() => props.comp?.components?.['content']?.length)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 </script>
 
 <style lang="scss">

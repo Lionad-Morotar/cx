@@ -29,7 +29,7 @@ defineOptions({ name: 'CxFigure' })
 const ns = useCxBEM('figure')
 const props = withDefaults(
   defineProps<{
-    cmpt: CxComponentRuntime
+    comp: CxComponentRuntime
     image?: CxImageUploadPropValue
     enableCaption?: boolean
     caption?: string
@@ -46,7 +46,7 @@ const { isEditMode } = useCxEditMode(() => {
     () => props.enableCaption,
     () => {
       if (!props.caption) {
-        props.cmpt.data.caption = '图标标题'
+        props.comp.data.caption = '图标标题'
       }
     },
   )

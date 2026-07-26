@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.b()" ref="cmptRef">
+  <div :class="ns.b()" ref="compRef">
     <UButton ref="goBackBtnRef" @click="router.go(-1)">
       <span>返回</span>
     </UButton>
@@ -37,9 +37,11 @@ const emits = defineEmits([])
 const props = withDefaults(
   defineProps<{
     // ...
+
   }>(),
   {
     // ...
+
   },
 )
 
@@ -47,7 +49,7 @@ const props = withDefaults(
 /*                                   states                                   */
 /* -------------------------------------------------------------------------- */
 
-const cmptRef = ref()
+const compRef = ref()
 const states = reactive({})
 
 /* -------------------------------------------------------------------------- */
@@ -55,7 +57,7 @@ const states = reactive({})
 /* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */
-/*                          cmpt lifecycle & exposed                          */
+/*                          comp lifecycle & exposed                          */
 /* -------------------------------------------------------------------------- */
 
 const resetReq = useAsync(async () => {

@@ -41,7 +41,7 @@ import type {
   CxLoaderInstance,
 } from '@lionad/cx-definition'
 
-// defineOptions({ name: 'CxRenderCmptWithBindings' })
+// defineOptions({ name: 'CxRenderCompWithBindings' })
 
 const cache = new Map<any, any>()
 
@@ -55,7 +55,7 @@ const getCachedCxRenderBreakpointType = (cxRenderRef: any) => {
 
 export default defineComponent({
   props: {
-    cmptID: {
+    compID: {
       type: String,
       required: true,
     },
@@ -82,8 +82,8 @@ export default defineComponent({
   },
   setup(props) {
     const cx = inject<CxLoaderInstance | undefined>('cx')!
-    const cmpt = inject<Ref<CxComponentRuntime>>('cx-cmpt')!
-    const meta = inject<Ref<CxComponentMetaDefined>>('cx-cmpt-meta')!
+    const comp = inject<Ref<CxComponentRuntime>>('cx-comp')!
+    const meta = inject<Ref<CxComponentMetaDefined>>('cx-comp-meta')!
 
     const attrs = useAttrs()
     const slots = useSlots()
@@ -102,13 +102,13 @@ export default defineComponent({
     /** 确定需要渲染的组件类型 */
 
     const componentType = computed(() => {
-      const cxCmpt = cx?.utils?.findFromCX?.(props.componentType)
-      const targetCmpt = cxCmpt || (resolveComponent(props.componentType) as Component) || 'div'
+      const cxComp = cx?.utils?.findFromCX?.(props.componentType)
+      const targetComp = cxComp || (resolveComponent(props.componentType) as Component) || 'div'
       // @ts-ignore
       if (window && window?._debug_verbose) {
-        if (cxCmpt) {
+        if (cxComp) {
           console.info(
-            '[verbose:render-component-with-bindings] using cmpt in cx',
+            '[verbose:render-component-with-bindings] using comp in cx',
             props.componentType,
           )
         } else {
@@ -116,11 +116,11 @@ export default defineComponent({
             '[verbose:render-component-with-bindings] not found in cx',
             props.componentType,
             'fallback to resolved-component',
-            targetCmpt,
+            targetComp,
           )
         }
       }
-      return targetCmpt
+      return targetComp
     })
 
     /** 确定组件样式 todo perf 不必每个组件都初始化 */
@@ -161,10 +161,10 @@ export default defineComponent({
       styleFont.init(f)
       styleCosm.init(c)
       // * for debug
-      // if (cmpt.value.data?._cx_name?.startsWith('debug')) {
+      // if (comp.value.data?._cx_name?.startsWith('debug')) {
       //   console.log(
       //     '[debug]',
-      //     cmpt.value,
+      //     comp.value,
       //     styleBox,
       //     styleMargin,
       //     stylePadding,
@@ -182,7 +182,7 @@ export default defineComponent({
     watchImmediate(
       () => [
         has(meta.value?.headless),
-        cmpt.value?.data?._cx_style,
+        comp.value?.data?._cx_style,
         unref(unref(pageBreakpointType)),
       ],
       ([headless, cxStyle, breakpointType]) => {
@@ -193,7 +193,7 @@ export default defineComponent({
         const vOverride = breakpointType ? (v as any)[breakpointType] : {}
         const { w: wo, m: mo, p: po, l: lo, r: ro, b: bo, f: fo, c: co } = vOverride || {}
         const { w, m, p, l, r, b, f, c } = v
-        // console.log('style', cmpt.value.data._cx_name, v, vOverride, breakpointType)
+        // console.log('style', comp.value.data._cx_name, v, vOverride, breakpointType)
         initStyle({
           w: wo || w,
           m: mo || m,
@@ -210,8 +210,8 @@ export default defineComponent({
 
     const kls = computed(() => {
       const kls: (string | false)[] = [
-        `is-${cmpt.value.key}`,
-        `cx-${cmpt.value.id}`,
+        `is-${comp.value.key}`,
+        `cx-${comp.value.id}`,
         `is-render-as-${props.componentType}`,
         'is-cx-component',
       ]
@@ -544,7 +544,7 @@ export default defineComponent({
               ...attrs,
               // @ts-ignore
               ref: props.setRef,
-              cmpt: markRaw(cmpt.value),
+              comp: markRaw(comp.value),
             },
             slots,
           )
@@ -555,15 +555,15 @@ export default defineComponent({
                 ...attrs,
                 // @ts-ignore
                 ref: props.setRef,
-                cmpt: markRaw(cmpt.value),
+                comp: markRaw(comp.value),
                 // 空样式不下传：styles 由 _cx_style（编辑器样式）驱动，默认空对象；
                 // 空的响应式 style 进入组件链会在 Reka Primitive 的 vnode 归一化阶段
                 // 触发只读代理写入异常（'set' on proxy），仅在有实际样式时传 style
                 ...(Object.keys(styles.value).length > 0 ? { style: styles.value } : {}),
                 class: kls.value,
-                ['data-is-cx-cmpt']: true,
-                ['data-cx-cmpt-id']: cmpt.value?.id,
-                ['data-cx-cmpt-key']: cmpt.value?.key,
+                ['data-is-cx-comp']: true,
+                ['data-cx-comp-id']: comp.value?.id,
+                ['data-cx-comp-key']: comp.value?.key,
               },
               slots,
             ),

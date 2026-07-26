@@ -1,5 +1,5 @@
 <template>
-  <UPagination ref="cmpt" v-model="currentPage" :class="ns.b()" v-bind="attrs">
+  <UPagination ref="comp" v-model="currentPage" :class="ns.b()" v-bind="attrs">
     <template v-if="showSlot('prev')" #prev="x">
       <slot name="prev" v-bind="x" />
     </template>
@@ -35,12 +35,12 @@ const ns = useCxBEM('meter')
 const emits = defineEmits(['update:value'])
 const inner = defineProps<{}>()
 const props = useAttrs() as UPaginationProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const currentPage = ref(1)

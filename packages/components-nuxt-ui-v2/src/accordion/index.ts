@@ -37,16 +37,16 @@ export default normalize({
     openIcon: {
       name: '展开时图标',
       type: 'icon',
-      hidden: ({ cmpt }: any) => has(cmpt.components?.default?.length),
+      hidden: ({ comp }: any) => has(comp.components?.default?.length),
     },
     closeIcon: {
       name: '折叠时图标',
       type: 'icon',
-      hidden: ({ cmpt }: any) => has(cmpt.components?.default?.length),
+      hidden: ({ comp }: any) => has(comp.components?.default?.length),
     },
     variant: {
       ...CxButton._cx_meta.props.variant!,
-      hidden: ({ cmpt }: any) => has(cmpt.components?.default?.length),
+      hidden: ({ comp }: any) => has(comp.components?.default?.length),
       pickData: ({ data }: any) => {
         return {
           ...data,
@@ -56,7 +56,7 @@ export default normalize({
     },
     size: {
       ...CxButton._cx_meta.props.size!,
-      hidden: ({ cmpt }: any) => has(cmpt.components?.default?.length),
+      hidden: ({ comp }: any) => has(comp.components?.default?.length),
       pickData: ({ data }: any) => {
         return {
           ...data,
@@ -66,7 +66,7 @@ export default normalize({
     },
     color: {
       ...CxButton._cx_meta.props.color!,
-      hidden: ({ cmpt }: any) => has(cmpt.components?.default?.length),
+      hidden: ({ comp }: any) => has(comp.components?.default?.length),
       pickData: ({ data }: any) => {
         return {
           ...data,
@@ -98,11 +98,11 @@ export default normalize({
       description: '折叠某项（0、1、2...）',
       schema: z.instanceof(Function),
     },
-    ...CxEvents.displaySubCmpt.define,
+    ...CxEvents.displaySubComp.define,
   },
-  slots: ({ cmpt }: any) => {
+  slots: ({ comp }: any) => {
     const res = [] as CxComponentSlot[]
-    const items = cmpt?.data?.items || []
+    const items = comp?.data?.items || []
     items.map((item: any) => {
       res.push({
         name: item.label,

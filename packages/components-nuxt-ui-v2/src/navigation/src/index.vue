@@ -1,5 +1,5 @@
 <template>
-  <UVerticalNavigation ref="cmpt" :orientation="orientation" :class="ns.b()" :links="items">
+  <UVerticalNavigation ref="comp" :orientation="orientation" :class="ns.b()" :links="items">
     <template v-if="showSlot('icon')" #icon="x">
       <slot name="icon" v-bind="x" />
     </template>
@@ -32,16 +32,16 @@ const ns = useCxBEM('navigation')
 const emits = defineEmits(['tab-change'])
 const inner = defineProps<{}>()
 const props = useAttrs() as (UNavigationMenuProps | UNavigationMenuProps) & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   items?: Item[]
   divideFrom?: Item['value']
   divideFromMultiple?: Item['value'][]
   orientation?: 'horizontal' | 'vertical'
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const orientation = computed(() => props.orientation || 'horizontal')
 
 useMountedWatch(
@@ -49,12 +49,12 @@ useMountedWatch(
   () => {
     const idx1 = props.items!.findIndex((x) => props.divideFrom === x.value)
     if (idx1 === -1) {
-      props.cmpt.data.divideFrom = ''
+      props.comp.data.divideFrom = ''
     }
     const idx2 =
       props.divideFromMultiple?.findIndex((x) => not(props.items!.find((y) => y.value === x))) || -1
     if (idx2 !== -1) {
-      props.cmpt.data.divideFromMultiple.splice(idx2, 1)
+      props.comp.data.divideFromMultiple.splice(idx2, 1)
     }
   },
   { deep: true },

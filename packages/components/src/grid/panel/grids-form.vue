@@ -195,12 +195,12 @@ const disabledRemoveColTip = computed(() => {
 })
 
 const childs = computed(() => {
-  return (props.cmpt?.components || {}) as Record<string, CxComponentRuntime[]>
+  return (props.comp?.components || {}) as Record<string, CxComponentRuntime[]>
 })
 const getChildsLen = (r: number, c: number) => {
-  const cmpts = childs.value[`row-${r}-col-${c}`] || []
+  const comps = childs.value[`row-${r}-col-${c}`] || []
   let count = 0
-  cmpts.map((cmpt) => props.cx.touch(cmpt, () => count++))
+  comps.map((comp) => props.cx.touch(comp, () => count++))
   return count
 }
 const getBlockStyle = (r: number, c: number) => {
@@ -259,30 +259,30 @@ const lastColsSlots = computed(() => {
   }
 })
 
-// const lastRowDirectCmpts = computed(() => {
+// const lastRowDirectComps = computed(() => {
 //   return lastRowsSlots.value.map(slot => (childs.value[slot] || [])).flat()
 // })
-const lastRowCmpts = computed(() => {
-  const cmpts = [] as CxComponentRuntime[]
+const lastRowComps = computed(() => {
+  const comps = [] as CxComponentRuntime[]
   lastRowsSlots.value.map((slot) => {
-    ;(childs.value[slot] || []).map((cmpt) => {
-      props.cx.touch(cmpt, (c) => cmpts.push(c))
+    ;(childs.value[slot] || []).map((comp) => {
+      props.cx.touch(comp, (c) => comps.push(c))
     })
   })
-  // console.log('[debug] lastRowCmpts', lastRowsSlots.value, cmpts.flat(Infinity))
-  return cmpts.flat(Infinity)
+  // console.log('[debug] lastRowComps', lastRowsSlots.value, comps.flat(Infinity))
+  return comps.flat(Infinity)
 })
-// const lastColDirectCmpts = computed(() => {
+// const lastColDirectComps = computed(() => {
 //   return lastColsSlots.value.map(slot => (childs.value[slot] || [])).flat()
 // })
-const lastColCmpts = computed(() => {
-  const cmpts = [] as CxComponentRuntime[]
+const lastColComps = computed(() => {
+  const comps = [] as CxComponentRuntime[]
   lastColsSlots.value.map((slot) => {
-    ;(childs.value[slot] || []).map((cmpt) => {
-      props.cx.touch(cmpt, (c) => cmpts.push(c))
+    ;(childs.value[slot] || []).map((comp) => {
+      props.cx.touch(comp, (c) => comps.push(c))
     })
   })
-  return cmpts.flat(Infinity)
+  return comps.flat(Infinity)
 })
 
 const addRow = () => (row.value += 1)
@@ -290,11 +290,11 @@ const addCol = () => (col.value += 1)
 
 const removeLastRow = () => {
   lastRowsSlots.value.map((slot) => {
-    ;(childs.value[slot] || []).map((cmpt) => {
+    ;(childs.value[slot] || []).map((comp) => {
       props.cx.removeComponent({
-        from: props.cmpt,
+        from: props.comp,
         slotKey: slot,
-        remove: cmpt,
+        remove: comp,
       })
     })
   })
@@ -303,11 +303,11 @@ const removeLastRow = () => {
 
 const removeLastCol = () => {
   lastColsSlots.value.map((slot) => {
-    ;(childs.value[slot] || []).map((cmpt) => {
+    ;(childs.value[slot] || []).map((comp) => {
       props.cx.removeComponent({
-        from: props.cmpt,
+        from: props.comp,
         slotKey: slot,
-        remove: cmpt,
+        remove: comp,
       })
     })
   })
@@ -316,14 +316,14 @@ const removeLastCol = () => {
 
 // 删除最后一行/列时若会移除组件，用原生 confirm 做二次确认（替代原 el-popconfirm）
 const confirmRemoveLastRow = () => {
-  if (lastRowCmpts.value.length) {
-    if (!window.confirm(`将删除${lastRowCmpts.value.length}个组件`)) return
+  if (lastRowComps.value.length) {
+    if (!window.confirm(`将删除${lastRowComps.value.length}个组件`)) return
   }
   removeLastRow()
 }
 const confirmRemoveLastCol = () => {
-  if (lastColCmpts.value.length) {
-    if (!window.confirm(`将删除${lastColCmpts.value.length}个组件`)) return
+  if (lastColComps.value.length) {
+    if (!window.confirm(`将删除${lastColComps.value.length}个组件`)) return
   }
   removeLastCol()
 }

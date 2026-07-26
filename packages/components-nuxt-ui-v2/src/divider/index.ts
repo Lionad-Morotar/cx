@@ -13,12 +13,12 @@ export default normalize({
       type: 'short',
       name: '文本',
       initial: '分隔',
-      hidden: ({ cmpt }: any) => has(cmpt.data?.icon),
+      hidden: ({ comp }: any) => has(comp.data?.icon),
     },
     icon: {
       type: 'icon',
       name: '图标',
-      hidden: ({ cmpt }: any) => has(cmpt.data?.label),
+      hidden: ({ comp }: any) => has(comp.data?.label),
     },
     orientation: {
       type: 'card-selector',

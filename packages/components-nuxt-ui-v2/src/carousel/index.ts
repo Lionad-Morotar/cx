@@ -34,7 +34,7 @@ export default normalize({
         { label: '中', value: 'c', icon: 'i-tabler-box-margin' },
         { label: '右', value: 'r', icon: 'i-tabler-box-align-right' },
       ],
-      hidden: ({ cmpt }: any) => not(cmpt.data?.size) || has(cmpt.data?.single),
+      hidden: ({ comp }: any) => not(comp.data?.size) || has(comp.data?.single),
     },
     size: {
       type: 'button-group',
@@ -45,7 +45,7 @@ export default normalize({
         { value: '1/3', label: '1/3' },
         { value: '1/4', label: '1/4' },
       ],
-      hidden: ({ cmpt }: any) => has(cmpt.data?.single),
+      hidden: ({ comp }: any) => has(comp.data?.single),
     },
     arrow: {
       type: 'switch',
@@ -68,7 +68,7 @@ export default normalize({
       initial: 3000,
       min: 1000,
       max: 10000,
-      hidden: ({ cmpt }: any) => not(cmpt.data?.autoplay),
+      hidden: ({ comp }: any) => not(comp.data?.autoplay),
     },
   },
   emits: {

@@ -32,7 +32,7 @@ export default normalize({
     divider: {
       type: 'short',
       name: '分隔符',
-      hidden: ({ cmpt }: any) => cmpt.data?.links?.length > 0,
+      hidden: ({ comp }: any) => comp.data?.links?.length > 0,
     },
   },
   slots: () => {

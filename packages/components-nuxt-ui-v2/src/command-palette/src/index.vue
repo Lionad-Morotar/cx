@@ -1,6 +1,6 @@
 <template>
   <UCommandPalette
-    ref="cmpt"
+    ref="comp"
     v-model="selected"
     :class="ns.b()"
     multiple
@@ -42,11 +42,11 @@ const inner = defineProps<{
   icon?: string
 }>()
 const props = useAttrs() as UCommandPaletteProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   clear?: boolean
   dftQuery?: string
 }
-const showSlot = (name: string) => props.cmpt?.components?.[name]?.length
+const showSlot = (name: string) => props.comp?.components?.[name]?.length
 const clearOpts = computed(() => {
   return (
     props.clear
@@ -55,12 +55,12 @@ const clearOpts = computed(() => {
   ) as any
 })
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 
 const isInited = ref(false)
 watchEffect(() => {
-  if (!isInited.value && props.dftQuery && unref((cmptRef.value as any)?.updateQuery)) {
-    ;(cmptRef.value as any).updateQuery?.(props.dftQuery)
+  if (!isInited.value && props.dftQuery && unref((compRef.value as any)?.updateQuery)) {
+    ;(compRef.value as any).updateQuery?.(props.dftQuery)
     isInited.value = true
   }
 })
@@ -89,9 +89,9 @@ function onSelect(item: Item) {
 }
 
 defineExpose({
-  query: computed(() => cmptRef.value?.query),
-  updateQuery: (query: string) => (cmptRef.value as any).updateQuery?.(query),
-  results: computed(() => (cmptRef.value as any).results),
+  query: computed(() => compRef.value?.query),
+  updateQuery: (query: string) => (compRef.value as any).updateQuery?.(query),
+  results: computed(() => (compRef.value as any).results),
 })
 </script>
 

@@ -2,7 +2,7 @@
   <template v-if="isReRendering">
     <div :class="ns.e('placeholder-box')" :style="size" />
   </template>
-  <button v-else ref="cmpt" :class="ns.b()" v-bind="mouseHandlers">
+  <button v-else ref="comp" :class="ns.b()" v-bind="mouseHandlers">
     <UPopover v-bind="attrs" :open="isOpen" style="pointer-events: none">
       <template #default="x">
         <slot v-if="showSlot('trigger')" name="trigger" v-bind="x" />
@@ -33,7 +33,7 @@ import { useAttrs, useTemplateRef, computed, ref } from 'vue'
 
 import { UButton, UPopover } from '../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey, has } from '@lionad/cx-definition'
+import { CxEventDisplayCompKey, has } from '@lionad/cx-definition'
 import { useCxSlot, useCxReRender, useCxEditMode, useCxBEM } from '@lionad/cx-vue'
 import type { Placement } from '@popperjs/core'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
@@ -47,18 +47,18 @@ const ns = useCxBEM('popover')
 const emits = defineEmits(['update:value'])
 const inner = defineProps<{}>()
 const props = useAttrs() as UPopoverProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   label?: string
   hoverMode?: boolean
   direction?: Placement
   dftOpen?: boolean
   // arrow?: boolean
 }
-// console.log('[info] cmpt popover -> ', props, inner)
+// console.log('[info] comp popover -> ', props, inner)
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const attrs = computed(
@@ -105,7 +105,7 @@ const editModeModalHandlers = computed(() => {
             clientX: e.clientX,
             clientY: e.clientY,
           })
-          const elm = unrefElement(cmptRef)
+          const elm = unrefElement(compRef)
           if (!elm?.dispatchEvent) return
           elm.dispatchEvent(fakeEvt)
         },
@@ -120,14 +120,14 @@ const editModeModalHandlers = computed(() => {
             clientX: e.clientX,
             clientY: e.clientY,
           })
-          const elm = unrefElement(cmptRef)
+          const elm = unrefElement(compRef)
           if (!elm?.dispatchEvent) return
           elm.dispatchEvent(fakeEvt)
         },
       }
 })
 
-const { isReRendering, size } = useCxReRender(cmptRef, () => [
+const { isReRendering, size } = useCxReRender(compRef, () => [
   props.direction,
   props.dftOpen,
   props.hoverMode,
@@ -135,10 +135,10 @@ const { isReRendering, size } = useCxReRender(cmptRef, () => [
 
 defineExpose({
   isOpen,
-  [CxEventDisplayCmptKey]: (toDisplayCmpt: CxComponentRuntime) => {
-    if (!toDisplayCmpt) return
-    const cmptsInModal = props.cmpt?.components?.panel || []
-    const isFind = cmptsInModal.some((cmpt) => cmpt.id === toDisplayCmpt.id)
+  [CxEventDisplayCompKey]: (toDisplayComp: CxComponentRuntime) => {
+    if (!toDisplayComp) return
+    const compsInModal = props.comp?.components?.panel || []
+    const isFind = compsInModal.some((comp) => comp.id === toDisplayComp.id)
     if (isFind) {
       open()
     }

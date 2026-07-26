@@ -1,5 +1,5 @@
 <template>
-  <UMeter ref="cmpt" :class="ns.b()" v-bind="attrs">
+  <UMeter ref="comp" :class="ns.b()" v-bind="attrs">
     <!-- ignored, we patched nuxt-ui v2 -->
     <!-- @vue-ignore -->
     <template v-if="attrs.icon || showSlot('icon')" #icon="x">
@@ -40,14 +40,14 @@ const inner = defineProps<{
   icon?: string
 }>()
 const props = useAttrs() as UMeterProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   label?: string
 }
-// console.log('[info] cmpt meter -> ', props, inner)
+// console.log('[info] comp meter -> ', props, inner)
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const attrs = computed(

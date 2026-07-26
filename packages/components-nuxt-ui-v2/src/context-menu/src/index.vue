@@ -4,7 +4,7 @@
 
     <teleport to="body">
       <UContextMenu
-        ref="cmpt"
+        ref="comp"
         v-model:open="isOpen"
         :class="ns.b()"
         :virtual-element="virtualElement"
@@ -83,7 +83,7 @@ const props = withDefaults(
 /*                                   states                                   */
 /* -------------------------------------------------------------------------- */
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 
 const { x, y } = useSharedMouse()
 const { y: windowY } = useSharedWindowScroll()
@@ -121,7 +121,7 @@ const getActions = (item: any) => {
 const hoverItem = ref(null as any)
 const hoverItemElement = computed(() => {
   const label = hoverItem.value?.label
-  // console.log('cmptElm.value?.', cmptElm.value)
+  // console.log('compElm.value?.', compElm.value)
   if (label) {
     isSubOpen.value = true
     return [...document.body.querySelectorAll('.p-actions')]
@@ -214,7 +214,7 @@ const close = async () => {
 onKeyStroke('Escape', close)
 
 /* -------------------------------------------------------------------------- */
-/*                          cmpt lifecycle & exposed                          */
+/*                          comp lifecycle & exposed                          */
 /* -------------------------------------------------------------------------- */
 
 const resetTask = useAsync(async () => {

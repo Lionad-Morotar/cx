@@ -97,6 +97,7 @@ props 键名 ⊆ `ComponentProps<component>`、emits 键名 ⊆ 组件 emits、e
 `CxMaterialBundle = { name: string; materials: CxMaterialComponent[] }`（`definition/src/types/defined/cx-material-bundle.ts`）。
 
 `packages/nuxt/src/module.ts`：
+
 - `CxBuiltinMaterialSet` 联合类型 + `BUILTIN_BUNDLES: Record<set, { package, namedExport }>`——纯字符串表，cx-nuxt 不依赖任何物料包。
 - `addTemplate` 生成 `#build/cx-bundles.mjs`：只把启用的包写进 `import` 语句（未启用不进入构建期解析，真 opt-in）。
 - 样式条件注入：仿 v2 的 `v-calendar/dist/style.css`，`specs.some(s => s.package === '<你的包>')` 时 `nuxt.options.css.push('<被包装库 style>')`。
@@ -113,10 +114,14 @@ props 键名 ⊆ `ComponentProps<component>`、emits 键名 ⊆ 组件 emits、e
   挂载桩（cx 渲染器把 cmpt 当 prop 注入，测试需手动构造）：
   ```ts
   const fakeCmpt = (key) => ({ id: `test-${key}`, key, data: {}, components: {} })
-  const mountMaterial = (cmpt, props = {}) => mount(cmpt, {
-    props: { cmpt: fakeCmpt(cmpt._cx_meta?.key || 'x'), ...props },
-    global: { directives: { cx: { mounted() {} } }, provide: { cx: undefined, 'is-cx-edit': false, 'is-cx-debug': false } },
-  })
+  const mountMaterial = (cmpt, props = {}) =>
+    mount(cmpt, {
+      props: { cmpt: fakeCmpt(cmpt._cx_meta?.key || 'x'), ...props },
+      global: {
+        directives: { cx: { mounted() {} } },
+        provide: { cx: undefined, 'is-cx-edit': false, 'is-cx-debug': false },
+      },
+    })
   ```
 - **契约测试**：`_cx_meta` 真、`typeof _cx_install === 'function'`、key 匹配 `^cx-<lib>-[a-z0-9-]+$`、key 唯一、`bundle.materials.length === CxXxx.length`。
 - **cx-bundles 测试**（`playground/tests/cx-bundles.test.ts`）：直接 `import { cxBundles } from '../.nuxt/cx-bundles.mjs'`

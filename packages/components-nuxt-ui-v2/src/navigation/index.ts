@@ -23,11 +23,11 @@ export default normalize({
       initial: '',
       help: '从选中的分隔项开始，将导航项分隔为两个部分。',
       multiple: false,
-      hidden: ({ cmpt }: any) => {
-        return (cmpt.data?.items || []).length < 2 || cmpt.data?.orientation !== 'horizontal'
+      hidden: ({ comp }: any) => {
+        return (comp.data?.items || []).length < 2 || comp.data?.orientation !== 'horizontal'
       },
-      options: ({ cmpt }: any) => {
-        return (cmpt.data?.items || []).slice(1)
+      options: ({ comp }: any) => {
+        return (comp.data?.items || []).slice(1)
       },
     },
     divideFromMultiple: {
@@ -36,11 +36,11 @@ export default normalize({
       initial: () => [],
       help: '从选中的分隔项开始，将导航项分隔为多个部分。',
       multiple: true,
-      hidden: ({ cmpt }: any) => {
-        return (cmpt.data?.items || []).length < 2 || cmpt.data?.orientation !== 'vertical'
+      hidden: ({ comp }: any) => {
+        return (comp.data?.items || []).length < 2 || comp.data?.orientation !== 'vertical'
       },
-      options: ({ cmpt }: any) => {
-        return (cmpt.data?.items || []).slice(1)
+      options: ({ comp }: any) => {
+        return (comp.data?.items || []).slice(1)
       },
     },
     orientation: {
@@ -54,7 +54,7 @@ export default normalize({
     },
   },
   exposes: {
-    ...CxEvents.displaySubCmpt.define,
+    ...CxEvents.displaySubComp.define,
   },
   slots: {
     icon: {

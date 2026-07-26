@@ -2,7 +2,7 @@
   <!-- cx-meter-group：包装 vendored UMeterGroup，default slot 透传子 UMeter；
        UMeterGroup 在 setup 顶层要求 default slot 存在（否则抛错），故子项为必填 -->
   <UMeterGroup
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     :min="safeNum(props.min, 0)"
     :max="safeNum(props.max, 100)"
@@ -29,9 +29,9 @@ type UMeterGroupProps = ComponentProps<typeof UMeterGroup>
 
 const ns = useCxBEM('meter-group')
 const props = useAttrs() as UMeterGroupProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 </script>
 
 <style lang="scss">

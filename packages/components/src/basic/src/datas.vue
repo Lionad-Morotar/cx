@@ -15,7 +15,7 @@ defineOptions({ name: 'CxDatas' })
 
 const cx = inject<CxLoaderInstance>('cx')!
 const props = defineProps<{
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }>()
 
 // const datasMeta = [
@@ -40,7 +40,7 @@ provide('cx-datas', datas)
 onMounted(async () => {
   await useSleep(500)
 
-  const parent = props.cmpt.parents[0]
+  const parent = props.comp.parents[0]
   if (!parent) {
     throw new Error('[test] CxDatas must have a parent component in this testcase')
   }

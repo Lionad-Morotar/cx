@@ -273,18 +273,18 @@ export class CxLoader {
     this.installedAsync = Object.create(null)
 
     this.installedComponents = computed(() => {
-      const syncCmpts = Object.values(this.installed || {})
+      const syncComps = Object.values(this.installed || {})
 
       // * 这样改和直接修改 installed 内 _cx_meta 一样也会导致报错
-      const asyncCmpts = Object.values(this.installedAsync || {})
-      // const asyncCmpts = [] as any[]
+      const asyncComps = Object.values(this.installedAsync || {})
+      // const asyncComps = [] as any[]
 
       // 异步组件真实内容加载完后，
       // 会自动覆盖一开始就注册的 defineAsyncComponent 同步组件，
       // 虽然也是用 normalize 处理了同步组件，但是他的 _cx_meta 等是不完整的，
       // 所以这里需要通过真实注册的组件来获取自定义组件元数据，
       // 这里的返回是顺序相关的
-      return [...asyncCmpts, ...syncCmpts]
+      return [...asyncComps, ...syncComps]
     })
 
     this.isInited = true
@@ -339,25 +339,25 @@ export class CxLoader {
                   // TODO 懒加载 https://segmentfault.com/a/1190000044239102
                   component: defineAsyncComponent({
                     loader: async () => {
-                      const cmpt = (await this.fetchModule(
+                      const comp = (await this.fetchModule(
                         fullURL,
                         exportsName,
                       )) as CxComponentMetaDefined
-                      // console.log('[info] cmpt', cmpt)
-                      const cmpts = getArray(cmpt)
+                      // console.log('[info] comp', comp)
+                      const comps = getArray(comp)
                       // installed 和 installedAsync 都是响应式数据，
                       // 修改后某些组件会重渲染，和当前异步组件的渲染发生冲突报错，
                       // 所以这里需要等待异步组件渲染结束
                       setTimeout(() => {
-                        cmpts.forEach((cmpt) => {
-                          this.installedAsync![installKey] = hmrFreeFreezing(cmpt as Component)
+                        comps.forEach((comp) => {
+                          this.installedAsync![installKey] = hmrFreeFreezing(comp as Component)
                           this.utils.findFromCX.clear()
-                          this.hooks.emit('cmpt:async-cmpt:loaded', {
-                            cmpt,
+                          this.hooks.emit('comp:async-comp:loaded', {
+                            comp,
                           })
                         })
                       })
-                      return cmpt
+                      return comp
                     },
                     // 可能是和 vue-draggable 有冲突报错，
                     // 总之不能使用默认的 suspensible 设置
@@ -399,26 +399,26 @@ export class CxLoader {
       name = capitalize(camelCase(key))
     }
     const app = this.config!.app
-    const cmpts = getArray(component).filter(Boolean)
-    cmpts.forEach((cmpt) => {
+    const comps = getArray(component).filter(Boolean)
+    comps.forEach((comp) => {
       if (app.component(key)) {
-        // console.log('[info] cmpt already installed', key)
+        // console.log('[info] comp already installed', key)
       } else {
-        app.component(key, hmrFreeFreezing(cmpt!))
+        app.component(key, hmrFreeFreezing(comp!))
         this.utils.findFromCX.clear()
       }
-      this.installed![cmpt!.name || name] = hmrFreeFreezing(cmpt as unknown as Component)
+      this.installed![comp!.name || name] = hmrFreeFreezing(comp as unknown as Component)
       this.utils.findFromCX.clear()
     })
   }
 
   async installComponents(component: CxComponentMetaDefined | CxComponentMetaDefined[]) {
-    const cmpts = getArray(component)
-    cmpts.forEach((cmpt) => {
-      const key = cmpt.key
+    const comps = getArray(component)
+    comps.forEach((comp) => {
+      const key = comp.key
       const name = capitalize(camelCase(key))
       // console.log('[info] prepare to install component', name, key)
-      this.installComponent(key, name, cmpt)
+      this.installComponent(key, name, comp)
     })
   }
 }

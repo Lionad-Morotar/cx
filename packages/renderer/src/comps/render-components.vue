@@ -1,34 +1,34 @@
 <template>
-  <div :class="`cx-${cx.id}-${cmpt.id}-${slot.key}`" style="display: contents">
-    <component :is="slotWrapper" v-if="slotWrapper" v-bind="cmptBinds">
+  <div :class="`cx-${cx.id}-${comp.id}-${slot.key}`" style="display: contents">
+    <component :is="slotWrapper" v-if="slotWrapper" v-bind="compBinds">
       <component
         :is="innerSlots[`${slot.key}-start`]"
         v-if="innerSlots[`${slot.key}-start`]"
         name="slot-start"
         v-bind="{ innerSlotKey: `${slot.key}-start` }"
       />
-      <template v-for="(_, csIDX) in cmptChilds[slot.key!]" v-if="cmptChilds[slot.key!]?.length">
+      <template v-for="(_, csIDX) in compChilds[slot.key!]" v-if="compChilds[slot.key!]?.length">
         <component
-          :is="innerSlots[`${slot.key}-${cmptChilds[slot.key!]![csIDX]!.id}-start`]"
-          v-if="innerSlots[`${slot.key}-${cmptChilds[slot.key!]![csIDX]!.id}-start`]"
-          name="slot-cmpt-start"
-          v-bind="{ innerSlotKey: `${slot.key}-${cmptChilds[slot.key!]![csIDX]!.id}-start` }"
+          :is="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-start`]"
+          v-if="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-start`]"
+          name="slot-comp-start"
+          v-bind="{ innerSlotKey: `${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-start` }"
         />
         <component
-          :is="innerSlots[`${slot.key}-${cmptChilds[slot.key!]![csIDX]!.id}`]"
-          v-if="innerSlots[`${slot.key}-${cmptChilds[slot.key!]![csIDX]!.id}`]"
-          name="slot-cmpt"
-          v-bind="{ innerSlotKey: `${slot.key}-${cmptChilds[slot.key!]![csIDX]!.id}` }"
+          :is="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}`]"
+          v-if="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}`]"
+          name="slot-comp"
+          v-bind="{ innerSlotKey: `${slot.key}-${compChilds[slot.key!]![csIDX]!.id}` }"
         />
         <cx-render-component
-          v-else-if="cmptChilds[slot.key!]![csIDX]"
-          :component="cmptChilds[slot.key!]![csIDX]!"
+          v-else-if="compChilds[slot.key!]![csIDX]"
+          :component="compChilds[slot.key!]![csIDX]!"
         />
         <component
-          :is="innerSlots[`${slot.key}-${cmptChilds[slot.key!]![csIDX]!.id}-end`]"
-          v-if="innerSlots[`${slot.key}-${cmptChilds[slot.key!]![csIDX]!.id}-end`]"
-          name="slot-cmpt-end"
-          v-bind="{ innerSlotKey: `${slot.key}-${cmptChilds[slot.key!]![csIDX]!.id}-end` }"
+          :is="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-end`]"
+          v-if="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-end`]"
+          name="slot-comp-end"
+          v-bind="{ innerSlotKey: `${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-end` }"
         />
       </template>
       <component
@@ -38,7 +38,7 @@
         v-bind="{ innerSlotKey: `${slot.key}-end` }"
       />
     </component>
-    <span v-else>no cmptWrapper warning</span>
+    <span v-else>no compWrapper warning</span>
   </div>
 </template>
 
@@ -52,7 +52,7 @@ defineOptions({ name: 'CxRenderComponents' })
 
 const props = withDefaults(
   defineProps<{
-    cmptID: CxComponentRuntime['id']
+    compID: CxComponentRuntime['id']
     slotWrapper: any
     slot: CxComponentSlot
   }>(),
@@ -60,21 +60,21 @@ const props = withDefaults(
 )
 
 const cx = inject<CxLoaderInstance>('cx')!
-const cmpt = inject<Ref<CxComponentRuntime>>('cx-cmpt')!
+const comp = inject<Ref<CxComponentRuntime>>('cx-comp')!
 
-const cmptChilds = computed((): Record<string, CxComponentRuntime[]> => {
-  const cmpts = cmpt.value.components
-  return cx.utils.isSlottedCxComponentGroup(cmpts) ? cmpts : {}
+const compChilds = computed((): Record<string, CxComponentRuntime[]> => {
+  const comps = comp.value.components
+  return cx.utils.isSlottedCxComponentGroup(comps) ? comps : {}
 })
 // const test = inject('test')
 // watchEffect(() => {
-//   console.log('[debug] cmptChilds', cmptChilds.value, unref(test))
+//   console.log('[debug] compChilds', compChilds.value, unref(test))
 // })
 
 /**
  * 外部组件可以修改 innerSlots，以指定组件内部打开某插槽
  * @example 外部组件可做如下修改
- * innerSlots['default-<cmptId>'] = 'div'
+ * innerSlots['default-<compId>'] = 'div'
  */
 const innerSlots = reactive({} as Record<string, any>)
 
@@ -85,23 +85,23 @@ const getSlotNames = () => {
     // `${slotKey}`,
     `${slotKey}-end`,
   ] as string[]
-  ;(unref(cmptChilds)[slotKey] || []).map((cmpt) => {
-    names.push(`${slotKey}-${cmpt.id}-start`)
-    names.push(`${slotKey}-${cmpt.id}`)
-    names.push(`${slotKey}-${cmpt.id}-end`)
+  ;(unref(compChilds)[slotKey] || []).map((comp) => {
+    names.push(`${slotKey}-${comp.id}-start`)
+    names.push(`${slotKey}-${comp.id}`)
+    names.push(`${slotKey}-${comp.id}-end`)
   })
   return names
 }
 
 /* ---------------------------------- slots --------------------------------- */
 
-const cmptBinds = computed(() => {
+const compBinds = computed(() => {
   const isFragment = props.slotWrapper === CxTransparentRender
   return isFragment
     ? {}
     : {
         name: 'render-components-slot-wrapper',
-        parentID: cmpt.value.id,
+        parentID: comp.value.id,
         'area-key': props.slot.key,
         'area-name': props.slot.name,
         'render-slots': innerSlots,

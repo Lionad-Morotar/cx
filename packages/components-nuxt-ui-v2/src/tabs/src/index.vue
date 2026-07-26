@@ -1,6 +1,6 @@
 <template>
   <UTabs
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     :items="tabs"
     :default-index="defaultIndex"
@@ -35,7 +35,7 @@ import { inject, useAttrs, useTemplateRef, computed, ref } from 'vue'
 
 import { UTabs, UIcon } from '../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey } from '@lionad/cx-definition'
+import { CxEventDisplayCompKey } from '@lionad/cx-definition'
 import { useCxSlot, useCxBEM, useMountedWatchImmediate } from '@lionad/cx-vue'
 import type { CxLoaderInstance, CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 import type { Tab } from '../types'
@@ -49,13 +49,13 @@ const ns = useCxBEM('tabs')
 const emits = defineEmits(['change'])
 const inner = defineProps<{}>()
 const props = useAttrs() as UTabsProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   tabs?: Tab[]
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 
 const attrs = computed(() => {
   return {
@@ -94,11 +94,11 @@ const onChange = (idx: number) => {
 
 defineExpose({
   change: onChange,
-  [CxEventDisplayCmptKey]: (toDisplayCmpt: CxComponentRuntime) => {
-    if (!toDisplayCmpt) return
-    const slots = cx.utils.calcSlots(props.cmpt)
+  [CxEventDisplayCompKey]: (toDisplayComp: CxComponentRuntime) => {
+    if (!toDisplayComp) return
+    const slots = cx.utils.calcSlots(props.comp)
     const slotToDisplay = slots.find((slot) => {
-      const isFind = (props.cmpt.components![slot.key] || []).some((c) => c.id === toDisplayCmpt.id)
+      const isFind = (props.comp.components![slot.key] || []).some((c) => c.id === toDisplayComp.id)
       return isFind ? slot : null
     })
     if (!slotToDisplay) {

@@ -43,10 +43,10 @@ export default normalize({
     //   initial: '8px',
     // },
   },
-  slots: ({ cmpt }) => {
-    const turn = +cmpt?.data?.turn || defaultDatas.turn
-    const row = +cmpt?.data?.rowCount || defaultDatas.rowCount
-    const col = +cmpt?.data?.colCount || defaultDatas.colCount
+  slots: ({ comp }) => {
+    const turn = +comp?.data?.turn || defaultDatas.turn
+    const row = +comp?.data?.rowCount || defaultDatas.rowCount
+    const col = +comp?.data?.colCount || defaultDatas.colCount
     if (!col || !row) return []
     // const isTurned = turn === 1 || turn === 3
 

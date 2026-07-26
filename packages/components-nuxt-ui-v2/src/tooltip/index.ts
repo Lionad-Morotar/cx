@@ -39,7 +39,7 @@ export default normalize({
       help: '鼠标离开触发区域后，弹出提示关闭的延迟时间，单位毫秒。',
     },
   },
-  slots: ({ cmpt, cx }: any) => {
+  slots: ({ comp, cx }: any) => {
     const res = [
       {
         key: 'default',
@@ -57,7 +57,7 @@ export default normalize({
         name: '弹出内容',
       },
     ]
-    const ref = (cx?.refs?.get?.(cmpt.id) || {}).ref
+    const ref = (cx?.refs?.get?.(comp.id) || {}).ref
     if (unref(ref?.dblClickMode)) {
       return res.reverse()
     } else {

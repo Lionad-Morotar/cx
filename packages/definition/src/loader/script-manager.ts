@@ -12,7 +12,7 @@ type getURLOptions = Partial<{
  * 应该从微前端薅一个管理器过来，碰到特殊情况如组件添加了样式，就非常难管理
  * @todo 样式文件的加载
  * @todo 卸载方法
- * @todo 不重复添加，defineAsyncCmpt 应该是做了优化所以现在不会有问题
+ * @todo 不重复添加，defineAsyncComp 应该是做了优化所以现在不会有问题
  */
 export const getURL = (url: string, _opts?: getURLOptions) => {
   const uuid = createCxID()

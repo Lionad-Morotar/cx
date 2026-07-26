@@ -25,36 +25,36 @@ const byKey = (key: string) => CxBasics.find((x: any) => x._cx_meta.key === key)
 
 describe('基础物料 smoke', () => {
   it('cx-text 渲染内容与元素类型', () => {
-    const cmpt = byKey('cx-text')
-    const wrapper = mountWithCx(cmpt, { content: '你好 cx', type: 'p' })
+    const comp = byKey('cx-text')
+    const wrapper = mountWithCx(comp, { content: '你好 cx', type: 'p' })
     expect(wrapper.text()).toContain('你好 cx')
     expect(wrapper.element.tagName.toLowerCase()).toBe('p')
   })
 
   it('cx-text truncate 类名随 prop 切换', () => {
-    const cmpt = byKey('cx-text')
-    const wrapper = mountWithCx(cmpt, { content: 'x', type: 'p', truncate: true })
+    const comp = byKey('cx-text')
+    const wrapper = mountWithCx(comp, { content: 'x', type: 'p', truncate: true })
     expect(wrapper.classes().join(' ')).toContain('is-truncate')
   })
 
   it('cx-header 渲染标题层级', () => {
-    const cmpt = byKey('cx-header')
-    const wrapper = mountWithCx(cmpt, { content: '标题' })
+    const comp = byKey('cx-header')
+    const wrapper = mountWithCx(comp, { content: '标题' })
     expect(wrapper.text()).toContain('标题')
   })
 
   it('cx-h1~cx-h5 均可挂载', () => {
     for (const key of ['cx-h1', 'cx-h2', 'cx-h3', 'cx-h4', 'cx-h5']) {
-      const cmpt = byKey(key)
-      const wrapper = mountWithCx(cmpt, { content: 't' })
+      const comp = byKey(key)
+      const wrapper = mountWithCx(comp, { content: 't' })
       expect(wrapper.exists()).toBe(true)
     }
   })
 
   it('cx-logic for 模式按次数重复渲染 slot', () => {
-    const cmpt = byKey('cx-logic')
+    const comp = byKey('cx-logic')
     const wrapper = mountWithCx(
-      cmpt,
+      comp,
       { type: 'for', value: 3 },
       {
         slots: { default: '<span class="item">x</span>' },

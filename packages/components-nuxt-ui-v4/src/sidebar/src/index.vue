@@ -59,7 +59,7 @@ const CONTAINED_UI = {
 // 样式被抽成未被加载的 style.css，Vue 运行时见不到 <style> 便不把 data-v 作用域属性渲染到
 // USidebar 的 container 上，scoped 选择器命中失败。也不能用 h-48 等 Tailwind 类：包 dist 不在
 // 宿主 Tailwind 内容扫描范围，包独有尺寸类不会被生成。故运行时注入一条纯 CSS——选择器用渲染器
-// 必加的 data-cx-cmpt-key（稳定、不依赖 Tailwind 生成、不依赖 data-v），由组件 JS 自带样式，
+// 必加的 data-cx-comp-key（稳定、不依赖 Tailwind 生成、不依赖 data-v），由组件 JS 自带样式，
 // 与构建管线无关，物料在任意宿主自包含。模块级标志保证多实例只注入一次。
 let containmentStyleInjected = false
 const injectContainmentStyle = () => {
@@ -68,7 +68,7 @@ const injectContainmentStyle = () => {
   const style = document.createElement('style')
   style.setAttribute('data-cx-sidebar-containment', '')
   style.textContent =
-    '[data-cx-cmpt-key="cx-nuxt-ui-v4-sidebar"] [data-slot="container"]{min-height:12rem}'
+    '[data-cx-comp-key="cx-nuxt-ui-v4-sidebar"] [data-slot="container"]{min-height:12rem}'
   document.head.appendChild(style)
 }
 onBeforeMount(injectContainmentStyle)

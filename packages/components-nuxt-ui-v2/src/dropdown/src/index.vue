@@ -4,7 +4,7 @@
   </template>
   <UDropdown v-else :class="ns.b()" v-bind="{ ...attrs }">
     <template #default="x">
-      <div ref="cmpt" :class="ns.e('content')">
+      <div ref="comp" :class="ns.e('content')">
         <slot v-if="showSlot('default')" name="default" v-bind="x" />
         <UButton
           v-else
@@ -36,15 +36,15 @@ type UDropdownMenuProps = ComponentProps<typeof UDropdown>
 const ns = useCxBEM('dropdown')
 const inner = defineProps<{}>()
 const props = useAttrs() as UDropdownMenuProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   label?: string
   hoverMode?: boolean
   direction?: Placement
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const attrs = computed(
@@ -56,7 +56,7 @@ const attrs = computed(
     }) as const,
 )
 
-const { isReRendering, size } = useCxReRender(cmptRef, () => props.direction)
+const { isReRendering, size } = useCxReRender(compRef, () => props.direction)
 
 defineExpose({})
 </script>

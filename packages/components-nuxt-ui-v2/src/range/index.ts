@@ -1,7 +1,7 @@
 import z from 'zod'
 import { normalize, safeNum } from '@lionad/cx-definition'
 import component from './src/index.vue'
-import { cmptColorNames3, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 
 export default normalize({
   key: 'cx-range',
@@ -22,8 +22,8 @@ export default normalize({
       type: 'number',
       name: '步长',
       initial: 1,
-      min: ({ cmpt }: any) => Math.max(safeNum(cmpt.data?.min || 0) + 1, 0),
-      max: ({ cmpt }: any) => Math.min(safeNum(cmpt.data?.max || 100), 100),
+      min: ({ comp }: any) => Math.max(safeNum(comp.data?.min || 0) + 1, 0),
+      max: ({ comp }: any) => Math.min(safeNum(comp.data?.max || 100), 100),
       step: 1,
     },
     disabled: {
@@ -40,7 +40,7 @@ export default normalize({
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
-      options: cmptColorNames3,
+      options: compColorNames3,
     },
   },
   emits: {

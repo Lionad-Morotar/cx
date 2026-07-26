@@ -7,7 +7,7 @@ export default defineNuxtPlugin({
   setup(nuxtApp) {
     const cx = nuxtApp.$cx as
       | {
-          installComponent: (key: string, cmpt: unknown) => void
+          installComponent: (key: string, comp: unknown) => void
         }
       | undefined
     if (!cx) {
@@ -17,9 +17,9 @@ export default defineNuxtPlugin({
     const materials = Object.values(StandupMaterials).filter(
       (v) => v && typeof v === 'object' && (v as { _cx_meta?: unknown })._cx_meta,
     ) as { _cx_meta: { key: string; type?: string } }[]
-    for (const cmpt of materials) {
-      cmpt._cx_meta.type = 'local'
-      cx.installComponent(cmpt._cx_meta.key, cmpt)
+    for (const comp of materials) {
+      comp._cx_meta.type = 'local'
+      cx.installComponent(comp._cx_meta.key, comp)
     }
     console.info(`[standup-materials] ${materials.length} materials installed`)
   },

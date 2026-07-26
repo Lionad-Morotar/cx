@@ -6,28 +6,28 @@ import type { CxComponentMetaDefined, CxComponentRuntime } from '../types'
  */
 export const cxLoaderHooks = mitt<{
   // 异步组件加载完成
-  'cmpt:async-cmpt:loaded': {
-    cmpt: CxComponentMetaDefined
+  'comp:async-comp:loaded': {
+    comp: CxComponentMetaDefined
   }
   // 异步组件完成后，在 cx-render 再次重置数据也完成
-  'cmpt:async-cmpt-data:loaded': {
-    cmpt: CxComponentMetaDefined
+  'comp:async-comp-data:loaded': {
+    comp: CxComponentMetaDefined
   }
-  'cmpt:cx-event:emit': {
+  'comp:cx-event:emit': {
     id: string
     event: any
     args: any[]
   }
-  'cmpt:before-mount': {
-    cmpt: CxComponentRuntime
+  'comp:before-mount': {
+    comp: CxComponentRuntime
   }
-  'cmpt:mounted': {
-    cmpt: CxComponentRuntime
+  'comp:mounted': {
+    comp: CxComponentRuntime
   }
-  'cmpt:before-unmount': {
-    cmpt: CxComponentRuntime
+  'comp:before-unmount': {
+    comp: CxComponentRuntime
   }
-  'cmpt:unmounted': {
-    cmpt: CxComponentRuntime
+  'comp:unmounted': {
+    comp: CxComponentRuntime
   }
 }>()

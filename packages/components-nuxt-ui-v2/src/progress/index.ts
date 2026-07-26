@@ -1,6 +1,6 @@
 import { normalize, safeNum } from '@lionad/cx-definition'
 import component from './src/index.vue'
-import { cmptColorNames3, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 import PanelItems from './panel/items.vue'
 import { binds } from './slots'
 
@@ -14,12 +14,12 @@ export default normalize({
     value: {
       type: 'range',
       name: '进度',
-      min: ({ cmpt }: any) => cmpt.data?.min || 0,
-      max: ({ cmpt }: any) => {
-        return cmpt.data?.type === 'number'
-          ? safeNum(cmpt.data?.max)
-          : cmpt.data?.type === 'label'
-            ? (cmpt.data?.maxItems || []).length - 1
+      min: ({ comp }: any) => comp.data?.min || 0,
+      max: ({ comp }: any) => {
+        return comp.data?.type === 'number'
+          ? safeNum(comp.data?.max)
+          : comp.data?.type === 'label'
+            ? (comp.data?.maxItems || []).length - 1
             : undefined
       },
       step: 1,
@@ -36,7 +36,7 @@ export default normalize({
     max: {
       type: 'number',
       name: '最大值',
-      hidden: ({ cmpt }: any) => cmpt.data?.type !== 'number',
+      hidden: ({ comp }: any) => comp.data?.type !== 'number',
     },
     // todo combine with max
     maxItems: {
@@ -44,12 +44,12 @@ export default normalize({
       name: '最大值',
       component: PanelItems,
       initial: () => [],
-      hidden: ({ cmpt }: any) => cmpt.data?.type !== 'label',
+      hidden: ({ comp }: any) => comp.data?.type !== 'label',
     },
     indicator: {
       type: 'boolean',
       name: '指示器',
-      hidden: ({ cmpt }: any) => cmpt.data?.type === 'label',
+      hidden: ({ comp }: any) => comp.data?.type === 'label',
     },
     animation: {
       type: 'card-selector',
@@ -79,15 +79,15 @@ export default normalize({
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
-      options: cmptColorNames3,
+      options: compColorNames3,
       ui: {
         item: 'w-[80%] h-28 px-4 pt-1 pb-8',
       },
     },
   },
-  slots: ({ cmpt }: any) => {
+  slots: ({ comp }: any) => {
     const res = []
-    if (cmpt.data?.type !== 'label') {
+    if (comp.data?.type !== 'label') {
       res.push({
         key: 'indicator',
         name: '指示器',
@@ -96,8 +96,8 @@ export default normalize({
         },
       })
     }
-    if (cmpt.data?.type === 'label') {
-      const items = cmpt.data?.maxItems || []
+    if (comp.data?.type === 'label') {
+      const items = comp.data?.maxItems || []
       items.forEach((item: any, index: any) => {
         res.push({
           key: `step-${index}`,

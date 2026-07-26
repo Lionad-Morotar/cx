@@ -32,7 +32,7 @@ export const useCxPanel = <
   const instance = getCurrentInstance()!
   // @ts-ignore * ComponentEmits not capable with @vue/compiler-sfc
   const emits = instance.emit as ComponentEmits<{
-    // cxCmptRuntime.data
+    // cxCompRuntime.data
     'update:data': [x: CxComponentRuntime['data']]
     // same as 'update:data'
     'update:datas': [x: CxComponentRuntime['data']]
@@ -43,7 +43,7 @@ export const useCxPanel = <
     Readonly<
       Partial<CxPropBase> & {
         cx: CxUtils
-        cmpt: CxComponentRuntime
+        comp: CxComponentRuntime
         data: Record<string, unknown>
         datas: Record<string, unknown>
         valueKey: string

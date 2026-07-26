@@ -1,7 +1,7 @@
 import z from 'zod'
 import { normalize } from '@lionad/cx-definition'
 import component from './src/index.vue'
-import { cmptColorNames3, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 import { binds } from './slots'
 
 export default normalize({
@@ -69,7 +69,7 @@ export default normalize({
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
-      options: cmptColorNames3,
+      options: compColorNames3,
     },
   },
   emits: {

@@ -1,6 +1,6 @@
 import { normalize } from '@lionad/cx-definition'
 import component from './src/index.vue'
-import { cmptColorNames3, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 import { binds } from './slots'
 
 export default normalize({
@@ -13,8 +13,8 @@ export default normalize({
     value: {
       type: 'range',
       name: '值',
-      min: ({ cmpt }: any) => cmpt.data?.min || 0,
-      max: ({ cmpt }: any) => cmpt.data?.max || 100,
+      min: ({ comp }: any) => comp.data?.min || 0,
+      max: ({ comp }: any) => comp.data?.max || 100,
       step: 1,
     },
     min: {
@@ -50,7 +50,7 @@ export default normalize({
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
-      options: cmptColorNames3,
+      options: compColorNames3,
       ui: {
         item: 'w-[80%] h-28 px-4 pt-1 pb-8',
       },

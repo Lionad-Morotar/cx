@@ -1,6 +1,6 @@
 <template>
   <UBadge
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     :ui="ui"
     :size="props.size || 'sm'"
@@ -40,13 +40,13 @@ const inner = defineProps<{
   prefix?: string
 }>()
 const props = useAttrs() as UBadgeProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   round?: boolean
   postfix?: string
 }
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => (props.round ? { rounded: 'rounded-full' } : {}))
 </script>
 

@@ -1,6 +1,6 @@
 <template>
   <URadio
-    ref="cmpt"
+    ref="comp"
     v-model="value"
     :class="ns.b()"
     :color="props.color"
@@ -35,11 +35,11 @@ type URadioProps = ComponentProps<typeof URadio>
 const ns = useCxBEM('radio')
 const inner = defineProps<{}>()
 const props = useAttrs() as URadioProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const value = ref(false)
 </script>
 

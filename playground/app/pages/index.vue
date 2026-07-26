@@ -22,7 +22,7 @@
     <section class="section">
       <h2 class="section-title">迁移物料 · schema 驱动渲染</h2>
       <div class="demo">
-        <CxRender :components="standupMaterialCmpts" />
+        <CxRender :components="standupMaterialComps" />
       </div>
     </section>
 
@@ -30,7 +30,7 @@
     <section class="section">
       <h2 class="section-title">基础物料 · schema 驱动渲染</h2>
       <div class="demo">
-        <CxRender :components="cmpts" />
+        <CxRender :components="comps" />
       </div>
     </section>
   </main>
@@ -41,7 +41,7 @@ import { ref } from 'vue'
 
 import type { CxComponentRuntime } from '@lionad/cx-definition'
 
-const cmpts = ref<CxComponentRuntime[]>([
+const comps = ref<CxComponentRuntime[]>([
   {
     id: 'demo-root',
     key: 'cx-block',
@@ -84,7 +84,7 @@ const cmpts = ref<CxComponentRuntime[]>([
 ])
 
 // 站会迁移物料（dashboard-card）的 schema 驱动渲染
-const standupMaterialCmpts = ref<CxComponentRuntime[]>([
+const standupMaterialComps = ref<CxComponentRuntime[]>([
   {
     id: 'standup-card-root',
     key: 'cx-dashboard-card',

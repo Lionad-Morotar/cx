@@ -1,6 +1,6 @@
 import z from 'zod'
 import { normalize } from '@lionad/cx-definition'
-import { cmptColorNames3 } from '@lionad/cx-vue'
+import { compColorNames3 } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
 export default normalize({
@@ -24,7 +24,7 @@ export default normalize({
       name: '颜色',
       type: 'card-selector',
       isPreview: true,
-      options: cmptColorNames3,
+      options: compColorNames3,
     },
     required: {
       name: '是否必填',

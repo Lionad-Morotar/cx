@@ -85,7 +85,7 @@ export default normalize({
       name: '关闭',
       description: '关闭警告',
     },
-    ...CxEvents.displaySubCmpt.define,
+    ...CxEvents.displaySubComp.define,
     ...CxEvents.init.define,
   },
   slots: (): any => {

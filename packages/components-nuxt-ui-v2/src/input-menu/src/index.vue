@@ -4,7 +4,7 @@
   </template>
   <UInputMenu
     v-else
-    ref="cmpt"
+    ref="comp"
     v-bind="attrs"
     v-model="value"
     v-model:query="query"
@@ -52,15 +52,15 @@ const inner = defineProps<{
   trailingIcon?: string
 }>()
 const props = useAttrs() as UInputMenuProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   dftValue?: string
   dftQuery?: string
   direction?: Placement
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef: any = useTemplateRef('cmpt')
+const compRef: any = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const value = ref(props.dftValue || '')
@@ -87,7 +87,7 @@ const attrs = computed(
     }) as const,
 )
 
-const { isReRendering, size } = useCxReRender(cmptRef, () => props.direction)
+const { isReRendering, size } = useCxReRender(compRef, () => props.direction)
 
 defineExpose({})
 </script>

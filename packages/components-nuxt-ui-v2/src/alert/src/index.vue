@@ -1,7 +1,7 @@
 <template>
   <UAlert
     v-if="isOpen"
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     :variant="props.variant"
     :size="props.size"
@@ -53,12 +53,12 @@ const emits = defineEmits(['open', 'close'])
 const inner = defineProps<{}>()
 const props = useAttrs() as UAlertProps &
   UButtonProps & {
-    cmpt: CxComponentRuntime
+    comp: CxComponentRuntime
     closeable?: boolean
   }
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 
 const isOpen = ref(true)
 const open = () => {
@@ -81,13 +81,13 @@ defineExpose({
   close,
   isOpen,
   [CxEvents.init.key]: init,
-  [CxEvents.displaySubCmpt.key]: (toDisplayCmpt: CxComponentRuntime) => {
-    if (!toDisplayCmpt) return
+  [CxEvents.displaySubComp.key]: (toDisplayComp: CxComponentRuntime) => {
+    if (!toDisplayComp) return
     if (isOpen.value) return
     let find = null
-    cx.utils.touch(props.cmpt.components!, (cmpt) => {
-      if (cmpt.id === toDisplayCmpt.id) {
-        find = cmpt
+    cx.utils.touch(props.comp.components!, (comp) => {
+      if (comp.id === toDisplayComp.id) {
+        find = comp
       }
     })
     if (find) {

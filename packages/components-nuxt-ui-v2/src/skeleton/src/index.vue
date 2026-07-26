@@ -1,5 +1,5 @@
 <template>
-  <div ref="cmpt" :class="[ns.b(), props.padded ? 'p-4' : '']" class="flex items-center gap-4">
+  <div ref="comp" :class="[ns.b(), props.padded ? 'p-4' : '']" class="flex items-center gap-4">
     <USkeleton
       v-if="type === 1"
       class="h-12 w-12 flex-shrink-0"
@@ -30,14 +30,14 @@ type USkeletonProps = ComponentProps<typeof USkeleton>
 const ns = useCxBEM('skeleton')
 const inner = defineProps<{}>()
 const props = useAttrs() as USkeletonProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   noAnimation?: boolean
   type?: number
   padded?: boolean
 }
-const { showSlot, showDefault } = useCxSlot(props.cmpt)
+const { showSlot, showDefault } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const type = computed(() => safeNum(props.type, 1))

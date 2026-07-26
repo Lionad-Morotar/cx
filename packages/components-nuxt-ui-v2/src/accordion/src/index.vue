@@ -1,6 +1,6 @@
 <template>
   <UAccordion
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     :ui="ui"
     :variant="props.variant"
@@ -31,7 +31,7 @@ import { useAttrs, useTemplateRef, computed } from 'vue'
 
 import { UAccordion, UButton } from '../../../vendor/bridge'
 
-import { CxEventDisplayCmptKey, useSleep } from '@lionad/cx-definition'
+import { CxEventDisplayCompKey, useSleep } from '@lionad/cx-definition'
 import { useCx, useCxSlot, useCxBEM, safeIcon } from '@lionad/cx-vue'
 import type { ComponentProps, CxComponentRuntime } from '@lionad/cx-definition'
 import type { Item } from '../types'
@@ -52,11 +52,11 @@ const props = useAttrs() as UAccordionProps &
     openIcon?: string
     closeIcon?: string
     items?: Item[]
-    cmpt: CxComponentRuntime
+    comp: CxComponentRuntime
   }
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef: any = useTemplateRef('cmpt')
+const compRef: any = useTemplateRef('comp')
 const ui = {}
 
 const items = computed(() =>
@@ -72,7 +72,7 @@ const closeIcon = computed(() => safeIcon(props.closeIcon))
 const defaultOpen = computed(() => !props.defaultClose)
 
 const open = async (index: number, reverse = false) => {
-  const elm = unrefElement(cmptRef.value)
+  const elm = unrefElement(compRef.value)
   const triggerElm = [...elm.querySelectorAll(`& > div > .${ns.e('trigger')}`)][index]
   return triggerElm.getAttribute('aria-expanded') === (reverse ? 'false' : 'true')
     ? false
@@ -84,13 +84,13 @@ const close = (index: number) => open(index, true)
 defineExpose({
   open,
   close,
-  [CxEventDisplayCmptKey]: async (toDisplayCmpt: CxComponentRuntime) => {
-    if (!toDisplayCmpt) return
+  [CxEventDisplayCompKey]: async (toDisplayComp: CxComponentRuntime) => {
+    if (!toDisplayComp) return
     // todo perf
-    const slotKey = Object.keys(props.cmpt?.components || {}).find((k) => {
+    const slotKey = Object.keys(props.comp?.components || {}).find((k) => {
       let find = null
-      cx.utils.touch(props.cmpt.components![k]!, (cmpt) => {
-        if (cmpt.id === toDisplayCmpt.id) {
+      cx.utils.touch(props.comp.components![k]!, (comp) => {
+        if (comp.id === toDisplayComp.id) {
           find = k
         }
       })

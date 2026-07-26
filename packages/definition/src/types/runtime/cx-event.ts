@@ -13,8 +13,8 @@ import type { RefsManager } from './cx-refs'
  *  id: 'event-id-123456',
  *  key: 'handle-click',
  *  subs: [
- *   { target: 'another-cmpt-id', trigger: 'refresh', args: [] },
- *   { target: 'another-cmpt-id-2', trigger: 'refresh', args: [] },
+ *   { target: 'another-comp-id', trigger: 'refresh', args: [] },
+ *   { target: 'another-comp-id-2', trigger: 'refresh', args: [] },
  *  ]
  * }
  */
@@ -52,7 +52,7 @@ export type CxEventDeprecated = {
 
 export type CxEmitter = ((opts: {
   // 从哪个组件触发的事件
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   // 事件名称（meta.emits 中记录的键名）
   eventKey: string
   // 事件参数

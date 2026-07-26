@@ -56,7 +56,7 @@ export default normalize({
       schema: z.any() as z.ZodType<FuseResults>,
     },
   },
-  slots: ({ cmpt }: any) => {
+  slots: ({ comp }: any) => {
     const res = [] as CxComponentSlot[]
 
     res.push({
@@ -64,7 +64,7 @@ export default normalize({
       name: '空状态',
     })
 
-    const groups = cmpt.data?.groups || []
+    const groups = comp.data?.groups || []
     groups.map((group: any) => {
       res.push(
         {

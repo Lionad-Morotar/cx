@@ -12,7 +12,7 @@ const byKey = (key: string) => CxBasics.find((x: any) => x._cx_meta.key === key)
 
 const mountNavigate = (provides: Record<any, any> = {}) =>
   mount(byKey('cx-navigate'), {
-    props: { cmpt: { id: 'cx-navigate-test', data: {} } as any },
+    props: { comp: { id: 'cx-navigate-test', data: {} } as any },
     global: {
       directives: { cx: { mounted() {} } },
       provide: provides,
@@ -21,10 +21,10 @@ const mountNavigate = (provides: Record<any, any> = {}) =>
 
 describe('cx-navigate 导航物料', () => {
   it('normalize 装配为 headless 物料', () => {
-    const cmpt = byKey('cx-navigate')
-    expect(cmpt._cx_meta.headless).toBe(true)
-    expect(cmpt._cx_meta.key).toBe('cx-navigate')
-    expect(typeof (cmpt as any)._cx_install).toBe('function')
+    const comp = byKey('cx-navigate')
+    expect(comp._cx_meta.headless).toBe(true)
+    expect(comp._cx_meta.key).toBe('cx-navigate')
+    expect(typeof (comp as any)._cx_install).toBe('function')
   })
 
   it('push/replace 调用注入的路由实现', () => {

@@ -6,7 +6,7 @@ export type CxComponentMetaSlots =
   | Record<string, ConfigMatcher>
   | ConfigMatcher[]
 
-type ConfigMatcher = CxComponentSlotBase | ((cmpt: CxComponentRuntime) => CxComponentSlotBase)
+type ConfigMatcher = CxComponentSlotBase | ((comp: CxComponentRuntime) => CxComponentSlotBase)
 
 export type CxComponentSlotBase = {
   key: string

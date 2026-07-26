@@ -75,8 +75,8 @@ function textNode(content: string): CxComponentRuntime {
   } as CxComponentRuntime
 }
 
-function toItem(cmpt: { _cx_meta: CxMeta }): { meta: CxMeta; node: CxComponentRuntime } {
-  const meta = cmpt._cx_meta
+function toItem(comp: { _cx_meta: CxMeta }): { meta: CxMeta; node: CxComponentRuntime } {
+  const meta = comp._cx_meta
   const node = {
     id: `dev-${meta.key}`,
     key: meta.key,

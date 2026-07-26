@@ -9,13 +9,13 @@ import { watch } from 'vue'
 defineOptions({ name: 'CxState' })
 
 const props = defineProps<{
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   name?: string
   value?: any
 }>()
 
 /**
- * 状态桥物料：把宿主 view 层传入的响应式 value 同步到自身 cmpt.data.value，
+ * 状态桥物料：把宿主 view 层传入的响应式 value 同步到自身 comp.data.value，
  * 供 schema 内其他物料经 _cx_data_config 按同名 key 绑定。
  *
  * 解决「外部状态（如 store/ref）无法被 _cx_data_config 直接绑定」的缺口
@@ -26,7 +26,7 @@ const props = defineProps<{
 watch(
   () => props.value,
   (v) => {
-    props.cmpt.data.value = v
+    props.comp.data.value = v
   },
   { immediate: true },
 )

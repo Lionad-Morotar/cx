@@ -36,7 +36,7 @@ const inner = defineProps<{
   size?: string | number
 }>()
 const props = useAttrs() as UIconProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   // if using a flex align-items-center container,
   // do not use this prop
   center?: boolean
@@ -44,9 +44,9 @@ const props = useAttrs() as UIconProps & {
   active?: boolean
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const isEdit = inject('is-cx-edit', false)

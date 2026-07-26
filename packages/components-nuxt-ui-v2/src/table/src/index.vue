@@ -1,5 +1,5 @@
 <template>
-  <div ref="cmpt" :class="ns.b()" v-bind="attrs">
+  <div ref="comp" :class="ns.b()" v-bind="attrs">
     <UTable v-bind="tableBinds" @select:all="$emit('select:all', $event)">
       <template v-for="(_, name) in $slots" #[name]="x">
         <slot v-if="showSlot(name)" :name="name as unknown as string" v-bind="x" />
@@ -28,15 +28,15 @@ type UTableProps = ComponentProps<typeof UTable>
 const ns = useCxBEM('table')
 const inner = defineProps<{}>()
 const props = useAttrs() as UTableProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   datas?: Data[]
   columns?: UseTableReturn['colsVisible']
   sorts?: UseTableReturn['colsSort']
   showSelect?: boolean
 }
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const attrs = computed(() => ({}))

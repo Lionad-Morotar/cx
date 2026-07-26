@@ -15,7 +15,7 @@ defineOptions({ name: 'CxUserStyle' })
 
 const props = withDefaults(
   defineProps<{
-    cmpt: CxComponentRuntime
+    comp: CxComponentRuntime
     userStyle?: string
   }>(),
   {
@@ -27,11 +27,11 @@ const props = withDefaults(
 
 const ns = useCxBEM('user-style')
 
-// console.log('[info] cmpt', props.cmpt)
+// console.log('[info] comp', props.comp)
 
 /** ********************************************************************* 组件状态 */
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const id = `${Date.now()}-${String(Math.random()).slice(-6)}`
 const cssID = `is-dynamic-${id}`
 

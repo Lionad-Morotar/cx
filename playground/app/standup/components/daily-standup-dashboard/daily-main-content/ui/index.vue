@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.b()" ref="cmptRef">
+  <div :class="ns.b()" ref="compRef">
     <!-- 昨天 -->
     <cx-dashboard-card
       data-focus-id="yesterday-dashboard-card"
@@ -96,9 +96,11 @@ const emits = defineEmits([])
 const props = withDefaults(
   defineProps<{
     // ...
+
   }>(),
   {
     // ...
+
   },
 )
 
@@ -106,7 +108,7 @@ const props = withDefaults(
 /*                                   states                                   */
 /* -------------------------------------------------------------------------- */
 
-const cmptRef = ref()
+const compRef = ref()
 const states = reactive({})
 
 const standupDetail = useStandupDetail()
@@ -243,7 +245,7 @@ const { editType, toggle } = CxTodoCard.useTodoCardEditType()
 // };
 
 /* -------------------------------------------------------------------------- */
-/*                          cmpt lifecycle & exposed                          */
+/*                          comp lifecycle & exposed                          */
 /* -------------------------------------------------------------------------- */
 
 const curUserRelatedIssusByDateReq = useAsync(async (user: User = currentUser.value!) => {

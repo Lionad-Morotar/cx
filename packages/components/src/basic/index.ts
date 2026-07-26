@@ -1,30 +1,30 @@
 import z from 'zod'
 import { normalize } from '@lionad/cx-definition'
-import cmptBlock from './src/block.vue'
-import cmptFigure from './src/figure.vue'
-import cmptHeader from './src/header.vue'
-import cmptH1 from './src/h1.vue'
-import cmptH2 from './src/h2.vue'
-import cmptH3 from './src/h3.vue'
-import cmptH4 from './src/h4.vue'
-import cmptH5 from './src/h5.vue'
-import cmptP from './src/p.vue'
-import cmptLogic from './src/logic.vue'
-import cmptDatas from './src/datas.vue'
-import cmptAction from './src/action.vue'
-import cmptToast from './src/toast.vue'
-import cmptState from './src/state.vue'
-import cmptComputed from './src/computed.vue'
-import cmptNavigate from './src/navigate.vue'
-import cmptScrollbar from './src/scrollbar.vue'
-import cmptSkeleton from './src/skeleton.vue'
+import compBlock from './src/block.vue'
+import compFigure from './src/figure.vue'
+import compHeader from './src/header.vue'
+import compH1 from './src/h1.vue'
+import compH2 from './src/h2.vue'
+import compH3 from './src/h3.vue'
+import compH4 from './src/h4.vue'
+import compH5 from './src/h5.vue'
+import compP from './src/p.vue'
+import compLogic from './src/logic.vue'
+import compDatas from './src/datas.vue'
+import compAction from './src/action.vue'
+import compToast from './src/toast.vue'
+import compState from './src/state.vue'
+import compComputed from './src/computed.vue'
+import compNavigate from './src/navigate.vue'
+import compScrollbar from './src/scrollbar.vue'
+import compSkeleton from './src/skeleton.vue'
 
 const CxText = normalize({
   name: '文本',
   icon: 'i-tabler-edit',
   description: '用来展示基础的文字内容',
   key: 'cx-text',
-  component: cmptP,
+  component: compP,
   props: {
     content: {
       name: '文本内容',
@@ -44,7 +44,7 @@ const CxHeader = normalize({
   icon: 'i-tabler-h-1',
   description: '用来展示标题内容',
   key: 'cx-header',
-  component: cmptHeader,
+  component: compHeader,
   props: {
     content: {
       name: '标题内容',
@@ -63,7 +63,7 @@ const CxH1 = normalize({
   icon: 'i-tabler-h-1',
   description: '用来展示标题内容',
   key: 'cx-h1',
-  component: cmptH1,
+  component: compH1,
   props: {
     content: {
       name: '标题内容',
@@ -82,7 +82,7 @@ const CxH2 = normalize({
   icon: 'i-tabler-h-2',
   description: '用来展示标题内容',
   key: 'cx-h2',
-  component: cmptH2,
+  component: compH2,
   props: {
     content: {
       name: '标题内容',
@@ -101,7 +101,7 @@ const CxH3 = normalize({
   icon: 'i-tabler-h-3',
   description: '用来展示标题内容',
   key: 'cx-h3',
-  component: cmptH3,
+  component: compH3,
   props: {
     content: {
       name: '标题内容',
@@ -120,7 +120,7 @@ const CxH4 = normalize({
   icon: 'i-tabler-h-4',
   description: '用来展示标题内容',
   key: 'cx-h4',
-  component: cmptH4,
+  component: compH4,
   props: {
     content: {
       name: '标题内容',
@@ -139,7 +139,7 @@ const CxH5 = normalize({
   icon: 'i-tabler-h-5',
   description: '用来展示标题内容',
   key: 'cx-h5',
-  component: cmptH5,
+  component: compH5,
   props: {
     content: {
       name: '标题内容',
@@ -158,7 +158,7 @@ const CxBlock = normalize({
   icon: 'i-tabler-box-model',
   description: '一个独立的页面区域，可以在内部填充其他组件',
   key: 'cx-block',
-  component: cmptBlock,
+  component: compBlock,
   props: {},
   slots: {
     default: {
@@ -173,7 +173,7 @@ const CxFigure = normalize({
   icon: 'i-ant-design-picture-outlined',
   description: '图片等内容',
   key: 'cx-figure',
-  component: cmptFigure,
+  component: compFigure,
   props: {
     image: {
       name: '图片',
@@ -202,7 +202,7 @@ const CxLogic = normalize({
   name: '条件容器',
   description: '在指定条件显示、隐藏或重复容器内的内容',
   icon: 'i-tabler-logic-xnor',
-  component: cmptLogic,
+  component: compLogic,
   headless: true,
   props: {
     type: {
@@ -219,15 +219,15 @@ const CxLogic = normalize({
       type: 'number',
       name: '条件值',
       initial: 0,
-      help: ({ cmpt }: any) => {
-        if (cmpt.data?.type === 'for') {
+      help: ({ comp }: any) => {
+        if (comp.data?.type === 'for') {
           return '重复次数最大为100'
         }
         return ''
       },
     },
   },
-  slots: ({ cmpt }: any) => {
+  slots: ({ comp }: any) => {
     const dftSlot = {
       key: 'default',
       name: '内容区域',
@@ -244,7 +244,7 @@ const CxLogic = normalize({
         },
       },
     }
-    if (cmpt.data?.type !== 'for') {
+    if (comp.data?.type !== 'for') {
       delete (dftSlot as any).binds
     }
     return [dftSlot]
@@ -256,7 +256,7 @@ const CxDatas = normalize({
   name: '数据容器',
   description: '创造新的数据，提供给插槽内其他组件',
   icon: 'i-mdi-database-outline',
-  component: cmptDatas,
+  component: compDatas,
   headless: true,
   props: {},
   slots: {
@@ -273,7 +273,7 @@ const CxAction = normalize({
   description:
     '执行宿主注入的异步函数（如 API 调用），暴露 loading/data/error 供绑定，成功/失败可触发其他物料',
   icon: 'i-tabler-bolt',
-  component: cmptAction,
+  component: compAction,
   headless: true,
   // action 是函数引用、由宿主 view 层注入；args 同理作为运行时参数。
   // 两者都不在编辑器配置层声明（序列化方案待定），props 元数据暂空。
@@ -285,7 +285,7 @@ const CxToast = normalize({
   name: '反馈',
   description: '经宿主 toast 服务弹出反馈（成功/失败提示），由其他物料的事件触发',
   icon: 'i-tabler-message-2',
-  component: cmptToast,
+  component: compToast,
   headless: true,
   props: {},
 })
@@ -295,7 +295,7 @@ const CxState = normalize({
   name: '状态',
   description: '把宿主传入的响应式 value 桥接到 schema，供其他物料经数据绑定消费',
   icon: 'i-tabler-database',
-  component: cmptState,
+  component: compState,
   headless: true,
   props: {},
 })
@@ -305,7 +305,7 @@ const CxComputed = normalize({
   name: '派生状态',
   description: '用受限表达式对依赖值求值，输出派生值供绑定（如 a || b）',
   icon: 'i-tabler-calculator',
-  component: cmptComputed,
+  component: compComputed,
   headless: true,
   props: {},
 })
@@ -315,7 +315,7 @@ const CxNavigate = normalize({
   name: '导航',
   description: '经宿主路由服务跳转页面（push/replace），由其他物料的事件触发',
   icon: 'i-tabler-arrow-right',
-  component: cmptNavigate,
+  component: compNavigate,
   headless: true,
   props: {},
 })
@@ -325,7 +325,7 @@ const CxScrollbar = normalize({
   name: '滚动容器',
   description: '可滚动的内容容器，提供自定义滚动条样式，替代 el-scrollbar',
   icon: 'i-tabler-scroll',
-  component: cmptScrollbar,
+  component: compScrollbar,
   props: {},
   slots: {
     default: {
@@ -340,7 +340,7 @@ const CxSkeleton = normalize({
   name: '骨架屏',
   description: '加载骨架遮罩，shimmer 动画，替代 ElSkeleton',
   icon: 'i-tabler-loader-2',
-  component: cmptSkeleton,
+  component: compSkeleton,
   headless: true,
   props: {},
 })

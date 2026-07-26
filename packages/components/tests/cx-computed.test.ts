@@ -54,40 +54,40 @@ describe('safeEval 受限表达式求值器', () => {
 
 describe('cx-computed 派生物料', () => {
   it('normalize 装配为 headless 物料', () => {
-    const cmpt = byKey('cx-computed')
-    expect(cmpt._cx_meta.headless).toBe(true)
-    expect(cmpt._cx_meta.key).toBe('cx-computed')
-    expect(typeof (cmpt as any)._cx_install).toBe('function')
+    const comp = byKey('cx-computed')
+    expect(comp._cx_meta.headless).toBe(true)
+    expect(comp._cx_meta.key).toBe('cx-computed')
+    expect(typeof (comp as any)._cx_install).toBe('function')
   })
 
-  it('expr + ctx 求值写入 cmpt.data.value', () => {
-    const cmpt = { id: 'cx-computed-test', data: reactive({}) } as any
+  it('expr + ctx 求值写入 comp.data.value', () => {
+    const comp = { id: 'cx-computed-test', data: reactive({}) } as any
     mount(byKey('cx-computed'), {
-      props: { cmpt, expr: 'a || b', ctx: { a: false, b: true } },
+      props: { comp, expr: 'a || b', ctx: { a: false, b: true } },
       global: { directives: { cx: { mounted() {} } } },
     })
-    expect(cmpt.data.value).toBe(true)
+    expect(comp.data.value).toBe(true)
   })
 
   it('ctx 变化重新求值', async () => {
-    const cmpt = { id: 'cx-computed-test', data: reactive({}) } as any
+    const comp = { id: 'cx-computed-test', data: reactive({}) } as any
     const wrapper = mount(byKey('cx-computed'), {
-      props: { cmpt, expr: 'a && b', ctx: { a: true, b: false } },
+      props: { comp, expr: 'a && b', ctx: { a: true, b: false } },
       global: { directives: { cx: { mounted() {} } } },
     })
-    expect(cmpt.data.value).toBe(false)
+    expect(comp.data.value).toBe(false)
     await wrapper.setProps({ ctx: { a: true, b: true } })
-    expect(cmpt.data.value).toBe(true)
+    expect(comp.data.value).toBe(true)
   })
 
   it('非法表达式回退 undefined（不抛错）', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    const cmpt = { id: 'cx-computed-test', data: reactive({}) } as any
+    const comp = { id: 'cx-computed-test', data: reactive({}) } as any
     mount(byKey('cx-computed'), {
-      props: { cmpt, expr: 'a.b.c', ctx: {} },
+      props: { comp, expr: 'a.b.c', ctx: {} },
       global: { directives: { cx: { mounted() {} } } },
     })
-    expect(cmpt.data.value).toBeUndefined()
+    expect(comp.data.value).toBeUndefined()
     warn.mockRestore()
   })
 })

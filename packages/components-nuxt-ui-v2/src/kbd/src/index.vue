@@ -1,5 +1,5 @@
 <template>
-  <UKbd ref="cmpt" :class="ns.b()" v-bind="attrs">
+  <UKbd ref="comp" :class="ns.b()" v-bind="attrs">
     <template v-if="showSlot('default')" #default="x">
       <slot name="default" v-bind="x" />
     </template>
@@ -23,12 +23,12 @@ const ns = useCxBEM('kbd')
 const emits = defineEmits(['update:value'])
 const inner = defineProps<{}>()
 const props = useAttrs() as UKbdProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const attrs = computed(

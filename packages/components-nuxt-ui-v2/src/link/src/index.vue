@@ -1,6 +1,6 @@
 <template>
   <ULink
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     v-bind="attrs"
     active-class="text-(--ui-primary)"
@@ -30,14 +30,14 @@ const ns = useCxBEM('kbd')
 const emits = defineEmits(['update:value'])
 const inner = defineProps<{}>()
 const props = useAttrs() as ULinkProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   openInNew?: boolean
   label?: string
 }
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const attrs = computed(

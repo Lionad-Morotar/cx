@@ -46,7 +46,7 @@ type ConfigPropMatch = CxPropBase &
   )
 
 export type CxPropCTX = Partial<{
-  cmpt: Readonly<CxComponentRuntime>
+  comp: Readonly<CxComponentRuntime>
   props: Readonly<Record<string, any>>
   data: Readonly<Record<string, any>>
   emits?: Readonly<AnyFn>
@@ -99,7 +99,7 @@ export type CxPropBase = {
     newValue: any,
     oldValue: any,
     ctx: Required<CxPropCTX> & {
-      cmpt: CxComponentRuntime
+      comp: CxComponentRuntime
     },
   ) => void
 }

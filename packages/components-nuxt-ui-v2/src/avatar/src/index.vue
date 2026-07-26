@@ -10,7 +10,7 @@
   </UAvatarGroup>
   <UAvatar
     v-else
-    ref="cmpt"
+    ref="comp"
     class="inline-block align-middle"
     :class="[ns.b(), ns.is('sub', props.isInGroup), ns.is(props.index as string)]"
     v-bind="{ ...avatarAttrs, ...chipAttrs }"
@@ -42,23 +42,23 @@ const inner = defineProps<{
   max?: number | string
 }>()
 const props = useAttrs() as UAvatarProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   image?: CxImageUploadPropValue
   enableChip?: boolean
   isInGroup?: boolean
   index?: string
 }
-const { showSlot } = useCxSlot(props.cmpt)
-const cmptRef = useTemplateRef('cmpt')
+const { showSlot } = useCxSlot(props.comp)
+const compRef = useTemplateRef('comp')
 
 const isGroup = showSlot('tail')
 const avatars = computed(() => {
   const res = [] as CxComponentRuntime[]
-  cx.utils.touch(props.cmpt, (cmpt) => {
-    if (cmpt.key === 'cx-avatar') {
-      const newAvatar = cx.utils.cloneComponent(cmpt, ['data', 'id', 'parents', 'sortn'])
+  cx.utils.touch(props.comp, (comp) => {
+    if (comp.key === 'cx-avatar') {
+      const newAvatar = cx.utils.cloneComponent(comp, ['data', 'id', 'parents', 'sortn'])
       newAvatar.data.size = props.size
-      newAvatar.data.isInGroup = not(cmpt.id === props.cmpt.id && isGroup)
+      newAvatar.data.isInGroup = not(comp.id === props.comp.id && isGroup)
       newAvatar.data.index = String(res.length)
       res.push(newAvatar)
     }
@@ -134,7 +134,7 @@ defineExpose({
       .cx-avatar {
         @apply ring-2 ring-white dark:ring-black;
 
-        // 使用 index 而不是 :nth-child，避免 render-cmpt-wrapper 多套了一层 DOM
+        // 使用 index 而不是 :nth-child，避免 render-comp-wrapper 多套了一层 DOM
         &:not(.is-0) {
           margin-left: var(--ml);
         }

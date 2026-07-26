@@ -11,7 +11,7 @@ export * from './use-cx-props'
 export * from './use-cx-responsive'
 export * from './use-cx-re-render'
 
-/** CxCmpt */
+/** CxComp */
 
 export * from './use-cx-slot'
 export * from './use-cx-states'

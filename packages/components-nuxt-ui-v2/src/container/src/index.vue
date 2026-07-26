@@ -1,5 +1,5 @@
 <template>
-  <UContainer ref="cmpt" :class="ns.b()">
+  <UContainer ref="comp" :class="ns.b()">
     <template #default>
       <slot v-if="showSlot('default')" name="default" />
       <CxEmptyImage v-else="showDefault()" />
@@ -23,11 +23,11 @@ type UContainerProps = ComponentProps<typeof UContainer>
 const ns = useCxBEM('container')
 const inner = defineProps<{}>()
 const props = useAttrs() as UContainerProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
 }
-const { showSlot, showDefault } = useCxSlot(props.cmpt)
+const { showSlot, showDefault } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 </script>
 

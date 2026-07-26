@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.b()" ref="cmptRef">
+  <div :class="ns.b()" ref="compRef">
     <div
       v-for="filter in filters"
       :key="filter.name"
@@ -52,9 +52,11 @@ const emits = defineEmits([])
 const props = withDefaults(
   defineProps<{
     // ...
+
   }>(),
   {
     // ...
+
   },
 )
 
@@ -62,7 +64,7 @@ const props = withDefaults(
 /*                                   states                                   */
 /* -------------------------------------------------------------------------- */
 
-const cmptRef = ref()
+const compRef = ref()
 const states = reactive({})
 
 const standupDetail = useStandupDetail()

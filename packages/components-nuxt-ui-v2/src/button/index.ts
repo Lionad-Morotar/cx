@@ -1,5 +1,5 @@
 import { normalize } from '@lionad/cx-definition'
-import { cmptColorNames2, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames2, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 import { slotBinds } from './slots'
 import type { CxComponentSlot } from '@lionad/cx-definition'
@@ -96,24 +96,24 @@ export default normalize({
       name: '颜色',
       type: 'card-selector',
       isPreview: true,
-      options: cmptColorNames2,
+      options: compColorNames2,
     },
   },
-  slots: ({ cmpt }: any) => {
+  slots: ({ comp }: any) => {
     const res = [] as CxComponentSlot[]
     res.push({
       name: '内容',
       key: 'default',
     })
-    if (cmpt.data._icon) {
-      if (cmpt.data.iconPos === 'leading') {
+    if (comp.data._icon) {
+      if (comp.data.iconPos === 'leading') {
         res.push({
           name: '内容后',
           key: 'trailing',
           binds: slotBinds,
         })
       }
-      if (cmpt.data.iconPos === 'trailing') {
+      if (comp.data.iconPos === 'trailing') {
         res.push({
           name: '内容前',
           key: 'leading',

@@ -1,5 +1,5 @@
 <template>
-  <UProgress ref="cmpt" :class="ns.b()" v-bind="attrs">
+  <UProgress ref="comp" :class="ns.b()" v-bind="attrs">
     <template v-for="(_, name) in $slots" #[name]="x">
       <slot v-if="showSlot(name)" :name="name as unknown as string" v-bind="x" />
     </template>
@@ -28,15 +28,15 @@ const inner = defineProps<{
   max?: number | string
 }>()
 const props = useAttrs() as UProgressProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   type?: 'number' | 'label'
   maxItems?: Item[]
 }
-// console.log('[info] cmpt progress -> ', props, inner)
+// console.log('[info] comp progress -> ', props, inner)
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 const ui = computed(() => {})
 
 const attrs = computed(

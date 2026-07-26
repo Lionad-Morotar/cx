@@ -15,7 +15,7 @@ export function createTestCx() {
     config: unknown
     installed: Record<string, unknown>
     installedAsync: Record<string, unknown>
-    installComponent: (key: string, cmpt: unknown) => Promise<void>
+    installComponent: (key: string, comp: unknown) => Promise<void>
   }
   cx.config = { app, type: 'umd' }
   cx.installed = Object.create(null)
@@ -30,10 +30,10 @@ export function installMaterials(
   cx: ReturnType<typeof createTestCx>,
   materials: Record<string, unknown>,
 ) {
-  for (const cmpt of Object.values(materials)) {
-    const key = (cmpt as { _cx_meta?: { key?: string } })?._cx_meta?.key
+  for (const comp of Object.values(materials)) {
+    const key = (comp as { _cx_meta?: { key?: string } })?._cx_meta?.key
     if (key) {
-      void cx.installComponent(key, cmpt)
+      void cx.installComponent(key, comp)
     }
   }
 }
@@ -41,7 +41,7 @@ export function installMaterials(
 /**
  * 低样板构造 schema 节点（补齐未提供的可选字段），供测试内联组装页面树。
  */
-export function cmpt(
+export function comp(
   id: string,
   key: string,
   data: Record<string, unknown> = {},

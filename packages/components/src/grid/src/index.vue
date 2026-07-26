@@ -19,14 +19,14 @@
 <script setup lang="ts">
 import { useSlots, computed } from 'vue'
 
-import { useCxBEM, useCmptSlots } from '@lionad/cx-vue'
+import { useCxBEM, useCompSlots } from '@lionad/cx-vue'
 
 import { defaultDatas } from '../config'
 import { getPosByTurn } from '../utils'
 
 defineOptions({ name: 'CxGrid' })
 
-const cmptEmptySlots = useCmptSlots('empty')
+const compEmptySlots = useCompSlots('empty')
 
 const ns = useCxBEM('grid')
 const slots = useSlots()

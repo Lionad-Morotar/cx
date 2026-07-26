@@ -4,7 +4,7 @@
     name="DefineSingleCalendarTemplate"
   >
     <el-calendar
-      ref="cmpt"
+      ref="comp"
       :model-value="value"
       :class="[ns.b(), ns.is(id), ns.is(viewType), ns.is(sourceViewType)]"
       :range="range"
@@ -190,7 +190,7 @@ const getFormattedCalendarCell = (value: MaybeRef<string | Dayjs | Date>) => {
 }
 
 watch(value, (n) => {
-  cmptRef.value?.pickDay(n)
+  compRef.value?.pickDay(n)
 })
 
 const checkIsDisabled = (day: string) => {
@@ -231,7 +231,7 @@ const getYearRange = (x: number) => {
   return retRange
 }
 
-const cmptRef = useTemplateRef('cmpt')
+const compRef = useTemplateRef('comp')
 
 const _select = (val: Dayjs | string) => {
   if (!val) {

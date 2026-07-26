@@ -31,111 +31,111 @@ export const createCxDatas = (cx: CxLoaderInstance) => {
   const clean = useCleanups()
 
   // 组件树
-  const cmptsTree = ref([] as CxComponentRuntime[])
+  const compsTree = ref([] as CxComponentRuntime[])
   const clearTree = () => {
-    cmptsTree.value = []
-    cmpts.value = []
+    compsTree.value = []
+    comps.value = []
     root.value = null
-    cmpts.value._cx_inited = false
+    comps.value._cx_inited = false
     clean.cleanup()
   }
 
   // 转化组件树需要用到的临时状态，如组件列表，组件 id map 等
-  const useCmptList = (cmpts: CxStoredComponent[]) => {
-    const tempCmptList = cmpts as CxStoredComponent[]
-    const tempCmptsIdMap = tempCmptList.reduce(
+  const useCompList = (comps: CxStoredComponent[]) => {
+    const tempCompList = comps as CxStoredComponent[]
+    const tempCompsIdMap = tempCompList.reduce(
       (acc, x) => {
         acc[x.id] = x
         return acc
       },
       {} as Record<string, CxStoredComponent>,
     )
-    const checkInTempCmptsIdMap = (id: string) => tempCmptsIdMap[id]
+    const checkInTempCompsIdMap = (id: string) => tempCompsIdMap[id]
     return {
-      tempCmptList,
-      tempCmptsIdMap,
-      checkInTempCmptsIdMap,
+      tempCompList,
+      tempCompsIdMap,
+      checkInTempCompsIdMap,
     }
   }
 
   // 把新的组件列表转换为组件树
-  const makeCxTree = (newCmpts: MaybeRef<CxStoredComponent[]>) => {
-    const treeState = useCmptList(unref(newCmpts) || [])
-    cmptsTree.value = makeTree(treeState)
-    // console.trace('[info] makeCxTree', cmptsTree.value)
-    return cmptsTree
+  const makeCxTree = (newComps: MaybeRef<CxStoredComponent[]>) => {
+    const treeState = useCompList(unref(newComps) || [])
+    compsTree.value = makeTree(treeState)
+    // console.trace('[info] makeCxTree', compsTree.value)
+    return compsTree
   }
   tryOnScopeDispose(() => {
     clearTree()
   })
   // 把新的组件列表附加并转化到现有组件树上
-  const attachCxTree = (newCmpts: MaybeRef<CxStoredComponent[]>, toCmpt: CxComponentRuntime) => {
-    // console.log('[debug] attachCxTree', newCmpts, toCmpt)
-    if (!unref(newCmpts)?.length) {
-      return cmptsTree
+  const attachCxTree = (newComps: MaybeRef<CxStoredComponent[]>, toComp: CxComponentRuntime) => {
+    // console.log('[debug] attachCxTree', newComps, toComp)
+    if (!unref(newComps)?.length) {
+      return compsTree
     } else {
-      toCmpt = cmptsIdMap.value[toCmpt.id]!
-      if (!toCmpt) {
-        throw new Error(`[ERR] toCmpt not found`)
+      toComp = compsIdMap.value[toComp.id]!
+      if (!toComp) {
+        throw new Error(`[ERR] toComp not found`)
       }
-      const subTreeState = useCmptList(unref(newCmpts) || [])
-      const subTreeCmpts = makeTree(subTreeState)
-      // 改变 toCmpt 的 components 会重新触发 cmpts 和 吹灭同IDMap 计算，所以不用重新 makeTree
-      toCmpt.components = {
-        default: subTreeCmpts,
+      const subTreeState = useCompList(unref(newComps) || [])
+      const subTreeComps = makeTree(subTreeState)
+      // 改变 toComp 的 components 会重新触发 comps 和 吹灭同IDMap 计算，所以不用重新 makeTree
+      toComp.components = {
+        default: subTreeComps,
       }
-      subTreeCmpts.map((cmpt) => {
-        cmpt.parents = [toCmpt.id]
+      subTreeComps.map((comp) => {
+        comp.parents = [toComp.id]
       })
     }
   }
-  const clearCxTree = (toCmpt: CxComponentRuntime) => {
-    toCmpt = cmptsIdMap.value[toCmpt.id]!
-    if (!toCmpt) {
-      throw new Error(`[ERR] toCmpt not found`)
+  const clearCxTree = (toComp: CxComponentRuntime) => {
+    toComp = compsIdMap.value[toComp.id]!
+    if (!toComp) {
+      throw new Error(`[ERR] toComp not found`)
     }
-    cx.utils.touch(toCmpt, (cmpt) => {
-      if (cmpt.parents?.includes(toCmpt.id)) {
-        cmpt.parents = cmpt.parents.filter((x: string) => x !== toCmpt.id)
+    cx.utils.touch(toComp, (comp) => {
+      if (comp.parents?.includes(toComp.id)) {
+        comp.parents = comp.parents.filter((x: string) => x !== toComp.id)
       }
     })
-    toCmpt.components = {}
+    toComp.components = {}
   }
 
   const root = ref(null) as Ref<CxComponentRuntime | null>
-  const cmpts = ref([]) as Ref<
+  const comps = ref([]) as Ref<
     CxComponentRuntime[] & {
       _cx_inited?: boolean
     }
   >
-  const cmptsIdMap = ref<Record<string, CxComponentRuntime>>({})
+  const compsIdMap = ref<Record<string, CxComponentRuntime>>({})
 
-  watch(cmptsTree, (_tree) => {
+  watch(compsTree, (_tree) => {
     clean.cleanup()
     if (!_tree?.length) return
 
-    // console.log('[debug] reCalc cmpts list')
+    // console.log('[debug] reCalc comps list')
     const list = ref(new Set() as Set<CxComponentRuntime>)
     clean.add(list.value.clear)
-    const follow = (cmpt: CxComponentRuntime) => {
-      list.value.add(cmpt)
-      // watch cmpt.id
+    const follow = (comp: CxComponentRuntime) => {
+      list.value.add(comp)
+      // watch comp.id
       clean.add(
         watchImmediate(
-          () => cmpt?.id,
+          () => comp?.id,
           (nv, ov) => {
             if (nv && ov && nv !== ov) {
-              cmptsIdMap.value[nv] = cmpt
-              delete cmptsIdMap.value[ov]
+              compsIdMap.value[nv] = comp
+              delete compsIdMap.value[ov]
             }
           },
         ),
       )
-      // watch cmpt.components
+      // watch comp.components
       clean.add(
         watchImmediate(
           () => {
-            return (Object.values(cmpt?.components || {}).flat(Infinity) as CxComponentRuntime[])
+            return (Object.values(comp?.components || {}).flat(Infinity) as CxComponentRuntime[])
               .map((x) => x.id)
               .join(':')
           },
@@ -146,14 +146,14 @@ export const createCxDatas = (cx: CxLoaderInstance) => {
             const removedIDs = oldIDs.filter((x) => !newIDs.includes(x))
             removedIDs.map((id) => {
               useMacroTask(() => {
-                if (list.value.has(cmptsIdMap.value[id]!)) {
-                  list.value.delete(cmptsIdMap.value[id]!)
+                if (list.value.has(compsIdMap.value[id]!)) {
+                  list.value.delete(compsIdMap.value[id]!)
                 }
               })
             })
 
             if (newIDs.length) {
-              ;(Object.values(cmpt?.components || {}).flat(Infinity) as CxComponentRuntime[]).map(
+              ;(Object.values(comp?.components || {}).flat(Infinity) as CxComponentRuntime[]).map(
                 (x) => {
                   follow(x)
                 },
@@ -163,50 +163,50 @@ export const createCxDatas = (cx: CxLoaderInstance) => {
         ),
       )
     }
-    cmptsTree.value.map((cmpt) => {
-      cx.utils.touch(cmpt, follow)
+    compsTree.value.map((comp) => {
+      cx.utils.touch(comp, follow)
     })
     clean.add(
       watchImmediate(
         () => list.value?.size,
         (_size) => {
-          cmpts.value = [...list.value]
-          cmptsIdMap.value = cmpts.value.reduce(
+          comps.value = [...list.value]
+          compsIdMap.value = comps.value.reduce(
             (acc, x) => {
               acc[x.id] = x
               return acc
             },
             {} as Record<string, CxComponentRuntime>,
           )
-          // console.log('[debug] reCalc cmpts value', _size, cmptsIdMap.value)
+          // console.log('[debug] reCalc comps value', _size, compsIdMap.value)
 
-          root.value = cmpts.value[0] || null
-          cmpts.value._cx_inited = true
+          root.value = comps.value[0] || null
+          comps.value._cx_inited = true
         },
       ),
     )
   })
 
-  function makeTree(treeState: ReturnType<typeof useCmptList>) {
-    const { tempCmptList, tempCmptsIdMap, checkInTempCmptsIdMap } = treeState
+  function makeTree(treeState: ReturnType<typeof useCompList>) {
+    const { tempCompList, tempCompsIdMap, checkInTempCompsIdMap } = treeState
 
-    if (!tempCmptList.length) return []
-    // console.log('[info] makeTree', tempCmptList.length, tempCmptList, tempCmptsIdMap)
+    if (!tempCompList.length) return []
+    // console.log('[info] makeTree', tempCompList.length, tempCompList, tempCompsIdMap)
 
-    const res = tempCmptList
+    const res = tempCompList
       // validate
-      .filter((cmpt) => {
-        if (!cmpt.key) console.error('[ERR] no key in cmpt, skip', cmpt)
-        return cmpt.key
+      .filter((comp) => {
+        if (!comp.key) console.error('[ERR] no key in comp, skip', comp)
+        return comp.key
       })
       // wash
-      .map((cmpt) => {
-        cmpt.sortn = (cmpt as any).sortnStr
-        return cmpt as CxStoredComponent
+      .map((comp) => {
+        comp.sortn = (comp as any).sortnStr
+        return comp as CxStoredComponent
       })
 
       // sort
-      // place root cmpt(no parent) first
+      // place root comp(no parent) first
       // order by sortn
       .sort((a, b) => {
         if (!a.parent && b.parent) return -1
@@ -214,12 +214,12 @@ export const createCxDatas = (cx: CxLoaderInstance) => {
         if (BigNumber(a.sortn as string).isEqualTo(BigNumber(b.sortn as string))) return 0
         return BigNumber(a.sortn as string).isLessThan(BigNumber(b.sortn as string)) ? -1 : 1
       })
-      // add cmpt to parent
-      .map((cmpt) => {
-        // console.log('[info] cmpt', cmpt.id, cmpt.key)
-        if (cmpt.parent?.id) {
-          const parent = tempCmptsIdMap[cmpt.parent.id] as unknown as CxComponentRuntime
-          const slotKey = cmpt.slot || 'default'
+      // add comp to parent
+      .map((comp) => {
+        // console.log('[info] comp', comp.id, comp.key)
+        if (comp.parent?.id) {
+          const parent = tempCompsIdMap[comp.parent.id] as unknown as CxComponentRuntime
+          const slotKey = comp.slot || 'default'
           if (parent) {
             parent.components = (parent.components || {}) as Record<string, CxComponentRuntime[]>
             if (!parent.components[slotKey]) {
@@ -227,10 +227,10 @@ export const createCxDatas = (cx: CxLoaderInstance) => {
             }
             const slot = parent.components[slotKey] || []
             if (!slot?.length) {
-              slot.push(cmpt as unknown as CxComponentRuntime)
+              slot.push(comp as unknown as CxComponentRuntime)
             } else {
-              if (slot.some((x) => x.id === cmpt.id)) {
-                return cmpt
+              if (slot.some((x) => x.id === comp.id)) {
+                return comp
               }
               // const sorts = slot.map(x => x.sortn)
               /**
@@ -239,54 +239,54 @@ export const createCxDatas = (cx: CxLoaderInstance) => {
                * 2. sortn 相同的，先来后到
                */
               const insertIndex = slot.findLastIndex((x: CxComponentRuntime) =>
-                checkLEIndexThan(x.sortn, cmpt.sortn),
+                checkLEIndexThan(x.sortn, comp.sortn),
               )
               if (insertIndex === -1) {
-                slot.unshift(cmpt as unknown as CxComponentRuntime)
+                slot.unshift(comp as unknown as CxComponentRuntime)
               } else {
-                slot.splice(insertIndex + 1, 0, cmpt as unknown as CxComponentRuntime)
+                slot.splice(insertIndex + 1, 0, comp as unknown as CxComponentRuntime)
               }
-              // console.log(cmpt.key, cmpt.sortn, '->', sorts, insertIndex)
+              // console.log(comp.key, comp.sortn, '->', sorts, insertIndex)
             }
-            ;(cmpt as unknown as CxComponentRuntime).parents = [parent.id]
+            ;(comp as unknown as CxComponentRuntime).parents = [parent.id]
           } else {
             // todo use retry
             // https://github.com/Shinigami92/vueuse/blob/e134d5e72241a797a24b98eb10eb084aabb9227d/packages/core/useRetry/index.ts
-            console.error('[ERR] parent not found', cmpt)
+            console.error('[ERR] parent not found', comp)
 
             // * for debug
-            const root = tempCmptList.find((x) => !x.parent)
+            const root = tempCompList.find((x) => !x.parent)
             const anySlot = Object.keys(root?.components || {})[0]
             if (anySlot) {
-              root!.components![anySlot]!.push(cmpt as unknown as CxComponentRuntime)
-              cmpt.parents = [root!.id]
+              root!.components![anySlot]!.push(comp as unknown as CxComponentRuntime)
+              comp.parents = [root!.id]
             }
           }
         }
-        return cmpt
+        return comp
       })
-      // remove un-parented cmpts, only capable with slotted cmpt.components, for example,
+      // remove un-parented comps, only capable with slotted comp.components, for example,
       // { key: 'cx-page', components: { default: [] } }
-      .map((_cmptAny: any) => {
-        const cmpt = _cmptAny as CxComponentRuntime & CxStoredComponent
-        // console.log('[debug] cmpt', cx)
-        if (!cx.utils.isSlottedCxComponentGroup(cmpt.components)) {
-          return cmpt
+      .map((_compAny: any) => {
+        const comp = _compAny as CxComponentRuntime & CxStoredComponent
+        // console.log('[debug] comp', cx)
+        if (!cx.utils.isSlottedCxComponentGroup(comp.components)) {
+          return comp
         }
-        Object.entries(cmpt.components!).map(([slotKey, slotCmpts]) => {
-          const cmptsInSlot = (slotCmpts || []) as CxComponentRuntime[]
-          cmptsInSlot.map((cmptInSlot) => {
-            if (checkInTempCmptsIdMap(cmptInSlot.id)) return
-            // remove un-parented cmpts
-            const idx = cmpt.components![slotKey]!.findIndex((x: CxComponentRuntime) => {
-              return x.id === cmptInSlot.id
+        Object.entries(comp.components!).map(([slotKey, slotComps]) => {
+          const compsInSlot = (slotComps || []) as CxComponentRuntime[]
+          compsInSlot.map((compInSlot) => {
+            if (checkInTempCompsIdMap(compInSlot.id)) return
+            // remove un-parented comps
+            const idx = comp.components![slotKey]!.findIndex((x: CxComponentRuntime) => {
+              return x.id === compInSlot.id
             })
             if (idx > -1) {
-              cmpt.components![slotKey]!.splice(idx, 1)
+              comp.components![slotKey]!.splice(idx, 1)
             }
           })
         })
-        return cmpt
+        return comp
       })
       .filter((x) => !x.parent) as CxComponentRuntime[]
 
@@ -297,13 +297,13 @@ export const createCxDatas = (cx: CxLoaderInstance) => {
 
   return {
     root,
-    cmpts,
+    comps,
     clearTree,
     makeCxTree,
     attachCxTree,
     clearCxTree,
-    cmptsTree,
-    cmptsIdMap,
+    compsTree,
+    compsIdMap,
   }
 }
 

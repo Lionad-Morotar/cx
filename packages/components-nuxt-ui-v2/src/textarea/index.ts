@@ -1,7 +1,7 @@
 import z from 'zod'
 import { normalize, has, not } from '@lionad/cx-definition'
 import component from './src/index.vue'
-import { cmptColorNames3, useSizeOptions } from '@lionad/cx-vue'
+import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 
 export default normalize({
   key: 'cx-textarea',
@@ -26,7 +26,7 @@ export default normalize({
       initial: 20,
       min: 1,
       max: 20,
-      hidden: ({ cmpt }: any) => not(cmpt.data?.autoresize),
+      hidden: ({ comp }: any) => not(comp.data?.autoresize),
     },
     rows: {
       type: 'range',
@@ -34,7 +34,7 @@ export default normalize({
       initial: 0,
       min: 0,
       max: 20,
-      hidden: ({ cmpt }: any) => has(cmpt.data?.autoresize),
+      hidden: ({ comp }: any) => has(comp.data?.autoresize),
     },
     resize: {
       type: 'boolean',
@@ -73,7 +73,7 @@ export default normalize({
       type: 'card-selector',
       name: '颜色',
       isPreview: true,
-      options: cmptColorNames3,
+      options: compColorNames3,
       pickData: ({ data }: any) => ({ ...data, autoresize: false, rows: 1 }),
       ui: {
         item: 'w-[80%] h-28 px-4 pt-1 pb-5',

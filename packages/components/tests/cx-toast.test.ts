@@ -12,7 +12,7 @@ const byKey = (key: string) => CxBasics.find((x: any) => x._cx_meta.key === key)
 
 const mountToast = (provides: Record<any, any> = {}) =>
   mount(byKey('cx-toast'), {
-    props: { cmpt: { id: 'cx-toast-test', data: {} } as any },
+    props: { comp: { id: 'cx-toast-test', data: {} } as any },
     global: {
       directives: { cx: { mounted() {} } },
       provide: provides,
@@ -21,10 +21,10 @@ const mountToast = (provides: Record<any, any> = {}) =>
 
 describe('cx-toast 反馈物料', () => {
   it('normalize 装配为 headless 物料', () => {
-    const cmpt = byKey('cx-toast')
-    expect(cmpt._cx_meta.headless).toBe(true)
-    expect(cmpt._cx_meta.key).toBe('cx-toast')
-    expect(typeof (cmpt as any)._cx_install).toBe('function')
+    const comp = byKey('cx-toast')
+    expect(comp._cx_meta.headless).toBe(true)
+    expect(comp._cx_meta.key).toBe('cx-toast')
+    expect(typeof (comp as any)._cx_install).toBe('function')
   })
 
   it('show 调用注入的 toast 实现', () => {

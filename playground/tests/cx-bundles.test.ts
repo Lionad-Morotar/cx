@@ -13,9 +13,9 @@ describe('物料 bundle 装配链路', () => {
     for (const bundle of cxBundles as any[]) {
       expect(typeof bundle.name).toBe('string')
       expect(bundle.materials.length).toBeGreaterThan(0)
-      for (const cmpt of bundle.materials) {
-        expect(cmpt._cx_meta?.key).toMatch(/^cx-[a-z0-9-]+$/)
-        expect(typeof cmpt._cx_install).toBe('function')
+      for (const comp of bundle.materials) {
+        expect(comp._cx_meta?.key).toMatch(/^cx-[a-z0-9-]+$/)
+        expect(typeof comp._cx_install).toBe('function')
       }
     }
   })
@@ -36,8 +36,8 @@ describe('物料 bundle 装配链路', () => {
     expect(duplicates.every((k) => KNOWN_DUPLICATE_KEYS.includes(k))).toBe(true)
 
     for (const bundle of cxBundles as any[]) {
-      for (const cmpt of bundle.materials) {
-        expect(cmpt._cx_meta.type).toBe('local')
+      for (const comp of bundle.materials) {
+        expect(comp._cx_meta.type).toBe('local')
       }
     }
   })

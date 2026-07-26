@@ -1,6 +1,6 @@
 <template>
   <UForm
-    ref="cmpt"
+    ref="comp"
     :class="ns.b()"
     class="space-y-2"
     :schema="schema"
@@ -33,15 +33,15 @@ type UFormProps = ComponentProps<typeof UForm>
 const ns = useCxBEM('form')
 const inner = defineProps<{}>()
 const props = useAttrs() as UFormProps & {
-  cmpt: CxComponentRuntime
+  comp: CxComponentRuntime
   uiEmptyTip?: boolean
   uiEmptyTipText?: string
 }
-provide(`cx-form-empty-tip-${props.cmpt.id}`, props.uiEmptyTip)
+provide(`cx-form-empty-tip-${props.comp.id}`, props.uiEmptyTip)
 
-const { showSlot } = useCxSlot(props.cmpt)
+const { showSlot } = useCxSlot(props.comp)
 
-const cmptRef = ref<any>()
+const compRef = ref<any>()
 const ui = computed(() => {})
 
 const attrs = computed(() => ({}) as const)
@@ -62,11 +62,11 @@ const state = reactive({
 })
 
 defineExpose({
-  validate: () => cmptRef.value?.validate(),
-  setErrors: (errors: Record<string, string>) => cmptRef.value?.setErrors(errors),
-  submit: () => cmptRef.value?.submit(),
-  getErrors: (path?: string) => cmptRef.value?.getErrors(path),
-  clear: (path?: string) => cmptRef.value?.clear(path),
+  validate: () => compRef.value?.validate(),
+  setErrors: (errors: Record<string, string>) => compRef.value?.setErrors(errors),
+  submit: () => compRef.value?.submit(),
+  getErrors: (path?: string) => compRef.value?.getErrors(path),
+  clear: (path?: string) => compRef.value?.clear(path),
 })
 </script>
 
