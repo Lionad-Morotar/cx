@@ -2,54 +2,25 @@ import { createTriggerRegistry } from '@lionad/cx-stream'
 import type { CxSpec, CxStreamNode, MatchesPerPath, TriggerRegistry } from '@lionad/cx-stream'
 import type { CxComponentRuntime } from '@lionad/cx-definition'
 
+import { compositeChunks } from './stream-mock.generated'
+
 // /dev/stream 验收页的确定性剧本与 cx 协议装配。
 // 抽成独立模块（而非内联进页面）有两个原因：
 // 1. 无头测试可直接驱动这些纯数据/纯函数，不必挂载 Nuxt 页面与定时器；
 // 2. 页面 setup 只保留回放引擎与面板渲染，控制在可读行数内。
 
 /**
- * LLM 最终要完整输出的 data-table Spec（剧本单一事实源）。
- *
- * 选用 cx-vtu-data-table 承载「大数组渐进渲染」：其行数据属性名为 `data`
- * （注意不是源包 readme 示例里的 rows——前身到当前的类型漂移），
- * 因此增量 trigger 的扫描路径见 createDemoRegistry。
+ * 流式剧本的 chunk 序列：Coze 录制转译产物（见 stream-mock.generated.ts），
+ * 边界对应真实 SSE delta 的心跳节奏。按 chunk 粒度推进回放时，
+ * 管线调用次数从「字符数/步长」降到「delta 数」。
  */
-export const DEMO_TABLE_SPEC: CxStreamNode = {
-  id: 'stream-demo-table',
-  key: 'cx-vtu-data-table',
-  name: '团队成员',
-  data: {
-    columns: [
-      { key: 'name', label: '名称', sortable: true },
-      { key: 'role', label: '角色' },
-      { key: 'active', label: '启用', format: { kind: 'boolean' } },
-    ],
-    data: [
-      { name: 'Alice', role: '管理员', active: true },
-      { name: 'Bob', role: '成员', active: false },
-      { name: 'Carol', role: '成员', active: true },
-      { name: 'Dave', role: '访客', active: false },
-    ],
-  },
-}
-
-// JSON.stringify 的 2 空格缩进让每个数组元素独占一行，
-// 流式回放时行数据「逐行到达」，增量渲染的渐进效果才肉眼可见。
-const specJson = JSON.stringify(DEMO_TABLE_SPEC, null, 2)
+export const STREAM_CHUNKS: string[] = compositeChunks
 
 /**
- * 预置的 LLM 流式输出剧本：散文 + ```json 围栏 Spec + 收尾散文。
- * 页面回放引擎按字符把它喂进一根不断生长的字符串。
+ * 字符串契约的完整剧本。
+ * detector / 增量管线等字符串消费者不需要感知 chunk 边界，统一消费这一根。
  */
-export const STREAM_SCRIPT = [
-  '好的，我把团队成员信息整理成了一张表格：',
-  '',
-  '```json',
-  specJson,
-  '```',
-  '',
-  '如上所示，共 4 位成员，多数处于启用状态。',
-].join('\n')
+export const STREAM_SCRIPT = STREAM_CHUNKS.join('')
 
 // --- 增量渲染 trigger（Route Z）---
 
