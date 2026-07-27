@@ -1,0 +1,5 @@
+# 全局 gitignore 的 zRefs 对 oxfmt 不可见（它只读本地 .gitignore/.prettierignore）；
+# vendored 录制与生成产物保持机器字节稳定，不纳入格式化
+zRefs/
+playground/app/dev/mocks/
+playground/app/dev/stream-mock.generated.ts

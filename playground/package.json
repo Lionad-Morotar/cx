@@ -6,7 +6,8 @@
     "dev": "nuxt dev --host 0.0.0.0 --port 3209",
     "build": "nuxt build",
     "typecheck": "nuxi prepare && vue-tsc --noEmit -p .nuxt/tsconfig.json",
-    "gen:mocks": "node scripts/generate-mocks.mjs"
+    "gen:mocks": "node scripts/generate-mocks.mjs",
+    "gen:stream-mock": "node scripts/gen-stream-mock.mjs"
   },
   "dependencies": {
     "@lionad/cx-components": "workspace:*",
