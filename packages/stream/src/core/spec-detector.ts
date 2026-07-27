@@ -231,6 +231,8 @@ export function createSpecDetector<TSpec = unknown>(config: SpecDetectorConfig<T
       let content = text
       const pendingSources: string[] = []
       let pendingIndex = 0
+      // 从后往前替换以保偏移量；副作用是 pendingSources 呈文档序倒序，
+      // [0] 恰是正在流式的最后一个块——下游依赖此顺序取当前块（见混合态分支）
       for (let i = blocks.length - 1; i >= 0; i--) {
         const b = blocks[i]!
         content =
@@ -246,6 +248,9 @@ export function createSpecDetector<TSpec = unknown>(config: SpecDetectorConfig<T
     let pendingIndex = 0
     const pendingSources: string[] = []
     let content = text
+    // 从后往前替换以保偏移量；同时让 pendingSources 呈文档序倒序，
+    // [0] 恰是正在流式的最后一个块——下游（增量管线、打字机预览）依赖
+    // 该顺序取当前块，「修正」为正序会造成多围栏场景静默错位
     for (let i = blocks.length - 1; i >= 0; i--) {
       const b = blocks[i]!
       if (b.pending && !b.spec) {

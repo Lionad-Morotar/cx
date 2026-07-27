@@ -27,7 +27,7 @@
         />
         <span class="speed-val">{{ speed }}</span>
       </label>
-      <span class="progress">{{ progress }} / {{ STREAM_SCRIPT.length }}</span>
+      <span class="progress">{{ progress }} / {{ STREAM_CHUNKS.length }} chunks</span>
     </section>
 
     <div class="grid">
@@ -53,10 +53,10 @@
         <pre class="raw raw--small">{{ detection.content ?? '—' }}</pre>
       </article>
 
-      <!-- 面板 3：打字机预览（pending 阶段） -->
+      <!-- 面板 3：打字机预览（任一围栏 pending 阶段） -->
       <article class="card" data-testid="panel-typewriter">
         <header class="card-head"><span class="card-name">打字机预览</span></header>
-        <p v-if="status === 'pending'" class="typewriter" data-testid="typewriter-text">
+        <p v-if="pendingSource" class="typewriter" data-testid="typewriter-text">
           {{ displayText }}<span class="cursor">▍</span>
         </p>
         <p v-else class="muted">仅 pending 阶段展示</p>
@@ -78,14 +78,18 @@
         </div>
       </article>
 
-      <!-- 面板 5：终态渲染（success 后接管） -->
+      <!-- 面板 5：终态渲染（success 后随围栏闭合逐个接管） -->
       <article class="card" data-testid="panel-final">
         <header class="card-head">
           <span class="card-name">终态渲染</span>
-          <span v-if="finalNode" class="badge badge--success">success</span>
+          <span v-if="finalNodes.length" class="badge badge--success">
+            {{ finalNodes.length }} / {{ totalSpecs }} specs
+          </span>
         </header>
         <div class="preview">
-          <CxRender v-if="finalNode" :components="[finalNode]" />
+          <template v-if="finalNodes.length">
+            <CxRender v-for="node in finalNodes" :key="node.id" :components="[node]" />
+          </template>
           <span v-else class="muted">Spec 闭合后渲染完整组件</span>
         </div>
       </article>
@@ -126,15 +130,20 @@ import {
   useStreamChunks,
   type CxStreamNode,
 } from '@lionad/cx-stream'
-import { createDemoRegistry, STREAM_SCRIPT, toRenderNode } from '~/dev/stream-scenario'
+import {
+  createDemoRegistry,
+  STREAM_CHUNKS,
+  STREAM_SCRIPT,
+  toRenderNode,
+} from '~/dev/stream-scenario'
 
-// --- 回放引擎：定时器把剧本逐字符喂进一根不断生长的字符串 ---
+// --- 回放引擎：定时器按 chunk（真实 SSE delta 边界）推进剧本 ---
 const progress = ref(0)
 const playing = ref(false)
 const speed = ref(6)
 let timer: ReturnType<typeof setInterval> | null = null
 
-const streamText = computed(() => STREAM_SCRIPT.slice(0, progress.value))
+const streamText = computed(() => STREAM_CHUNKS.slice(0, progress.value).join(''))
 
 function togglePlay() {
   if (playing.value) {
@@ -142,10 +151,10 @@ function togglePlay() {
   } else {
     playing.value = true
     // 已到结尾再播放则从头开始
-    if (progress.value >= STREAM_SCRIPT.length) progress.value = 0
+    if (progress.value >= STREAM_CHUNKS.length) progress.value = 0
     timer = setInterval(() => {
-      progress.value = Math.min(STREAM_SCRIPT.length, progress.value + speed.value)
-      if (progress.value >= STREAM_SCRIPT.length) pause()
+      progress.value = Math.min(STREAM_CHUNKS.length, progress.value + speed.value)
+      if (progress.value >= STREAM_CHUNKS.length) pause()
     }, 50)
   }
 }
@@ -162,7 +171,9 @@ onUnmounted(pause)
 const detector = createSpecDetector(cxSpecDetectorConfig)
 const detection = computed(() => detector.extractSpecs(streamText.value))
 const status = computed(() => detection.value.status)
-// pending 阶段的原始 JSON（隔离自 markdown 渲染层），供增量渲染与打字机消费
+// pendingSources 按文档序倒序 push（detector 为保偏移量从后往前替换占位符），
+// [0] 恰是正在流式的最后一个围栏——多围栏下这个顺序不可「修正」，
+// 否则增量渲染与打字机消费的当前块静默错位
 const pendingSource = computed(() => detection.value.pendingSources?.[0] ?? '')
 
 // --- 增量渲染（Route Z）：partialSpec 为当前可渲染的部分 Spec ---
@@ -172,10 +183,16 @@ const { partialSpec, reset: resetExtractor } = useIncrementalTree(
 )
 const partialNode = computed(() => toCxNode(partialSpec.value))
 
-// --- 终态渲染：success 后由完整 Spec 接管 ---
-const finalNode = computed(() =>
-  status.value === 'success' ? toCxNode(detection.value.spec ?? null) : null,
+// --- 终态渲染：success 后已闭合的 Spec 逐个接管（多围栏下随闭合递增） ---
+const finalNodes = computed(() =>
+  status.value === 'success'
+    ? detection.value.specs
+        .map((spec) => toCxNode(spec))
+        .filter((node): node is NonNullable<typeof node> => node !== null)
+    : [],
 )
+// 围栏总数来自完整剧本的静态检出，用于进度展示（不随回放变化）
+const totalSpecs = detector.extractSpecs(STREAM_SCRIPT).specs.length
 
 // CxSpec（单根或数组）→ CxRender 可消费节点；空/缺省一律 null（数组根取首元素）
 function toCxNode(spec: CxStreamNode | CxStreamNode[] | null) {
