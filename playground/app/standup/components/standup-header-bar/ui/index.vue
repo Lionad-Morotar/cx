@@ -1,5 +1,5 @@
 <template>
-  <div class="header-section">
+  <div class="cx-standup-header-bar header-section">
     <TimeCount weekday />
     <div class="buttons-con">
       <UButton class="manual-sync" color="primary" @mousedown="apiSyncIssues">
@@ -51,6 +51,8 @@ import {
 import { dayjs, timeStr } from '../../../utils'
 
 import type { Standup, User } from '../../../apis'
+
+defineOptions({ name: 'CxStandupHeaderBar' })
 
 const router = useRouter()
 const toast = useToast()

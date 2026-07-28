@@ -1,5 +1,5 @@
 <template>
-  <div :class="`cx-${cx.id}-${comp.id}-${slot.key}`" style="display: contents">
+  <div :class="`cx-${cx.id}-${comp.id}-${slot.key}`" style="display: contents" class="cx-render-components">
     <component :is="slotWrapper" v-if="slotWrapper" v-bind="compBinds">
       <component
         :is="innerSlots[`${slot.key}-start`]"

@@ -1,6 +1,6 @@
 <template>
   <UButton
-    class="fullscreen-button"
+    class="cx-fullscreen-button fullscreen-button"
     :class="props.icon ? 'is-type-icon' : 'is-type-text'"
     variant="outline"
     ref="fullscreenButtonRef"
@@ -16,6 +16,8 @@ import { ref } from 'vue'
 import { unrefElement, useFullscreen, eagerComputed } from '@vueuse/core'
 
 import type { MaybeElementRef } from '@vueuse/core'
+
+defineOptions({ name: 'CxFullscreenButton' })
 
 const props = withDefaults(
   defineProps<{

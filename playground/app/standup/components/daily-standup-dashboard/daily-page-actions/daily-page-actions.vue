@@ -29,7 +29,7 @@ import { CxFullscreenButton } from '../..'
 
 type AnyValue = any
 
-defineOptions({ name: 'daily-page-actions' })
+defineOptions({ name: 'CxDailyPageActions' })
 const router = useRouter()
 
 const ns = useCxNamespace('daily-page-actions')

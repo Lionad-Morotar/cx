@@ -1,5 +1,5 @@
 <template>
-  <div v-bind="mouseEventHandlers">
+  <div v-bind="mouseEventHandlers" class="cx-context-menu">
     <slot name="trigger-area" />
 
     <teleport to="body">
@@ -58,6 +58,8 @@ import {
 import { useLastPosition } from '../hooks/use-position'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 import type { Action } from '../types'
+
+defineOptions({ name: 'CxContextMenu' })
 
 /* -------------------------------------------------------------------------- */
 /*                                 types & env                                */

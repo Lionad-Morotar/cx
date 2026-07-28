@@ -1,5 +1,5 @@
 <template>
-  <span class="sorter" v-if="sorts.length">
+  <span class="cx-column-sorter sorter" v-if="sorts.length">
     <template v-for="sort in sorts" :key="sort">
       <div :class="[sort, isActive(sort) && 'is-active']" @click="active(sort)" />
     </template>
@@ -10,6 +10,8 @@
 import { computed } from 'vue'
 
 import type { Column, SelectedSort } from './type'
+
+defineOptions({ name: 'CxColumnSorter' })
 
 const emits = defineEmits(['update:selected'])
 const props = withDefaults(

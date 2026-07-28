@@ -12,6 +12,7 @@ const definedSlots = [
 ]
 
 export default defineComponent({
+  name: 'CxWeeklyStandardDashboardPageLayout',
   setup() {
     const runtimeSlots = useSlots()
 

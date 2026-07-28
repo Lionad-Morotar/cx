@@ -1,5 +1,5 @@
 <template>
-  <cx-folder-container class="issues-view-statics is-card" customized-icon>
+  <cx-folder-container class="cx-view-issues-statics-cards issues-view-statics is-card" customized-icon>
     <template #header="{ isFold, toggle }">
       <div class="card-header-section">
         <div class="fold-icon-con" @click="toggle()">
@@ -49,6 +49,8 @@ import IconArrow from '../../assets/arrow.svg'
 
 import type { User } from '../../apis'
 import type { FormattedIssue } from '../../utils/task'
+
+defineOptions({ name: 'CxViewIssuesStaticsCards' })
 
 const props = withDefaults(
   defineProps<{

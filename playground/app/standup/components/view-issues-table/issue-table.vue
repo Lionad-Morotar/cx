@@ -1,5 +1,5 @@
 <template>
-  <div class="standup-issue-table">
+  <div class="cx-issue-table standup-issue-table">
     <div class="table-header">
       <div class="columns">
         <div class="column-item" v-for="column in columns" :key="column.key">
@@ -116,6 +116,8 @@ import ColumnSorter from './column-sorter.vue'
 
 import type { User, FormattedIssue } from '../../apis'
 import type { SelectedSort, Columns } from './type'
+
+defineOptions({ name: 'CxIssueTable' })
 
 const instance = getCurrentInstance()!
 cx.emit('pass:instance:CxViewIssuesTable', instance)

@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.e('line-content')" @click="focus">
+  <div :class="ns.e('line-content')" @click="focus" class="cx-render-content">
     <!-- maybe refactor with https://www.npmjs.com/package/rich-string-parser -->
     <template v-if="content?.mention?.length">
       <template v-for="tag in content.mention" :key="tag.id">
@@ -31,6 +31,8 @@ import { useVModel } from '@vueuse/core'
 import { standupBus as emitter } from '../../../../utils/standup-bus'
 
 import type { Content, Mention } from '../../types'
+
+defineOptions({ name: 'CxRenderContent' })
 
 const ns = useCxNamespace('todo-card')
 const emits = defineEmits(['update:content'])

@@ -1,5 +1,5 @@
 <template>
-  <UForm label-position="top" :model="modelValue" label-width="110px">
+  <UForm label-position="top" :model="modelValue" label-width="110px" class="cx-tabs">
     <UFormField
       v-for="(tab, idx) in modelValue"
       :key="`${idx}-${tab.value}`"
@@ -24,6 +24,8 @@
 <script setup lang="ts">
 import { useCxPanel } from '@lionad/cx-vue'
 import type { Tab } from '../types'
+
+defineOptions({ name: 'CxTabs' })
 
 const { value: modelValue } = useCxPanel<Tab[]>()
 

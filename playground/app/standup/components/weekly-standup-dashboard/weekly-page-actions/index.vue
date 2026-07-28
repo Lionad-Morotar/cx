@@ -1,5 +1,5 @@
 <template>
-  <div class="buttons-con">
+  <div class="cx-weekly-page-actions buttons-con">
     <div class="meeting-spent-time-count" v-if="isToday">
       <img class="time-icon" :src="IconTime" />
       <cx-time-tick v-if="isCurStandupInProgress" :from="meetingDate" format="HH:mm:ss" />
@@ -33,6 +33,8 @@ import { useStandupDetail } from '../../../states/standups'
 import { dayjs } from '../../../utils'
 
 import IconTime from '../../../assets/time.svg'
+
+defineOptions({ name: 'CxWeeklyPageActions' })
 
 const router = useRouter()
 const toast = useToast()

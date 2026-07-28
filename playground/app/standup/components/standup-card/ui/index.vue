@@ -5,7 +5,7 @@
     :group="group"
     :idx="idx"
     :view-type="viewType"
-    @mousedown.stop="goDashboardPage(standup)"
+    @mousedown.stop="goDashboardPage(standup)" class="cx-standup-card"
   >
     <template v-if="isWeeklyMeeting" #card-title>
       <div class="time" :title="dayjs(standup.meetingDate).format('YYYY-MM-DD')">
@@ -26,6 +26,8 @@ import { useStandupType } from '../../../states/standups'
 import { dayjs, toCNNumber } from '../../../utils'
 
 import type { GroupOfStandup, Standup } from '../../../apis'
+
+defineOptions({ name: 'CxStandupCard' })
 
 const props = withDefaults(
   defineProps<{

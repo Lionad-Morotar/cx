@@ -1,5 +1,5 @@
 <template>
-  <div class="group-header" @mousedown="toggle">
+  <div class="cx-standup-group-header group-header" @mousedown="toggle">
     <CxSvgIcon class="icon" icon-class="benzhoudianjihou" />
     <div class="group-con-title">
       第{{ toCNNumber(group?.offsetCount ?? 1) }}{{ timeRangeMeterStr(groupByType) }}
@@ -21,6 +21,8 @@ import CxSvgIcon from '../../cx-svg-icon.vue'
 import { FolderContainerCtxKey, StandupGroupKey } from '../../standup-context'
 import { useStandupType } from '../../../states/standups'
 import { timeRangeMeterStr, toCNNumber } from '../../../utils'
+
+defineOptions({ name: 'CxStandupGroupHeader' })
 
 // group 由 group-list 注入；折叠上下文由外层 folder-container 注入
 const group = inject(StandupGroupKey, null)

@@ -1,6 +1,6 @@
 <template>
   <cx-dashboard-card
-    class="comp-weekly-todo-card"
+    class="cx-weekly-todo-card comp-weekly-todo-card"
     :title="todoCardWeekType === 'curWeek' ? '问题' : '上周问题'"
     :side-title="dayStr()"
     full-content
@@ -34,6 +34,8 @@ import { dayStr } from '../../../utils'
 
 import type { User } from '../../../apis'
 import type { Content } from '../../todo-card/types'
+
+defineOptions({ name: 'CxWeeklyTodoCard' })
 
 const props = defineProps<{
   user?: User | null

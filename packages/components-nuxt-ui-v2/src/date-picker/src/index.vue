@@ -1,5 +1,5 @@
 <template>
-  <UPopover :popper="{ placement: 'bottom-start' }">
+  <UPopover :popper="{ placement: 'bottom-start' }" class="cx-date-picker">
     <UButton icon="i-heroicons-calendar-days-20-solid" :label="label" />
 
     <template #panel="{ close }">
@@ -43,6 +43,8 @@ import { computed, ref, watch } from 'vue'
 import { UButton, UPopover } from '../../../vendor/bridge'
 
 import CxDatePicker from './date-picker.vue'
+
+defineOptions({ name: 'CxDatePicker' })
 
 const emits = defineEmits(['change', 'close'])
 const props = withDefaults(

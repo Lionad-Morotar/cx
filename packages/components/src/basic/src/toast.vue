@@ -1,5 +1,5 @@
 <template>
-  <span style="display: none" aria-hidden="true" />
+  <span style="display: none" aria-hidden="true" class="cx-toast" />
 </template>
 
 <script setup lang="ts">

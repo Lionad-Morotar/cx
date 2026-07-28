@@ -7,7 +7,7 @@
     ]"
     :title="title"
     role="img"
-    @click="emits('click', $event)"
+    @click="emits('click', $event)" class="cx-cx-icon"
   >
     <slot>
       <Icon v-if="name" :icon="name" :width="size" :height="size" class="cx-icon__svg" />
@@ -22,7 +22,7 @@ import { Icon } from '@iconify/vue'
  * 物料通用的图标渲染（原为 p-ray 全局组件 p-icon 的 cx 轻量替代）。
  * 视觉差异：tooltip 降级为原生 title 属性。
  */
-defineOptions({ name: 'CxIcon' })
+defineOptions({ name: 'CxCxIcon' })
 
 withDefaults(
   defineProps<{

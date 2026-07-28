@@ -1,5 +1,5 @@
 <template>
-  <span style="display: none" aria-hidden="true" />
+  <span style="display: none" aria-hidden="true" class="cx-navigate" />
 </template>
 
 <script setup lang="ts">

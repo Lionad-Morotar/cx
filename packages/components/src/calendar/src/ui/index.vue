@@ -1,7 +1,7 @@
 <template>
   <define-single-calendar-template
     v-slot="{ value, range, viewType, sourceViewType, enableSelect }"
-    name="DefineSingleCalendarTemplate"
+    name="DefineSingleCalendarTemplate" class="cx-calendar"
   >
     <el-calendar
       ref="comp"
@@ -118,6 +118,8 @@ import 'dayjs/plugin/weekday'
 
 import type { Dayjs } from 'dayjs'
 import type { MaybeRef } from 'vue'
+
+defineOptions({ name: 'CxCalendar' })
 
 const [DefineSingleCalendarTemplate, ReuseSingleCalendarTemplate] = createReusableTemplate()
 

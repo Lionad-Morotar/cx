@@ -2,7 +2,7 @@
   <!-- /dev/components-nuxt-ui-v2：@lionad/cx-components-nuxt-ui-v2 物料 schema 驱动渲染验收。
        按 Nuxt UI 官方分类（Elements / Form / Data / Layout / Navigation / Overlay）分组展示，
        分类骨架来自 vendored 源码 vendor/src/runtime/components/ 的 6 大目录。 -->
-  <main class="page">
+  <main class="page-dev-components-nuxt-ui-v2 page">
     <header class="page-header">
       <h1 class="title">cx components · nuxt-ui v2</h1>
       <p class="subtitle">
@@ -43,6 +43,8 @@
 import { CxNuxtUIV2 } from '@lionad/cx-components-nuxt-ui-v2'
 import { toItem, type CxMeta } from '~/dev/material-utils'
 import { groupByCategory, type CategoryGroup } from '~/dev/nuxt-ui-v2-categories'
+
+defineOptions({ name: 'PageDevComponentsNuxtUiV2' })
 
 // v2 包物料经 cx-nuxt 的 nuxt-ui-v2 bundle 注册到全局 $cx；
 // groupByCategory 按官方分类装配成 6 组，未映射 key 会抛错强制补全映射

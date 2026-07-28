@@ -89,7 +89,7 @@ import type { Content } from '../../../todo-card/types'
 /*                                 types & env                                */
 /* -------------------------------------------------------------------------- */
 
-defineOptions({ name: 'daily-main-content' })
+defineOptions({ name: 'CxDailyMainContent' })
 
 const ns = useCxNamespace('daily-main-content')
 const emits = defineEmits([])

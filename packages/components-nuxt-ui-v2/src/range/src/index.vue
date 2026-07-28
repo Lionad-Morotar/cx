@@ -19,7 +19,7 @@ import { isBoolean } from 'lodash-es'
 import { useCxSlot, useCxBEM } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
-defineOptions({ name: 'CxMeter' })
+defineOptions({ name: 'CxRange' })
 
 type USliderProps = ComponentProps<typeof URange>
 

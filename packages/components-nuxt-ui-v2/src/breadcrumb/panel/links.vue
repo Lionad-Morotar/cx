@@ -1,5 +1,5 @@
 <template>
-  <div class="form">
+  <div class="cx-links form">
     <template v-for="(tab, idx) in value" :key="`${idx}-${tab.id}`">
       <UFormGroup class="accordion-item">
         <template #label>
@@ -31,6 +31,8 @@ import { createItem } from '../utils'
 import type { Item } from '../types'
 
 import { UButton, UFormGroup, UInput, UTextarea } from '../../../vendor/bridge'
+
+defineOptions({ name: 'CxLinks' })
 
 const { emits, props, value } = useCxPanel<Item[]>([])
 

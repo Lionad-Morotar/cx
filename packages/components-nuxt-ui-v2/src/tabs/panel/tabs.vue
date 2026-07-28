@@ -1,5 +1,5 @@
 <template>
-  <div class="form">
+  <div class="cx-tabs form">
     <UFormGroup v-for="(tab, idx) in value" :key="`${idx}-${tab.value}`" class="tab-item">
       <template #label>
         <div class="label">
@@ -20,6 +20,8 @@ import { createTab } from '../utils'
 import type { Tab } from '../types'
 
 import { UButton, UFormGroup, UInput } from '../../../vendor/bridge'
+
+defineOptions({ name: 'CxTabs' })
 
 const { emits, props, value } = useCxPanel<Tab[]>([])
 

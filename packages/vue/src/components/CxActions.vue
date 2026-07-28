@@ -1,6 +1,6 @@
 <template>
   <!-- 动作按钮组（原为 p-ray p-actions 的 cx 轻量替代；u-button/u-separator 降级为原生元素） -->
-  <div class="cx-actions">
+  <div class="cx-cx-actions cx-actions">
     <template v-for="(group, idx) in groupedActions" :key="idx">
       <button
         v-for="button in group"
@@ -23,7 +23,7 @@ import { computed } from 'vue'
  * 动作按钮组：兼容 dropdown-menu actions 字段（单组或分组数组，自动归一）。
  * 原版为 p-ray 全局组件 p-actions；视觉差异：u-button/u-separator 降级为原生元素。
  */
-defineOptions({ name: 'CxActions' })
+defineOptions({ name: 'CxCxActions' })
 
 const emits = defineEmits(['after-click', 'hover', 'unhover'])
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="standup-list-page">
+  <div class="cx-standup-list-layout standup-list-page">
     <slot />
   </div>
 </template>

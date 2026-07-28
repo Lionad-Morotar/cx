@@ -1,5 +1,5 @@
 <template>
-  <div class="form">
+  <div class="cx-groups form">
     <template v-for="(group, gIDX) in value" :key="`${gIDX}-${group.key}`">
       <UFormGroup class="item">
         <template #label>
@@ -63,6 +63,8 @@ import { createItem, createGroupItem } from '../utils'
 import type { Item, GroupItem } from '../types'
 
 import { UButton, UFormGroup, UInput } from '../../../vendor/bridge'
+
+defineOptions({ name: 'CxGroups' })
 
 const { emits, props, value } = useCxPanel<GroupItem[]>([])
 value.value = value.value || []

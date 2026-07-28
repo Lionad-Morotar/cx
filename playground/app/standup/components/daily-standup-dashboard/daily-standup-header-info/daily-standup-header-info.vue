@@ -85,7 +85,7 @@ import { apiStopStandup } from '../../../apis'
 /* Types */
 import type { Standup } from '../../../apis'
 
-defineOptions({ name: 'daily-standup-header-info' })
+defineOptions({ name: 'CxDailyStandupHeaderInfo' })
 
 const router = useRouter()
 const toast = useToast()

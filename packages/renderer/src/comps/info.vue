@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="cx-info">
     <!-- cx internal error boundary -->
     {{ info }} <span v-if="component">- {{ key }} - {{ id }}</span>
   </div>
@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import type { CxComponentRuntime } from '@lionad/cx-definition'
 
-defineOptions({ name: 'CxRenderInfo' })
+defineOptions({ name: 'CxInfo' })
 
 const props = withDefaults(
   defineProps<{

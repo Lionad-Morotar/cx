@@ -1,5 +1,5 @@
 <template>
-  <div class="user-select">
+  <div class="cx-user-select user-select">
     <CxScrollbar class="scroll-area">
       <div class="members">
         <template v-for="user in presentUsers" :key="user.id">
@@ -30,7 +30,7 @@ import { useUserSelect } from '../states'
 
 import type { User, Users } from '../../../apis'
 
-defineOptions({ name: 'user-select' })
+defineOptions({ name: 'CxUserSelect' })
 
 const instance = getCurrentInstance()!
 cx.emit('pass:instance:CxUserSelectRef', instance)

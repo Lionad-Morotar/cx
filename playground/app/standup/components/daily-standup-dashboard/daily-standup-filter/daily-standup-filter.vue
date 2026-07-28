@@ -45,7 +45,7 @@ type Filter = {
 }
 type Filters = Filter[]
 
-defineOptions({ name: 'daily-standup-filter' })
+defineOptions({ name: 'CxDailyStandupFilter' })
 
 const ns = useCxNamespace('daily-standup-filter')
 const emits = defineEmits([])

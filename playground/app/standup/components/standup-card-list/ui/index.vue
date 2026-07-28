@@ -1,5 +1,5 @@
 <template>
-  <div class="days-con" ref="daysConRef" :class="[kls, countClass]">
+  <div class="cx-standup-card-list days-con" ref="daysConRef" :class="[kls, countClass]">
     <div class="empty-tip" v-if="!standups.length">没有找到{{ meetingTypeName }}记录</div>
     <template v-for="(standup, idx) in standups" :key="`${standup.id}${idx}`">
       <StandupContextProvider :item="{ standup, group: group!, idx }">
@@ -17,6 +17,8 @@ import { useResponseClassName } from '../../../hooks'
 import { useStandupType } from '../../../states/standups'
 
 import type { Standup } from '../../../apis'
+
+defineOptions({ name: 'CxStandupCardList' })
 
 /**
  * standups 优先取 prop 注入（测试缝隙），否则取注入的 group.standups（生产路径）。

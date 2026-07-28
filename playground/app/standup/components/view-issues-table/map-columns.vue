@@ -9,6 +9,8 @@
 
 import type { Column } from './type'
 
+defineOptions({ name: 'CxMapColumns' })
+
 const props = withDefaults(
   defineProps<{
     columns?: Column[]

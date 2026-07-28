@@ -1,5 +1,5 @@
 <template>
-  <div class="list-con">
+  <div class="cx-standup-group-list list-con">
     <span v-if="!groups.length" class="empty-group-tip">没有找到{{ meetingTypeName }}记录</span>
     <template v-for="group in groups" :key="group.startDay">
       <StandupContextProvider :group="group">
@@ -17,6 +17,8 @@ import { useStandupGroups } from '../states/use-standup-groups'
 import { useStandupType } from '../../../states/standups'
 
 import type { GroupOfStandup } from '../../../apis'
+
+defineOptions({ name: 'CxStandupGroupList' })
 
 /**
  * groups 优先取 prop 注入（测试缝隙：schema 静态，测试经 data.groups 注入受控数据）；

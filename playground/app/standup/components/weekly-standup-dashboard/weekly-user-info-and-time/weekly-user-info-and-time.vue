@@ -1,5 +1,5 @@
 <template>
-  <div class="user-tag" v-if="user">
+  <div class="cx-weekly-user-info-and-time user-tag" v-if="user">
     <div class="avatar">
       <img :src="user?.avatarUrl" />
     </div>
@@ -21,6 +21,8 @@ import CxTimeCount from '../../time-count'
 import { useStandupDetail } from '../../../states/standups'
 import { dayjs } from '../../../utils'
 import { useCurrentUser } from '../../../states/users'
+
+defineOptions({ name: 'CxWeeklyUserInfoAndTime' })
 
 const user = useCurrentUser()
 const standup = useStandupDetail()

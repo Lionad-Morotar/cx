@@ -41,7 +41,7 @@ import { useCardTabs } from '../states'
 import type { Tab } from '../types'
 
 defineOptions({
-  name: 'card-tabs',
+  name: 'CxCardTabs',
 })
 
 const ns = useCxNamespace('card-tabs')

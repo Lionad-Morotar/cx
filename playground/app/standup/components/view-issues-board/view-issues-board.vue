@@ -1,5 +1,5 @@
 <template>
-  <div class="issue-card" :class="kls" ref="cardRef">
+  <div class="cx-view-issues-board issue-card" :class="kls" ref="cardRef">
     <div class="handler" />
     <div class="progress-con" :class="`is-active-${progressStep}`">
       <div
@@ -83,6 +83,8 @@ import { getTaskActiveStep, getTaskStepsSpendSeconds } from '../../utils/label'
 import { standupBus as emitter } from '../../utils/standup-bus'
 
 import type { FormattedIssue } from '../../apis'
+
+defineOptions({ name: 'CxViewIssuesBoard' })
 
 const emits = defineEmits(['quick-link'])
 const props = defineProps<{

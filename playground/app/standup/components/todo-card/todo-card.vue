@@ -1,5 +1,5 @@
 <template>
-  <div :class="kls" v-show="dataState.isInited" @click="handleClick">
+  <div :class="kls" v-show="dataState.isInited" @click="handleClick" class="cx-todo-card">
     <slot name="header">
       <div :class="ns.e('input-con')">
         <UInput
@@ -111,6 +111,8 @@ import EmptyStrImage from '../../assets/empty.svg'
 import type { User } from '../../apis'
 import { useStandupContents } from './contents'
 import type { Content } from './types'
+
+defineOptions({ name: 'CxTodoCard' })
 
 // const [LineTemplate, ReuseLineTemplate] = createReusableTemplate()
 

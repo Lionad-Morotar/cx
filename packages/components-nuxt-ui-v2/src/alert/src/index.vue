@@ -42,7 +42,7 @@ import { CxEvents } from '@lionad/cx-definition'
 import { useCx, useCxSlot, useCxBEM } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
-defineOptions({ name: 'CxButton' })
+defineOptions({ name: 'CxAlert' })
 
 type UAlertProps = ComponentProps<typeof UAlert>
 type UButtonProps = ComponentProps<typeof UButton>

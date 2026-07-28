@@ -1,6 +1,6 @@
 <template>
   <!-- dev 验收页之间的横向互链导航；当前页高亮。Nuxt 自动导入到所有 dev 页 header。 -->
-  <nav class="dev-pages-nav">
+  <nav class="cx-dev-pages-nav dev-pages-nav">
     <NuxtLink
       v-for="l in links"
       :key="l.to"
@@ -14,6 +14,8 @@
 
 <script setup lang="ts">
 // useRoute 由 Nuxt 自动导入
+defineOptions({ name: 'CxDevPagesNav' })
+
 const route = useRoute()
 
 const links = [

@@ -1,5 +1,5 @@
 <template>
-  <div class="standup-by-year">
+  <div class="cx-view-standup-github-grid standup-by-year">
     <div class="weekdays">
       <div
         v-for="weekday in showDayInWeek"
@@ -75,6 +75,8 @@ import { useStandupType, useStandups } from '../../states/standups'
 
 import type { Dayjs } from 'dayjs'
 import type { Standups } from '../../apis'
+
+defineOptions({ name: 'CxViewStandupGithubGrid' })
 
 type DayInCalendar = {
   day: Dayjs

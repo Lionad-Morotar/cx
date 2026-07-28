@@ -1,5 +1,5 @@
 <template>
-  <cx-text type="h4" v-bind="$attrs">
+  <cx-text type="h4" v-bind="$attrs" class="cx-h4">
     <template v-for="(_, name) in $slots" #[name]="x">
       <slot :name="name as unknown as string" v-bind="x" />
     </template>

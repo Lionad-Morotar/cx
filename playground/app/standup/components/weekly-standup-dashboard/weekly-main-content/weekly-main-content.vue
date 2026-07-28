@@ -1,5 +1,5 @@
 <template>
-  <cx-card-tabs v-model="curTab" :tabs="tabs" v-bind="$attrs">
+  <cx-card-tabs v-model="curTab" :tabs="tabs" v-bind="$attrs" class="cx-weekly-main-content">
     <div class="cx-weekly-card-tabs-contents">
       <cx-view-issues-statics-cards
         :issues-full="issuesUnFiltered"
@@ -66,6 +66,8 @@ import { formatIssue } from '../../../utils/task'
 
 import type { Ref } from 'vue'
 import type { FormattedIssue, User } from '../../../apis'
+
+defineOptions({ name: 'CxWeeklyMainContent' })
 
 // console.log("[debug] cx", cx);
 

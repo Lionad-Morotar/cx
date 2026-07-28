@@ -42,7 +42,7 @@ import { UFormGroup } from '../../../vendor/bridge'
 import { useCxSlot, useCxBEM } from '@lionad/cx-vue'
 import type { CxComponentRuntime, ComponentProps } from '@lionad/cx-definition'
 
-defineOptions({ name: 'CxForm' })
+defineOptions({ name: 'CxFormItem' })
 
 type UFormFieldProps = ComponentProps<typeof UFormGroup>
 

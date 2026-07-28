@@ -2,7 +2,7 @@
   原用途：weekly-main-content 的 <cx-card :name="'任务列表'"> 外壳，
   提供 header（name + action 区）+ body 结构，class 保真便于样式复用 -->
 <template>
-  <div class="cx-card">
+  <div class="cx-cx-card cx-card">
     <div class="cx-card__header">
       <div class="cx-card__name">{{ name }}</div>
       <div class="cx-card__action-con">
@@ -16,6 +16,8 @@
 </template>
 
 <script lang="ts" setup>
+defineOptions({ name: 'CxCxCard' })
+
 defineProps<{ name?: string }>()
 </script>
 

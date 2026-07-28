@@ -1,5 +1,5 @@
 <template>
-  <div class="form">
+  <div class="cx-actions form">
     <template v-for="(group, gIDX) in value" :key="gIDX">
       <UFormGroup class="item">
         <template #label>
@@ -54,6 +54,8 @@ import { createItem } from '../utils'
 import type { ActionItem } from '../types'
 
 import { UButton, UFormGroup, UInput } from '../../../vendor/bridge'
+
+defineOptions({ name: 'CxActions' })
 
 const { emits, props, value } = useCxPanel<ActionItem[][]>([])
 value.value = value.value || []

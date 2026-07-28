@@ -54,6 +54,7 @@ const getCachedCxRenderBreakpointType = (cxRenderRef: any) => {
 }
 
 export default defineComponent({
+  name: 'CxRenderComponentWithBindings',
   props: {
     compID: {
       type: String,

@@ -1,5 +1,5 @@
 <template>
-  <div class="project-members-section">
+  <div class="cx-standup-member-draggable project-members-section">
     <div class="member-section-title">项目成员</div>
     <CxScrollbar>
       <div class="project-members-con">

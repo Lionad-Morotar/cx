@@ -1,6 +1,6 @@
 <template>
   <UModal
-    class="select-participants-dialog"
+    class="cx-select-participants-dialog select-participants-dialog"
     v-model:open="visible"
     title="确认与会人"
     @update:open="(v: boolean) => !v && handleDialogClose()"
@@ -97,6 +97,8 @@ import Draggable from 'vuedraggable'
 
 import CxSvgIcon from '../../cx-svg-icon.vue'
 import { useParticipantsPrompt } from '../states/use-participants-prompt'
+
+defineOptions({ name: 'CxSelectParticipantsDialog' })
 
 // 弹窗只是共享单例的渲染层：状态与 confirm/cancel 编排都在 useParticipantsPrompt
 const {

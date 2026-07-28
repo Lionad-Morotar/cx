@@ -1,6 +1,6 @@
 <template>
   <!-- /dev/components：@lionad/cx-components 物料的 schema 驱动渲染验收页 -->
-  <main class="page">
+  <main class="page-dev-components page">
     <header class="page-header">
       <h1 class="title">cx components</h1>
       <p class="subtitle">/dev/components · 物料 schema 驱动渲染验收</p>
@@ -38,6 +38,8 @@
 <script setup lang="ts">
 import { CxBasics, CxCalendar, CxGrid, CxPage, CxUserStyle } from '@lionad/cx-components'
 import type { CxComponentRuntime } from '@lionad/cx-definition'
+
+defineOptions({ name: 'PageDevComponents' })
 
 interface CxMeta {
   key: string

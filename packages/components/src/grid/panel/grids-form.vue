@@ -1,5 +1,5 @@
 <template>
-  <h5 v-text="`更改行列（${col} x ${row}）`" />
+  <h5 v-text="`更改行列（${col} x ${row}）`" class="cx-grids-form" />
   <div
     class="mt-2"
     :class="[
@@ -120,6 +120,8 @@ import { useCxPanel } from '@lionad/cx-vue'
 import type { CxComponentRuntime } from '@lionad/cx-definition'
 import { defaultDatas } from '../config'
 import { getPosByTurn } from '../utils'
+
+defineOptions({ name: 'CxGridsForm' })
 
 const [DefineRemoveColsButton, ReuseRemoveColsButton] = createReusableTemplate()
 const [DefineRemoveRowsButton, ReuseRemoveRowsButton] = createReusableTemplate()

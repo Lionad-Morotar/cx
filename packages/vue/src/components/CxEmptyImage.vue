@@ -1,6 +1,6 @@
 <template>
   <!-- 图片空态占位（原为 p-ray p-empty-image 的 cx 轻量替代） -->
-  <div class="cx-empty-image">
+  <div class="cx-cx-empty-image cx-empty-image">
     <slot>
       <span class="cx-empty-image__label">{{ text }}</span>
     </slot>
@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({ name: 'CxEmptyImage' })
+defineOptions({ name: 'CxCxEmptyImage' })
 
 withDefaults(
   defineProps<{

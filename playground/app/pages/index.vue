@@ -1,6 +1,6 @@
 <template>
   <!-- playground 首页：能力导航 + schema 渲染验收 -->
-  <main class="page">
+  <main class="page-index page">
     <h1 class="title">cx playground</h1>
 
     <!-- 站会模块入口（EAP 迁移版，与 playground 同等重量的一等公民） -->
@@ -40,6 +40,8 @@
 import { ref } from 'vue'
 
 import type { CxComponentRuntime } from '@lionad/cx-definition'
+
+defineOptions({ name: 'PageIndex' })
 
 const comps = ref<CxComponentRuntime[]>([
   {

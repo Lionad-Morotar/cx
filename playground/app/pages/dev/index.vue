@@ -1,6 +1,6 @@
 <template>
   <!-- /dev：物料验收页索引，聚合四类 cx 物料的 schema 驱动渲染验收入口 -->
-  <main class="page">
+  <main class="page-dev page">
     <header class="page-header">
       <h1 class="title">dev · 物料验收</h1>
       <p class="subtitle">/dev · cx 物料 schema 驱动渲染验收入口</p>
@@ -19,6 +19,8 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ name: 'PageDev' })
+
 const links = [
   {
     to: '/dev/components',

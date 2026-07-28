@@ -72,6 +72,8 @@ import { useDashboardCard } from '../states'
 import type { CSSProperties } from 'vue'
 import { watchEffect } from 'vue'
 
+defineOptions({ name: 'CxDashboardCard' })
+
 const ns = useCxNamespace('dashboard-card')
 // 类型内联声明：跨文件 import type 会触发 SFC 编译器的 fs 类型解析（rolldown 环境不可用）
 const emits = defineEmits([])

@@ -1,5 +1,5 @@
 <template>
-  <div class="time-stamp">
+  <div class="cx-time-count time-stamp">
     <span class="time">{{ displayTime }}</span>
     <span class="weekday" v-if="props.weekday">{{ displayWeekday }}</span>
   </div>
@@ -11,6 +11,8 @@ import { useInterval } from '@vueuse/core'
 import { dayjs, weekdayStr } from '../../utils'
 
 import type { Dayjs } from 'dayjs'
+
+defineOptions({ name: 'CxTimeCount' })
 
 const props = withDefaults(
   defineProps<{

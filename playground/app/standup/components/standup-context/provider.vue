@@ -10,6 +10,8 @@ import { StandupGroupKey, StandupItemKey } from './keys'
 import type { StandupItemContext } from './keys'
 import type { GroupOfStandup } from '../../apis'
 
+defineOptions({ name: 'CxProvider' })
+
 /**
  * 循环容器在 v-for 的每次迭代里用本组件包裹模板插槽，
  * 把当前 group / standup 注入上下文，供插槽内的 schema 子节点 inject。

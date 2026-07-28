@@ -43,6 +43,8 @@ import { useCxNamespace } from '../../../utils/namespace'
 import { FolderContainerCtxKey } from '../../standup-context/keys'
 import type { WatchStopHandle } from 'vue'
 
+defineOptions({ name: 'CxFolderContainer' })
+
 const ns = useCxNamespace('folder-container')
 const slots = useSlots()
 const emits = defineEmits(['inited'])

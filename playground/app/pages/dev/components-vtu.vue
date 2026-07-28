@@ -2,7 +2,7 @@
   <!-- /dev/components-vtu：@lionad/cx-components-vtu 物料 schema 驱动渲染验收。
        按 vtu 官方分类（Data Display / Code & Terminal / Media / Social / Forms & Input / Workflow）
        分组展示，分类骨架来自 vtu 的 histoire storyGroups。 -->
-  <main class="page">
+  <main class="page-dev-components-vtu page">
     <header class="page-header">
       <h1 class="title">cx components · vtu</h1>
       <p class="subtitle">
@@ -43,6 +43,8 @@
 import { CxVtu } from '@lionad/cx-components-vtu'
 import { toItem, type CxMeta } from '~/dev/material-utils'
 import { groupByCategory, type CategoryGroup } from '~/dev/vtu-categories'
+
+defineOptions({ name: 'PageDevComponentsVtu' })
 
 // vtu 包物料（CxVtu 数组），经 cx-nuxt 生成的装配清单注册到全局 $cx；
 // groupByCategory 按官方分类装配成 6 组，未映射 key 会抛错强制补全映射

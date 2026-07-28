@@ -1,5 +1,5 @@
 <template>
-  <CxScrollbar class="left-scroll-area">
+  <CxScrollbar class="cx-standup-list-main left-scroll-area">
     <!-- 当期分组标题 -->
     <div class="list-section-title is-first">
       本{{ timeRangeMeterStr(groupByType) }}{{ meetingTypeName }}

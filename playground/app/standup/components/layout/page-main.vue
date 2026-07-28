@@ -1,5 +1,5 @@
 <template>
-  <main class="layout-content-main">
+  <main class="cx-page-main layout-content-main">
     <slot />
   </main>
 </template>
@@ -8,6 +8,8 @@
 import { onBeforeUnmount, onErrorCaptured, onMounted, useSlots, watchEffect } from 'vue'
 import { useIdleOnce } from '../../hooks'
 import { isFunction } from 'lodash-es'
+
+defineOptions({ name: 'CxPageMain' })
 
 const slots = useSlots()
 

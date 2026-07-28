@@ -2,7 +2,7 @@
   <!-- /dev/stream：@lionad/cx-stream 流式结构化渲染管线验收。
        模拟 LLM 流式输出（一根不断生长的字符串），演示四组能力：
        三态检测（none/pending/success）、Route Z 增量渲染、打字机预览、多策略切分。 -->
-  <main class="page">
+  <main class="page-dev-stream page">
     <header class="page-header">
       <h1 class="title">cx stream · 流式结构化渲染</h1>
       <p class="subtitle">/dev/stream · 从不完整 LLM JSON 增量提取可渲染组件树的管线验收</p>
@@ -149,6 +149,8 @@ import {
   MAX_COMPONENTS,
   toRenderNode,
 } from '~/dev/stream-scenario'
+
+defineOptions({ name: 'PageDevStream' })
 
 // --- 回放引擎：定时器按「字符/秒」推进，进度对齐到 chunk（SSE delta）边界 ---
 // 组件数量决定剧本裁剪：原始流只含前 N 个组件围栏，默认单组件

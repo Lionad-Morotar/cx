@@ -1,12 +1,14 @@
 <!-- SVG sprite 图标引用器（原 CSvgIcon 迁移版，prefix 默认 cx-standup） -->
 <template>
-  <svg class="cx-svg-icon" :class="kls" aria-hidden="true">
+  <svg class="cx-cx-svg-icon cx-svg-icon" :class="kls" aria-hidden="true">
     <use :xlink:href="iconName"></use>
   </svg>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue'
+
+defineOptions({ name: 'CxCxSvgIcon' })
 
 const props = withDefaults(
   defineProps<{

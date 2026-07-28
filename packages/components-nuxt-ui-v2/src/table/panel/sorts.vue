@@ -1,6 +1,6 @@
 <template>
   <!-- 排序配置编辑（原为 p-ray 数据域 popper 的 cx 原生最小实现） -->
-  <UFormGroup :help="helpText">
+  <UFormGroup :help="helpText" class="cx-sorts">
     <div class="cx-panel-sorts">
       <div v-for="(item, idx) in value" :key="item.id" class="cx-panel-sorts__row">
         <span class="cx-panel-sorts__label">{{ item.label }}</span>
@@ -24,6 +24,8 @@ import { computed } from 'vue'
 import { useCxPanel } from '@lionad/cx-vue'
 
 import type { Data } from '../types'
+
+defineOptions({ name: 'CxSorts' })
 
 type SortItem = Data & { direction?: 'asc' | 'desc' }
 

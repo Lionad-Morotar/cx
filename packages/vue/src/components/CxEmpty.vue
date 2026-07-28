@@ -1,6 +1,6 @@
 <template>
   <!-- 空态占位（原为 p-ray p-empty 的 cx 轻量替代；el-empty 降级为纯样式实现） -->
-  <div :class="['cx-empty', { 'cx-empty--loading': loading }]">
+  <div :class="['cx-empty', { 'cx-empty--loading': loading }]" class="cx-cx-empty">
     <slot name="icon">
       <span class="cx-empty__icon">∅</span>
     </slot>
@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-defineOptions({ name: 'CxEmpty' })
+defineOptions({ name: 'CxCxEmpty' })
 
 withDefaults(
   defineProps<{

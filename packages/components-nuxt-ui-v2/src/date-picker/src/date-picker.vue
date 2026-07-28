@@ -4,7 +4,7 @@
     v-model.range="date"
     :columns="2"
     v-bind="{ ...attrs, ...$attrs }"
-    @dayclick="onDayClick"
+    @dayclick="onDayClick" class="cx-date-picker"
   />
   <v-calendar-date-picker
     v-else
