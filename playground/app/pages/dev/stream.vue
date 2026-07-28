@@ -1,7 +1,7 @@
 <template>
   <!-- /dev/stream：@lionad/cx-stream 流式结构化渲染管线验收。
        模拟 LLM 流式输出（一根不断生长的字符串），演示四组能力：
-       三态检测（none/pending/success）、Route Z 增量渲染、打字机预览、多策略切分。 -->
+       三态检测（none/pending/success）、增量渲染、打字机预览、多策略切分。 -->
   <main class="page-dev-stream page">
     <header class="page-header">
       <h1 class="title">cx stream · 流式结构化渲染</h1>
@@ -74,7 +74,7 @@
         <p v-else class="muted">仅 pending 阶段展示</p>
       </article>
 
-      <!-- 面板 4：增量渲染（Route Z，pending 阶段行逐步增长） -->
+      <!-- 面板 4：增量渲染（pending 阶段行逐步增长） -->
       <article class="card" data-testid="panel-incremental">
         <header class="card-head">
           <span class="card-name">增量渲染</span>
@@ -220,7 +220,7 @@ const status = computed(() => detection.value.status)
 // 否则增量渲染与打字机消费的当前块静默错位
 const pendingSource = computed(() => detection.value.pendingSources?.[0] ?? '')
 
-// --- 增量渲染（Route Z）：partialSpec 为当前可渲染的部分 Spec ---
+// --- 增量渲染：partialSpec 为当前可渲染的部分 Spec ---
 const { partialSpec, reset: resetExtractor } = useIncrementalTree(
   computed(() => pendingSource.value),
   { registry: createDemoRegistry(), matchTrigger: matchCxTrigger },

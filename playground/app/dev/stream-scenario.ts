@@ -56,7 +56,7 @@ export function cropScenarioChunks(n: number): string[] {
   return out
 }
 
-// --- 增量渲染 trigger（Route Z）---
+// --- 增量渲染 trigger ---
 
 /**
  * 数组增长型组件的增量配置。
