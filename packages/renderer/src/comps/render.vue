@@ -52,8 +52,14 @@ const props = withDefaults(
     renderCompsWrapper?: Component
   }>(),
   {
+    isLazy: false,
+    components: undefined,
+    component: undefined,
+    cx: undefined,
     isDebug: false,
     isEdit: false,
+    renderCompWrapper: undefined,
+    renderErrorCompWrapper: undefined,
     // renderCompWrapper: CxTransparentRender,
     renderCompsWrapper: CxTransparentRender,
   },
@@ -63,8 +69,8 @@ const cx = props.cx || inject<CxLoaderInstance>('cx')!
 const renderKey = ref(1)
 const reRender = async () => {
   renderKey.value += 1
-  // @ts-ignore
-  if (window && window?._debug) {
+  // SSR 守卫：仅在浏览器环境读全局调试标记
+  if (typeof window !== 'undefined' && window._debug) {
     console.log('[debug] cx-render reRender, renderKey:', renderKey.value)
   }
 }
@@ -88,7 +94,9 @@ const $cxRenderParent = computed(() => {
   if (!cxRenderRef.value) {
     return null
   }
-  const $el = unrefElement(cxRenderRef as any)
+  // cxRenderRef 指向 Suspense 组件实例，unrefElement 取其 $el；
+  // 组件实例类型与 MaybeElementRef 不直接重叠，断言对齐
+  const $el = unrefElement(cxRenderRef as unknown as Parameters<typeof unrefElement>[0])
   return $el?.parentElement
 })
 
@@ -120,7 +128,8 @@ const comps = (
 // watchEffect(() => {
 //   console.log('[info] props.comps', comps.value, comps.value[0]?.id, comps.value[0]?.key)
 // })
-const logComp = () => console.log('[debug] cx-render', comps.value?.[0])
+// _ 前缀豁免 unused（调试函数，模板 @dblclick 绑定被临时注释，可随时启用）
+const _logComp = () => console.log('[debug] cx-render', comps.value?.[0])
 
 onMounted(() => {
   if (!props.components && !props.component) {
