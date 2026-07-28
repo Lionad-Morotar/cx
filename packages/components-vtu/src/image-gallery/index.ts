@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '图片画廊',
   description: '图片画廊（网格 + 灯箱），每项需 id/src/alt 与正数宽高。',
   key: 'cx-vtu-image-gallery',

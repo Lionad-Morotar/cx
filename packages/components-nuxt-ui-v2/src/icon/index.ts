@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-icon',
   name: '图标',
   description: '选定图标以展示',

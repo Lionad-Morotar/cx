@@ -1,9 +1,9 @@
-import { normalize, type CxComponentSlot } from '@lionad/cx-definition'
+import { define, type CxComponentSlot } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { binds } from './slots'
 import { useSizeOptions } from '@lionad/cx-vue'
 
-export default normalize({
+export default define({
   key: 'cx-form-item',
   name: '表单项',
   description: '在表单元素周围显示标签和其他信息。',

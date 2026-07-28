@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { useSizeOptions } from '@lionad/cx-vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-tabs',
   name: '标签页',
   description: 'Nuxt UI v4 标签页，切换不同分组内容',

@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
@@ -19,7 +19,7 @@ const DEFAULT_ITEMS = () => [
   { label: '选项 3', value: '3' },
 ]
 
-export default normalize({
+export default define({
   name: '输入菜单',
   description: 'Nuxt UI v4 可输入下拉，兼顾自由输入与建议项选择',
   key: 'cx-nuxt-ui-v4-input-menu',

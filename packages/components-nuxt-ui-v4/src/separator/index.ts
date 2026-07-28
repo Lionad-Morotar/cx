@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '分割线',
   description: 'Nuxt UI v4 分割线（v2 divider 对应 v4 Separator）',
   key: 'cx-nuxt-ui-v4-separator',

@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-empty',
   name: '空状态',
   description: 'Nuxt UI v4 空状态，图标/标题/描述/操作按钮组合；loading 切换加载态',

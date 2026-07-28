@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import { createApp } from 'vue'
 import * as Materials from '../app/standup/components'
 
-// 迁移物料的 normalize 契约：key 唯一、_cx_install 可注册、基础物料可渲染
+// 迁移物料的 defineCxComponent 契约：key 唯一、_cx_install 可注册、基础物料可渲染
 const materialEntries = Object.entries(Materials).filter(
   ([, v]) => v && typeof v === 'object' && (v as { _cx_meta?: unknown })._cx_meta,
 ) as [
@@ -15,7 +15,7 @@ const materialEntries = Object.entries(Materials).filter(
   },
 ][]
 
-describe('站会物料 normalize 契约', () => {
+describe('站会物料 defineCxComponent 契约', () => {
   it('32 个物料全部带 _cx_meta 且 key 唯一', () => {
     expect(materialEntries.length).toBe(32)
     const keys = materialEntries.map(([, m]) => m._cx_meta.key)
@@ -23,7 +23,7 @@ describe('站会物料 normalize 契约', () => {
     keys.forEach((k) => expect(k).toMatch(/^cx-[a-z0-9-]+$/))
   })
 
-  it('component.name 被 normalize 覆写为 key 的 PascalCase', () => {
+  it('component.name 被 defineCxComponent 覆写为 key 的 PascalCase', () => {
     const pascal = (k: string) =>
       k
         .split('-')

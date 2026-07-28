@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '条目轮播',
   description: '条目轮播卡，支持标题/副标题/图片与操作按钮，含 itemClick/itemAction 事件。',
   key: 'cx-vtu-item-carousel',

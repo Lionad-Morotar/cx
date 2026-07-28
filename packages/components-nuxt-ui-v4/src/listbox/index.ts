@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-listbox',
   name: '列表框',
   description: 'Nuxt UI v4 列表框，可搜索/虚拟化的富渲染选项列表',

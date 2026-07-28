@@ -1,7 +1,7 @@
-import { normalize, translate } from '@lionad/cx-definition'
+import { define, translate } from '@lionad/cx-definition'
 import component from './ui/index.vue'
 
-export default normalize({
+export default define({
   name: translate('看板卡片'),
   description: translate('看板卡片是一个特殊样式组件，提供了丰富的插槽和配置用于定制卡片样式'),
   key: 'cx-dashboard-card',

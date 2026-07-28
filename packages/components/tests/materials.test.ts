@@ -6,7 +6,7 @@ import { CxBasics } from '../src/index'
 /**
  * 物料 smoke：每个物料的组件能挂载且 props 归一化不炸。
  * v-cx 指令由宿主编辑器安装，测试中注册 no-op 版避免警告。
- * 注意：normalize 的返回即组件本体（_cx_meta 挂载其上）。
+ * 注意：defineCxComponent 的返回即组件本体（_cx_meta 挂载其上）。
  */
 const mountWithCx = (
   component: any,
@@ -63,7 +63,7 @@ describe('基础物料 smoke', () => {
     expect(wrapper.findAll('.item')).toHaveLength(3)
   })
 
-  it('物料 meta 全部经 normalize 装配（_cx_meta + install）', () => {
+  it('物料 meta 全部经 defineCxComponent 装配（_cx_meta + install）', () => {
     for (const meta of CxBasics) {
       expect(meta._cx_meta).toBeTruthy()
       expect(typeof (meta as any)._cx_install).toBe('function')

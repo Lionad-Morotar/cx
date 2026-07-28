@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-footer',
   name: '页脚',
   description: 'Nuxt UI v4 响应式页脚，left / default / right 三区与 top / bottom 扩展区',

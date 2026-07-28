@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-drawer',
   name: '抽屉',
   description: 'Nuxt UI v4 抽屉，屏幕边缘平滑滑入的内容面板',

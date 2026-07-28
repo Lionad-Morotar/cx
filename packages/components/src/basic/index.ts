@@ -1,5 +1,5 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import compBlock from './src/block.vue'
 import compFigure from './src/figure.vue'
 import compHeader from './src/header.vue'
@@ -19,7 +19,7 @@ import compNavigate from './src/navigate.vue'
 import compScrollbar from './src/scrollbar.vue'
 import compSkeleton from './src/skeleton.vue'
 
-const CxText = normalize({
+const CxText = define({
   name: '文本',
   icon: 'i-tabler-edit',
   description: '用来展示基础的文字内容',
@@ -39,7 +39,7 @@ const CxText = normalize({
   },
 })
 
-const CxHeader = normalize({
+const CxHeader = define({
   name: '标题',
   icon: 'i-tabler-h-1',
   description: '用来展示标题内容',
@@ -58,7 +58,7 @@ const CxHeader = normalize({
   },
 })
 
-const CxH1 = normalize({
+const CxH1 = define({
   name: '一级标题',
   icon: 'i-tabler-h-1',
   description: '用来展示标题内容',
@@ -77,7 +77,7 @@ const CxH1 = normalize({
   },
 })
 
-const CxH2 = normalize({
+const CxH2 = define({
   name: '二级标题',
   icon: 'i-tabler-h-2',
   description: '用来展示标题内容',
@@ -96,7 +96,7 @@ const CxH2 = normalize({
   },
 })
 
-const CxH3 = normalize({
+const CxH3 = define({
   name: '三级标题',
   icon: 'i-tabler-h-3',
   description: '用来展示标题内容',
@@ -115,7 +115,7 @@ const CxH3 = normalize({
   },
 })
 
-const CxH4 = normalize({
+const CxH4 = define({
   name: '四级标题',
   icon: 'i-tabler-h-4',
   description: '用来展示标题内容',
@@ -134,7 +134,7 @@ const CxH4 = normalize({
   },
 })
 
-const CxH5 = normalize({
+const CxH5 = define({
   name: '五级标题',
   icon: 'i-tabler-h-5',
   description: '用来展示标题内容',
@@ -153,7 +153,7 @@ const CxH5 = normalize({
   },
 })
 
-const CxBlock = normalize({
+const CxBlock = define({
   name: '块',
   icon: 'i-tabler-box-model',
   description: '一个独立的页面区域，可以在内部填充其他组件',
@@ -168,7 +168,7 @@ const CxBlock = normalize({
   },
 })
 
-const CxFigure = normalize({
+const CxFigure = define({
   name: '插图',
   icon: 'i-ant-design-picture-outlined',
   description: '图片等内容',
@@ -197,7 +197,7 @@ const CxFigure = normalize({
   },
 })
 
-const CxLogic = normalize({
+const CxLogic = define({
   key: 'cx-logic',
   name: '条件容器',
   description: '在指定条件显示、隐藏或重复容器内的内容',
@@ -251,7 +251,7 @@ const CxLogic = normalize({
   },
 })
 
-const CxDatas = normalize({
+const CxDatas = define({
   key: 'cx-datas',
   name: '数据容器',
   description: '创造新的数据，提供给插槽内其他组件',
@@ -267,7 +267,7 @@ const CxDatas = normalize({
   },
 })
 
-const CxAction = normalize({
+const CxAction = define({
   key: 'cx-action',
   name: '动作执行',
   description:
@@ -280,7 +280,7 @@ const CxAction = normalize({
   props: {},
 })
 
-const CxToast = normalize({
+const CxToast = define({
   key: 'cx-toast',
   name: '反馈',
   description: '经宿主 toast 服务弹出反馈（成功/失败提示），由其他物料的事件触发',
@@ -290,7 +290,7 @@ const CxToast = normalize({
   props: {},
 })
 
-const CxState = normalize({
+const CxState = define({
   key: 'cx-state',
   name: '状态',
   description: '把宿主传入的响应式 value 桥接到 schema，供其他物料经数据绑定消费',
@@ -300,7 +300,7 @@ const CxState = normalize({
   props: {},
 })
 
-const CxComputed = normalize({
+const CxComputed = define({
   key: 'cx-computed',
   name: '派生状态',
   description: '用受限表达式对依赖值求值，输出派生值供绑定（如 a || b）',
@@ -310,7 +310,7 @@ const CxComputed = normalize({
   props: {},
 })
 
-const CxNavigate = normalize({
+const CxNavigate = define({
   key: 'cx-navigate',
   name: '导航',
   description: '经宿主路由服务跳转页面（push/replace），由其他物料的事件触发',
@@ -320,7 +320,7 @@ const CxNavigate = normalize({
   props: {},
 })
 
-const CxScrollbar = normalize({
+const CxScrollbar = define({
   key: 'cx-scrollbar',
   name: '滚动容器',
   description: '可滚动的内容容器，提供自定义滚动条样式，替代 el-scrollbar',
@@ -335,7 +335,7 @@ const CxScrollbar = normalize({
   },
 })
 
-const CxSkeleton = normalize({
+const CxSkeleton = define({
   key: 'cx-skeleton',
   name: '骨架屏',
   description: '加载骨架遮罩，shimmer 动画，替代 ElSkeleton',

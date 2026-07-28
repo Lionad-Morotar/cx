@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '图片',
   description: '图片卡，支持比例、填充模式、标题、描述与跳转。',
   key: 'cx-vtu-image',

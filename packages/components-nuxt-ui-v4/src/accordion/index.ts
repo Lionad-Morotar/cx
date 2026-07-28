@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '折叠面板',
   description:
     'Nuxt UI v4 折叠面板；cx 层 multiple 布尔映射到 v4 type（single/multiple）；items 为展开项数据源（v4 必需，spec 未列已按 v4 能力补齐）；v4 无 item slot（spec 所列已去除），default/leading/trailing/content 透传',

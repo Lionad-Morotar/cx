@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import { CxRender } from '@lionad/cx-render'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import CxDailyStandardDashboardPageLayout from '../app/standup/components/daily-standup-dashboard/daily-standard-dashboard-page-layout'
 import CxWeeklyStandardDashboardPageLayout from '../app/standup/components/weekly-standup-dashboard/weekly-standard-dashboard-page-layout'
@@ -22,7 +22,7 @@ import type { CxComponentRuntime } from '@lionad/cx-definition'
 
 // 最小占位物料：避开真实物料的 router/store 依赖，纯粹验证 slot 通道
 const makeTracerContent = (marker: string) =>
-  normalize({
+  define({
     name: marker,
     key: `cx-tracer-${marker}`,
     component: defineComponent({

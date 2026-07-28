@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '终端',
   description:
     '终端命令执行结果：展示命令、退出码、标准输出/错误与耗时，ANSI 配色、可折叠、可复制。',

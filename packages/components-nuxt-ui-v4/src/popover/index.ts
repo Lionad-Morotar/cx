@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-popover',
   name: '气泡',
   description: 'Nuxt UI v4 气泡卡片，点击或悬停触发的弹出层',

@@ -1,9 +1,9 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 import { binds } from './slots'
 
-export default normalize({
+export default define({
   key: 'cx-meter',
   name: '计量',
   description: '表示某个范围内的数值，比如进度、评分或容量使用情况。',

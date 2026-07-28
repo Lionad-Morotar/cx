@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '数据表格',
   description: '可排序数据表格，列定义含 key/label 与格式化规则，行值为原始类型或数组。',
   key: 'cx-vtu-data-table',

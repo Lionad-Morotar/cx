@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '按钮',
   description: 'Nuxt UI v4 按钮，触发用户交互（跳转、提交、打开弹窗等）',
   key: 'cx-nuxt-ui-v4-button',

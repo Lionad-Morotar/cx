@@ -1,9 +1,9 @@
 import z from 'zod'
-import { normalize, has, not } from '@lionad/cx-definition'
+import { define, has, not } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 
-export default normalize({
+export default define({
   key: 'cx-textarea',
   name: '多行文本输入框',
   description: '多行文本输入框组件',

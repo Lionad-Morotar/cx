@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '轮播',
   description:
     'Nuxt UI v4 轮播（基于 Embla）；items 为轮播项数据源（v4 必需，spec 未列已按 v4 能力补齐）；item slot 经 v4 default slot 透传（带 item/index scope）',

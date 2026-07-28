@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '视频',
   description: '视频播放器，支持封面、比例、填充模式、自动播放与跳转。',
   key: 'cx-vtu-video',

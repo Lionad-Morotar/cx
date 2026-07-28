@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-input-tags',
   name: '标签输入',
   description: 'Nuxt UI v4 标签输入，交互式标签列表；物料层 tags 单向映射 default-value',

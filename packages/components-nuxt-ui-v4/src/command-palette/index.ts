@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-command-palette',
   name: '命令面板',
   description: 'Nuxt UI v4 命令面板，搜索并选择命令或选项',

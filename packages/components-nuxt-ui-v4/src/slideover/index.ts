@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-slideover',
   name: '侧边抽屉',
   description: 'Nuxt UI v4 侧边抽屉，从侧边滑出的交互层',

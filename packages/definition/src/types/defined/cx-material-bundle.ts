@@ -1,7 +1,7 @@
 import type { App } from 'vue'
 
 /**
- * normalize 产物的最小协议面：装配层（cx-nuxt / 编辑器宿主）只依赖
+ * defineCxComponent 产物的最小协议面：装配层（cx-nuxt / 编辑器宿主）只依赖
  * _cx_meta 与 _cx_install，不耦合具体物料的 props/slots 泛型。
  */
 export interface CxMaterialComponent {
@@ -23,6 +23,6 @@ export interface CxMaterialComponent {
 export interface CxMaterialBundle {
   /** bundle 标识（如 'render' / 'components' / 'nuxt-ui' / 'nuxt-ui-v4'），装配日志与调试使用 */
   name: string
-  /** 物料清单（normalize 产物：Vue 组件挂载 _cx_meta/_cx_install） */
+  /** 物料清单（defineCxComponent 产物：Vue 组件挂载 _cx_meta/_cx_install） */
   materials: ReadonlyArray<CxMaterialComponent>
 }

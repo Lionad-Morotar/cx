@@ -1,8 +1,8 @@
-import { normalize, CxEvents } from '@lionad/cx-definition'
+import { define, CxEvents } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { unref } from 'vue'
 
-export default normalize({
+export default define({
   key: 'cx-modal',
   name: '弹窗',
   description: '打断交互流程，引导用户进行下一步操作',

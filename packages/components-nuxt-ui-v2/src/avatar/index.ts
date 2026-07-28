@@ -1,9 +1,9 @@
-import { normalize, not } from '@lionad/cx-definition'
+import { define, not } from '@lionad/cx-definition'
 import { compColorNames, positionOptions, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 import { unref } from 'vue'
 
-export default normalize({
+export default define({
   key: 'cx-avatar',
   name: '头像',
   description: '头像组件用于展示账号头像等图片信息',

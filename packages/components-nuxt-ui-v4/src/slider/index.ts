@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
 const COLOR_OPTIONS = [
@@ -11,7 +11,7 @@ const COLOR_OPTIONS = [
   { label: '中性', value: 'neutral' },
 ]
 
-export default normalize({
+export default define({
   name: '滑块',
   description: 'Nuxt UI v4 滑块，v2 range 在 v4 对应 Slider，在区间内拖动取值',
   key: 'cx-nuxt-ui-v4-slider',

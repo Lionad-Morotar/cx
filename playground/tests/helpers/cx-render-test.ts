@@ -24,7 +24,7 @@ export function createTestCx() {
 }
 
 /**
- * 把一组 normalize 过的物料安装进 loader（与 standup-materials.ts 的装配方式一致）。
+ * 把一组 defineCxComponent 过的物料安装进 loader（与 standup-materials.ts 的装配方式一致）。
  */
 export function installMaterials(
   cx: ReturnType<typeof createTestCx>,

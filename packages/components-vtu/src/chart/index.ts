@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '图表',
   description: 'chart.js 图表（柱状/折线），数据行须含 xKey 与各 series key 且为有限数。',
   key: 'cx-vtu-chart',

@@ -1,8 +1,8 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-notification',
   name: '页面通知',
   description: '页面通知组件适合用于即时展示用户的操作反馈，如消息、警告、错误等通知信息',

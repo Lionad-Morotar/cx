@@ -68,7 +68,7 @@ app/
 ├── plugins/                # Element Plus / 站会域装配 / 物料注册 / iconfont
 ├── standup/                # EAP 站会功能域（迁移本体）
 │   ├── views/              # 页面级组件
-│   ├── components/         # 25 个 normalize 物料 + 域内组件
+│   ├── components/         # 25 个 defineCxComponent 物料 + 域内组件
 │   ├── states/ apis/ hooks/ utils/ styles/ assets/
 ├── app.vue                 # NuxtPage 壳
 ├── app.config.ts           # ui.colors 等 vendored 物料配置兜底

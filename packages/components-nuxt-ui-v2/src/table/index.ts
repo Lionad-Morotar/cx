@@ -1,12 +1,12 @@
 import z from 'zod'
-import { normalize, has, not } from '@lionad/cx-definition'
+import { define, has, not } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import PanelColumns from './panel/columns.vue'
 import PanelSorts from './panel/sorts.vue'
 import { zData, zColumn } from './types'
 import { unref } from 'vue'
 
-export default normalize({
+export default define({
   key: 'cx-table',
   name: '表格',
   description: '表格用于展示数据列表，支持排序、筛选等功能',

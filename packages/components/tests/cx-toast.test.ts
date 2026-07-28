@@ -20,7 +20,7 @@ const mountToast = (provides: Record<any, any> = {}) =>
   })
 
 describe('cx-toast 反馈物料', () => {
-  it('normalize 装配为 headless 物料', () => {
+  it('defineCxComponent 装配为 headless 物料', () => {
     const comp = byKey('cx-toast')
     expect(comp._cx_meta.headless).toBe(true)
     expect(comp._cx_meta.key).toBe('cx-toast')

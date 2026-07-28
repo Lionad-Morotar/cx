@@ -1,7 +1,7 @@
-import { normalize, translate } from '@lionad/cx-definition'
+import { define, translate } from '@lionad/cx-definition'
 import component from './daily-standard-dashboard-page-layout.vue'
 
-export default normalize({
+export default define({
   name: translate('站会详情页面布局'),
   description: translate('标准站会详情页面布局'),
   key: 'cx-daily-standard-dashboard-page-layout',

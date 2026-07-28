@@ -1,8 +1,8 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-link',
   name: '链接',
   description: '链接组件用于展示一个链接，可以是外部链接或者内部链接',

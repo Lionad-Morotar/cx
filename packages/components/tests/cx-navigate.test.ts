@@ -20,7 +20,7 @@ const mountNavigate = (provides: Record<any, any> = {}) =>
   })
 
 describe('cx-navigate 导航物料', () => {
-  it('normalize 装配为 headless 物料', () => {
+  it('defineCxComponent 装配为 headless 物料', () => {
     const comp = byKey('cx-navigate')
     expect(comp._cx_meta.headless).toBe(true)
     expect(comp._cx_meta.key).toBe('cx-navigate')

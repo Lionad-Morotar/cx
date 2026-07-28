@@ -1,12 +1,12 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import panelGroups from './panel/groups.vue'
 import type { CxComponentSlot } from '@lionad/cx-definition'
 import { slotBinds } from './slots'
 import type { FuseResults } from './types'
 
-export default normalize({
+export default define({
   key: 'cx-command-palette',
   name: '选项面板',
   description: '使用选项面板搜索和选择一系列选项',

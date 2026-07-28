@@ -1,9 +1,9 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import type { CxComponentSlot } from '@lionad/cx-definition'
 import { useSizeOptions } from '@lionad/cx-vue'
 
-export default normalize({
+export default define({
   key: 'cx-kbd',
   name: '键盘键',
   description: '以方块形式展示键盘按键',

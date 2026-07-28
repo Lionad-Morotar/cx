@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-field-group',
   name: '字段组',
   description: 'Nuxt UI v4 字段组，把多个按钮/输入类元素无缝拼接为一组（官方 ButtonGroup 后继）',

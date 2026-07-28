@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-marquee',
   name: '跑马灯',
   description: 'Nuxt UI v4 跑马灯，无限滚动内容；用户偏好减弱动效时自动静态展示',

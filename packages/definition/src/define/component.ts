@@ -24,14 +24,14 @@ import type {
 } from '../types'
 
 /**
- * normalizeCxComponent
- * 生成标准化组件，
+ * defineCxComponent
+ * 从声明式配置定义 cx 运行时组件：
  * 相比普通的 Vue 组件挂载了自定义组件元信息、安装函数等属性
  * TODO FIXME 推断 exposes.event.args
  * TODO 推断 exposes slots
- * TODO 类似 defineOptions 之类的语法也许可以使 normalize 更加简化
+ * TODO 类似 defineOptions 之类的语法也许可以使 defineCxComponent 更加简化
  */
-export const normalize = <
+export const defineCxComponent = <
   VueComp extends Component,
   CnName extends string,
   VKey extends string,
@@ -96,7 +96,7 @@ export const normalize = <
 }
 
 // 类型守卫并不提供类型推断能力，
-// 推断能力依靠 normalize 接口的泛型约束（即 extends）
+// 推断能力依靠 defineCxComponent 接口的泛型约束（即 extends）
 type Guard<M> = IsEveryTrueThen<
   [
     // 名称不应为空字符串

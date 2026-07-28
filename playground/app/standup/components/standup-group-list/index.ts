@@ -1,4 +1,4 @@
-import { normalize, translate } from '@lionad/cx-definition'
+import { define, translate } from '@lionad/cx-definition'
 import component from './ui/index.vue'
 
 /**
@@ -6,7 +6,7 @@ import component from './ui/index.vue'
  * group-item 模板插槽种类固定，渲染数量由 groups 数据长度驱动，
  * 每个分组经 StandupContextProvider 注入当前 group 供模板子节点消费。
  */
-export default normalize({
+export default define({
   name: translate('站会分组列表'),
   description: translate('按分组循环渲染 group-item 模板插槽，单项 group 数据经上下文注入'),
   key: 'cx-standup-group-list',

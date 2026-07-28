@@ -1,10 +1,10 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { popperPlacementOptions } from '@lionad/cx-vue'
 import { unref } from 'vue'
 
-export default normalize({
+export default define({
   key: 'cx-tooltip',
   name: '弹出提示',
   description: '弹出提示',

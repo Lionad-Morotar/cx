@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '天气组件',
   description: '天气组件，含当前位置、实况与多日预报，支持温度单位与背景特效。',
   key: 'cx-vtu-weather-widget',

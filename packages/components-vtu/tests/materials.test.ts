@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import { CxVtu, CxVtuBundle } from '../src/index'
 
 /**
- * vtu 物料 smoke：normalize 契约（_cx_meta + _cx_install + key 唯一）+ 代表性挂载。
+ * vtu 物料 smoke：defineCxComponent 契约（_cx_meta + _cx_install + key 唯一）+ 代表性挂载。
  * v-cx 指令由宿主编辑器安装，测试中注册 no-op 版避免警告。
  * comp 为 cx 运行时节点桩：渲染器实际注入含 id/key/data 的对象，包装层据此回退 vtu 必填 id。
  */

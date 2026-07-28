@@ -25,7 +25,7 @@ const mountAction = (props: Record<string, any>) =>
   })
 
 describe('cx-action 编排枢纽物料', () => {
-  it('normalize 装配为 headless 物料', () => {
+  it('defineCxComponent 装配为 headless 物料', () => {
     const comp = byKey('cx-action')
     expect(comp._cx_meta).toBeTruthy()
     expect(comp._cx_meta.headless).toBe(true)

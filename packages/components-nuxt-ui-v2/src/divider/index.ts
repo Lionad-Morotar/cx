@@ -1,8 +1,8 @@
-import { normalize, has } from '@lionad/cx-definition'
+import { define, has } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { useSizeOptions } from '@lionad/cx-vue'
 
-export default normalize({
+export default define({
   key: 'cx-divider',
   name: '分隔',
   description: '在内容间插入分隔线',

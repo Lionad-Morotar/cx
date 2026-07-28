@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '引用',
   description: '来源引用卡，含链接、标题、摘要、域名与跳转事件，支持多种变体。',
   key: 'cx-vtu-citation',

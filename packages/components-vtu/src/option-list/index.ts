@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '选项列表',
   description: '可选列表，单选/多选，含选择约束与 change/action 事件，支持 v-model。',
   key: 'cx-vtu-option-list',

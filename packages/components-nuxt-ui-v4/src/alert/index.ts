@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '警告提示',
   description:
     'Nuxt UI v4 警告横幅；icon 在 v4 接收图标名（spec 的 boolean 不适用，以 v4 源码为准改用 icon 类型），v4 无 default/trailing slot 故未暴露',

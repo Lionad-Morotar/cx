@@ -1,5 +1,5 @@
 import z from 'zod'
-import { normalize, has } from '@lionad/cx-definition'
+import { define, has } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import PanelItems from './panel/items.vue'
 import CxSelect from '../select/index'
@@ -11,7 +11,7 @@ import { zItem } from './types'
 import type { CxComponentSlot } from '@lionad/cx-definition'
 import { omit as useOmit } from 'lodash-es'
 
-export default normalize({
+export default define({
   key: 'cx-select-menu',
   name: '下拉菜单',
   description: '增强版选项框组件，增加了多选，搜索等实用功能',

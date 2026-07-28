@@ -1,10 +1,10 @@
-import { normalize, safeNum } from '@lionad/cx-definition'
+import { define, safeNum } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 import PanelItems from './panel/items.vue'
 import { binds } from './slots'
 
-export default normalize({
+export default define({
   key: 'cx-progress',
   name: '进度条',
   description: '进度条组件用于展示线性的进度状态，也可以展示百分比等数值形式的状态',

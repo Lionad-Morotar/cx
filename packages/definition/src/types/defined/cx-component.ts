@@ -27,7 +27,7 @@ export type SFCExtended<T> = Plugin &
     key: string
   }
 
-// 在 normalize 需要中补全不完整的元信息
+// defineCxComponent 会补全不完整的元信息
 export type CxComponentMetaDefined<VueComp extends Component = Component> = {
   name: string
   key: string

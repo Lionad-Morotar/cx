@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
 const COLOR_OPTIONS = [
@@ -19,7 +19,7 @@ const DEFAULT_ITEMS = () => [
   { label: '选项 C', value: 'c' },
 ]
 
-export default normalize({
+export default define({
   name: '单选组',
   description: 'Nuxt UI v4 单选组，v2 radio 在 v4 对应 RadioGroup，从一组互斥选项中择一',
   key: 'cx-nuxt-ui-v4-radio-group',

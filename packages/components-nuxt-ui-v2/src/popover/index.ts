@@ -1,9 +1,9 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { popperPlacementOptions } from '@lionad/cx-vue'
 import { binds } from './slots'
 
-export default normalize({
+export default define({
   key: 'cx-popover',
   name: '弹出层',
   description: '展示弹出式的内容，如悬浮提示、悬浮菜单等',

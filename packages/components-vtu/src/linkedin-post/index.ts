@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: 'LinkedIn 贴文',
   description: 'LinkedIn 贴文展示，post 对象含作者（可选头衔）、文本与链接预览。',
   key: 'cx-vtu-linkedin-post',

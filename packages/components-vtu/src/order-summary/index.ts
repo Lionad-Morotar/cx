@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '订单摘要',
   description: '订单摘要/收据，items 含数量与单价，pricing 含小计/税额/总计与币种。',
   key: 'cx-vtu-order-summary',

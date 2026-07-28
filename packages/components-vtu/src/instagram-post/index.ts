@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: 'Instagram 贴文',
   description: 'Instagram 贴文展示，post 对象含作者、文本、媒体与统计。',
   key: 'cx-vtu-instagram-post',

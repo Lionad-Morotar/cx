@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '表单',
   description: 'Nuxt UI v4 表单容器，配合 UFormField 与 schema 做校验与提交',
   key: 'cx-nuxt-ui-v4-form',

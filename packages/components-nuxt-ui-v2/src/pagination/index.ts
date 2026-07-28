@@ -1,9 +1,9 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { useSizeOptions } from '@lionad/cx-vue'
 
-export default normalize({
+export default define({
   key: 'cx-pagination',
   name: '分页指示',
   description: '展示分页信息，如上一页、下一页、跳转到指定页等',

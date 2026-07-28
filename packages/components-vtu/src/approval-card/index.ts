@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '审批卡',
   description: '审批确认卡，含标题、描述、元数据与确认/取消动作，支持破坏性变体。',
   key: 'cx-vtu-approval-card',

@@ -1,9 +1,9 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import PanelLinks from './panel/links.vue'
 import { slotBinds } from './slots'
 
-export default normalize({
+export default define({
   key: 'cx-breadcrumb',
   name: '面包屑导航',
   description: '面包屑导航用于展示一系列项目，可以表示层级关系，如页面路径、目录等',

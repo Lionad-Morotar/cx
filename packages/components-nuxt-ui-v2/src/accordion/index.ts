@@ -1,5 +1,5 @@
 import z from 'zod'
-import { normalize, CxEvents, has } from '@lionad/cx-definition'
+import { define, CxEvents, has } from '@lionad/cx-definition'
 import ItemsForm from './panel/items.vue'
 import component from './src/index.vue'
 import CxButton from '../button'
@@ -7,7 +7,7 @@ import { createItem } from './utils'
 import { slotBinds } from './slots'
 import type { CxComponentSlot } from '@lionad/cx-definition'
 
-export default normalize({
+export default define({
   name: '手风琴',
   description: '显示可切换的折叠面板',
   key: 'cx-accordion',

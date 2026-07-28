@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '卡片',
   description:
     'Nuxt UI v4 卡片容器；v4 Card 无 header-leading/header-trailing slot（spec 所列已按 v4 源码去除）',

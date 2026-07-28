@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-stepper',
   name: '步骤条',
   description: 'Nuxt UI v4 步骤条，多步流程进度指示，点击步骤可导航',

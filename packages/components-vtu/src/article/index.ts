@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '文章',
   description: 'Markdown / HTML 文章卡片，支持标题、作者、封面、标签与阅读时长。',
   key: 'cx-vtu-article',

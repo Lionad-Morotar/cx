@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '音频',
   description: '音频播放器，支持封面、时长、紧凑/完整变体与播放事件。',
   key: 'cx-vtu-audio',

@@ -1,8 +1,8 @@
-import { normalize, translate } from '@lionad/cx-definition'
+import { define, translate } from '@lionad/cx-definition'
 import component from './ui/index.vue'
 import PanelTabs from './panel/tabs.vue'
 
-export default normalize({
+export default define({
   name: translate('标签页'),
   description: translate('卡片标签页组件'),
   key: 'cx-card-tabs',

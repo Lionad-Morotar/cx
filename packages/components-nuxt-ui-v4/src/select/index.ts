@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
@@ -27,7 +27,7 @@ const DEFAULT_ITEMS = () => [
   { label: '选项 3', value: '3' },
 ]
 
-export default normalize({
+export default define({
   name: '下拉选择',
   description: 'Nuxt UI v4 下拉选择，从 items 中择一或择多',
   key: 'cx-nuxt-ui-v4-select',

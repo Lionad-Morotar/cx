@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { compColorNames, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '标签',
   description: '标签组件用于展示事物的状态、数量等附加信息',
   key: 'cx-badge',

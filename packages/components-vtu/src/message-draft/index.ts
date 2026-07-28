@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '消息草稿',
   description: '邮件 / Slack 草稿预览，按渠道切换字段，含发送/撤销/取消回调。',
   key: 'cx-vtu-message-draft',

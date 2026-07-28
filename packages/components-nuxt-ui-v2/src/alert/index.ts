@@ -1,9 +1,9 @@
 import z from 'zod'
-import { normalize, CxEvents } from '@lionad/cx-definition'
+import { define, CxEvents } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import CxButton from '../button'
 
-export default normalize({
+export default define({
   name: '警告',
   description: '引人注目的警告信息',
   key: 'cx-alert',

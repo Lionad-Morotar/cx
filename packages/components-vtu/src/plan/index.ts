@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '计划',
   description: '执行计划清单，todos 含状态（pending/in-progress/completed），含 todoClick 事件。',
   key: 'cx-vtu-plan',

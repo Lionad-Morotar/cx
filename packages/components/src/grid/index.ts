@@ -1,10 +1,10 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import GridForm from './panel/grids-form.vue'
 import { defaultDatas } from './config'
 import { getPosByTurn } from './utils'
 
-export default normalize({
+export default define({
   name: '网格',
   icon: 'i-tabler-columns-3',
   description: '能将一系列组件在页面中按行列排列开，并调整行列的宽高和间距',

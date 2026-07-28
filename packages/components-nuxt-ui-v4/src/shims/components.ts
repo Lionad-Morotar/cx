@@ -1,7 +1,7 @@
 import { defineComponent, h } from 'vue'
 
 // Nuxt #components 虚拟模块离线占位：宿主 Nuxt 环境由 @nuxt/ui 提供真实 U* 组件；
-// 测试环境将 U* 替换为透传 stub——物料层（normalize 包装、props/slots 透传）真实执行，
+// 测试环境将 U* 替换为透传 stub——物料层（defineCxComponent 包装、props/slots 透传）真实执行，
 // U* 真实渲染行为由 playground 验收页在宿主中覆盖。
 // 清单对齐官方核心 6 分类 70 组件，新增物料时同步补 stub。
 const stub = (name: string) =>

@@ -1,9 +1,9 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { zError } from './types'
 
-export default normalize({
+export default define({
   key: 'cx-form',
   name: '表单',
   description: '用于展示表单内容，并提供流程化控制',

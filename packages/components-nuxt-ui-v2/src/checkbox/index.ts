@@ -1,10 +1,10 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { compColorNames3 } from '@lionad/cx-vue'
 import component from './src/index.vue'
 import type { CxComponentSlot } from '@lionad/cx-definition'
 
-export default normalize({
+export default define({
   key: 'cx-checkbox',
   name: '复选框',
   description: '复选框组件用于展示一个可选中的按钮，用于表示一个选中或未选中的二元状态',

@@ -1,9 +1,9 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import panelActions from './panel/actions.vue'
 
 // todo 和 p-context-actions 合并
-export default normalize({
+export default define({
   key: 'cx-context-menu',
   name: '右键菜单',
   description: '显示在右键点击时出现的菜单。',

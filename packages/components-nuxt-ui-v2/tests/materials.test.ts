@@ -32,7 +32,7 @@ const mountMaterial = (
   })
 
 describe('nuxt-ui-v2 物料 smoke', () => {
-  it('物料数量与 normalize 装配（补 button-group/meter-group 后 >= 42）', () => {
+  it('物料数量与 defineCxComponent 装配（补 button-group/meter-group 后 >= 42）', () => {
     expect(CxNuxtUIV2.length).toBeGreaterThanOrEqual(42)
     for (const meta of CxNuxtUIV2) {
       expect(meta._cx_meta).toBeTruthy()

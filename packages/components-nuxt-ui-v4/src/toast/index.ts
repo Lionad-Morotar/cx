@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-toast',
   name: '通知',
   description: 'Nuxt UI v4 单条通知（UToast）；完整通知流需配合 useToast API 与 UToaster 容器',

@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import PanelItems from './panel/items.vue'
 import CxInput from '../input/index'
@@ -8,7 +8,7 @@ import { zItem } from './types'
 import { binds as inputBinds } from '../input/slots'
 import { omit as useOmit } from 'lodash-es'
 
-export default normalize({
+export default define({
   key: 'cx-input-menu',
   name: '搜索输入框',
   description: '带搜索功能以及补全功能的输入框',

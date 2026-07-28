@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-avatar-group',
   name: '头像组',
   description: 'Nuxt UI v4 头像组，堆叠多个头像，max 限制展示数量、溢出折叠为 +N',

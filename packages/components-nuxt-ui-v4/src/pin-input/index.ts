@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-pin-input',
   name: 'PIN 输入',
   description: 'Nuxt UI v4 PIN 输入，分段字符输入（验证码/密码场景），支持掩码与 OTP',

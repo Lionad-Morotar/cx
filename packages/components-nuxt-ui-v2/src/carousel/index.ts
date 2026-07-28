@@ -1,10 +1,10 @@
 import z from 'zod'
-import { normalize, has, not } from '@lionad/cx-definition'
+import { define, has, not } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { slotItemBinds, slotPrevBinds, slotNextBinds, slotIndicatorBinds } from './slots'
 import panelContent from './panel/content.vue'
 
-export default normalize({
+export default define({
   key: 'cx-carousel',
   name: '轮播图',
   description: '在可滚动区域中显示图像或内容',

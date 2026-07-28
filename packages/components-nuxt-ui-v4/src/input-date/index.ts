@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
@@ -12,7 +12,7 @@ const COLOR_OPTIONS = [
   { label: '中性', value: 'neutral' },
 ]
 
-export default normalize({
+export default define({
   name: '日期选择',
   description:
     'Nuxt UI v4 日期输入；物料层将 YYYY-MM-DD 字符串映射为 default-value（CalendarDate）',

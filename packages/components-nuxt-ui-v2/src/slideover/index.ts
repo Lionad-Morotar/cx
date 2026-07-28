@@ -1,9 +1,9 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import CxModal from '../modal'
 import { unref } from 'vue'
 
-export default normalize({
+export default define({
   key: 'cx-slideover',
   name: '侧边弹窗',
   description: '打断当前交互流程，并展示一个新的交互层',

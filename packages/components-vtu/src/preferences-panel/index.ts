@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '偏好面板',
   description:
     '偏好设置面板，分区含多种控件类型（switch/toggle/select/input/textarea），支持 v-model。',

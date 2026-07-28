@@ -21,7 +21,7 @@ export const toJSON = (_meta: CxComponentMetaDefined): Meta => {
   meta.type = type || 'umd'
   meta.url = url || `${meta.key.replace(/^cx-/, '')}.js`
 
-  // 移除属性里的大对象，与 normalize 部分逻辑相对
+  // 移除属性里的大对象，与 defineCxComponent 部分逻辑相对
   Object.keys(meta.props || {}).forEach((k) => {
     try {
       delete meta.props[k].component

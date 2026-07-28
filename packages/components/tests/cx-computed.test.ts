@@ -53,7 +53,7 @@ describe('safeEval 受限表达式求值器', () => {
 })
 
 describe('cx-computed 派生物料', () => {
-  it('normalize 装配为 headless 物料', () => {
+  it('defineCxComponent 装配为 headless 物料', () => {
     const comp = byKey('cx-computed')
     expect(comp._cx_meta.headless).toBe(true)
     expect(comp._cx_meta.key).toBe('cx-computed')

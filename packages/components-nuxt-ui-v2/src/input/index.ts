@@ -1,10 +1,10 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 import { binds } from './slots'
 
-export default normalize({
+export default define({
   key: 'cx-input',
   name: '输入框',
   description: '输入框组件',

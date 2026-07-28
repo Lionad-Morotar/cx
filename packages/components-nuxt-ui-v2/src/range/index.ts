@@ -1,9 +1,9 @@
 import z from 'zod'
-import { normalize, safeNum } from '@lionad/cx-definition'
+import { define, safeNum } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { compColorNames3, useSizeOptions } from '@lionad/cx-vue'
 
-export default normalize({
+export default define({
   key: 'cx-range',
   name: '范围',
   description: '范围组件用于表示某个范围内的数值，比如进度、评分或容量使用情况。',

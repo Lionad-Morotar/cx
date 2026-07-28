@@ -4,13 +4,13 @@ import { mount } from '@vue/test-utils'
 import { CxNuxtUIV4, CxNuxtUIV4Button } from '../src/index'
 
 /**
- * v4 物料 normalize 契约：数量、key 唯一与官方命名约定、_cx_install 可注册。
+ * v4 物料 defineCxComponent 契约：数量、key 唯一与官方命名约定、_cx_install 可注册。
  * U* 组件经 vite alias 替换为离线 stub（#components → src/shims/components.ts），
  * 物料层模板与 props/slots 透传真实执行；U* 真实渲染由 playground 验收页覆盖。
  */
 const byKey = (key: string) => CxNuxtUIV4.find((x: any) => x._cx_meta.key === key)!
 
-describe('Nuxt UI v4 物料 normalize 契约', () => {
+describe('Nuxt UI v4 物料 defineCxComponent 契约', () => {
   it('70 个物料全部带 _cx_meta 且 key 唯一（官方核心 6 分类全量对齐）', () => {
     expect(CxNuxtUIV4.length).toBe(70)
     const keys = CxNuxtUIV4.map((m: any) => m._cx_meta.key)

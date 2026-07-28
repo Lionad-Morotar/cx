@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '地理地图',
   description:
     'leaflet 地图，标记 lat∈[-90,90]/lng∈[-180,180]，支持路线、聚类与 marker/route 事件。',

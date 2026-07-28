@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '问答流',
   description:
     '多步问答流（upfront 模式），steps 各含标题与至少一个选项，含 select/complete 事件。',

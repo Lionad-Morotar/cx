@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-file-upload',
   name: '文件上传',
   description: 'Nuxt UI v4 文件上传，拖拽区与按钮两种形态，支持类型限制与多选',

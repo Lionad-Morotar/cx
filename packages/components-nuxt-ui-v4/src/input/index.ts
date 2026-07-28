@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
@@ -22,7 +22,7 @@ const COLOR_OPTIONS = [
   { label: '中性', value: 'neutral' },
 ]
 
-export default normalize({
+export default define({
   name: '输入框',
   description: 'Nuxt UI v4 单行输入框，承载文本/数字/密码等基础录入',
   key: 'cx-nuxt-ui-v4-input',

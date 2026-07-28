@@ -1,9 +1,9 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { compColorNames3 } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-radio',
   name: '单选框',
   description: '单选框组件用于展示一个可选中的按钮，用于表示一个选中或未选中的二元状态',

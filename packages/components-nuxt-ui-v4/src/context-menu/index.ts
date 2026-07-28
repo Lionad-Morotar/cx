@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-context-menu',
   name: '右键菜单',
   description: 'Nuxt UI v4 右键上下文菜单，右键触发区域弹出操作选项',

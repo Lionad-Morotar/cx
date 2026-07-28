@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-checkbox-group',
   name: '复选组',
   description: 'Nuxt UI v4 复选组，从列表中选择多个选项',

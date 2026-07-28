@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-nuxt-ui-v4-banner',
   name: '横幅',
   description: 'Nuxt UI v4 横幅，页面顶部重要信息展示，支持图标、颜色与关闭按钮',

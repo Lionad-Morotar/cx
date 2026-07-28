@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '键盘按键',
   description:
     'Nuxt UI v4 键盘按键，展示快捷键；prop 名 value（v4 真实 API，spec 的 content 已按 v4 源码对齐为 value）',

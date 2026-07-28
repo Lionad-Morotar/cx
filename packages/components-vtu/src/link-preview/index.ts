@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '链接预览',
   description: '链接预览卡，含链接、标题、描述、缩略图与域名，支持跳转事件。',
   key: 'cx-vtu-link-preview',

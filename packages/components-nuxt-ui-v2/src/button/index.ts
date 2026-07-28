@@ -1,10 +1,10 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { compColorNames2, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 import { slotBinds } from './slots'
 import type { CxComponentSlot } from '@lionad/cx-definition'
 
-export default normalize({
+export default define({
   name: '按钮',
   description: '按钮组件用于触发用户交互，如跳转页面、提交表单、打开弹窗等',
   key: 'cx-button',

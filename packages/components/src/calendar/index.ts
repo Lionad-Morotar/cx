@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/ui/index.vue'
 
-export default normalize({
+export default define({
   name: '日历',
   description: '日历组件，有多种视图样式，可以显示日、周、月、年多种视图',
   icon: 'i-ant-design-calendar-outlined',

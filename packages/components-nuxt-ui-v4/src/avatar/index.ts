@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '头像',
   description: 'Nuxt UI v4 头像，支持图片加载失败时回退到文字或图标',
   key: 'cx-nuxt-ui-v4-avatar',

@@ -16,7 +16,7 @@ import { createCxEmitter } from '../events/cx-emitter'
 import { useRefs } from '../utils/refs'
 import { createCxUtils, createCxDatas, createCxID } from '../utils'
 import { cxLoaderHooks } from '../events'
-import { normalize } from '../normalize'
+import { defineCxComponent } from '../define'
 import getURL from './script-manager'
 import { isDev } from './config'
 import { getDefaultExportFromModule } from './module'
@@ -281,7 +281,7 @@ export class CxLoader {
 
       // 异步组件真实内容加载完后，
       // 会自动覆盖一开始就注册的 defineAsyncComponent 同步组件，
-      // 虽然也是用 normalize 处理了同步组件，但是他的 _cx_meta 等是不完整的，
+      // 虽然也是用 defineCxComponent 处理了同步组件，但是他的 _cx_meta 等是不完整的，
       // 所以这里需要通过真实注册的组件来获取自定义组件元数据，
       // 这里的返回是顺序相关的
       return [...asyncComps, ...syncComps]
@@ -331,7 +331,7 @@ export class CxLoader {
           const component = (
             !async
               ? await this.fetchModule(fullURL, exportsName)
-              : normalize({
+              : defineCxComponent({
                   name: meta.name,
                   key: meta.key,
                   aliasKeys: meta.aliasKeys,

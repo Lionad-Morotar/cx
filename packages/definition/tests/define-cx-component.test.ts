@@ -1,15 +1,19 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalize, toJSON } from '../src/index'
+import { define, defineCxComponent, toJSON } from '../src/index'
 
 import type { Component } from 'vue'
 
-/** 最小 Vue 组件桩：normalize 只读写属性，不要求真实渲染 */
+/** 最小 Vue 组件桩：defineCxComponent 只读写属性，不要求真实渲染 */
 const stubComp = { render: () => null } as unknown as Component
 
-describe('normalize', () => {
+describe('defineCxComponent', () => {
+  it('define 是同一函数的短名 alias', () => {
+    expect(define).toBe(defineCxComponent)
+  })
+
   it('key 转 PascalCase 作为组件 name', () => {
-    const comp = normalize({
+    const comp = defineCxComponent({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
@@ -22,7 +26,7 @@ describe('normalize', () => {
   })
 
   it('挂载 _cx_meta 并填充默认值', () => {
-    const comp = normalize({
+    const comp = defineCxComponent({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
@@ -44,7 +48,7 @@ describe('normalize', () => {
   })
 
   it('显式声明的 headless 保留', () => {
-    const comp = normalize({
+    const comp = defineCxComponent({
       name: '逻辑',
       icon: 'i-tabler-box',
       description: '逻辑组件',
@@ -57,7 +61,7 @@ describe('normalize', () => {
   })
 
   it('_cx_install 以 kebab-case 名注册组件', () => {
-    const comp = normalize({
+    const comp = defineCxComponent({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
@@ -76,7 +80,7 @@ describe('normalize', () => {
 
 describe('toJSON', () => {
   it('剥离 component 并生成默认 type/url/exports', () => {
-    const comp = normalize({
+    const comp = defineCxComponent({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
@@ -92,7 +96,7 @@ describe('toJSON', () => {
   })
 
   it('props 中的函数 default/initial 被剥离', () => {
-    const comp = normalize({
+    const comp = defineCxComponent({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',
@@ -114,7 +118,7 @@ describe('toJSON', () => {
   })
 
   it('props.options 嵌套的函数 default/initial 同样被剥离', () => {
-    const comp = normalize({
+    const comp = defineCxComponent({
       name: '文本',
       icon: 'i-tabler-edit',
       description: '文本组件',

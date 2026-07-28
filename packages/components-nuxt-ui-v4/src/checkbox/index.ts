@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
 const COLOR_OPTIONS = [
@@ -11,7 +11,7 @@ const COLOR_OPTIONS = [
   { label: '中性', value: 'neutral' },
 ]
 
-export default normalize({
+export default define({
   name: '复选框',
   description: 'Nuxt UI v4 复选框，用于二值或多选状态标记',
   key: 'cx-nuxt-ui-v4-checkbox',

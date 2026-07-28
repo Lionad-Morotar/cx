@@ -1,10 +1,10 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import { popperPlacementOptions } from '@lionad/cx-vue'
 import panelActions from '../context-menu/panel/actions.vue'
 
-export default normalize({
+export default define({
   key: 'cx-dropdown',
   name: '下拉菜单',
   description: '展示多个选项，用户可以从中选择一个选项',

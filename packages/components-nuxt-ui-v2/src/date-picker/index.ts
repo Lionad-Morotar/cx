@@ -1,8 +1,8 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-date-picker',
   name: '日期选择',
   description: '选择日期、时间、日期范围等',

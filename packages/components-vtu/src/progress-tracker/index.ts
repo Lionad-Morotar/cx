@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '进度追踪',
   description: '步骤进度追踪，steps 含状态（pending/in-progress/completed/failed）与耗时。',
   key: 'cx-vtu-progress-tracker',

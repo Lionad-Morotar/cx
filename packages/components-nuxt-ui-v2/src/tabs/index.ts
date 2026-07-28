@@ -1,5 +1,5 @@
 import z from 'zod'
-import { normalize, CxEvents } from '@lionad/cx-definition'
+import { define, CxEvents } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import PanelTabs from './panel/tabs.vue'
 import { createTab } from './utils'
@@ -7,7 +7,7 @@ import { bindTab } from './slots'
 import type { Tab } from './types'
 import { omit as useOmit } from 'lodash-es'
 
-export default normalize({
+export default define({
   key: 'cx-tabs',
   name: '标签页',
   description: '选中不同的标签，可以切换到不同的显示内容。',

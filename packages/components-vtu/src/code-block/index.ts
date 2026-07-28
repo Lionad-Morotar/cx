@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '代码块',
   description: '语法高亮代码块（shiki），支持行号、文件名、高亮行与折叠。',
   key: 'cx-vtu-code-block',

@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
@@ -19,7 +19,7 @@ const DEFAULT_ITEMS = () => [
   { label: '选项 3', value: '3' },
 ]
 
-export default normalize({
+export default define({
   name: '选择菜单',
   description: 'Nuxt UI v4 可搜索下拉，在 items 中检索并选择一项或多项',
   key: 'cx-nuxt-ui-v4-select-menu',

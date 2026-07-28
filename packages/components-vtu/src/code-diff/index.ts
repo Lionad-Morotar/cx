@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '代码差异',
   description: '代码差异对比（diff 渲染），支持 old/new 或 patch 输入，统一/分屏视图。',
   key: 'cx-vtu-code-diff',

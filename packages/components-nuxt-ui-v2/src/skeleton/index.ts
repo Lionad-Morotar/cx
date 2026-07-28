@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-skeleton',
   name: '加载占位',
   description: '加载占位可以让你在数据加载时展示一个占位的骨架。',

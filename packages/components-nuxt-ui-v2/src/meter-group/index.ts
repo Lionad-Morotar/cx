@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-meter-group',
   name: '计量组',
   description: '将多个计量项组合展示，适合呈现容量分布、多维进度或评分占比等场景',

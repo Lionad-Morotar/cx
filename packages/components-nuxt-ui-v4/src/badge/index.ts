@@ -1,7 +1,7 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '徽标',
   description: 'Nuxt UI v4 徽标，标注状态或分类',
   key: 'cx-nuxt-ui-v4-badge',

@@ -1,10 +1,10 @@
 import z from 'zod'
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { compColorNames3, positionOptions, useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 import type { CxComponentSlot } from '@lionad/cx-definition'
 
-export default normalize({
+export default define({
   key: 'cx-chip',
   name: '标记',
   description: '使用标记组件在任意组件上展示轻量化，如标签、状态等',

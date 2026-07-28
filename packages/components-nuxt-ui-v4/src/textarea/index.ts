@@ -1,4 +1,4 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
@@ -20,7 +20,7 @@ const COLOR_OPTIONS = [
   { label: '中性', value: 'neutral' },
 ]
 
-export default normalize({
+export default define({
   name: '文本域',
   description: 'Nuxt UI v4 多行文本输入，支持行数与自适应高度',
   key: 'cx-nuxt-ui-v4-textarea',

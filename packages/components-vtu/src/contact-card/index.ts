@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '联系卡',
   description: '联系方式卡，按类型（电话/邮箱/地址/社交/网站）展示值，可复制或跳转。',
   key: 'cx-vtu-contact-card',

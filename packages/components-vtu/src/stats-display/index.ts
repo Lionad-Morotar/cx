@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '统计展示',
   description: '统计指标卡片组，带数值格式化、差异与迷你折线（sparkline 数据至少 2 点）。',
   key: 'cx-vtu-stats-display',

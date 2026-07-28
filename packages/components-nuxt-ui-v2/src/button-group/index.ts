@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import { useSizeOptions } from '@lionad/cx-vue'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   key: 'cx-button-group',
   name: '按钮组',
   description: '将多个按钮组织成一组，常用于分段操作、分页或工具栏等并列场景',

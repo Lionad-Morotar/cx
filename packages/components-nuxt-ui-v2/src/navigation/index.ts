@@ -1,10 +1,10 @@
-import { normalize, CxEvents } from '@lionad/cx-definition'
+import { define, CxEvents } from '@lionad/cx-definition'
 import component from './src/index.vue'
 import PanelTabs from './panel/items.vue'
 import { createItem } from './utils'
 import { binds } from './slots'
 
-export default normalize({
+export default define({
   key: 'cx-navigation',
   name: '水平导航',
   description: '水平导航',

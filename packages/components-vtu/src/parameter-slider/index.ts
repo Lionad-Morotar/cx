@@ -1,8 +1,8 @@
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '参数滑块',
   description: '参数滑块组，每个滑块需 min<max 且 value 在区间内，含 change/commit 事件。',
   key: 'cx-vtu-parameter-slider',
