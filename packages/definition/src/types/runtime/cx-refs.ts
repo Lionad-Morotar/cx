@@ -10,7 +10,7 @@ import type { CxComponentRuntime } from './cx-component'
  */
 export interface RefsManager<
   Data = {
-    ref: any
+    ref: unknown
     data: CxComponentRuntime
   },
 > {
@@ -19,7 +19,7 @@ export interface RefsManager<
   set: (id: string, vm: Data) => void
   get: (id: string) => Data | undefined
   remove: (id: string) => void
-  setRef: <G extends { id: string }>(item: G, ref: any, data?: Partial<Data>) => void
+  setRef: <G extends { id: string }>(item: G, ref: unknown, data?: Partial<Data>) => void
   removeRef: (item: { id: string }) => void
   getData: (x: { id: string } | string) => Data | undefined
   clear: () => void
@@ -29,7 +29,7 @@ export interface RefsManager<
 
 export type CxRefs<
   Data = {
-    ref: any
+    ref: unknown
     data: CxComponentRuntime
   },
 > = RefsManager<Data>

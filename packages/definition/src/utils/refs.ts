@@ -11,7 +11,7 @@ type UseRefsOptions<T> = {
 /**
  * component ref manager
  */
-export function useRefs<T = Element | ComponentPublicInstance | Record<string, any>>(
+export function useRefs<T = Element | ComponentPublicInstance | Record<string, unknown>>(
   opts: UseRefsOptions<T> = {},
 ) {
   const { defaultValue } = Object.assign(
@@ -32,7 +32,7 @@ export function useRefs<T = Element | ComponentPublicInstance | Record<string, a
     delete maps[id]
   }
 
-  const setRef = <G extends { id: string }>(item: G, ref: any, data?: Partial<T>) => {
+  const setRef = <G extends { id: string }>(item: G, ref: unknown, data?: Partial<T>) => {
     // console.log('ref', ref)
     const toSetData = Object.assign(toValue(defaultValue), data || {})
     set(
@@ -71,12 +71,12 @@ export function useRefs<T = Element | ComponentPublicInstance | Record<string, a
     watchImmediate(
       () => {
         // console.log('[debug] checkCompsInited getter', refs.value.length, refs.value.map(x => {
-        //   return (x as { ref: any }).ref?.isInited
+        //   return (x as { ref: { isInited?: boolean } }).ref?.isInited
         // }))
         return (
           refs.value.length &&
           refs.value.map((x) => {
-            return (x as { ref: any }).ref?.isInited
+            return (x as { ref: { isInited?: boolean } }).ref?.isInited
           })
         )
       },
@@ -85,13 +85,13 @@ export function useRefs<T = Element | ComponentPublicInstance | Record<string, a
         //   '[debug] checkCompsInited result',
         //   refs.value.length,
         //   refs.value.map(x => {
-        //     return (x as { ref: any }).ref?.isInited
+        //     return (x as { ref: { isInited?: boolean } }).ref?.isInited
         //   }),
         //   refs.value.map(x => {
         //     return (x as Record<typeof countNameInRef, number>)[countNameInRef] === refs.value.length
         //   }),
         //   refs.value.every(x => {
-        //     return (x as { ref: any }).ref?.isInited
+        //     return (x as { ref: { isInited?: boolean } }).ref?.isInited
         //       && (x as Record<typeof countNameInRef, number>)[countNameInRef] === refs.value.length
         //   })
         // )
@@ -100,7 +100,7 @@ export function useRefs<T = Element | ComponentPublicInstance | Record<string, a
           refs.value.length > 0 &&
           refs.value.every((x) => {
             return (
-              (x as { ref: any }).ref?.isInited &&
+              (x as { ref: { isInited?: boolean } }).ref?.isInited &&
               (x as Record<typeof countNameInRef, number>)[countNameInRef] === refs.value.length
             )
           })
@@ -131,4 +131,5 @@ export function useRefs<T = Element | ComponentPublicInstance | Record<string, a
   return states
 }
 
-export type RefsMan<T = Element> = RefsManager<any>
+// RefsMan 是 RefsManager 的别名（原 <T> 泛型未用已移除，Data 用 RefsManager 默认类型）
+export type RefsMan = RefsManager

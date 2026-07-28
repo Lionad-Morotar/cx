@@ -19,7 +19,7 @@ export type CxComponentBundles = CxComponentBundle[]
  */
 export type CxDataBind = string
 
-export interface CxComponentData extends Record<string, any> {
+export interface CxComponentData extends Record<string, unknown> {
   // 运行时组件名称（组件昵称）
   _cx_name?: string
   // 运行时组件事件数据
@@ -70,7 +70,7 @@ type MakeNet<Recur> = Recur & {
           description?: string
         }
       >
-    | ((comp: Recur) => Record<string, any>)
+    | ((comp: Recur) => Record<string, unknown>)
     | null
   // 子模块数据，
   // 有些模块如文本、详情模块没有子模块数据，

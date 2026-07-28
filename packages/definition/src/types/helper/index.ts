@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// @ts-nocheck —— 类型体操集在 tsgo/TS7 下求值行为未经实测，豁免待后续治理验证后摘除
-
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck —— 类型体操集在 tsgo/TS7 下求值有真实错误（M["component"] 推导退化为 unknown），
+// 待 TS7 类型体操求值能力增强后摘除；此文件仅被 define/component.ts 的 Guard 消费
 import type { KebabCase, UnionToIntersection } from 'type-fest'
 
+// IsAny 的两个 any 是核心逻辑：用 [T] extends [any] + [any] extends [T] 双向判定
+// 检测 T 是否为 any（unknown 会破坏此语义——[unknown] extends [T] 分布行为不同）
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IsAny<T> = [T] extends [any] ? ([any] extends [T] ? true : false) : false
 
 /* -------------------------------------------------------------------------- */
 /*                                    Union                                   */
 /* -------------------------------------------------------------------------- */
 
-export type RecordToUnion<T extends Record<string, any>> = T[keyof T]
+export type RecordToUnion<T extends Record<string, unknown>> = T[keyof T]
 
 /* -------------------------------------------------------------------------- */
 /*                                  Function                                  */
@@ -56,8 +60,11 @@ export type IsEveryTrueXOrY<
 /*                                   record                                   */
 /* -------------------------------------------------------------------------- */
 
+// Get 的 Record<K, any> 保留 any：改 unknown 会让 Get<M,"component"> 的返回类型
+// 在 extends Component 约束处退化为 unknown（component.ts Guard 消费），破坏类型体操
 export type Get<T, K = string> = K extends keyof T
-  ? T extends Record<K, any>
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T extends Record<K, any>
     ? T[K]
     : never
   : never
@@ -73,5 +80,5 @@ export type IsKebabCase<T> = IsEqual<KebabCase<T>, T>
 /* -------------------------------------------------------------------------- */
 
 export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends (...args: any[]) => any ? T[P] : DeepPartial<T[P]>
+  [P in keyof T]?: T[P] extends (...args: unknown[]) => unknown ? T[P] : DeepPartial<T[P]>
 }

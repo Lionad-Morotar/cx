@@ -1,6 +1,5 @@
 import type { CxEventKey } from '../../configs'
 import type { CxComponentRuntime } from './cx-component'
-import type { RefsManager } from './cx-refs'
 
 /** ******************************************************************* CxEvent */
 
@@ -34,7 +33,7 @@ export type CxSubEvent = {
   //  触发目标组件的暴露的事件
   trigger: CxEventKey | string
   // 参数
-  args?: any[]
+  args?: unknown[]
 }
 
 /**
@@ -47,7 +46,7 @@ export type CxEventDeprecated = {
   key: string
   target: string
   trigger: string
-  args?: any[]
+  args?: unknown[]
 }
 
 export type CxEmitter = ((opts: {
@@ -56,7 +55,7 @@ export type CxEmitter = ((opts: {
   // 事件名称（meta.emits 中记录的键名）
   eventKey: string
   // 事件参数
-  args: any[]
+  args: unknown[]
 }) => void) & {
   // 根据事件参数找到对应组件（的 Vue 组件实例），然后执行对应的方法
   trigger: (event: CxSubEvent) => Promise<void>
