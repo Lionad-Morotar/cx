@@ -61,6 +61,10 @@
 - 禁用注释优先使用行内形式：`// eslint-disable-next-line @typescript-eslint/no-explicit-any`（见 `playground/tests/utils-label.test.ts:35`）；多行元素盖不住属性行时用文件级注释并注明 Why（见 `packages/renderer/src/comps/render-component.vue:2`）
 - 存量治理期：`no-explicit-any`、`no-unused-vars`、`vue/return-in-computed-property` 等 9 条规则在 cx 预设中降级为 warn（清单与治理优先级见 `packages/eslint/index.js` 的 `LEGACY_WARN_RULES`），治理后恢复 error；**新增代码按 error 标准写**
 - `typescript-eslint` 不支持仓库锁定的 TS 7.0（加载即抛错）：`packages/eslint` 包内把 `typescript` 重定向到 `npm:typescript@^6` 副本喂给 lint，typecheck 链路的 TS 7 不受影响
+- 自研三规则（`packages/eslint/rules/`，以 `cx/` 前缀注册）：
+  - `cx/require-component-name`：组件必须拥有与文件路径一致的规范名，落在 Option Name（defineOptions/defineComponent，PascalCase）与根元素标记 class（kebab）两处；`:class="ns.b()"` BEM 调用视为标记类存在；v4 薄包装经 `skipRootClassPackages` 跳过根 class 校验；fixer 可全量收敛
+  - `cx/no-tracking-marker`：注释禁止夹带开发追踪标记（Phase/任务 ID/CR#/Route X 等），只解释 Why；eslint/@ts- 指令注释天然豁免
+  - `cx/no-hardcoded-color`：**暂时关闭**——颜色治理依赖物料级设计 Token 源文件（未建），待设计系统落地后恢复；规则本体行为由 `packages/eslint/tests/rules.test.ts` 守护
 - 当前全仓状态：0 错误，警告按需治理
 
 **TypeScript：** TypeScript 7（tsgo / vue-tsgo）
