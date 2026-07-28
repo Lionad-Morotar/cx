@@ -20,6 +20,7 @@ import { has } from './guard'
 import { genUseHooks } from './use-fn'
 import { createCxID } from './create-id'
 import { isFunction, isString } from '@vue/shared'
+import type { AnyFn } from '@vueuse/core'
 
 const metaKeys = readonly([
   'name',
@@ -31,6 +32,21 @@ const metaKeys = readonly([
   'slots',
   'headless',
 ])
+
+/**
+ * 组件数据记录的通用形状：CxComponentData extends Record<string, any>，
+ * 但消费侧（reduce 累积、动态键赋值）用 unknown 收紧，避免 any 逃逸
+ */
+type DataRecord = Record<string, unknown>
+
+/**
+ * useHooks 包装函数的 cancel 回调参数结构（见 use-fn.ts 的 cancel 注册：
+ * 回调接收 { result, args }，args 为原函数参数元组）
+ */
+type CancelArgs<T extends AnyFn> = {
+  result: ReturnType<T>
+  args: Parameters<T>
+}
 
 export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtils) => {
   const useHooks = genUseHooks()
@@ -125,7 +141,7 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
     let parent = comp
     while (parent?.id) {
       // todo multi parents capable
-      const curParent = unref(cx.datas.compsIdMap)[(parent as any).parents?.[0]]
+      const curParent = unref(cx.datas.compsIdMap)?.[parent.parents?.[0] ?? '']
       if (!curParent) {
         break
       }
@@ -145,13 +161,15 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
         slotKey,
       }),
     )
-    delete (comp.components as Record<string, any>)[slotKey]
+    if (comp.components) {
+      delete comp.components[slotKey]
+    }
   }
 
   // 初始化组件
   function createComponent(
     input: (Partial<CxComponentRuntime> & { key: CxComponentRuntime['key'] }) | string,
-    initialData: Record<string, any> = {},
+    initialData: Record<string, unknown> = {},
     component?: Record<string, CxComponentRuntime[]>,
   ): CxComponentRuntime {
     input = isString(input) ? { key: input } : input
@@ -198,12 +216,13 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
   const cloneComponent = (
     comp: Partial<CxComponentRuntime | CxComponentStructured> & {
       key: CxComponentRuntime['key']
-      components?: any
+      components?: Record<string, CxComponentRuntime[]> | null
     },
     preserve: string[] = ['data'],
     exclude: string[] = [],
   ): CxComponentRuntime => {
     const component = createComponent(comp, cloneDeep(comp.data))
+    // cover 按字段名累积覆盖值，键集合开放（preserve 来自调用方），值类型放宽为 unknown
     const cover = preserve.reduce(
       (h, k) => {
         if (comp.components && k === 'components') {
@@ -220,17 +239,18 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
             throw new Error('deprecated')
           }
         } else {
-          // @ts-ignore todo
-          h[k] = cloneDeep(comp[k])
+          // preserve 的键是调用方传入的运行时字段名，comp 在联合类型上动态索引，
+          // TS 无法静态收窄；cloneDeep 保持原值透传
+          h[k as keyof typeof h] = cloneDeep((comp as Record<string, unknown>)[k])
         }
         return h
       },
-      {} as Record<string, any>,
+      {} as Record<string, unknown>,
     )
     Object.assign(component, cover)
 
     exclude.map((k) => {
-      delete (component as Record<string, any>)[k]
+      delete (component as Record<string, unknown>)[k]
     })
 
     // 新组件自带子组件的情况
@@ -238,7 +258,6 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
       if (component.components && isSlottedCxComponentGroup(component.components)) {
         const newComps = Object.entries(component.components).reduce(
           (h, [k, v]) => {
-            // @ts-ignore
             h[k] = (v || []).map((x) => cloneComponent(x, preserve))
             return h
           },
@@ -257,7 +276,7 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
   const reInitComponent = (comp: CxComponentRuntime): CxComponentRuntime =>
     Object.assign(cloneComponent(comp, ['data', 'id', 'components', 'parents', 'sortn']), {
       _cx_inited: true,
-    } as Record<string, any>)
+    } as Record<string, unknown>)
   const reInitComponentDeep = <
     T =
       | CxComponentRuntime
@@ -271,10 +290,11 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
       ? // * is 'id' necessary?
         (cloneComponent(comps, ['data', 'id', 'components', 'parents', 'sortn']) as T)
       : isCxComponentGroup(comps)
-        ? // @ts-ignore
+        ? // 类型守卫在联合类型 T 上分布收窄不全：守卫已确认 comps 为 CxComponentRuntime[]，
+          // 但 TS 无法把 CxComponentRuntime[] 自动证明可赋回联合 T，运行时分支正确
           (comps.map((comp) => reInitComponentDeep(comp)) as T)
         : isCxComponentGroups(comps)
-          ? // @ts-ignore
+          ? // 同上：守卫确认 comps 为 CxComponentRuntime[][]，map 结果无法静态对齐 T
             (comps.map((group) => group.map((comp) => reInitComponentDeep(comp))) as T)
           : isSlottedCxComponentGroup(comps)
             ? (Object.entries(comps).reduce(
@@ -413,7 +433,9 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
     if (typeof opts.force !== 'boolean') {
       opts.force = false
     }
-    if (!opts.comp && (opts.comp as any).key !== opts.from) {
+    // 校验：comp 必须存在，且其 key 与 from 一致（原写法 !opts.comp && ...key
+    // 在 comp 为 falsy 时短路失败还会触发对 falsy 取 .key，逻辑与类型双重错误）
+    if (!opts.comp || opts.comp.key !== opts.from) {
       throw new Error('invalid args')
     }
 
@@ -426,16 +448,16 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
 
     if (opts.force) {
       // ! check events
-      opts._oldDatas = Object.entries(opts.comp.data as Record<string, any>).reduce(
+      opts._oldDatas = Object.entries(opts.comp.data as DataRecord).reduce(
         (h, [k, v]) => {
           h[k] = v
           return h
         },
-        {} as Record<string, any>,
+        {} as DataRecord,
       )
-      const toKeys = Object.keys(opts.datas as Record<string, any>)
-      Object.entries(opts.datas as Record<string, any>).map(([k, v]) => {
-        ;(opts.comp.data as Record<string, any>)[k] = v
+      const toKeys = Object.keys(opts.datas as DataRecord)
+      Object.entries(opts.datas as DataRecord).map(([k, v]) => {
+        ;(opts.comp.data as DataRecord)[k] = v
       })
       const toResetKeys = fromKeys.filter((x) => !toKeys.includes(x))
       toResetKeys.map((k) => {
@@ -464,20 +486,20 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
       }
     }
     metaKeys.map((k) => {
-      ;(opts.comp as Record<string, any>)[k] = (newComp as Record<string, any>)[k]
+      ;(opts.comp as DataRecord)[k] = (newComp as DataRecord)[k]
     })
 
     return opts
   }
   const transformComponent = useHooks(transformComponentSource)
 
-  transformComponent.cancel((args: any) => {
-    const isForce = (args as any).args[0].force
+  transformComponent.cancel((args: CancelArgs<typeof transformComponentSource>) => {
+    const isForce = args.args[0].force
     const comp = args.args[0].comp
     if (!isForce) {
       const meta = utils.getMeta(args.args[0].from)
-      for (const k in metaKeys) {
-        comp[k] = meta[k]
+      for (const k of metaKeys) {
+        ;(comp as DataRecord)[k] = (meta as DataRecord)[k]
       }
     } else {
       const oldDatas = args.args[0]._oldDatas || {}
@@ -486,10 +508,10 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
           h[k] = v
           return h
         },
-        {} as Record<string, any>,
+        {} as DataRecord,
       )
-      for (const k in metaKeys) {
-        comp[k] = args.args[0].comp[k]
+      for (const k of metaKeys) {
+        ;(comp as DataRecord)[k] = (args.args[0].comp as DataRecord)[k]
       }
     }
   })
@@ -573,13 +595,17 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
       }
     }
 
-    opts.from ? removeFrom(opts.from) : cx.datas.clearTree()
+    if (opts.from) {
+      removeFrom(opts.from)
+    } else {
+      cx.datas.clearTree()
+    }
 
     return opts
   }
   const removeComponent = useHooks(removeComponentSource)
 
-  addComponent.cancel((opts: any) => {
+  addComponent.cancel((opts: CancelArgs<typeof addComponentSource>) => {
     const _added = unref(opts.result)
     if (_added) {
       removeComponentSource({
@@ -592,14 +618,15 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
     }
   })
 
-  removeComponent.cancel((opts: any) => {
+  removeComponent.cancel((opts: CancelArgs<typeof removeComponentSource>) => {
     // return console.log('[debug] removeComponent.cancel opts, remove me if nothing goes wrong', opts)
     const _removed = unref(opts.result)
     if (_removed) {
       addComponentSource({
         comp: _removed.remove,
         target: _removed.from,
-        slotKey: _removed.slotKey,
+        // slotKey 在 removeComponentSource 执行后由 removeFromSlot 填充（opts.slotKey 必已赋值）
+        slotKey: _removed.slotKey!,
         position: _removed.position,
         anchor: _removed.anchor,
       })
@@ -654,25 +681,30 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
 
     return opts
   }
-  const moveComponent = useHooks(moveComponentSource, (): any => ({
-    _removed: null,
-    _added: null,
+  const moveComponent = useHooks(moveComponentSource, (): Partial<
+    Parameters<typeof moveComponentSource>[0]
+  > => ({
+    _removed: undefined,
+    _added: undefined,
     isCopy: false,
   }))
-  const pasteComponent = useHooks(moveComponentSource, (): any => ({
-    _removed: null,
-    _added: null,
+  const pasteComponent = useHooks(moveComponentSource, (): Partial<
+    Parameters<typeof moveComponentSource>[0]
+  > => ({
+    _removed: undefined,
+    _added: undefined,
     isCopy: true,
   }))
 
-  moveComponent.cancel((opts: any) => {
+  moveComponent.cancel((opts: CancelArgs<typeof moveComponentSource>) => {
     console.log('[debug] moveComponent.cancel opts', opts)
     const _removed = unref(opts.args[0]._removed)
     if (_removed) {
       addComponentSource({
         comp: _removed.remove,
         target: _removed.from,
-        slotKey: _removed.slotKey,
+        // slotKey 在 removeComponentSource 执行后由 removeFromSlot 填充（opts.slotKey 必已赋值）
+        slotKey: _removed.slotKey!,
         position: _removed.position,
         anchor: _removed.anchor,
       })
