@@ -433,6 +433,17 @@ export default {
                 `"${expected} ${staticClass.value.value}"`
               )
             }
+            // vue/attributes-order：class（OTHER_ATTR）须位于事件与内容指令之前——
+            // 插到首个 @/v-on: 或 v-html/v-text 属性前，否则 fixer 产物自身违反属性序
+            const eventLikeAttr = target.startTag.attributes.find(
+              (attr) =>
+                attr.type === 'VAttribute' &&
+                attr.directive &&
+                ['on', 'html', 'text'].includes(attr.key.name.name)
+            )
+            if (eventLikeAttr) {
+              return fixer.insertTextBefore(eventLikeAttr, `class="${expected}" `)
+            }
             // 插入点: 开标签收尾符(> 或 />)之前的尾部空白之前,保持既有空白风格
             const tagText = sourceCode.text.slice(
               target.startTag.range[0],

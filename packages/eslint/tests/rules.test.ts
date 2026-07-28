@@ -147,6 +147,22 @@ describe('require-component-name：SFC 行为', () => {
     expect(result?.output).toContain('class="cx-alert"')
   })
 
+  it('根元素带事件属性：class 插在事件之前（attributes-order 合法序）', async () => {
+    const code = sfc(
+      ['<script setup lang="ts">', "defineOptions({ name: 'CxAlert' })", '</script>'].join('\n'),
+      '<div v-show="ok" @click="go">content</div>',
+    )
+    const result = await lint(alertPath, code, true)
+    const tpl = result?.output ?? ''
+    expect(tpl.indexOf('class="cx-alert"')).toBeGreaterThan(tpl.indexOf('v-show'))
+    expect(tpl.indexOf('class="cx-alert"')).toBeLessThan(tpl.indexOf('@click'))
+    // 修复产物自身不再违反 attributes-order
+    const relint = await lint(alertPath, tpl)
+    expect(
+      (relint?.messages ?? []).filter((m) => m.ruleId === 'vue/attributes-order'),
+    ).toHaveLength(0)
+  })
+
   it('BEM 豁免：:class="ns.b()" 视为标记类存在', async () => {
     const code = sfc(
       [
