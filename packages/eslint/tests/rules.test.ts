@@ -4,23 +4,50 @@ import { fileURLToPath } from 'node:url'
 import { ESLint } from 'eslint'
 import { describe, expect, it } from 'vitest'
 
-import cx from '../index.js'
+import cxPreset, { createConfig, cxPlugin } from '../index.js'
 import { deriveComponentName, toPascal } from '../rules/require-component-name.js'
 
 /**
  * cx 自研三规则的行为契约测试。
  * 经 ESLint API + 真实 filePath 直测（lint-infra 手册：RuleTester 的别名注册
  * 会让 eslint-disable 抑制语义失真，且路径推导依赖物理路径形态）。
+ *
+ * 与项目治理范围解耦：默认预设的 ignores 黑名单（components 物料包等）会吞掉
+ * 本测试的 fixture 路径——规则本体行为经工厂版 config + 显式规则层守护，
+ * 预设本身仅承担"治理决策"断言（颜色暂关用例）。
  */
 
 // 注意级数：resolve 的首个 '..' 弹的是文件名本身，tests/ → eslint/ → packages/ → cx 需四级
 const repoRoot = resolve(fileURLToPath(import.meta.url), '../../../..')
 
+const testConfig = createConfig().concat({
+  name: 'test/custom-rules',
+  plugins: { cx: cxPlugin },
+  rules: {
+    'cx/no-hardcoded-color': 'error',
+    'cx/no-tracking-marker': 'error',
+    // options 与默认预设保持一致（物料包中缀体系 + v4 薄包装豁免）
+    'cx/require-component-name': [
+      'error',
+      {
+        prefix: 'cx',
+        packagePrefixes: {
+          'components-nuxt-ui-v4': 'cx-nuxt-ui-v4',
+          'components-vtu': 'cx-vtu',
+        },
+        skipRootClassPackages: ['components-nuxt-ui-v4'],
+      },
+    ],
+    // 与 require-component-name 的 case 宽容冲突，预设同款关闭
+    'vue/component-definition-name-casing': 'off',
+  },
+})
+
 function makeEslint(fix = false) {
   return new ESLint({
     cwd: repoRoot,
     overrideConfigFile: true,
-    overrideConfig: cx,
+    overrideConfig: testConfig,
     fix,
   })
 }
@@ -34,19 +61,6 @@ async function lint(filePath: string, code: string, fix = false) {
 
 const cxHits = (result: Awaited<ReturnType<typeof lint>>, rule: string) =>
   (result?.messages ?? []).filter((m) => m.ruleId === rule)
-
-// 颜色规则在预设中暂时关闭（等设计系统），测试显式重开以守护规则本体行为
-const cxWithColor = cx.concat({ rules: { 'cx/no-hardcoded-color': 'error' } })
-
-async function lintColor(filePath: string, code: string) {
-  const eslint = new ESLint({
-    cwd: repoRoot,
-    overrideConfigFile: true,
-    overrideConfig: cxWithColor,
-  })
-  const [result] = await eslint.lintText(code, { filePath: resolve(repoRoot, filePath) })
-  return result
-}
 
 function sfc(script: string, template = '<div>content</div>') {
   return ['<template>', `  ${template}`, '</template>', script, ''].join('\n')
@@ -221,7 +235,7 @@ describe('no-hardcoded-color', () => {
 
   it('hex/rgb 硬编码命中，suggestions 经 option 文案兜底', async () => {
     const hits = cxHits(
-      await lintColor(widgetPath, sfc('', '<div style="color: #ff8400">x</div>')),
+      await lint(widgetPath, sfc('', '<div style="color: #ff8400">x</div>')),
       'cx/no-hardcoded-color',
     )
     expect(hits).toHaveLength(1)
@@ -230,7 +244,7 @@ describe('no-hardcoded-color', () => {
 
   it('rgb(var(--x)) 变量通道包装豁免（区间重叠而非被包含）', async () => {
     const code = sfc('', '<div style="color: rgb(var(--color-primary-500))">x</div>')
-    expect(cxHits(await lintColor(widgetPath, code), 'cx/no-hardcoded-color')).toHaveLength(0)
+    expect(cxHits(await lint(widgetPath, code), 'cx/no-hardcoded-color')).toHaveLength(0)
   })
 
   it('var(--x, #fff) 回退色豁免，独立硬编码仍报', async () => {
@@ -238,19 +252,29 @@ describe('no-hardcoded-color', () => {
       '',
       '<div style="color: var(--fg, #fff); background: #000; box-shadow: var(--s) 0 0 4px rgba(0,0,0,0.5)">x</div>',
     )
-    const hits = cxHits(await lintColor(widgetPath, code), 'cx/no-hardcoded-color')
+    const hits = cxHits(await lint(widgetPath, code), 'cx/no-hardcoded-color')
     const colors = hits.map((m) => m.message.match(/"([^"]+)"/)?.[1])
     expect(colors).toEqual(['#000', 'rgba(0,0,0,0.5)'])
   })
 
   it('白名单值不报', async () => {
     const code = sfc('', '<div style="color: transparent; fill: currentColor">x</div>')
-    expect(cxHits(await lintColor(widgetPath, code), 'cx/no-hardcoded-color')).toHaveLength(0)
+    expect(cxHits(await lint(widgetPath, code), 'cx/no-hardcoded-color')).toHaveLength(0)
   })
 
   it('预设中颜色规则暂时关闭（等设计系统落地后恢复）', async () => {
-    const code = sfc('', '<div style="color: #ff8400">x</div>')
-    expect(cxHits(await lint(widgetPath, code), 'cx/no-hardcoded-color')).toHaveLength(0)
+    const eslint = new ESLint({
+      cwd: repoRoot,
+      overrideConfigFile: true,
+      overrideConfig: cxPreset,
+    })
+    // 核心包路径（物料包在预设 ignores 黑名单内，无法用于验证预设规则状态）
+    const [result] = await eslint.lintText(sfc('', '<div style="color: #ff8400">x</div>'), {
+      filePath: resolve(repoRoot, 'packages/definition/src/widget/index.vue'),
+    })
+    expect(
+      (result?.messages ?? []).filter((m) => m.ruleId === 'cx/no-hardcoded-color'),
+    ).toHaveLength(0)
   })
 })
 

@@ -9,7 +9,7 @@ import cx, { createConfig } from '../index.js'
 /**
  * 共享 flat config 的契约测试。
  * 行为契约：config 可加载（typescript-eslint 与包内 TS6 alias 工作）、
- * TS/Vue/Vitest 规则生效、格式类规则全关（归 Oxfmt）、项目级 ignores 命中。
+ * TS/Vue 规则生效、格式类规则全关（归 Oxfmt）、项目级 ignores 黑名单命中。
  */
 
 // 注意级数：resolve 的首个 '..' 弹的是文件名本身，tests/ → eslint/ → packages/ → cx 需四级
@@ -85,26 +85,22 @@ describe('cx eslint config', () => {
     expect(hits.filter((m) => m.ruleId === 'no-undef')).toHaveLength(0)
   })
 
-  it('测试文件启用 vitest 规则（无 expect 的用例被报出）', async () => {
-    const code = [
-      "import { it } from 'vitest'",
-      "it('works', () => {",
-      '  const a = 1',
-      '  void a',
-      '})',
-      '',
-    ].join('\n')
-    const hits = await lint('fixture.test.ts', code)
-    expect(hits.map((m) => m.ruleId)).toContain('vitest/expect-expect')
-  })
-
-  it('默认预设忽略 vendored 源码，不忽略正常源码', async () => {
+  it('默认预设忽略沙箱/物料包/测试文件，扫描核心包', async () => {
     const eslint = makeEslint()
     await expect(
-      eslint.isPathIgnored(resolve(repoRoot, 'packages/components-nuxt-ui-v2/vendor/shims/imports.ts')),
+      eslint.isPathIgnored(resolve(repoRoot, 'playground/app/pages/index.vue')),
     ).resolves.toBe(true)
     await expect(
       eslint.isPathIgnored(resolve(repoRoot, 'packages/components/src/index.ts')),
+    ).resolves.toBe(true)
+    await expect(
+      eslint.isPathIgnored(resolve(repoRoot, 'packages/definition/tests/loader.test.ts')),
+    ).resolves.toBe(true)
+    await expect(
+      eslint.isPathIgnored(resolve(repoRoot, 'packages/definition/src/index.ts')),
+    ).resolves.toBe(false)
+    await expect(
+      eslint.isPathIgnored(resolve(repoRoot, 'packages/stream/src/core/incremental.ts')),
     ).resolves.toBe(false)
   })
 

@@ -19,7 +19,6 @@ import js from '@eslint/js'
 import { defineConfig } from 'eslint/config'
 import prettier from 'eslint-config-prettier'
 import vue from 'eslint-plugin-vue'
-import vitest from '@vitest/eslint-plugin'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
@@ -36,12 +35,6 @@ export const cxPlugin = {
     'require-component-name': requireComponentName,
   },
 }
-
-/** 测试文件模式：与根 vite.config.ts 的 test.include 对齐 */
-const TEST_FILES = [
-  '**/*.test.{ts,mts,js,mjs}',
-  '**/tests/**/*.{ts,mts,js,mjs}',
-]
 
 /**
  * TS 规则作用的文件集：ts 家族 + .vue SFC（<script setup lang="ts">）。
@@ -66,6 +59,8 @@ export function createConfig(options = {}) {
         '**/coverage/**',
         '**/.nuxt/**',
         '**/.output/**',
+        // 调试参考区（zRefs 目录惯例：第三方源码副本、一次性脚本，非项目本体）
+        '**/zRefs/**',
         ...ignores,
       ],
     },
@@ -114,11 +109,6 @@ export function createConfig(options = {}) {
       },
     },
 
-    {
-      ...vitest.configs.recommended,
-      files: TEST_FILES,
-    },
-
     // 收尾：格式归 Oxfmt，关闭全部格式类规则（含 vue/html-* 系列）
     prettier,
   )
@@ -155,12 +145,27 @@ const LEGACY_WARN_RULES = {
   'vue/valid-v-for': 'warn',
 }
 
-/** cx monorepo 开箱即用预设：追加 vendored 第三方源码忽略 + 存量治理降级 */
+/**
+ * cx monorepo 开箱即用预设：治理范围收敛 + 存量治理降级。
+ *
+ * 扫描范围策略：先只 lint definition / nuxt / renderer / skills / stream / vue 六个核心包——
+ * 物料包（components*）含大量 vendored 移植与存量代码、playground 是演示沙箱，
+ * 待核心包存量治理收敛后按包逐步放开（黑名单制：放开即删行）。
+ * 测试文件不 lint：mock/fixture 的 any 与宽松表达式是测试固有形态，生产向规则对它是噪音。
+ */
 export default createConfig({
   ignores: [
-    'packages/components-nuxt-ui-v2/vendor/**',
-    'packages/components-nuxt-ui-v4/vendor/**',
-    'packages/components/src/calendar/vendor/el-calendar/**',
+    // 测试文件（含核心包内 tests/）
+    '**/*.test.{ts,mts,js,mjs}',
+    '**/tests/**',
+    // 沙箱与物料包（vendored 忽略随之冗余，保留注释备查：components*/vendor、calendar/vendor/el-calendar）
+    'playground/**',
+    'packages/components/**',
+    'packages/components-nuxt-ui-v2/**',
+    'packages/components-nuxt-ui-v4/**',
+    'packages/components-vtu/**',
+    // 基建包自身不在首批治理范围（自研规则的形态样例会触发自扫描）
+    'packages/eslint/**',
   ],
 })
   .concat({
@@ -192,12 +197,4 @@ export default createConfig({
   .concat({
     name: 'cx/legacy-warns',
     rules: LEGACY_WARN_RULES,
-  })
-  .concat({
-    // 规则定义自举豁免：no-tracking-marker 扫注释，会把规则文件自身的形态样例当违规
-    name: 'cx/custom-rules-bootstrap',
-    files: ['packages/eslint/rules/**'],
-    rules: {
-      'cx/no-tracking-marker': 'off',
-    },
   })
