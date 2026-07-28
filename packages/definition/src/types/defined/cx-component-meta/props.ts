@@ -47,15 +47,15 @@ type ConfigPropMatch = CxPropBase &
 
 export type CxPropCTX = Partial<{
   comp: Readonly<CxComponentRuntime>
-  props: Readonly<Record<string, any>>
-  data: Readonly<Record<string, any>>
+  props: Readonly<Record<string, unknown>>
+  data: Readonly<Record<string, unknown>>
   emits?: Readonly<AnyFn>
   cx?: Readonly<CxLoaderInstance>
 }>
 // 根据 CX 环境生成某些值
 export type CxGen<T> = ((ctx: CxPropCTX) => T) | T
 
-type InitialFn = (ctx: Partial<CxPropCTX>) => any
+type InitialFn = (ctx: Partial<CxPropCTX>) => unknown
 type Initial = InitialFn | string | number | boolean
 
 export type CxPropBase = {
@@ -68,9 +68,9 @@ export type CxPropBase = {
   // 展示名别名（部分物料用 label 表达同一语义）
   label?: string
   // 选项型属性的选项集（结构随 type 而定）
-  options?: any
+  options?: unknown
   // 透传给被包装组件的 ui 覆盖配置
-  ui?: any
+  ui?: unknown
   // 卡片选择器的预览标记
   isPreview?: boolean
   // 从 props/data 中挑选子集的映射函数
@@ -96,8 +96,8 @@ export type CxPropBase = {
   isFormily?: boolean
   // 值改变时产生的副作用（以后会使用钩子函数重构）
   effect?: (
-    newValue: any,
-    oldValue: any,
+    newValue: unknown,
+    oldValue: unknown,
     ctx: Required<CxPropCTX> & {
       comp: CxComponentRuntime
     },
@@ -181,10 +181,10 @@ export type CustomProp = {
 
 /* ------------------------------- prop Formily ------------------------------- */
 
-type FormilyProp = Record<string, any> & {
+type FormilyProp = Record<string, unknown> & {
   isFormily: true
   type: string
-  properties: Omit<Record<string, any>, 'component'>
+  properties: Omit<Record<string, unknown>, 'component'>
 }
 
 /* --------------------------- prop card-selector --------------------------- */
@@ -202,7 +202,7 @@ export type CxCardSelectorPropOption<OptionValue extends string | number = strin
 type CardSelectorProp = {
   type: 'card-selector'
   isPreview?: boolean
-  pickData?: (ctx: CxPropCTX) => Record<string, any>
+  pickData?: (ctx: CxPropCTX) => Record<string, unknown>
   pickComponent?: (ctx: CxPropCTX) => Record<string, CxComponentRuntime>
   options?: CxCardSelectorPropOption[]
   ui?: DeepPartial<{

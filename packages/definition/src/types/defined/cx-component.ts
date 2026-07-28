@@ -3,7 +3,8 @@ import type { RecordToUnion } from '../helper'
 import type { UnionToIntersection } from 'type-fest'
 import type { AllowedComponentProps, App, Component, Plugin, VNodeProps } from 'vue'
 
-type PluginInstallFunction = (app: App, ...options: any[]) => any
+// 与 Vue 官方 Plugin.install 签名对齐；options 形态由具体插件决定（schema 驱动边界）
+type PluginInstallFunction = (app: App, ...options: unknown[]) => unknown
 
 /**
  * 扩展后的 Vue 组件应该携带这些“自定义组件的标准化数据”，
@@ -36,8 +37,8 @@ export type CxComponentMetaDefined<VueComp extends Component = Component> = {
   // 是否是异步组件
   async?: boolean
   props?: ComponentProps<VueComp>
-  emits?: Record<string, any>
-  exposes?: Record<string, any>
+  emits?: Record<string, unknown>
+  exposes?: Record<string, unknown>
   slots?: Record<string, CxComponentSlot>
   // 组件包类型, wip npm-package\esm
   type?: 'umd' | 'esm' | 'local'
@@ -65,23 +66,24 @@ export type CxMetaBase = CxMeta
  * 提取 vue 组件的 props 类型
  * @see https://stackoverflow.com/questions/68602712/extracting-the-prop-types-of-a-component-in-vue-3-typescript-to-use-them-somew
  */
-export type ComponentProps<C extends Component> = C extends new (...args: any) => any
+export type ComponentProps<C extends Component> = C extends new (...args: unknown[]) => unknown
   ? Omit<InstanceType<C>['$props'], keyof VNodeProps | keyof AllowedComponentProps>
   : never
 
 // 推断 vue 组件的 emit 接收的事件名
-export type KeyofComponentEmits<C extends Component> = C extends new (...args: any) => any
-  ? InstanceType<C>['$emit'] extends (e: infer EvtKey, ...args: any[]) => void
+export type KeyofComponentEmits<C extends Component> = C extends new (...args: unknown[]) => unknown
+  ? InstanceType<C>['$emit'] extends (e: infer EvtKey, ...args: unknown[]) => void
     ? EvtKey
     : never
   : never
 
 // @vue/compiler-sfc cannot resolved such complex type,
 // @see https://github.com/vitejs/vite-plugin-vue/issues/167
-// @ts-ignore
-// export type ComponentEmits<T> = [/*nothing */]
 
 // 从组件 emits 定义推断 defineEmits 的类型
+// 泛型约束保留 any：T[K] 要作为 rest 参数（...args: T[K]），rest 参数要求数组类型，
+// any 能绕过此约束；改 unknown 会让 T[K] 退化为非数组而报 TS2370。这是类型体操的合理边界
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ComponentEmits<T extends Record<string, any>> = UnionToIntersection<
   RecordToUnion<{
     [K in keyof T]: (evt: K, ...args: T[K]) => void
