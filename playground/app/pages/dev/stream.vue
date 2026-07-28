@@ -252,7 +252,12 @@ const { displayText } = usePendingTypewriter(
 )
 
 // --- 多策略切分：按段落空行切块 ---
-const { chunks } = useStreamChunks(streamText, [{ marker: '\n\n', offset: 2 }])
+// 切分器只看字符串、感知不到流是否播完：所有 delta 送达（进度满）即流结束，
+// 尾块随之封底；缺这个信号时终态渲染已接管、JSON 尾块仍误显「生长中」
+const streamEnded = computed(() => progress.value >= scenarioChunks.value.length)
+const { chunks } = useStreamChunks(streamText, [{ marker: '\n\n', offset: 2 }], {
+  ended: streamEnded,
+})
 
 function reset() {
   pause()

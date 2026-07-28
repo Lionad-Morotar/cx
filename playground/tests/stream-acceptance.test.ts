@@ -240,6 +240,23 @@ describe('stream 验收 · 打字机素材与流式切分', () => {
     expect(chunks.value.at(-1)!.isComplete).toBe(false)
     expect(chunks.value.at(-1)!.content).toContain('随时告诉我')
   })
+
+  it('流结束信号使尾块封底：单组件剧本播完后 JSON 块不再生长中', () => {
+    const ended = ref(false)
+    const { chunks } = useStreamChunks(
+      ref(cropScenarioChunks(1).join('')),
+      [{ marker: '\n\n', offset: 2 }],
+      {
+        ended,
+      },
+    )
+    // 未结束：含组件 JSON 围栏的尾块仍在生长
+    expect(chunks.value.at(-1)!.isComplete).toBe(false)
+    expect(chunks.value.at(-1)!.content).toContain(compositeMeta.componentKeys[0])
+
+    ended.value = true
+    expect(chunks.value.at(-1)!.isComplete).toBe(true)
+  })
 })
 
 describe('stream 验收 · 剧本裁剪（组件数量）', () => {
