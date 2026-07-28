@@ -4,25 +4,39 @@ import { has } from '@lionad/cx-definition'
 import { useAnysort } from './use-sort'
 import { useClone } from './clone'
 
-import type { Ref } from 'vue'
+type TableColumn = {
+  field: string
+  title: string
+  width?: number
+  // 关联字段/模型，形态由具体业务列配置决定（动态边界）
+  linkField?: unknown
+  linkModel?: unknown
+}
+
+type TableRecord = Record<string, unknown>
+
+type ColSortEntry = { field: { id: string; name: string }; sort: 'asc' | 'desc' | '' }
+
+/** useTable.init 的参数结构（与内部 ref 声明对应） */
+type InitOptions = {
+  useNewColsVisible?: boolean
+  records?: TableRecord[]
+  columns?: TableColumn[]
+  sorts?: ColSortEntry[]
+  colsVisibleDeprecated?: boolean[]
+  colsVisible?: Record<string, boolean>
+  colsSort?: ColSortEntry[]
+}
 
 export const useTable = () => {
-  const columns = ref<
-    {
-      field: string
-      title: string
-      width?: number
-      linkField?: any
-      linkModel?: any
-    }[]
-  >([])
-  const records = ref<Record<string, any>[]>([])
+  const columns = ref<TableColumn[]>([])
+  const records = ref<TableRecord[]>([])
 
-  const filters = ref<any[]>([])
-  const filtered = ref<Record<string, any>[]>([])
+  const filters = ref<unknown[]>([])
+  const filtered = ref<TableRecord[]>([])
 
-  const colsSort = ref<{ field: { id: string; name: string }; sort: 'asc' | 'desc' | '' }[]>([])
-  const sorted = ref<Record<string, any>[]>([])
+  const colsSort = ref<ColSortEntry[]>([])
+  const sorted = ref<TableRecord[]>([])
 
   const useNewColsVisible = ref(false)
   const colsVisibleDeprecated = ref<boolean[]>([])
@@ -30,7 +44,7 @@ export const useTable = () => {
   const filteredColumns = computed(() => {
     return useNewColsVisible.value
       ? columns.value.filter((col) => colsVisible.value[col.field])
-      : columns.value.filter((col, idx) => colsVisibleDeprecated.value[idx])
+      : columns.value.filter((_col, idx) => colsVisibleDeprecated.value[idx])
   })
 
   const init = ({
@@ -41,7 +55,7 @@ export const useTable = () => {
     colsVisibleDeprecated: _colsVisibleDeprecated = [],
     colsVisible: _colsVisible = {},
     colsSort: _colsSort = [],
-  }: any) => {
+  }: InitOptions) => {
     useNewColsVisible.value = _useNewColsVisible
 
     records.value = _records.filter(has)
