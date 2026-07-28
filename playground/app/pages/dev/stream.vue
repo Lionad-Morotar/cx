@@ -21,11 +21,11 @@
           v-model.number="speed"
           type="range"
           min="1"
-          max="24"
+          max="600"
           step="1"
           data-testid="stream-speed"
         />
-        <span class="speed-val">{{ speed }}</span>
+        <span class="speed-val">{{ speed }} 字/秒</span>
       </label>
       <label class="speed">
         组件
@@ -150,16 +150,37 @@ import {
   toRenderNode,
 } from '~/dev/stream-scenario'
 
-// --- 回放引擎：定时器按 chunk（真实 SSE delta 边界）推进剧本 ---
+// --- 回放引擎：定时器按「字符/秒」推进，进度对齐到 chunk（SSE delta）边界 ---
 // 组件数量决定剧本裁剪：原始流只含前 N 个组件围栏，默认单组件
 const componentCount = ref(1)
 const scenarioChunks = computed(() => cropScenarioChunks(componentCount.value))
 const scenarioScript = computed(() => scenarioChunks.value.join(''))
 
-const progress = ref(0)
+// chunk 起始偏移前缀和：字符进度换算 chunk 进度的索引
+const chunkStarts = computed(() => {
+  const starts: number[] = []
+  let acc = 0
+  for (const c of scenarioChunks.value) {
+    starts.push(acc)
+    acc += c.length
+  }
+  return starts
+})
+
+const TICK_MS = 50
+const charOffset = ref(0)
 const playing = ref(false)
-const speed = ref(6)
+const speed = ref(120) // 生成速度（字符/秒）
 let timer: ReturnType<typeof setInterval> | null = null
+
+// 进度以 chunk 为单位对齐：管线（检测/增量/打字机）只在 delta 边界处重算，
+// 避免按字符步进把每帧重算放大回字符数级
+const progress = computed(() => {
+  const starts = chunkStarts.value
+  let n = 0
+  while (n < starts.length && starts[n]! <= charOffset.value) n++
+  return n
+})
 
 const streamText = computed(() => scenarioChunks.value.slice(0, progress.value).join(''))
 
@@ -169,11 +190,14 @@ function togglePlay() {
   } else {
     playing.value = true
     // 已到结尾再播放则从头开始
-    if (progress.value >= scenarioChunks.value.length) progress.value = 0
+    if (charOffset.value >= scenarioScript.value.length) charOffset.value = 0
     timer = setInterval(() => {
-      progress.value = Math.min(scenarioChunks.value.length, progress.value + speed.value)
-      if (progress.value >= scenarioChunks.value.length) pause()
-    }, 50)
+      charOffset.value += (speed.value * TICK_MS) / 1000
+      if (charOffset.value >= scenarioScript.value.length) {
+        charOffset.value = scenarioScript.value.length
+        pause()
+      }
+    }, TICK_MS)
   }
 }
 function pause() {
@@ -232,7 +256,7 @@ const { chunks } = useStreamChunks(streamText, [{ marker: '\n\n', offset: 2 }])
 
 function reset() {
   pause()
-  progress.value = 0
+  charOffset.value = 0
   resetExtractor()
 }
 
@@ -287,7 +311,7 @@ watch(componentCount, reset)
   color: #666;
 }
 .speed-val {
-  width: 20px;
+  min-width: 20px;
   color: #2563eb;
 }
 .progress {
