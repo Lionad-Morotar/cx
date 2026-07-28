@@ -45,9 +45,9 @@ export type CxComponentRuntime = MakeNet<{
   // 模块的动态表单的配置信息
   props: CxComponentMetaProps
   // 模块事件触发
-  emits: Record<string, any>
+  emits: Record<string, unknown>
   // 模块事件接收
-  exposes: Record<string, any>
+  exposes: Record<string, unknown>
   // 组件元信息
   _cx_meta?: CxMetaBase
   // 组件的父组件ID，要获取父组件实例可以使用 cx.utils.getParent，

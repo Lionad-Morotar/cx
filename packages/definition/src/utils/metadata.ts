@@ -11,6 +11,16 @@ import type {
 import { useMemoize } from '@vueuse/core'
 import { toRaw } from 'vue'
 import { isString } from '@vue/shared'
+import type { Component } from 'vue'
+
+/**
+ * installed/installedAsync 存储的组件实例形态：
+ * Vue Component 上动态挂载了 _cx_meta 元信息字段（运行时由 defineCxComponent 挂载）。
+ * _cx_meta 除标准字段外还可能挂载 getName 等运行时方法，故保留索引签名
+ */
+type CxInstalledComponent = Component & {
+  _cx_meta?: CxComponentMetaDefined & { description?: string } & Record<string, unknown>
+}
 
 export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
   /**
@@ -23,7 +33,7 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
       if (isCxComponent(key)) {
         key = key.key
       }
-      const isSameKey = (meta: any) => {
+      const isSameKey = (meta: (CxInstalledComponent['_cx_meta']) | string | undefined) => {
         if (!meta) {
           return false
         }
@@ -38,16 +48,13 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
         return keys.includes(key)
       }
 
-      const syncComps = Object.values(cx.installed || {})
-      const asyncComps = Object.values(cx.installedAsync || {})
+      const syncComps = Object.values(cx.installed || {}) as CxInstalledComponent[]
+      const asyncComps = Object.values(cx.installedAsync || {}) as CxInstalledComponent[]
 
       // * 本地开发时，async 组件不会异步加载
-      // const target = isAsyncComp
-      //   ? (asyncComps.find((x: any) => isSameKey(x._cx_meta)) as any)
-      //   : (syncComps.find((x: any) => isSameKey(x._cx_meta)) as any)
       const target =
-        (asyncComps.find((x: any) => isSameKey(x._cx_meta)) as any) ||
-        (syncComps.find((x: any) => isSameKey(x._cx_meta)) as any)
+        asyncComps.find((x) => isSameKey(x._cx_meta)) ||
+        syncComps.find((x) => isSameKey(x._cx_meta))
 
       // console.log('@findFromCX', key, target)
       return target
@@ -65,13 +72,20 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
    * @param key 组件类型（key）
    */
 
-  const getMeta = (_key: CxComponentRuntime['key'] | CxComponentRuntime) => {
+  const getMeta = (
+    _key: CxComponentRuntime['key'] | CxComponentRuntime,
+  ): CxComponentMetaDefined & Record<string, unknown> => {
     let key = _key ? toRaw(_key) : ''
     if (isCxComponent(key)) {
       key = key.key
     }
     const cxComp = findCompFromCX(key)
-    return cxComp ? cxComp._cx_meta : {}
+    // _cx_meta 除标准字段外含 getName 等运行时方法，索引签名覆盖动态挂载；
+    // fallback 为空元信息对象，与有组件时同形态，保证消费侧属性访问安全
+    return (
+      (cxComp?._cx_meta as CxComponentMetaDefined & Record<string, unknown>) ??
+      ({} as CxComponentMetaDefined & Record<string, unknown>)
+    )
   }
 
   // 获取组件初始化信息
@@ -79,7 +93,9 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     let key = _key ? toRaw(_key) : ''
     key = isCxComponent(key) ? key.key : key
     const comp = findCompFromCX(key)
-    return comp as CxComponentRuntime | null
+    // installed 存的是 Component（带 _cx_meta），运行时按 CxComponentRuntime 形态消费；
+    // 两者结构不重叠（Component vs runtime record），用 unknown 双重断言越过
+    return (comp ?? null) as unknown as CxComponentRuntime | null
   }
 
   /**
@@ -93,7 +109,7 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     }
     const cxComp = findCompFromCX(key)
     // console.log(cxComp)
-    const name = cxComp ? cxComp._cx_meta?.name : ''
+    const name = cxComp ? cxComp._cx_meta?.name ?? '' : ''
     return name.startsWith('-') ? `${key}-${name}` : name
   }
 
@@ -122,7 +138,7 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     // console.log('[debug] key', key)
     const cxComp = findCompFromCX(key)
     // console.log('[debug] cxComp', cxComp)
-    return cxComp ? cxComp._cx_meta?.props : {}
+    return (cxComp ? cxComp._cx_meta?.props : undefined) ?? ({} as CxComponentMetaProps)
   }
 
   /**
@@ -132,9 +148,9 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
    */
   const getData = (
     key: CxComponentRuntime['key'] | CxComponentRuntime,
-    initialData: Record<string, any> = {},
+    initialData: Record<string, unknown> = {},
     context?: CxPropCTX,
-  ): Record<string, any> => {
+  ): Record<string, unknown> => {
     key = key ? toRaw(key) : ''
     if (isCxComponent(key)) {
       key = key.key
@@ -168,14 +184,19 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     if (isCxComponent(key)) {
       key = key.key
     }
-    const initialValues: CxComponentMetaProps = {}
+    // initialValues 存的是属性初始值（string/number/函数返回），非属性配置 ConfigPropMatch
+    const initialValues: Record<string, unknown> = {}
     const targetProps: CxComponentMetaProps = getProps(key)
     const initialContext = context as CxPropCTX
 
     Object.entries(targetProps || {}).reduce((h, [k, v]) => {
       const initialKeys = ['initial', 'default'] as ['initial', 'default']
       initialKeys.forEach((key) => {
-        h[k] = h[k] || (v[key] instanceof Function ? (v[key] as any)?.(initialContext) : v[key])
+        h[k] =
+          h[k] ||
+          (v[key] instanceof Function
+            ? (v[key] as (ctx: CxPropCTX) => unknown)?.(initialContext)
+            : v[key])
       })
       if (h[k] == null) {
         delete h[k]
@@ -197,7 +218,7 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     }
     const cxComp = findCompFromCX(key)
     // console.log('[debug] key', key, cxComp._cx_meta)
-    return cxComp ? cxComp._cx_meta?.emits : {}
+    return cxComp ? cxComp._cx_meta?.emits ?? {} : {}
   }
 
   /**
@@ -210,7 +231,7 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
       key = key.key
     }
     const cxComp = findCompFromCX(key)
-    return cxComp ? cxComp._cx_meta?.exposes : {}
+    return cxComp ? cxComp._cx_meta?.exposes ?? {} : {}
   }
 
   const getSlots = (
@@ -225,8 +246,8 @@ export const createCxMetadataUtils = (cx: CxLoaderInstance) => {
     return slots || {}
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const getKey = (_key: CxComponentRuntime['key'] | CxComponentRuntime, data?: any) => {
+  // _ 前缀豁免 unused（TS6133 与 no-unused-vars 的 argsIgnorePattern: '^_'）
+  const getKey = (_key: CxComponentRuntime['key'] | CxComponentRuntime, _data?: unknown) => {
     let key = _key ? toRaw(_key) : ''
     if (isCxComponent(key)) {
       key = key.key

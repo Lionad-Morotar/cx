@@ -14,6 +14,7 @@ import type {
 } from '../types'
 import type { CxMetadataUtils } from './metadata'
 import { readonly, toRaw, unref } from 'vue'
+import type { DeepReadonly } from 'vue'
 import { preIndex, nextIndex, insertIndex } from './number'
 import { pick } from 'lodash-es'
 import { has } from './guard'
@@ -56,7 +57,14 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
     if (!_comp) return ''
     const comp = toRaw(_comp)
     const meta = utils.getMeta(comp.key)
-    const getName = meta?.getName
+    // getName 是运行时挂载到 _cx_meta 的动态方法（非 CxComponentMetaDefined 标准字段），
+    // 索引签名下推断为 unknown 不可调用，按真实形态断言为 (ctx) => string；
+    // ctx 用 DeepReadonly 匹配调用方传入的 vue readonly()（深只读代理）
+    const getName = meta?.getName as ((ctx: {
+      comp: DeepReadonly<typeof comp>
+      data: DeepReadonly<typeof comp.data>
+      cx: typeof rCX
+    }) => string) | undefined
     return getName
       ? getName({
           comp: readonly(comp),
@@ -199,7 +207,8 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
     // 特殊处理，如果传入 data.components，
     // components 会当作组件属性（comp.component）而不是数据属性（data.component）
     if (data.components) {
-      comp.components = data.components
+      // data.components 运行时形态为 Record<string, CxComponentRuntime[]>（从 schema 加载的子组件映射）
+      comp.components = data.components as Record<string, CxComponentRuntime[]>
       delete data.components
     }
 
