@@ -1,5 +1,5 @@
 import type { Component } from 'vue'
-import type { CxComponentMetaDefined } from '../types'
+import type { CxComponentMetaDefined, CxComponentMetaProps } from '../types'
 import { has } from '../utils/guard'
 
 // 格式化组件元信息
@@ -15,14 +15,17 @@ export function withDefaultMeta<M extends CxComponentMetaDefined<Component>>(met
   } as unknown as Required<M>
 }
 
-function cleanProps(props: any) {
-  return Object.entries(props).reduce((h, [k, v]) => {
-    h[k] = v
+function cleanProps(props: CxComponentMetaProps): CxComponentMetaProps {
+  return Object.entries(props).reduce(
+    (h, [k, v]) => {
+      h[k] = v
 
-    if (!h[k].key) {
-      h[k].key = k
-    }
+      if (!h[k].key) {
+        h[k].key = k
+      }
 
-    return h
-  }, {} as any)
+      return h
+    },
+    {} as CxComponentMetaProps,
+  )
 }

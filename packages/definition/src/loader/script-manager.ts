@@ -19,21 +19,20 @@ export const getURL = (url: string, _opts?: getURLOptions) => {
   const uuidKey = 'data-cx-script-id'
   const opts = Object.assign({}, _opts || {})
 
-  // @ts-ignore
+  // loader 仅在浏览器运行，DOM lib 完整可用
   const targetParent = document.head
-  // @ts-ignore
   const $script = document.createElement('script')
 
   $script.setAttribute(uuidKey, uuid)
   $script.setAttribute('async', 'async')
 
   if (opts.moduleType === 'esm') {
-    // @ts-ignore
+    // @ts-expect-error window.rawWindow 是 qiankun 注入的非标准字段
     const w = window?.rawWindow || window
     const fetch = w.fetch
 
     $script.type = 'module'
-    fetch(url, { cors: true }).then(async (res: any) => {
+    fetch(url, { cors: true }).then(async (res: Response) => {
       const triggerLoad = `;document.head.querySelector("[${uuidKey}='${uuid}']").dispatchEvent(new Event('load'))`
       const content = await res.text()
       const matchRes = content.match(/[^{]*export { (.*) as default }[^}]*$/)

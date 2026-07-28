@@ -1,3 +1,6 @@
-export const getDefaultExportFromModule = (x: any) => {
-  return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x
+export const getDefaultExportFromModule = (x: unknown) => {
+  const record = x as Record<string, unknown> | null
+  return record && record.__esModule && Object.prototype.hasOwnProperty.call(record, 'default')
+    ? record['default']
+    : x
 }

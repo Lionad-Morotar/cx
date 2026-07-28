@@ -10,7 +10,7 @@ export type CxLoaderConfig = {
    * "export { index as default }" -> "window[ModuleName] = index"
    */
   type?: 'umd' | 'esm-native' | 'esm' | 'module-federation'
-  fetchModule?(url: string, exportsName: string, pkgName: string): Promise<any>
+  fetchModule?(url: string, exportsName: string, pkgName: string): Promise<unknown>
 }
 
 export type CxLoaderInstance = InstanceType<typeof CxLoader>

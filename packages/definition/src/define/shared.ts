@@ -10,7 +10,9 @@ export const toJSON = (_meta: CxComponentMetaDefined): Meta => {
   const { name } = _meta.component || {}
   const { type, url, umdExportsName } = _meta
 
-  // @ts-ignore
+  // component 是 CxComponentMetaDefined 必填字段，但此处运行时已提取到变量，
+  // 从 meta 删除避免序列化时包含 Vue 组件实例
+  // @ts-expect-error deleting required 'component' field at runtime
   delete _meta.component
 
   // CxG2 转换为 kebab-case 是“cx-g-2”，但应该得到“cx-g2”

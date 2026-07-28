@@ -23,7 +23,7 @@ export type CxStoredComponent = {
   components?: Record<string, CxComponentRuntime[]>
   parents?: string[]
   /** 遗留动态字段（wash/挂载阶段写入），后续治理时收敛 */
-  [key: string]: any
+  [key: string]: unknown
 }
 
 // todo 提供判断组件层级的方法，不然每次要调用 touch 计算，性能不行
@@ -201,7 +201,7 @@ export const createCxDatas = (cx: CxLoaderInstance) => {
       })
       // wash
       .map((comp) => {
-        comp.sortn = (comp as any).sortnStr
+        comp.sortn = (comp as { sortnStr?: string }).sortnStr
         return comp as CxStoredComponent
       })
 
@@ -267,7 +267,7 @@ export const createCxDatas = (cx: CxLoaderInstance) => {
       })
       // remove un-parented comps, only capable with slotted comp.components, for example,
       // { key: 'cx-page', components: { default: [] } }
-      .map((_compAny: any) => {
+      .map((_compAny: unknown) => {
         const comp = _compAny as CxComponentRuntime & CxStoredComponent
         // console.log('[debug] comp', cx)
         if (!cx.utils.isSlottedCxComponentGroup(comp.components)) {

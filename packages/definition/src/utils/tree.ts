@@ -35,10 +35,12 @@ export const touch = (
   flatted.forEach((comp) => {
     handler(comp)
     if (comp?.components) {
-      slot
-        ? // slot 不会传递
-          touch(comp.components[slot]!, handler)
-        : touch(comp.components, handler)
+      if (slot) {
+        // slot 不会传递
+        touch(comp.components[slot]!, handler)
+      } else {
+        touch(comp.components, handler)
+      }
     }
   })
 }

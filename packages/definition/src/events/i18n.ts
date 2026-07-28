@@ -1,12 +1,15 @@
 import mitt from 'mitt'
 
+/** 翻译函数类型：(key, data?) => string */
+type TranslateFn = (key: string, data?: unknown) => string
+
 export const cxTranslateFn = {
-  value: null as any,
+  value: null as TranslateFn | null,
 }
 
 export const cxTranslator = mitt<{
   provide: {
-    t: any
+    t: TranslateFn
   }
 }>()
 

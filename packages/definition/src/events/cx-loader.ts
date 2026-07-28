@@ -15,8 +15,8 @@ export const cxLoaderHooks = mitt<{
   }
   'comp:cx-event:emit': {
     id: string
-    event: any
-    args: any[]
+    event: unknown
+    args: unknown[]
   }
   'comp:before-mount': {
     comp: CxComponentRuntime

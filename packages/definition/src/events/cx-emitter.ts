@@ -36,12 +36,12 @@ export const createSubEvent = (): CxSubEvent => {
  */
 export const createCxEmitter = (
   refs: RefsManager<{
-    ref: any
+    ref: unknown
     data: CxComponentRuntime
   }>,
 ): CxEmitter => {
   // 根据事件参数找到对应组件（的 Vue 组件实例），然后执行对应的方法
-  const _trigger = async (event: CxSubEvent, compArgs: any[] = []) => {
+  const _trigger = async (event: CxSubEvent, compArgs: unknown[] = []) => {
     if (!isValidSubEvent(event)) {
       return console.log(`[info] invalid cx-event ${event}`)
     }
@@ -59,7 +59,10 @@ export const createCxEmitter = (
 
     targets.map((target) => {
       try {
-        target?.[event.trigger]?.(...bindArgs, ...compArgs)
+        // target 是 Vue 组件实例，event.trigger 是动态暴露方法名（反射调用）
+        ;(target as Record<string, ((...args: unknown[]) => void) | undefined> | undefined)?.[
+          event.trigger as string
+        ]?.(...bindArgs, ...compArgs)
       } catch (err) {
         console.error('[ERR] error when exec event', err)
       }
@@ -77,10 +80,10 @@ export const createCxEmitter = (
     /* 找到需要广播的事件 */
 
     const events = [] as CxEvent[]
-    const compData = (refs.get(fromID)?.data || {}) as Record<string, any>
-    const evts: CxEvent[] = Array.isArray(compData?.data?._cx_events)
-      ? compData.data._cx_events
-      : []
+    // refs.get()?.data 是 CxComponentRuntime；.data 取其 CxComponentData（含 _cx_events）
+    const compRef = refs.get(fromID)?.data
+    const compData = (compRef?.data || {}) as CxComponentRuntime['data']
+    const evts: CxEvent[] = Array.isArray(compData?._cx_events) ? compData._cx_events : []
     const filtered = evts.filter((x) => x.key === eventKey)
     events.push(...filtered)
 

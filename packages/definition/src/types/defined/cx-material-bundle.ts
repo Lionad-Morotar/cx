@@ -7,11 +7,11 @@ import type { App } from 'vue'
 export interface CxMaterialComponent {
   name?: string
   key?: string
-  _cx_install: (app: App, ...options: any[]) => any
+  _cx_install: (app: App, ...options: unknown[]) => unknown
   _cx_meta: {
     key: string
     type?: 'umd' | 'esm' | 'local'
-    [key: string]: any
+    [key: string]: unknown
   }
 }
 
