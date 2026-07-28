@@ -53,6 +53,42 @@ describe('useStreamChunks', () => {
     expect(onChunkDetected).toHaveBeenCalledTimes(1)
     expect(onChunkDetected).toHaveBeenCalledWith('first', 0)
   })
+
+  it('流结束（ended）后尾块从生长中转为完整块', async () => {
+    const content = ref('part1\n\n---\n\npart2')
+    const ended = ref(false)
+    const { chunks } = useStreamChunks(content, [separator], { ended })
+    await nextTick()
+    expect(chunks.value[1]).toEqual({ content: 'part2', isComplete: false })
+
+    ended.value = true
+    await nextTick()
+    expect(chunks.value[1]).toEqual({ content: 'part2', isComplete: true })
+  })
+
+  it('ended 时为非空尾块补发 onChunkDetected 回调', async () => {
+    const content = ref('first\n\n---\n\nsecond')
+    const ended = ref(false)
+    const onChunkDetected = vi.fn()
+    useStreamChunks(content, [separator], { onChunkDetected, ended })
+    await nextTick()
+    expect(onChunkDetected).toHaveBeenCalledTimes(1)
+    expect(onChunkDetected).toHaveBeenLastCalledWith('first', 0)
+
+    ended.value = true
+    await nextTick()
+    expect(onChunkDetected).toHaveBeenCalledTimes(2)
+    expect(onChunkDetected).toHaveBeenLastCalledWith('second', 1)
+  })
+
+  it('内容恰以分隔符结尾时 ended 不补发空尾块回调', async () => {
+    const content = ref('first\n\n---\n\n')
+    const onChunkDetected = vi.fn()
+    useStreamChunks(content, [separator], { onChunkDetected, ended: ref(true) })
+    await nextTick()
+    expect(onChunkDetected).toHaveBeenCalledTimes(1)
+    expect(onChunkDetected).toHaveBeenLastCalledWith('first', 0)
+  })
 })
 
 // --- useIncrementalTree ---
