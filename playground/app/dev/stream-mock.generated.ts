@@ -737,6 +737,8 @@ export const compositeMeta = {
   source: 'vtu-composite.json',
   fenceCount: 6,
   componentKeys: ["cx-vtu-data-table","cx-vtu-chart","cx-vtu-image-gallery","cx-vtu-stats-display","cx-vtu-geo-map","cx-vtu-option-list"],
+  /** 各围栏闭合标记在剧本中的结束偏移；把剧本裁到前 N 个围栏时取 [N-1] */
+  fenceEndOffsets: [1146,2158,3045,4999,7068,7801],
   chunkCount: 728,
 } as const
 
@@ -1427,5 +1429,7 @@ export const doubleCmptsMeta = {
   source: 'vtu-double-cmpts.json',
   fenceCount: 2,
   componentKeys: ["cx-vtu-data-table","cx-vtu-option-list"],
+  /** 各围栏闭合标记在剧本中的结束偏移；把剧本裁到前 N 个围栏时取 [N-1] */
+  fenceEndOffsets: [1163,2064],
   chunkCount: 679,
 } as const

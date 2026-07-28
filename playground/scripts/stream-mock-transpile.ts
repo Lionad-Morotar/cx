@@ -71,6 +71,8 @@ export interface TranspileStreamResult {
   chunks: string[]
   componentKeys: string[]
   fenceCount: number
+  /** 每个围栏闭合标记在重组剧本中的结束偏移；用于把剧本裁到前 N 个围栏 */
+  fenceEndOffsets: number[]
 }
 
 /** 匹配 ```json ... ``` 围栏；match 区间含围栏标记本身 */
@@ -140,5 +142,11 @@ export function transpileStream(content: string, boundaries: number[]): Transpil
   }
   chunks.push(script.slice(prev))
 
-  return { script, chunks, componentKeys, fenceCount: fences.length }
+  return {
+    script,
+    chunks,
+    componentKeys,
+    fenceCount: fences.length,
+    fenceEndOffsets: mappings.map((f) => f.newEnd),
+  }
 }

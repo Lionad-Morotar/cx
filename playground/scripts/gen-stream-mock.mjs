@@ -57,7 +57,10 @@ const banner = `// 本文件由 \`pnpm gen:stream-mock\` 生成，勿手改。
 
 const sections = SCENARIOS.map(({ name, file }) => {
   const { content, boundaries } = loadScenario(file)
-  const { chunks, componentKeys, fenceCount } = transpileStream(content, boundaries)
+  const { chunks, componentKeys, fenceCount, fenceEndOffsets } = transpileStream(
+    content,
+    boundaries,
+  )
   const chunkLines = chunks.map((c) => `  ${JSON.stringify(c)},`).join('\n')
   return [
     `/** ${file}：${fenceCount} 个组件围栏，${chunks.length} 个 chunk（原 delta 边界比例映射） */`,
@@ -67,6 +70,8 @@ const sections = SCENARIOS.map(({ name, file }) => {
     `  source: '${file}',`,
     `  fenceCount: ${fenceCount},`,
     `  componentKeys: ${JSON.stringify(componentKeys)},`,
+    `  /** 各围栏闭合标记在剧本中的结束偏移；把剧本裁到前 N 个围栏时取 [N-1] */`,
+    `  fenceEndOffsets: ${JSON.stringify(fenceEndOffsets)},`,
     `  chunkCount: ${chunks.length},`,
     `} as const`,
   ].join('\n')

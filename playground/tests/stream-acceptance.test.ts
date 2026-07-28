@@ -15,6 +15,9 @@ import {
 import { compositeMeta } from '../app/dev/stream-mock.generated'
 import {
   createDemoRegistry,
+  cropScenarioChunks,
+  mainArrayOf,
+  MAX_COMPONENTS,
   STREAM_CHUNKS,
   STREAM_SCRIPT,
   toRenderNode,
@@ -140,6 +143,58 @@ describe('stream 验收 · 增量渲染（Route Z）', () => {
     }
   })
 
+  it('后续围栏流式期间增量产物切换到当前组件，不冻结在首个组件', () => {
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createDemoRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+    // chart 是第 2 个围栏：specs 为 1 且 pendingSources 为 1 的帧即其流式窗口
+    const chartCounts: number[] = []
+    for (let i = 1; i <= STREAM_CHUNKS.length; i++) {
+      const text = prefix(i)
+      const result = detector.extractSpecs(text)
+      if (result.specs.length >= 2) break
+      if (result.specs.length !== 1 || (result.pendingSources?.length ?? 0) !== 1) continue
+      const partial = extractor.next(text) as CxStreamNode | null
+      if (partial?.key !== 'cx-vtu-chart') continue
+      chartCounts.push(mainArrayOf(partial)?.length ?? 0)
+    }
+    // chart 围栏流式期间增量产物应持续出现（多帧），且数据点逐步爬升
+    expect(chartCounts.length).toBeGreaterThan(1)
+    for (let i = 1; i < chartCounts.length; i++) {
+      expect(chartCounts[i]).toBeGreaterThanOrEqual(chartCounts[i - 1]!)
+    }
+  })
+
+  it('chart 增量：尾随序列化的 xKey/series 缺席时从完整数据点推导', () => {
+    // chart 的必需字段 xKey/series 排在数据数组之后，数据点流式期间
+    // partial 缺失它们会导致组件无法渲染；与生成侧转译器同一推导语义兜底
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createDemoRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+    const partialJson = [
+      '{',
+      '  "id": "c1",',
+      '  "key": "cx-vtu-chart",',
+      '  "data": {',
+      '    "type": "bar",',
+      '    "title": "营收",',
+      '    "data": [',
+      '      { "month": "1月", "online": 186, "offline": 124 },',
+      '      { "month": "2月", "online": 200, "offline": 130 }',
+    ].join('\n')
+    const partial = extractor.next(partialJson) as CxStreamNode | null
+    expect(partial?.key).toBe('cx-vtu-chart')
+    const data = partial?.data as { data: unknown[]; xKey?: string; series?: unknown[] }
+    expect(data.data).toHaveLength(2)
+    expect(data.xKey).toBe('month')
+    expect(data.series).toEqual([
+      { key: 'online', label: 'online' },
+      { key: 'offline', label: 'offline' },
+    ])
+  })
+
   it('toRenderNode 补稳定 id 并保留 key/data', () => {
     const fixture: CxStreamNode = {
       id: 'stream-demo-table',
@@ -184,5 +239,30 @@ describe('stream 验收 · 打字机素材与流式切分', () => {
     expect(chunks.value[0]!.isComplete).toBe(true)
     expect(chunks.value.at(-1)!.isComplete).toBe(false)
     expect(chunks.value.at(-1)!.content).toContain('随时告诉我')
+  })
+})
+
+describe('stream 验收 · 剧本裁剪（组件数量）', () => {
+  it('裁到前 1 个组件：终态单 spec 且为首个组件，结尾散文不出现', () => {
+    const chunks = cropScenarioChunks(1)
+    expect(chunks.length).toBeLessThan(STREAM_CHUNKS.length)
+    expect(chunks.every((c) => c.length > 0)).toBe(true)
+    const script = chunks.join('')
+    const result = detector.extractSpecs(script)
+    expect(result.status).toBe('success')
+    expect(result.specs).toHaveLength(1)
+    const node = Array.isArray(result.specs[0]) ? result.specs[0][0] : result.specs[0]
+    expect(node?.key).toBe(compositeMeta.componentKeys[0])
+    expect(script).not.toContain('随时告诉我')
+  })
+
+  it('裁到前 3 个组件：终态 3 specs，顺序与 meta 一致', () => {
+    const result = detector.extractSpecs(cropScenarioChunks(3).join(''))
+    const keys = result.specs.map((s) => (Array.isArray(s) ? s[0]?.key : s.key))
+    expect(keys).toEqual([...compositeMeta.componentKeys].slice(0, 3))
+  })
+
+  it('裁到组件总数即完整剧本（保留结尾散文）', () => {
+    expect(cropScenarioChunks(MAX_COMPONENTS).join('')).toBe(STREAM_SCRIPT)
   })
 })

@@ -27,7 +27,19 @@
         />
         <span class="speed-val">{{ speed }}</span>
       </label>
-      <span class="progress">{{ progress }} / {{ STREAM_CHUNKS.length }} chunks</span>
+      <label class="speed">
+        组件
+        <input
+          v-model.number="componentCount"
+          type="range"
+          min="1"
+          :max="MAX_COMPONENTS"
+          step="1"
+          data-testid="stream-component-count"
+        />
+        <span class="speed-val">{{ componentCount }}</span>
+      </label>
+      <span class="progress">{{ progress }} / {{ scenarioChunks.length }} chunks</span>
     </section>
 
     <div class="grid">
@@ -67,7 +79,7 @@
         <header class="card-head">
           <span class="card-name">增量渲染</span>
           <span v-if="partialNode" class="badge badge--pending">
-            {{ (partialNode.data?.data as unknown[])?.length ?? 0 }} 行
+            {{ mainArrayOf(partialNode)?.length ?? 0 }} 项
           </span>
         </header>
         <div class="preview">
@@ -119,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import {
   createSpecDetector,
   cxHumanTextConfig,
@@ -132,18 +144,24 @@ import {
 } from '@lionad/cx-stream'
 import {
   createDemoRegistry,
-  STREAM_CHUNKS,
-  STREAM_SCRIPT,
+  cropScenarioChunks,
+  mainArrayOf,
+  MAX_COMPONENTS,
   toRenderNode,
 } from '~/dev/stream-scenario'
 
 // --- 回放引擎：定时器按 chunk（真实 SSE delta 边界）推进剧本 ---
+// 组件数量决定剧本裁剪：原始流只含前 N 个组件围栏，默认单组件
+const componentCount = ref(1)
+const scenarioChunks = computed(() => cropScenarioChunks(componentCount.value))
+const scenarioScript = computed(() => scenarioChunks.value.join(''))
+
 const progress = ref(0)
 const playing = ref(false)
 const speed = ref(6)
 let timer: ReturnType<typeof setInterval> | null = null
 
-const streamText = computed(() => STREAM_CHUNKS.slice(0, progress.value).join(''))
+const streamText = computed(() => scenarioChunks.value.slice(0, progress.value).join(''))
 
 function togglePlay() {
   if (playing.value) {
@@ -151,10 +169,10 @@ function togglePlay() {
   } else {
     playing.value = true
     // 已到结尾再播放则从头开始
-    if (progress.value >= STREAM_CHUNKS.length) progress.value = 0
+    if (progress.value >= scenarioChunks.value.length) progress.value = 0
     timer = setInterval(() => {
-      progress.value = Math.min(STREAM_CHUNKS.length, progress.value + speed.value)
-      if (progress.value >= STREAM_CHUNKS.length) pause()
+      progress.value = Math.min(scenarioChunks.value.length, progress.value + speed.value)
+      if (progress.value >= scenarioChunks.value.length) pause()
     }, 50)
   }
 }
@@ -191,8 +209,8 @@ const finalNodes = computed(() =>
         .filter((node): node is NonNullable<typeof node> => node !== null)
     : [],
 )
-// 围栏总数来自完整剧本的静态检出，用于进度展示（不随回放变化）
-const totalSpecs = detector.extractSpecs(STREAM_SCRIPT).specs.length
+// 围栏总数来自当前裁剪剧本的静态检出，用于进度展示（不随回放变化）
+const totalSpecs = computed(() => detector.extractSpecs(scenarioScript.value).specs.length)
 
 // CxSpec（单根或数组）→ CxRender 可消费节点；空/缺省一律 null（数组根取首元素）
 function toCxNode(spec: CxStreamNode | CxStreamNode[] | null) {
@@ -217,6 +235,9 @@ function reset() {
   progress.value = 0
   resetExtractor()
 }
+
+// 剧本随组件数量切换：播放中改动立即停表归零，避免旧进度落到新剧本的错误区间
+watch(componentCount, reset)
 </script>
 
 <style scoped>

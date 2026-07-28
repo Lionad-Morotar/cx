@@ -166,4 +166,21 @@ describe('stream-mock 生成产物 · 语义不变量', () => {
       'cx-vtu-option-list',
     ])
   })
+
+  it('fenceEndOffsets：逐围栏闭合偏移自洽，裁剪点检出数等于围栏序号', () => {
+    const offsets = compositeMeta.fenceEndOffsets
+    expect(offsets).toHaveLength(compositeMeta.fenceCount)
+    for (let i = 1; i < offsets.length; i++) {
+      expect(offsets[i]).toBeGreaterThan(offsets[i - 1]!)
+    }
+    for (const end of offsets) {
+      expect(script.slice(end - 3, end)).toBe('```')
+    }
+    // 裁到第 n 个围栏闭合处，detector 恰好检出 n 个 spec——
+    // 页面「组件数量」控件的裁剪语义直接依赖这一不变量
+    for (let n = 1; n <= offsets.length; n++) {
+      const cropped = script.slice(0, offsets[n - 1])
+      expect(detector.extractSpecs(cropped).specs.length).toBe(n)
+    }
+  })
 })
