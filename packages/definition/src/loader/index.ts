@@ -27,6 +27,20 @@ import type { CxRefs, CxEmitter, CxComponentMetaDefined, CxLoaderConfig } from '
 
 const getArray = <T>(x: T | T[]) => (Array.isArray(x) ? x : x ? [x] : [])
 
+/**
+ * metadata.js 加载回来的单条组件元信息形态。
+ * 字段比 CxComponentMetaDefined 更宽（含 exports 导出名、字段多可选），
+ * 因为是加载阶段未补全的原始数据；installComponentsFromMetadata 会消费它
+ */
+type CxComponentMetadataEntry = {
+  key: string
+  name?: string
+  exports?: string
+  url?: string
+  async?: boolean
+  aliasKeys?: string[]
+}
+
 // 开发模式不能冻结组件元数据，
 // 热更新需要覆盖更新组件元信息
 const hmrFreeFreezing = (x: Component) => {
@@ -69,25 +83,25 @@ export class CxLoader {
    */
   baseURL: string | null
   /**
-   * 已安装的组件
+   * 已安装的组件（组件实例上动态挂载了 _cx_meta 等元信息字段）
    */
-  installed: Record<string, any> | null
+  installed: Record<string, Component> | null
   /**
    * 已安装的组件的异步组件的实际组件（但不包括 Error、Loading）
    */
-  installedAsync: Record<string, any> | null
+  installedAsync: Record<string, Component> | null
   /**
    * this.installed 的数组形式
    */
-  installedComponents: ComputedRef<any[]>
+  installedComponents: ComputedRef<Component[]>
   /**
    * 组件 key 对应的注册好的组件或空
    */
-  cs: Record<string, any> | null
+  cs: Record<string, Component> | null
   /**
    * 根据地址加载的组件元信息
    */
-  metadata: any[]
+  metadata: CxComponentMetadataEntry[]
   /**
    * 是否已加载 CxRender
    */
@@ -95,7 +109,7 @@ export class CxLoader {
   /**
    * 把 metadata 定义的组件加载完成之后的回调函数
    */
-  cb: null | ((instance: any) => void)
+  cb: null | ((instance: CxLoader) => void)
 
   /**
    * new CxLoader
@@ -103,7 +117,7 @@ export class CxLoader {
    * @param config { app?: 用于组件注册等, type: 'umd'、'esm' 模块类型 }
    * @param cb 回调函数
    */
-  constructor(url?: string, config?: CxLoaderConfig, cb?: (instance: any) => void) {
+  constructor(url?: string, config?: CxLoaderConfig, cb?: (instance: CxLoader) => void) {
     // console.log('[INFO] cx-loader created', this)
     // console.log('[info] current env', nodeEnv)
 
@@ -120,7 +134,8 @@ export class CxLoader {
     this.baseURL = null
     this.installed = null
     this.installedAsync = null
-    this.installedComponents = [] as unknown as ComputedRef<any[]>
+    // init() 会赋真正的 computed；构造期先用空数组的 computed 占位
+    this.installedComponents = computed(() => []) as ComputedRef<Component[]>
     this.cs = null
     this.isLoadedCxRender = false
     this.metadata = []
@@ -168,21 +183,29 @@ export class CxLoader {
     return `${this.baseURL}${url}`
   }
 
-  fetchModule = useMemoize(async (url: string, exportsName = 'default') => {
+  fetchModule = useMemoize(async (...args: [url: string, exportsName?: string]) => {
+    // useMemoize 泛型会让具名参数在闭包内退化为 unknown；用具名解构重新锚定类型
+    const [urlArg, exportsNameArg = 'default'] = args
+    const url: string = urlArg
+    const exportsName: string = exportsNameArg
     const moduleType = this.config!.type
-    const customFetcher = this.config!.fetchModule
+    // 显式标注 fetchModule 签名：CxLoaderConfig 与 CxLoader 循环导入会导致
+    // this.config!.fetchModule 的参数类型退化为 unknown，此处收口
+    const customFetcher = this.config!.fetchModule as
+      | ((url: string, exportsName: string, pkgName: string) => Promise<unknown>)
+      | undefined
 
     // TODO ext auto adapter
     if (!url.endsWith('.js')) {
-      url += '.js'
+      args[0] = `${url}.js`
     }
+    const finalURL = args[0]
 
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (resolve, reject) => {
       if (customFetcher) {
         try {
-          // @ts-ignore
-          const res = await customFetcher(url, exportsName, 'CxComponent')
+          const res = await customFetcher(finalURL, exportsName, 'CxComponent')
           resolve(res)
         } catch (e) {
           reject(e)
@@ -201,7 +224,7 @@ export class CxLoader {
       //     })
       // }
       if (moduleType === 'esm') {
-        const { mount } = getURL(url, {
+        const { mount } = getURL(finalURL, {
           moduleType,
           onError(err) {
             console.error('[ERR]', err)
@@ -209,8 +232,8 @@ export class CxLoader {
           },
           onLoad() {
             try {
-              // @ts-ignore
-              const component = window[url]
+              // esm 模式下脚本会把模块挂到 window[url]；window 无字符串索引签名，断言取出
+              const component = (window as unknown as Record<string, unknown>)[finalURL]
               resolve(component)
             } catch (error) {
               console.error('[ERR]', error)
@@ -221,7 +244,7 @@ export class CxLoader {
         mount()
       }
       if (moduleType === 'umd') {
-        const { mount } = getURL(url, {
+        const { mount } = getURL(finalURL, {
           moduleType,
           onError(err) {
             console.error('[ERR]', err)
@@ -229,8 +252,10 @@ export class CxLoader {
           },
           onLoad() {
             try {
-              // @ts-ignore
-              const component = getDefaultExportFromModule(window[exportsName as any])
+              // umd 模式下脚本会把模块挂到 window[exportsName]
+              const component = getDefaultExportFromModule(
+                (window as unknown as Record<string, unknown>)[exportsName],
+              )
               resolve(component)
             } catch (error) {
               console.error('[ERR]', error)
@@ -253,7 +278,7 @@ export class CxLoader {
     })
   })
 
-  init(url?: string, config?: CxLoaderConfig, cb?: (instance: any) => void) {
+  init(url?: string, config?: CxLoaderConfig, cb?: (instance: CxLoader) => void) {
     if (this.isInited) {
       return this
     }
@@ -277,7 +302,6 @@ export class CxLoader {
 
       // * 这样改和直接修改 installed 内 _cx_meta 一样也会导致报错
       const asyncComps = Object.values(this.installedAsync || {})
-      // const asyncComps = [] as any[]
 
       // 异步组件真实内容加载完后，
       // 会自动覆盖一开始就注册的 defineAsyncComponent 同步组件，
@@ -305,7 +329,7 @@ export class CxLoader {
   async loadMetadata() {
     const fullURL = this._getURL('metadata')
     try {
-      const metadata = (await this.fetchModule(fullURL, 'CxMetadata')) as any[]
+      const metadata = (await this.fetchModule(fullURL, 'CxMetadata')) as CxComponentMetadataEntry[]
       this.metadata = metadata || []
       await this.installComponentsFromMetadata()
     } catch (e) {
@@ -322,11 +346,12 @@ export class CxLoader {
 
     return await NPromise.map(
       this.metadata,
-      async (meta: any) => {
+      async (meta: CxComponentMetadataEntry) => {
         const { async, exports, url, key, aliasKeys } = meta
         const installKey = capitalize(camelCase(key))
         const exportsName = exports
-        const fullURL = this.baseURL + url
+        // baseURL 在 init() 后必填；url 缺失时退空串（metadata 契约保证有值）
+        const fullURL = `${this.baseURL ?? ''}${url ?? ''}`
         try {
           const component = (
             !async
