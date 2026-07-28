@@ -23,6 +23,20 @@ import vitest from '@vitest/eslint-plugin'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
+import noHardcodedColor from './rules/no-hardcoded-color.js'
+import noTrackingMarker from './rules/no-tracking-marker.js'
+import requireComponentName from './rules/require-component-name.js'
+
+/** cx 自研规则插件：下游项目可自行注册后按自身参数开启 */
+export const cxPlugin = {
+  meta: { name: 'cx', version: '0.1.0' },
+  rules: {
+    'no-hardcoded-color': noHardcodedColor,
+    'no-tracking-marker': noTrackingMarker,
+    'require-component-name': requireComponentName,
+  },
+}
+
 /** 测试文件模式：与根 vite.config.ts 的 test.include 对齐 */
 const TEST_FILES = [
   '**/*.test.{ts,mts,js,mjs}',
@@ -148,7 +162,42 @@ export default createConfig({
     'packages/components-nuxt-ui-v4/vendor/**',
     'packages/components/src/calendar/vendor/el-calendar/**',
   ],
-}).concat({
-  name: 'cx/legacy-warns',
-  rules: LEGACY_WARN_RULES,
 })
+  .concat({
+    name: 'cx/custom-rules',
+    plugins: { cx: cxPlugin },
+    rules: {
+      // 暂时关闭：颜色治理依赖物料级设计 Token 源文件（cx 尚无，Token 只在 playground
+      // @theme 注册），存量约 35 处无可迁移目标——待设计系统落地后恢复 error 并分期治理
+      'cx/no-hardcoded-color': 'off',
+      'cx/no-tracking-marker': 'error',
+      // 物料包中缀体系：components/v2/renderer 等为 cx-*，v4/vtu 带包中缀
+      'cx/require-component-name': [
+        'error',
+        {
+          prefix: 'cx',
+          packagePrefixes: {
+            'components-nuxt-ui-v4': 'cx-nuxt-ui-v4',
+            'components-vtu': 'cx-vtu',
+          },
+          // v4 物料是 Nuxt UI v4 薄包装：根为 U* 组件，DOM 类体系由被包装组件控制
+          skipRootClassPackages: ['components-nuxt-ui-v4'],
+        },
+      ],
+      // 与 require-component-name 的 kebab fixer 循环打架；Cx 命名 PascalCase 由其 case 宽容接管
+      'vue/component-definition-name-casing': 'off',
+    },
+  })
+  // 降级层必须位于规则启用层之后——flat config 后者覆盖前者，否则 warn 会被 error 盖回
+  .concat({
+    name: 'cx/legacy-warns',
+    rules: LEGACY_WARN_RULES,
+  })
+  .concat({
+    // 规则定义自举豁免：no-tracking-marker 扫注释，会把规则文件自身的形态样例当违规
+    name: 'cx/custom-rules-bootstrap',
+    files: ['packages/eslint/rules/**'],
+    rules: {
+      'cx/no-tracking-marker': 'off',
+    },
+  })

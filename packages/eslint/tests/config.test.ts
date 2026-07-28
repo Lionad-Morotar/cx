@@ -12,7 +12,8 @@ import cx, { createConfig } from '../index.js'
  * TS/Vue/Vitest 规则生效、格式类规则全关（归 Oxfmt）、项目级 ignores 命中。
  */
 
-const repoRoot = resolve(fileURLToPath(import.meta.url), '../../..')
+// 注意级数：resolve 的首个 '..' 弹的是文件名本身，tests/ → eslint/ → packages/ → cx 需四级
+const repoRoot = resolve(fileURLToPath(import.meta.url), '../../../..')
 
 function makeEslint(config = cx) {
   return new ESLint({

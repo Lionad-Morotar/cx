@@ -171,7 +171,7 @@ export function createSpecDetector<TSpec = unknown>(config: SpecDetectorConfig<T
    * 5. 无代码块 → 裸 JSON 兜底扫描
    */
   function extractSpecs(text: string): ExtractSpecsResult<TSpec> {
-    // --- Phase 1: 扫描所有围栏代码块 ---
+    // --- 扫描所有围栏代码块（步骤拆解见函数头注释） ---
     const codeBlockMatches = Array.from(text.matchAll(fenceBlockPattern(fence)))
 
     if (codeBlockMatches.length === 0) {

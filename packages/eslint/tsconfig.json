@@ -1,7 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "allowJs": true
   },
-  "include": ["index.d.ts", "tests/**/*.ts"]
+  "include": [
+    "index.d.ts",
+    "tests/**/*.ts",
+    "rules/**/*.js"
+  ]
 }
