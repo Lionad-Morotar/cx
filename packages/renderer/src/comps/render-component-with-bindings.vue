@@ -5,6 +5,7 @@
 import { has } from '@lionad/cx-definition'
 
 import { watchImmediate } from '@vueuse/core'
+import type { MaybeRef } from '@vueuse/core'
 import {
   resolveDirective,
   resolveComponent,
@@ -15,7 +16,6 @@ import {
   useAttrs,
   useSlots,
   computed,
-  ref,
   h,
   markRaw,
   withDirectives,
@@ -29,7 +29,6 @@ import {
   useCxStyleBorder,
   useCxStyleFont,
   useCxStyleCosm,
-  // breakPointOptions,
   useCxBreakpointType,
 } from '@lionad/cx-vue'
 import { kebabCase } from 'lodash-es'
@@ -43,14 +42,34 @@ import type {
 
 // defineOptions({ name: 'CxRenderCompWithBindings' })
 
-const cache = new Map<any, any>()
+/**
+ * 断点取值范围：与 use-cx-styles/config/media.ts 的 breakPointOptions 对齐
+ */
+type BreakpointValue = 'desktop' | 'mobile' | 'tablet' | 'laptop'
 
-const getCachedCxRenderBreakpointType = (cxRenderRef: any) => {
-  if (!cache.get(unref(cxRenderRef))) {
-    cache.clear()
-    cache.set(unref(cxRenderRef), useCxBreakpointType(unref(cxRenderRef) as HTMLElement))
+/**
+ * 运行时 schema 允许在顶层用断点字段（如 mobile/tablet）存放覆盖样式，
+ * 因此把 CxComponentStyle 扩展上断点键
+ */
+type CxComponentStyleWithBreakpoints = CxComponentStyle &
+  Partial<Record<BreakpointValue, CxComponentStyle>>
+
+/**
+ * 缓存每个 cx-render 根元素对应的断点类型响应式 ref，
+ * 避免每次 setup 重建 useCxBreakpointType 导致的监听泄漏
+ */
+const breakpointCache = new Map<
+  HTMLElement | undefined,
+  ReturnType<typeof useCxBreakpointType>
+>()
+
+const getCachedCxRenderBreakpointType = (cxRenderRef: MaybeRef<HTMLElement | undefined>) => {
+  const el = unref(cxRenderRef)
+  if (!breakpointCache.get(el)) {
+    breakpointCache.clear()
+    breakpointCache.set(el, useCxBreakpointType(el))
   }
-  return cache.get(unref(cxRenderRef))
+  return breakpointCache.get(el)!
 }
 
 export default defineComponent({
@@ -105,8 +124,8 @@ export default defineComponent({
     const componentType = computed(() => {
       const cxComp = cx?.utils?.findFromCX?.(props.componentType)
       const targetComp = cxComp || (resolveComponent(props.componentType) as Component) || 'div'
-      // @ts-ignore
-      if (window && window?._debug_verbose) {
+      // SSR 守卫：仅在浏览器环境读全局调试标记
+      if (typeof window !== 'undefined' && window._debug_verbose) {
         if (cxComp) {
           console.info(
             '[verbose:render-component-with-bindings] using comp in cx',
@@ -132,14 +151,14 @@ export default defineComponent({
 
     const pageBreakpointType = computed(() => getCachedCxRenderBreakpointType(unref(cxRenderRef)))
 
-    let styleBox: any,
-      styleMargin: any,
-      stylePadding: any,
-      styleLayout: any,
-      styleRound: any,
-      styleBorder: any,
-      styleFont: any,
-      styleCosm: any
+    let styleBox: ReturnType<typeof useCxStyleBox> | undefined,
+      styleMargin: ReturnType<typeof useCxStyleMargin> | undefined,
+      stylePadding: ReturnType<typeof useCxStylePadding> | undefined,
+      styleLayout: ReturnType<typeof useCxStyleLayout> | undefined,
+      styleRound: ReturnType<typeof useCxStyleRound> | undefined,
+      styleBorder: ReturnType<typeof useCxStyleBorder> | undefined,
+      styleFont: ReturnType<typeof useCxStyleFont> | undefined,
+      styleCosm: ReturnType<typeof useCxStyleCosm> | undefined
     let isStyleInited = false
     const initStyle = ({ w, m, p, l, r, b, f, c }: CxComponentStyle) => {
       if (!isStyleInited) {
@@ -178,7 +197,6 @@ export default defineComponent({
       // }
     }
 
-    const styles = ref({} as CSSStyleDeclaration)
     // todo deep
     watchImmediate(
       () => [
@@ -190,8 +208,8 @@ export default defineComponent({
         if (headless) {
           return
         }
-        const v = (cxStyle || {}) as CxComponentStyle
-        const vOverride = breakpointType ? (v as any)[breakpointType] : {}
+        const v = (cxStyle || {}) as CxComponentStyleWithBreakpoints
+        const vOverride = breakpointType ? v[breakpointType] : {}
         const { w: wo, m: mo, p: po, l: lo, r: ro, b: bo, f: fo, c: co } = vOverride || {}
         const { w, m, p, l, r, b, f, c } = v
         // console.log('style', comp.value.data._cx_name, v, vOverride, breakpointType)
@@ -205,322 +223,364 @@ export default defineComponent({
           f: fo || f,
           c: co || c,
         })
-        styles.value = {} as CSSStyleDeclaration
+        // styleSnapshot computed 会基于 styleBox/Margin/... 的最新响应式状态
+        // 自动重算 classes/styles，无需在此手动重置
       },
     )
 
-    const kls = computed(() => {
-      const kls: (string | false)[] = [
+    /**
+     * 一次性把当前样式状态映射为 { classes, styles }。
+     * 纯计算：不再像旧实现那样在 computed getter 内写 styles ref（旧写法
+     * 触发 vue/no-side-effects-in-computed-properties，且依赖追踪会失序）。
+     * 空的 inline styles 不下传，避免在 Reka Primitive 的 vnode 归一化阶段
+     * 触发只读代理写入异常
+     */
+    const styleSnapshot = computed(() => {
+      const classes: string[] = [
         `is-${comp.value.key}`,
         `cx-${comp.value.id}`,
         `is-render-as-${props.componentType}`,
         'is-cx-component',
       ]
+      const styles: Partial<CSSStyleDeclaration> = {}
+
       if (!isStyleInited) {
-        return kls
+        return { classes, styles }
       }
 
       /* Box(width & height) */
-      if (styleBox.isInited.value) {
-        if (styleBox.widthMeter.value) {
-          if (styleBox.isFreeSetW.value) {
-            styles.value.width = `${styleBox.width.value}${styleBox.widthMeter.value}`
+      if (styleBox!.isInited.value) {
+        if (styleBox!.widthMeter.value) {
+          if (styleBox!.isFreeSetW.value) {
+            styles.width = `${styleBox!.width.value}${styleBox!.widthMeter.value}`
           } else {
-            kls.push(`w-${styleBox.widthMeter.value}`)
+            classes.push(`w-${styleBox!.widthMeter.value}`)
           }
         }
-        if (styleBox.minWidthMeter.value) {
-          if (styleBox.isFreeSetMinW.value) {
-            styles.value.minWidth = `${styleBox.minWidth.value}${styleBox.minWidthMeter.value}`
+        if (styleBox!.minWidthMeter.value) {
+          if (styleBox!.isFreeSetMinW.value) {
+            styles.minWidth = `${styleBox!.minWidth.value}${styleBox!.minWidthMeter.value}`
           } else {
-            kls.push(`min-w-${styleBox.minWidthMeter.value}`)
+            classes.push(`min-w-${styleBox!.minWidthMeter.value}`)
           }
         }
-        if (styleBox.maxWidthMeter.value) {
-          if (styleBox.isFreeSetMaxW.value) {
-            styles.value.maxWidth = `${styleBox.maxWidth.value}${styleBox.maxWidthMeter.value}`
+        if (styleBox!.maxWidthMeter.value) {
+          if (styleBox!.isFreeSetMaxW.value) {
+            styles.maxWidth = `${styleBox!.maxWidth.value}${styleBox!.maxWidthMeter.value}`
           } else {
-            kls.push(`max-w-${styleBox.maxWidthMeter.value}`)
+            classes.push(`max-w-${styleBox!.maxWidthMeter.value}`)
           }
         }
-        if (styleBox.heightMeter.value) {
-          if (styleBox.isFreeSetH.value) {
-            styles.value.height = `${styleBox.height.value}${styleBox.heightMeter.value}`
+        if (styleBox!.heightMeter.value) {
+          if (styleBox!.isFreeSetH.value) {
+            styles.height = `${styleBox!.height.value}${styleBox!.heightMeter.value}`
           } else {
-            kls.push(`h-${styleBox.heightMeter.value}`)
+            classes.push(`h-${styleBox!.heightMeter.value}`)
           }
         }
-        if (styleBox.minHeightMeter.value) {
-          if (styleBox.isFreeSetMinH.value) {
-            styles.value.minHeight = `${styleBox.minHeight.value}${styleBox.minHeightMeter.value}`
+        if (styleBox!.minHeightMeter.value) {
+          if (styleBox!.isFreeSetMinH.value) {
+            styles.minHeight = `${styleBox!.minHeight.value}${styleBox!.minHeightMeter.value}`
           } else {
-            kls.push(`min-h-${styleBox.minHeightMeter.value}`)
+            classes.push(`min-h-${styleBox!.minHeightMeter.value}`)
           }
         }
-        if (styleBox.maxHeightMeter.value) {
-          if (styleBox.isFreeSetMaxH.value) {
-            styles.value.maxHeight = `${styleBox.maxHeight.value}${styleBox.maxHeightMeter.value}`
+        if (styleBox!.maxHeightMeter.value) {
+          if (styleBox!.isFreeSetMaxH.value) {
+            styles.maxHeight = `${styleBox!.maxHeight.value}${styleBox!.maxHeightMeter.value}`
           } else {
-            kls.push(`max-h-${styleBox.maxHeightMeter.value}`)
+            classes.push(`max-h-${styleBox!.maxHeightMeter.value}`)
           }
         }
       }
 
       /* margin */
-      if (styleMargin.isInited.value) {
-        kls.push(
-          'box-border',
-          styleMargin.top.value && `mt-${styleMargin.top.value}`,
-          styleMargin.right.value && `mr-${styleMargin.right.value}`,
-          styleMargin.bottom.value && `mb-${styleMargin.bottom.value}`,
-          styleMargin.left.value && `ml-${styleMargin.left.value}`,
-        )
+      if (styleMargin!.isInited.value) {
+        classes.push('box-border')
+        if (styleMargin!.top.value) classes.push(`mt-${styleMargin!.top.value}`)
+        if (styleMargin!.right.value) classes.push(`mr-${styleMargin!.right.value}`)
+        if (styleMargin!.bottom.value) classes.push(`mb-${styleMargin!.bottom.value}`)
+        if (styleMargin!.left.value) classes.push(`ml-${styleMargin!.left.value}`)
       }
 
       /* padding */
-      if (stylePadding.isInited.value) {
-        kls.push(
-          stylePadding.top.value && `pt-${stylePadding.top.value}`,
-          stylePadding.right.value && `pr-${stylePadding.right.value}`,
-          stylePadding.bottom.value && `pb-${stylePadding.bottom.value}`,
-          stylePadding.left.value && `pl-${stylePadding.left.value}`,
-        )
+      if (stylePadding!.isInited.value) {
+        if (stylePadding!.top.value) classes.push(`pt-${stylePadding!.top.value}`)
+        if (stylePadding!.right.value) classes.push(`pr-${stylePadding!.right.value}`)
+        if (stylePadding!.bottom.value) classes.push(`pb-${stylePadding!.bottom.value}`)
+        if (stylePadding!.left.value) classes.push(`pl-${stylePadding!.left.value}`)
       }
 
       /* border */
-      if (styleBorder.isInited.value) {
-        kls.push(
-          styleBorder.top.value &&
-            (styleBorder.top.value === '1' ? 'border-t' : `border-t-${styleBorder.top.value}`),
-          styleBorder.right.value &&
-            (styleBorder.right.value === '1' ? 'border-r' : `border-r-${styleBorder.right.value}`),
-          styleBorder.bottom.value &&
-            (styleBorder.bottom.value === '1'
+      if (styleBorder!.isInited.value) {
+        if (styleBorder!.top.value) {
+          classes.push(
+            styleBorder!.top.value === '1' ? 'border-t' : `border-t-${styleBorder!.top.value}`,
+          )
+        }
+        if (styleBorder!.right.value) {
+          classes.push(
+            styleBorder!.right.value === '1'
+              ? 'border-r'
+              : `border-r-${styleBorder!.right.value}`,
+          )
+        }
+        if (styleBorder!.bottom.value) {
+          classes.push(
+            styleBorder!.bottom.value === '1'
               ? 'border-b'
-              : `border-b-${styleBorder.bottom.value}`),
-          styleBorder.left.value &&
-            (styleBorder.left.value === '1' ? 'border-l' : `border-l-${styleBorder.left.value}`),
-          styleBorder.top.value === '0' &&
-            styleBorder.right.value === '0' &&
-            styleBorder.bottom.value === '0' &&
-            styleBorder.left.value === '0' &&
-            'ring-0',
-        )
+              : `border-b-${styleBorder!.bottom.value}`,
+          )
+        }
+        if (styleBorder!.left.value) {
+          classes.push(
+            styleBorder!.left.value === '1'
+              ? 'border-l'
+              : `border-l-${styleBorder!.left.value}`,
+          )
+        }
+        // 四向都为 0 时显式关闭 ring，避免继承的环形阴影残留
+        if (
+          styleBorder!.top.value === '0' &&
+          styleBorder!.right.value === '0' &&
+          styleBorder!.bottom.value === '0' &&
+          styleBorder!.left.value === '0'
+        ) {
+          classes.push('ring-0')
+        }
       }
 
       /* round */
-      if (styleRound.isInited.value) {
-        if (styleRound.isConfigured.value) {
-          kls.push('overflow-hidden')
+      if (styleRound!.isInited.value) {
+        if (styleRound!.isConfigured.value) {
+          classes.push('overflow-hidden')
           const isSame =
-            styleRound.top.value === styleRound.right.value &&
-            styleRound.top.value === styleRound.bottom.value &&
-            styleRound.top.value === styleRound.left.value
-          const isCircle = isSame && styleRound.top.value === 'full'
+            styleRound!.top.value === styleRound!.right.value &&
+            styleRound!.top.value === styleRound!.bottom.value &&
+            styleRound!.top.value === styleRound!.left.value
+          const isCircle = isSame && styleRound!.top.value === 'full'
           if (isCircle) {
-            kls.push('rounded-full')
+            classes.push('rounded-full')
           } else {
-            styleRound.top.value && kls.push(`rounded-tl-${styleRound.top.value}`)
-            styleRound.right.value && kls.push(`rounded-tr-${styleRound.right.value}`)
-            styleRound.bottom.value && kls.push(`rounded-bl-${styleRound.bottom.value}`)
-            styleRound.left.value && kls.push(`rounded-br-${styleRound.left.value}`)
+            if (styleRound!.top.value) classes.push(`rounded-tl-${styleRound!.top.value}`)
+            if (styleRound!.right.value) classes.push(`rounded-tr-${styleRound!.right.value}`)
+            if (styleRound!.bottom.value) classes.push(`rounded-bl-${styleRound!.bottom.value}`)
+            if (styleRound!.left.value) classes.push(`rounded-br-${styleRound!.left.value}`)
           }
         }
       }
 
       /* layout */
-      if (styleLayout.isInited.value) {
-        if (styleLayout.direction.value) {
-          kls.push('flex')
-          if (styleLayout.direction.value === 'h') {
-            styleLayout.isReverse.value ? kls.push('flex-row-reverse') : kls.push('flex-row')
+      if (styleLayout!.isInited.value) {
+        if (styleLayout!.direction.value) {
+          classes.push('flex')
+          if (styleLayout!.direction.value === 'h') {
+            if (styleLayout!.isReverse.value) classes.push('flex-row-reverse')
+            else classes.push('flex-row')
           }
-          if (styleLayout.direction.value === 'w') {
-            styleLayout.isReverse.value
-              ? kls.push('flex-row-reverse flex-wrap')
-              : kls.push('flex-row flex-wrap')
+          if (styleLayout!.direction.value === 'w') {
+            if (styleLayout!.isReverse.value) classes.push('flex-row-reverse flex-wrap')
+            else classes.push('flex-row flex-wrap')
           }
-          if (styleLayout.direction.value === 'v') {
-            styleLayout.isReverse.value ? kls.push('flex-col-reverse') : kls.push('flex-col')
+          if (styleLayout!.direction.value === 'v') {
+            if (styleLayout!.isReverse.value) classes.push('flex-col-reverse')
+            else classes.push('flex-col')
           }
         }
-        if (styleLayout.isFull.value) {
-          kls.push('w-full h-full')
+        if (styleLayout!.isFull.value) {
+          classes.push('w-full h-full')
         }
-        if (styleLayout.gap.value) {
-          kls.push(`gap-${styleLayout.gap.value}`)
+        if (styleLayout!.gap.value) {
+          classes.push(`gap-${styleLayout!.gap.value}`)
         }
-        if (styleLayout.align.value) {
-          const isRow = styleLayout.direction.value === 'h' || styleLayout.direction.value === 'w'
-          const isCol = styleLayout.direction.value === 'v'
+        if (styleLayout!.align.value) {
+          const isRow = styleLayout!.direction.value === 'h' || styleLayout!.direction.value === 'w'
+          const isCol = styleLayout!.direction.value === 'v'
           const canStretch =
-            styleLayout.isStretch.value && ['h', 'v'].includes(styleLayout.direction.value)
+            styleLayout!.isStretch.value && ['h', 'v'].includes(styleLayout!.direction.value)
           const [align, mode] = [
-            styleLayout.align.value.slice(0, 2),
-            styleLayout.align.value.slice(2, 3) || ' ',
+            styleLayout!.align.value.slice(0, 2),
+            styleLayout!.align.value.slice(2, 3) || ' ',
           ]
           if (align === 'tl') {
             if (isRow) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-start content-start')
-              canStretch ? kls.push('justify-between') : kls.push('justify-start')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-start content-start')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-start')
             }
             if (isCol) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-start')
-              canStretch ? kls.push('justify-between') : kls.push('justify-start')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-start')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-start')
             }
           }
           if (align === 'tc') {
             if (isRow) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-start content-start')
-              canStretch ? kls.push('justify-between') : kls.push('justify-center')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-start content-start')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-center')
             }
             if (isCol) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-center')
-              canStretch ? kls.push('justify-between') : kls.push('justify-start')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-center')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-start')
             }
           }
           if (align === 'tr') {
             if (isRow) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-start content-start')
-              canStretch ? kls.push('justify-between') : kls.push('justify-end')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-start content-start')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-end')
             }
             if (isCol) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-end')
-              canStretch ? kls.push('justify-between') : kls.push('justify-start')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-end')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-start')
             }
           }
           if (align === 'cl') {
             if (isRow) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-center content-center')
-              canStretch ? kls.push('justify-between') : kls.push('justify-start')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-center content-center')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-start')
             }
             if (isCol) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-start')
-              canStretch ? kls.push('justify-between') : kls.push('justify-center')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-start')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-center')
             }
           }
           if (align === 'cc') {
             if (isRow) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-center content-center')
-              canStretch ? kls.push('justify-between') : kls.push('justify-center')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-center content-center')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-center')
             }
             if (isCol) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-center')
-              canStretch ? kls.push('justify-between') : kls.push('justify-center')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-center')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-center')
             }
           }
           if (align === 'cr') {
             if (isRow) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-center content-center')
-              canStretch ? kls.push('justify-between') : kls.push('justify-end')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-center content-center')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-end')
             }
             if (isCol) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-end')
-              canStretch ? kls.push('justify-between') : kls.push('justify-center')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-end')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-center')
             }
           }
           if (align === 'bl') {
             if (isRow) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-end content-end')
-              canStretch ? kls.push('justify-between') : kls.push('justify-start')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-end content-end')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-start')
             }
             if (isCol) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-start')
-              canStretch ? kls.push('justify-between') : kls.push('justify-end')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-start')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-end')
             }
           }
           if (align === 'bc') {
             if (isRow) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-end content-end')
-              canStretch ? kls.push('justify-between') : kls.push('justify-center')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-end content-end')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-center')
             }
             if (isCol) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-center')
-              canStretch ? kls.push('justify-between') : kls.push('justify-end')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-center')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-end')
             }
           }
           if (align === 'br') {
             if (isRow) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-end content-end')
-              canStretch ? kls.push('justify-between') : kls.push('justify-end')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-end content-end')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-end')
             }
             if (isCol) {
-              mode === 'n' && kls.push('items-normal')
-              mode === 's' && kls.push('items-stretch')
-              mode === ' ' && kls.push('items-end')
-              canStretch ? kls.push('justify-between') : kls.push('justify-end')
+              if (mode === 'n') classes.push('items-normal')
+              if (mode === 's') classes.push('items-stretch')
+              if (mode === ' ') classes.push('items-end')
+              if (canStretch) classes.push('justify-between')
+              else classes.push('justify-end')
             }
           }
         }
       }
 
       /* fonts */
-      if (styleFont.isInited.value) {
-        styleFont.size.value && kls.push(`text-${styleFont.size.value}`)
-        styleFont.align.value && kls.push(`text-${styleFont.align.value}`)
-        styleFont.lineHeight.value && kls.push(`leading-${styleFont.lineHeight.value}`)
-        if (styleFont.family.value) {
-          if (styleFont.familySubset.value) {
-            styleFont.family.value &&
-              kls.push(
-                `font-${kebabCase(styleFont.family.value)}-${kebabCase(styleFont.familySubset.value)}`,
-              )
+      if (styleFont!.isInited.value) {
+        if (styleFont!.size.value) classes.push(`text-${styleFont!.size.value}`)
+        if (styleFont!.align.value) classes.push(`text-${styleFont!.align.value}`)
+        if (styleFont!.lineHeight.value) classes.push(`leading-${styleFont!.lineHeight.value}`)
+        if (styleFont!.family.value) {
+          if (styleFont!.familySubset.value) {
+            classes.push(
+              `font-${kebabCase(styleFont!.family.value)}-${kebabCase(styleFont!.familySubset.value)}`,
+            )
           } else {
-            styleFont.family.value && kls.push(`font-${kebabCase(styleFont.family.value)}`)
+            classes.push(`font-${kebabCase(styleFont!.family.value)}`)
           }
-        } else {
-          styleFont.weight.value && kls.push(`font-${styleFont.weight.value}`)
+        } else if (styleFont!.weight.value) {
+          classes.push(`font-${styleFont!.weight.value}`)
         }
       }
 
       /* cosm */
-      if (styleCosm.isInited.value) {
-        if (styleCosm.bgType.value) {
-          if (styleCosm.bgType.value === 'color') {
-            if (styleCosm.bgColorStrength.value) {
-              kls.push(`bg-${styleCosm.bgColorName.value}-${styleCosm.bgColorStrength.value}`)
+      if (styleCosm!.isInited.value) {
+        if (styleCosm!.bgType.value) {
+          if (styleCosm!.bgType.value === 'color') {
+            if (styleCosm!.bgColorStrength.value) {
+              classes.push(`bg-${styleCosm!.bgColorName.value}-${styleCosm!.bgColorStrength.value}`)
             } else {
-              kls.push(`bg-${styleCosm.bgColorName.value}`)
+              classes.push(`bg-${styleCosm!.bgColorName.value}`)
             }
           }
         }
       }
 
-      return kls
+      return { classes, styles }
     })
 
     /** Render Function */
@@ -543,8 +603,11 @@ export default defineComponent({
             componentType.value,
             {
               ...attrs,
-              // @ts-ignore
+              // componentType 是 Component | string 动态联合类型，标准 VNode props
+              // 未声明 ref/comp 这两个自定义字段，TS 无法收窄；运行时由 Vue 处理
+              // @ts-expect-error dynamic component props not in VNodeProps
               ref: props.setRef,
+              // @ts-expect-error dynamic component props not in VNodeProps
               comp: markRaw(comp.value),
             },
             slots,
@@ -554,14 +617,18 @@ export default defineComponent({
               componentType.value,
               {
                 ...attrs,
-                // @ts-ignore
+                // 见上 headless 分支：动态组件自定义 props 同理
+                // @ts-expect-error dynamic component props not in VNodeProps
                 ref: props.setRef,
+                // @ts-expect-error dynamic component props not in VNodeProps
                 comp: markRaw(comp.value),
                 // 空样式不下传：styles 由 _cx_style（编辑器样式）驱动，默认空对象；
                 // 空的响应式 style 进入组件链会在 Reka Primitive 的 vnode 归一化阶段
                 // 触发只读代理写入异常（'set' on proxy），仅在有实际样式时传 style
-                ...(Object.keys(styles.value).length > 0 ? { style: styles.value } : {}),
-                class: kls.value,
+                ...(Object.keys(styleSnapshot.value.styles).length > 0
+                  ? { style: styleSnapshot.value.styles }
+                  : {}),
+                class: styleSnapshot.value.classes,
                 ['data-is-cx-comp']: true,
                 ['data-cx-comp-id']: comp.value?.id,
                 ['data-cx-comp-key']: comp.value?.key,
