@@ -41,7 +41,7 @@ export const defineCxComponent = <
     getName?: (opts: {
       cx: CxLoaderInstance
       comp: CxComponentRuntime
-      data?: Record<string, any>
+      data?: Record<string, unknown>
     }) => string
     // example: 'i-ant-design-layout-outlined'
     icon: string
@@ -68,7 +68,7 @@ export const defineCxComponent = <
     // 组件规则（指导实现组件搭建的使用方遵循此类规则）
     // 之后可能会作为 cx 和业务层（p-ray setup）之间的一层分层规则
     rules?: {
-      edit: {}
+      edit: Record<string, unknown>
     }
   },
   GM extends Partial<Guard<M>>,
@@ -76,14 +76,19 @@ export const defineCxComponent = <
   m: GM,
 ) => {
   const component = m.component as VueComp & NormalizeKey<Required<M>>
-  // @ts-ignore
+  // 泛型 M 与 CxComponentMetaDefined 的精确推导不兼容（defineCxComponent 的
+  // 声明式配置 M 经 Guard 约束后，withDefaultMeta 的入参类型无法静态对齐），
+  // 运行时 by withDefaultMeta 补全缺省字段保证形态
+  // @ts-expect-error generic M vs CxComponentMetaDefined inference mismatch
   const meta = withDefaultMeta(m)
   // console.log('[debug] meta', meta)
 
   component.name = upperFirst(camelCase(meta.key))
   component.key = kebabCase(component.name)
 
-  // @ts-ignore
+  // meta 是 Required<CxComponentMetaDefined>，component 是 VueComp & NormalizeKey<Required<M>>，
+  // 两个 Required 联合的属性集在泛型下无法静态证明一致
+  // @ts-expect-error Required<M> vs Required<CxComponentMetaDefined> assignment
   component[prefix('meta')] = meta
 
   component[prefix('install')] = (app: App) => {
@@ -126,13 +131,13 @@ type Guard<M> = IsEveryTrueThen<
     Get<M, 'exposes'> extends never
       ? true
       : IsEqual<
-            keyof { [K in keyof Get<M, 'exposes'>]: any },
+            keyof { [K in keyof Get<M, 'exposes'>]: unknown },
             keyof {
               [K in keyof Get<M, 'exposes'> as K extends keyof InstanceType<Get<M, 'component'>>
-                ? Get<InstanceType<Get<M, 'component'>>, K> extends (...args: any[]) => any
+                ? Get<InstanceType<Get<M, 'component'>>, K> extends (...args: unknown[]) => unknown
                   ? K
                   : never
-                : never]: any
+                : never]: unknown
             }
           > extends true
         ? true
