@@ -52,11 +52,15 @@
 - 2 空格缩进
 - 多行对象/数组尾逗号
 
-**Lint：** Oxlint（经 Vite+ 集成）
+**Lint：** Oxlint（经 Vite+ 集成）+ ESLint 10（深度规则层，并存）
 
-- 配置位于 `vite.config.ts:38` 的 `lint` 字段
-- 忽略：`dist/**`、`packages/components-nuxt-ui-v4/vendor/**`、`playground/.output/**`、`playground/.nuxt/**`
-- 禁用注释优先使用行内形式：`// eslint-disable-next-line @typescript-eslint/no-explicit-any`（见 `playground/tests/utils-label.test.ts:35`、`packages/components/src/basic/src/datas.vue:52`）
+- Oxlint 配置位于 `vite.config.ts:38` 的 `lint` 字段；ESLint 配置为共享子包 `@lionad/cx-eslint-config`（`packages/eslint`），根 `eslint.config.mjs` 直接引用其默认预设
+- 分工：Oxlint 随 `vp check` 求快；ESLint 提供 Vue/TS/Vitest 生态完整规则，`pnpm lint` 独立跑，两者重叠处以 ESLint 为准
+- 格式化一律归 Oxfmt：ESLint 经 eslint-config-prettier 关闭全部格式类规则，不写格式相关规则配置
+- 忽略：`dist/**`、`packages/components-nuxt-ui-v2/vendor/**`、`packages/components-nuxt-ui-v4/vendor/**`、`packages/components/src/calendar/vendor/el-calendar/**`、`playground/.output/**`、`playground/.nuxt/**`
+- 禁用注释优先使用行内形式：`// eslint-disable-next-line @typescript-eslint/no-explicit-any`（见 `playground/tests/utils-label.test.ts:35`）；多行元素盖不住属性行时用文件级注释并注明 Why（见 `packages/renderer/src/comps/render-component.vue:2`）
+- 存量治理期：`no-explicit-any`、`no-unused-vars`、`vue/return-in-computed-property` 等 9 条规则在 cx 预设中降级为 warn（清单与治理优先级见 `packages/eslint/index.js` 的 `LEGACY_WARN_RULES`），治理后恢复 error；**新增代码按 error 标准写**
+- `typescript-eslint` 不支持仓库锁定的 TS 7.0（加载即抛错）：`packages/eslint` 包内把 `typescript` 重定向到 `npm:typescript@^6` 副本喂给 lint，typecheck 链路的 TS 7 不受影响
 - 当前全仓状态：0 错误，警告按需治理
 
 **TypeScript：** TypeScript 7（tsgo / vue-tsgo）

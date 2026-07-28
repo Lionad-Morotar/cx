@@ -66,6 +66,7 @@ allowBuilds:
 **构建 / 开发：**
 
 - `vp` (Vite+ CLI) — `pnpm build` → `vp run build`（按依赖拓扑 + 缓存）；`pnpm test` → `vp test`；`pnpm check` → `vp check`（fmt + lint + 类型检查一站式）
+- ESLint 10 + `@lionad/cx-eslint-config`（`packages/eslint` 共享子包） — 深度规则层（Vue/TS/Vitest 生态完整规则），与 Oxlint 并存；`pnpm lint` 独立跑；包内 `typescript` 重定向到 `npm:typescript@^6`（typescript-eslint 8.x 不支持 TS 7.0）
 - `vp pack` — 子包产物打包（tsdown / rolldown 内核；`packages/*/vite.config.ts` 的 `pack` 段配置插件、alias、neverBundle 清单）
 - `vue-tsgo@0.3.0` + `tsgo`（TypeScript 7 原生 Go 实现）— 类型检查工具，命令为 `pnpm -r run typecheck`
 - `vue-tsc@^3.3.7` — 仅 `packages/{vue,renderer,components,components-nuxt-ui-v4}` 的 `build` 脚本调用 `vue-tsc -p tsconfig.build.json` 生成 `.d.ts`
@@ -152,6 +153,7 @@ pnpm build          # vp run build — 按依赖拓扑构建所有子包
 pnpm test           # vp test — 全仓 Vitest 一次跑
 pnpm typecheck      # pnpm -r run typecheck — 每子包独立 tsgo/vue-tsgo --noEmit
 pnpm check          # vp check — fmt + lint + 类型检查一站式
+pnpm lint           # eslint . — ESLint 深度规则层（@lionad/cx-eslint-config）
 pnpm dev:playground # pnpm -C playground dev — 启动 Nuxt dev server (port 3209)
 ```
 
