@@ -1,0 +1,39 @@
+{
+  "name": "@lionad/cx-eslint-config",
+  "version": "0.1.0",
+  "description": "Shared ESLint flat config for cx monorepo (and downstream projects)",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "eslint": ">=10"
+  },
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitest/eslint-plugin": "^1.6.24",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.10.0",
+    "globals": "^17.8.0",
+    "typescript": "npm:typescript@^6.0.0",
+    "typescript-eslint": "^8.65.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "eslint": "^10.8.0"
+  },
+  "scripts": {
+    "typecheck": "tsgo --noEmit"
+  }
+}

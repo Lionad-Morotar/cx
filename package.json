@@ -7,11 +7,14 @@
     "test": "vp test",
     "typecheck": "pnpm -r run typecheck",
     "check": "vp check",
-    "dev:playground": "pnpm -C playground dev"
+    "dev:playground": "pnpm -C playground dev",
+    "lint": "eslint ."
   },
   "devDependencies": {
+    "@lionad/cx-eslint-config": "workspace:*",
     "@voidzero-dev/vite-plus-core": "latest",
     "@vue/test-utils": "^2.4.11",
+    "eslint": "^10.8.0",
     "happy-dom": "^20.11.0",
     "typescript": "^7.0.0",
     "unplugin-vue": "^7.2.0",
