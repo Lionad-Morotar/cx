@@ -217,17 +217,18 @@ export function useAsync<
         if (idx > -1) {
           states.controllers.splice(idx, 1)
         }
-        return
-      }
-      states.isLoading = false
-      execRunningResolve!(states.result as unknown as Result | null)
+      } else {
+        states.isLoading = false
+        execRunningResolve!(states.result as unknown as Result | null)
 
-      const idx = states.controllers.indexOf(controller)
-      if (idx > -1) {
-        states.controllers.splice(idx, 1)
+        const idx = states.controllers.indexOf(controller)
+        if (idx > -1) {
+          states.controllers.splice(idx, 1)
+        }
       }
     }
-    return states.result
+    // Why 过期任务丢弃 result：与原实现 finally 内 return undefined 的语义等价
+    return currentGeneration !== generation ? undefined : states.result
   }
 
   async function execOnce(...args: Args) {

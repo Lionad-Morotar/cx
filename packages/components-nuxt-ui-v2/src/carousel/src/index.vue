@@ -13,8 +13,13 @@
     @select="onSelect"
   >
     <template #default="{ item, index }">
-      <template v-if="item" :key="item?.id || item?.content">
-        <div :class="ns.e('item')" class="flex items-center w-full" draggable="false">
+      <template v-if="item">
+        <div
+          :key="item?.id || item?.content"
+          :class="ns.e('item')"
+          class="flex items-center w-full"
+          draggable="false"
+        >
           <slot v-if="showSlot('default')" name="default" v-bind="{ item, index }" />
           <CxEmptyImage v-else class="w-full h-40" />
         </div>

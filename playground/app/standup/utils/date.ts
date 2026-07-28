@@ -140,7 +140,6 @@ export function getDayRange(
   const result = []
   let count = 0
   const countMeter = direction === 'prev' ? -1 : 1
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const cur = fromDay.add(count, 'day')
     if (Math.abs(count) > limit) {

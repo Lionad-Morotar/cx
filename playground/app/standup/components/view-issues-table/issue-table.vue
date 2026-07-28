@@ -376,7 +376,6 @@ const titleEditState = useEditing({
     const index = props.issues.findIndex((x) => x.id === query.id)
     if (index >= 0) {
       // 仅修改一个标题，不重新拉数据，所以直接改 props
-      // eslint-disable-next-line vue/no-mutating-props
       const target = props.issues[index]
       if (target) target.name = query.title
     }

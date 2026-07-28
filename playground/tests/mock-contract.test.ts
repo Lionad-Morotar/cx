@@ -85,8 +85,13 @@ describe('Standup 契约', () => {
   it('meetingDate 为日期串、startTime/endTime 为时钟串（前端按空格拼接展示）', () => {
     for (const s of standups) {
       expect(s.meetingDate).toMatch(/^\d{4}-\d{2}-\d{2}$/)
-      if (s.startTime) expect(s.startTime).toMatch(/^\d{2}:\d{2}:\d{2}$/)
-      if (s.endTime) expect(s.endTime).toMatch(/^\d{2}:\d{2}:\d{2}$/)
+    }
+    // startTime/endTime 可选：有值的条目必须符合时钟串
+    for (const s of standups.filter((x) => x.startTime)) {
+      expect(s.startTime!).toMatch(/^\d{2}:\d{2}:\d{2}$/)
+    }
+    for (const s of standups.filter((x) => x.endTime)) {
+      expect(s.endTime!).toMatch(/^\d{2}:\d{2}:\d{2}$/)
     }
   })
 })
@@ -239,8 +244,10 @@ describe('Issue 契约', () => {
     ]
     for (const issue of issues) {
       for (const field of TS_FIELDS) expect(issue).toHaveProperty(field)
-      // 已验收通过的议题状态应为 closed
-      if (issue.pmPassedAt) expect(issue.state).toBe('closed')
+    }
+    // 已验收通过的议题状态应为 closed
+    for (const issue of issues.filter((x) => x.pmPassedAt)) {
+      expect(issue.state).toBe('closed')
     }
   })
 

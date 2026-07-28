@@ -307,11 +307,9 @@ export class CSSParser {
     }
 
     // get comment content
-    let commentText = this.cssText.slice(2, i - 2)
+    const commentText = this.cssText.slice(2, i - 2)
 
     this.recordResult(`/*${commentText}*/`)
-
-    commentText = trim(commentText.replace(/^\s*!/, ''))
 
     this.cssText = this.cssText.slice(i)
 

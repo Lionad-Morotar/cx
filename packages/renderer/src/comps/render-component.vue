@@ -1,4 +1,5 @@
 <template>
+  <!-- eslint-disable vue/no-deprecated-slot-attribute -- :slot 是 cx-render-components 已声明的 prop，非废弃插槽特性 -->
   <template v-if="comp?.key">
     <component :is="showCompErrorWrapper" v-if="showCompErrorWrapper" name="showCompErrorWrapper" />
     <component
@@ -21,7 +22,7 @@
       >
         <template
           v-for="slot in compSlots"
-          #[slot.key!]="data"
+          #[slot.key!]
           :key="`render-${comp.id}-area-${slot.key}`"
         >
           <cx-render-components :slot="slot" :comp-i-d="comp.id" :slot-wrapper="slotWrapper" />

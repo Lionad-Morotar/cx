@@ -158,7 +158,6 @@ const filteredYesterdayList = computed(() => {
   // console.info('[debug] 6', find(raw.filter(byRoleProject).filter(filterStates.genByFocusDone(yesterday.value)).filter(x => selectedFilter.value(x, 'yesterday')).sort(filterStates.sortByStage).sort(filterStates.sortByDueDate)))
   // console.info('[debug] res', raw.filter(byRoleProject).filter(filterStates.genByFocusDone(yesterday.value)).filter(x => selectedFilter.value(x, 'yesterday')).sort(filterStates.sortByStage).sort(filterStates.sortByDueDate))
 
-  // eslint-disable-next-line no-debugger
   // debugger
 
   const hasStage = (x: FormattedIssue) => !isEmpty(x.issueStage)

@@ -230,7 +230,7 @@ export const apiGetStandupMemo = (disabled: boolean) =>
           })
           return res
         } else {
-          throw new Error('... but failed')
+          throw new Error('... but failed', { cause: err })
         }
       } else {
         console.info('[INFO] disabled, skip')

@@ -105,7 +105,6 @@ export const createUseFocus = (direction: Direction) => (elems: Elems, hdls?: Ha
 
   const findParentOfSubElements = (elm: HTMLElement) => {
     return (
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       [...subFocusMap.value].find(([_, v]) =>
         unref(v).subs.find((x) => x.find((y) => y === elm)),
       )?.[0] || null
@@ -285,7 +284,6 @@ export const createUseFocus = (direction: Direction) => (elems: Elems, hdls?: Ha
    * 1. 点击选中元素
    * 2. 如果当前元素有子元素，则进入子元素选中状态
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function confirmHandler(e: KeyboardEvent) {
     if (!inFocusElement.value) {
       return

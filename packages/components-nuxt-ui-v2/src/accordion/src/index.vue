@@ -14,7 +14,7 @@
     @open="($event) => $emit('open', $event)"
     @close="($event) => $emit('close', $event)"
   >
-    <template v-for="(_, name) in $slots" #[name]="x">
+    <template v-for="(_, name) in $slots" #[name]="x" :key="name">
       <template v-if="showSlot(name)">
         <div :class="name.startsWith('item-') ? ns.e('item') : ns.e('trigger')">
           <slot :name="name as unknown as string" v-bind="x" />

@@ -1,6 +1,6 @@
 <template>
   <div class="form">
-    <template v-for="(group, gIDX) in value">
+    <template v-for="(group, gIDX) in value" :key="gIDX">
       <UFormGroup class="item">
         <template #label>
           <div class="label">

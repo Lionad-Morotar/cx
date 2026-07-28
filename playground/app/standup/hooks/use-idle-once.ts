@@ -11,8 +11,6 @@ export function useIdleOnce(delay = 300, controlled = false) {
     }
   })
 
-  let ret = null
-
   const states = reactive({
     isIdled,
     reset: () => (isIdled.value = false),
@@ -21,11 +19,7 @@ export function useIdleOnce(delay = 300, controlled = false) {
     states.isIdled = isIdled.value
   })
 
-  if (controlled) {
-    ret = states
-  } else {
-    ret = isIdled
-  }
+  const ret = controlled ? states : isIdled
 
   // em... refactor with is?
   return ret as typeof controlled extends true ? typeof states : typeof isIdled

@@ -76,12 +76,7 @@ export const createCxRuntimeUtils = (cx: CxLoaderInstance, utils: CxMetadataUtil
     return res
   }
 
-  let calcSlotsTick
   const calcSlots = (_comp: CxComponentRuntime | CxComponentMetaDefined) => {
-    if (calcSlotsTick) {
-      clearTimeout(calcSlotsTick)
-    }
-
     const comp = toRaw(_comp)
     const slotDefs = utils.getSlots(comp)
     const slots = isFunction(slotDefs)

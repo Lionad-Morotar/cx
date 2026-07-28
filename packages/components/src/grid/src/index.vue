@@ -46,8 +46,8 @@ const props = withDefaults(
 )
 
 const _turn = computed(() => +props.turn || defaultDatas.turn)
-const turn = computed(() => (Number.isNaN(_turn.value) ? 0 : _turn.value))
-const isTurned = computed(() => turn.value === 1 || turn.value === 3)
+const turnValue = computed(() => (Number.isNaN(_turn.value) ? 0 : _turn.value))
+const isTurned = computed(() => turnValue.value === 1 || turnValue.value === 3)
 
 const _row = computed(() => +props.rowCount || defaultDatas.rowCount)
 const row = computed(() => (Number.isNaN(_row.value) ? 1 : _row.value))
@@ -68,8 +68,8 @@ const cssVars = computed(() => ({
 // })
 
 const getSlotArea = (rIdx: number, cIdx: number) => {
-  const [r, c] = getPosByTurn(row.value, col.value, rIdx, cIdx, turn.value)
-  // console.log('[debug] getSlotArea', turn.value, rIdx, cIdx, '->', r, c)
+  const [r, c] = getPosByTurn(row.value, col.value, rIdx, cIdx, turnValue.value)
+  // console.log('[debug] getSlotArea', turnValue.value, rIdx, cIdx, '->', r, c)
   return {
     'grid-area': `${r + 1} / ${c + 1} / ${r + 2} / ${c + 2}`,
   }

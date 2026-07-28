@@ -2,7 +2,8 @@
   <UContainer ref="comp" :class="ns.b()">
     <template #default>
       <slot v-if="showSlot('default')" name="default" />
-      <CxEmptyImage v-else="showDefault()" />
+      <!-- Why 纯 v-else：原写法 v-else="showDefault()" 的值在运行时本就被忽略，保持原行为 -->
+      <CxEmptyImage v-else />
     </template>
   </UContainer>
 </template>

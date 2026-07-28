@@ -49,7 +49,6 @@ onMounted(async () => {
   function createGrid() {
     grid.value = []
     for (let i = 0; i <= rows.value; i++) {
-      // eslint-disable-next-line unicorn/no-new-array
       grid.value.push(new Array(cols.value).fill(null) as any)
     }
   }

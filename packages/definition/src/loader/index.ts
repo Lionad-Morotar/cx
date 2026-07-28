@@ -310,7 +310,7 @@ export class CxLoader {
       await this.installComponentsFromMetadata()
     } catch (e) {
       console.error(e)
-      throw new Error('[ERR] error on loading components-metadata')
+      throw new Error('[ERR] error on loading components-metadata', { cause: e })
     }
     return this
   }
@@ -370,7 +370,6 @@ export class CxLoader {
           ) as CxComponentMetaDefined
 
           const keys = [key, ...(aliasKeys || [])]
-          // eslint-disable-next-line unicorn/no-array-method-this-argument
           await NPromise.map(keys, async (key: string) => {
             // console.log('[info] xxx', key, exportsName, component)
             await this.installComponent(key, component)

@@ -7,7 +7,7 @@
         name="slot-start"
         v-bind="{ innerSlotKey: `${slot.key}-start` }"
       />
-      <template v-for="(_, csIDX) in compChilds[slot.key!]" v-if="compChilds[slot.key!]?.length">
+      <template v-for="(_, csIDX) in compChilds[slot.key!] ?? []">
         <component
           :is="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-start`]"
           v-if="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-start`]"
