@@ -2,7 +2,7 @@
 
 流式结构化渲染管线：从 LLM 流式输出的**不完整 JSON** 中增量提取可渲染的组件树，让大数组（表格行、图表数据）在传输过程中就渐进渲染，而不是等整个 JSON 闭合后才出现。
 
-源自线上 AI 聊天场景的生产渲染管线（Route Z），重写为三方库无关的通用包。
+源自线上 AI 聊天场景的生产渲染管线，重写为三方库无关的通用包。
 
 ## 两条解耦轴
 
@@ -19,7 +19,7 @@ core/    纯 TS，零 vue 依赖
   parse.ts             safeJsonParse（jsonrepair 回退 + 100KB 内存保护）
   fence.ts             围栏代码块正则工具
   spec-detector.ts     三态漏斗：text / widget（闭合）/ pending（未闭合）
-  incremental.ts       Route Z 增量管线 + trigger registry 工厂
+  incremental.ts       增量管线 + trigger registry 工厂
   human-text.ts        部分 JSON 人类可读文本提取 + 打字机素材
 vue/     composables 绑定层（peer: vue ^3）
   useStreamChunks.ts       多策略 marker 流式切分
@@ -47,7 +47,7 @@ const result = detector.extractSpecs(streamingText)
 host 的 markdown 流渲染器按标签名把占位符映射为组件（如 markstream 的 customHtmlTags）。
 标签名经 detector 配置可换。
 
-### 2. pending 阶段增量渲染（Route Z）
+### 2. pending 阶段增量渲染
 
 ```ts
 import {

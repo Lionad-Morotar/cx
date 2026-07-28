@@ -45,7 +45,7 @@ const links = [
   {
     to: '/dev/stream',
     name: 'cx stream · 流式结构化渲染',
-    desc: '流式管线验收：模拟 LLM 输出不完整 JSON，演示三态检测、Route Z 增量渲染、打字机预览与多策略切分',
+    desc: '流式管线验收：模拟 LLM 输出不完整 JSON，演示三态检测、增量渲染、打字机预览与多策略切分',
   },
 ] as const
 </script>

@@ -106,7 +106,7 @@ describe('stream 验收 · 三态漏斗（多围栏）', () => {
   })
 })
 
-describe('stream 验收 · 增量渲染（Route Z）', () => {
+describe('stream 验收 · 增量渲染', () => {
   it('首个围栏流式期间增量行数单调递增，闭合时达到完整行数', () => {
     const extractor = createIncrementalExtractor<CxSpec>({
       registry: createDemoRegistry(),
