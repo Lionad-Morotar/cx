@@ -1,7 +1,7 @@
 <template>
   <UModal
-    class="cx-select-participants-dialog select-participants-dialog"
     v-model:open="visible"
+    class="cx-select-participants-dialog select-participants-dialog"
     title="确认与会人"
     @update:open="(v: boolean) => !v && handleDialogClose()"
   >
@@ -10,8 +10,8 @@
         <div class="to-select-panel">
           <div class="input-wrapper">
             <UInput
-              class="search-input"
               v-model="filterStr"
+              class="search-input"
               :placeholder="'输入关键字搜索'"
               trailing-icon="i-lucide-search"
             />
@@ -61,9 +61,9 @@
               </div>
               <div class="actions">
                 <span
+                  v-if="selected.length"
                   class="button remove-all-button"
                   @click="clearSelection"
-                  v-if="selected.length"
                   >清空</span
                 >
               </div>

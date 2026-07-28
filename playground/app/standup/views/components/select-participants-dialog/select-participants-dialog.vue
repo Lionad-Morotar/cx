@@ -1,12 +1,12 @@
 <template>
-  <UModal class="select-participants-dialog" v-model:open="visible" title="确认与会人">
+  <UModal v-model:open="visible" class="select-participants-dialog" title="确认与会人">
     <template #body>
       <div class="dialog-content">
         <div class="to-select-panel">
           <div class="input-wrapper">
             <UInput
-              class="search-input"
               v-model="filterStr"
+              class="search-input"
               :placeholder="'输入关键字搜索'"
               trailing-icon="i-lucide-search"
             />
@@ -56,9 +56,9 @@
               </div>
               <div class="actions">
                 <span
+                  v-if="selected.length"
                   class="button remove-all-button"
                   @click="clearSelection"
-                  v-if="selected.length"
                   >清空</span
                 >
               </div>

@@ -1,6 +1,6 @@
 <template>
-  <div class="cx-standup-card-list days-con" ref="daysConRef" :class="[kls, countClass]">
-    <div class="empty-tip" v-if="!standups.length">没有找到{{ meetingTypeName }}记录</div>
+  <div ref="daysConRef" class="cx-standup-card-list days-con" :class="[kls, countClass]">
+    <div v-if="!standups.length" class="empty-tip">没有找到{{ meetingTypeName }}记录</div>
     <template v-for="(standup, idx) in standups" :key="`${standup.id}${idx}`">
       <StandupContextProvider :item="{ standup, group: group!, idx }">
         <slot name="card-item" />

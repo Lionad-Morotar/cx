@@ -1,6 +1,6 @@
 <template>
   <div class="cx-weekly-page-actions buttons-con">
-    <div class="meeting-spent-time-count" v-if="isToday">
+    <div v-if="isToday" class="meeting-spent-time-count">
       <img class="time-icon" :src="IconTime" />
       <cx-time-tick v-if="isCurStandupInProgress" :from="meetingDate" format="HH:mm:ss" />
       <cx-time-tick v-else :time="meetingDurationMS" format="HH:mm:ss" />

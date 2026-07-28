@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.b()" ref="compRef">
+  <div ref="compRef" :class="ns.b()">
     <UButton ref="goBackBtnRef" @click="router.go(-1)">
       <span>返回</span>
     </UButton>

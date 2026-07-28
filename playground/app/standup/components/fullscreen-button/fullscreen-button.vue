@@ -1,9 +1,9 @@
 <template>
   <UButton
+    ref="fullscreenButtonRef"
     class="cx-fullscreen-button fullscreen-button"
     :class="props.icon ? 'is-type-icon' : 'is-type-text'"
     variant="outline"
-    ref="fullscreenButtonRef"
     :icon="!props.icon ? undefined : isFullscreen ? 'i-lucide-minimize-2' : 'i-lucide-maximize'"
     @click="toggle"
   >

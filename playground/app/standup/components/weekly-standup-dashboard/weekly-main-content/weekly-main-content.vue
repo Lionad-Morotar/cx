@@ -21,11 +21,11 @@
             : []
         "
       />
-      <cx-card class="issues-section is-cx-card" :name="'任务列表'" ref="issueTableWrapperRef">
+      <cx-card ref="issueTableWrapperRef" class="issues-section is-cx-card" :name="'任务列表'">
         <template #action>
           <UInput
-            class="filter-issue-input"
             v-model="tableFilterStr"
+            class="filter-issue-input"
             placeholder="搜索任务列表"
             icon="i-lucide-search"
           />

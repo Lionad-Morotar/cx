@@ -1,15 +1,15 @@
 <template>
-  <div :class="kls" v-show="dataState.isInited" @click="handleClick" class="cx-todo-card">
+  <div v-show="dataState.isInited" :class="kls" class="cx-todo-card" @click="handleClick">
     <slot name="header">
       <div :class="ns.e('input-con')">
         <UInput
           ref="todoInputRef"
-          type="todo-input"
           v-model="input"
+          type="todo-input"
           placeholder="请输入问题，按下回车添加"
           :disabled="isDisabled"
         >
-          <template #leading v-if="inputTag">
+          <template v-if="inputTag" #leading>
             <UBadge color="neutral" variant="subtle" class="closable-tag">
               {{ inputTag }}
               <button
@@ -26,7 +26,7 @@
       </div>
     </slot>
     <template v-if="isEmptyContent">
-      <div :class="ns.e('empty-con')" ref="emptyFirstRef">
+      <div ref="emptyFirstRef" :class="ns.e('empty-con')">
         <img class="image" :src="EmptyStrImage" />
         <div class="title">暂时没有内容哦~</div>
       </div>
@@ -34,15 +34,15 @@
     <template v-else>
       <div :class="ns.e('bg')" />
       <CxScrollbar
-        :class="[ns.e('scroll-area-y'), 'cx-todo-scroll-y']"
         ref="scrollAreaRef"
+        :class="[ns.e('scroll-area-y'), 'cx-todo-scroll-y']"
         @scroll="scrollY"
       >
         <div :class="[scrollXVal && ns.is('scroll-x'), ns.e('content-wrapper')]">
           <div :class="ns.e('orders')">
             <template v-for="(line, idx) in dataState.value" :key="String(idx) + line.id">
               <slot name="order" :line="line" :idx="idx">
-                <span class="order" :class="ns.is('checked', line.checked)" v-if="isTextEditor">
+                <span v-if="isTextEditor" class="order" :class="ns.is('checked', line.checked)">
                   <span class="order-number">{{ Number(idx) + 1 }}.</span>
                 </span>
               </slot>
@@ -60,7 +60,7 @@
                 ]"
               >
                 <slot name="line-content-prefix" :line="line" :idx="idx">
-                  <span :class="[ns.is('checked', line.checked), ns.e('order')]" v-if="isTodoList">
+                  <span v-if="isTodoList" :class="[ns.is('checked', line.checked), ns.e('order')]">
                     <slot name="line-content-prefix-prefix" :line="line" :idx="idx" />
                     <UCheckbox
                       v-model="line.checked"
@@ -72,19 +72,19 @@
                 </slot>
                 <slot name="line-content" :line="line" :idx="idx">
                   <render-content
-                    :class="[startWithMark(line.content)]"
                     :key="line.id"
-                    :readonly="isDisabled"
-                    :disabled="isDisabled"
                     :ref="(ref: any) => refsMan?.set(line.id, { ref, line })"
                     v-model:content="dataState.value[idx]"
+                    :class="[startWithMark(line.content)]"
+                    :readonly="isDisabled"
+                    :disabled="isDisabled"
                     @blur="(e: Event) => syncEdit(e, line)"
                     @click.stop="() => focusSafe(line)"
                     @input="(e: Event) => preventInputHTML(e as InputEvent, line)"
                   />
                 </slot>
                 <slot name="line-content-suffix" :line="line" :idx="idx">
-                  <div :class="ns.e('actions')" v-if="isTodoList">
+                  <div v-if="isTodoList" :class="ns.e('actions')">
                     <div :class="ns.e('action')" @click="dataState.remove(line)">
                       <UIcon name="i-lucide-trash" />
                     </div>

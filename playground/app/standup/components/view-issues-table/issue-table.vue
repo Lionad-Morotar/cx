@@ -2,15 +2,15 @@
   <div class="cx-issue-table standup-issue-table">
     <div class="table-header">
       <div class="columns">
-        <div class="column-item" v-for="column in columns" :key="column.key">
+        <div v-for="column in columns" :key="column.key" class="column-item">
           {{ column.name }}
-          <column-sorter :column="column" v-model:selected="selectedSort" />
+          <column-sorter v-model:selected="selectedSort" :column="column" />
         </div>
       </div>
     </div>
-    <CxScrollbar class="table-content" v-cx-skeleton="props.isLoading" cx-skeleton-delay="150">
+    <CxScrollbar v-cx-skeleton="props.isLoading" class="table-content" cx-skeleton-delay="150">
       <template v-if="!displayIssues?.length">
-        <div class="empty-con" ref="emptyFirstRef">
+        <div ref="emptyFirstRef" class="empty-con">
           <img class="image" :src="EmptyStrImage" />
           <div class="title">{{ props.isLoading ? '载入中...' : '暂时没有内容哦~' }}</div>
         </div>
@@ -19,13 +19,13 @@
         <div
           v-for="issue in displayIssues"
           :key="issue.id"
-          class="line"
           :ref="(ref: any) => refsMan?.set(issue.id, { ref, issue })"
+          class="line"
         >
           <div
-            class="line-item"
             v-for="column in columns"
             :key="column.key"
+            class="line-item"
             :class="[column?.kls?.(issue), `is-${column.key}`]"
             :title="column?.title?.(issue)"
           >
@@ -61,12 +61,12 @@
             </template>
 
             <template v-if="column.key === 'stage'">
-              <span class="tag is-pending" v-if="isPending(issue)">已挂起</span>
-              <span class="tag is-due-date" v-else-if="isOverDueDate(issue)">已延期</span>
-              <span class="tag is-un-label" v-else-if="isUnLabel(issue)">-</span>
-              <span class="tag is-plan" v-else-if="isInPlan(issue)">计划中</span>
-              <span class="tag is-undone" v-else-if="isUndone(issue)">进行中</span>
-              <span class="tag is-done" v-else>已完成</span>
+              <span v-if="isPending(issue)" class="tag is-pending">已挂起</span>
+              <span v-else-if="isOverDueDate(issue)" class="tag is-due-date">已延期</span>
+              <span v-else-if="isUnLabel(issue)" class="tag is-un-label">-</span>
+              <span v-else-if="isInPlan(issue)" class="tag is-plan">计划中</span>
+              <span v-else-if="isUndone(issue)" class="tag is-undone">进行中</span>
+              <span v-else class="tag is-done">已完成</span>
             </template>
 
             <template v-if="column.key === 'label'">

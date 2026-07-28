@@ -7,10 +7,10 @@
     theme-color="#ff4c4f"
     v-bind="$attrs"
   >
-    <template #after-title v-if="isEnableSwitchTodoDataType">
+    <template v-if="isEnableSwitchTodoDataType" #after-title>
       <img class="switch-icon" :src="IconSwitch" @click="switchTodoDataType" />
     </template>
-    <template #icons v-if="isCurStandupInProgress">
+    <template v-if="isCurStandupInProgress" #icons>
       <UIcon name="i-lucide-toggle-left" class="switch-edit-type" @click="switchTodoCardEditType" />
     </template>
     <cx-todo-card

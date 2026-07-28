@@ -1,5 +1,5 @@
 <template>
-  <div class="cx-view-issues-board issue-card" :class="kls" ref="cardRef">
+  <div ref="cardRef" class="cx-view-issues-board issue-card" :class="kls">
     <div class="handler" />
     <div class="progress-con" :class="`is-active-${progressStep}`">
       <div
@@ -21,15 +21,15 @@
         title="开发"
       />
       <div
-        class="progress in-test"
         v-if="!isQAUnable && !isSubTask"
+        class="progress in-test"
         :class="isActive(3)"
         :data-time="activeTime(3)"
         title="测试"
       />
       <div
-        class="progress in-ui-check"
         v-if="!isUIUnable && !isSubTask"
+        class="progress in-ui-check"
         :class="isActive(4)"
         :data-time="activeTime(4)"
         title="设计验收"
@@ -59,15 +59,15 @@
     </div>
     <div class="labels">
       <div
-        class="label"
         v-for="label in issue.issueLabels"
-        v-text="label.name"
         :key="label.id"
+        class="label"
         :data-gitlab-label-type="label.name?.split(':')?.[0] || 'normal'"
         :data-gitlab-label-text="label.name"
+        v-text="label.name"
       />
     </div>
-    <div class="lastday" v-if="isDueDateToday">
+    <div v-if="isDueDateToday" class="lastday">
       <!-- cspell:disable-next-line -->
       <CxSvgIcon class="icon-date" icon-class="riqi" />
       <span class="label">{{ dayjs(issue.dueDate).format('YYYY-MM-DD') }}</span>

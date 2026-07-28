@@ -7,7 +7,7 @@
     ]"
     :title="title"
     role="img"
-    @click="emits('click', $event)" class="cx-cx-icon"
+    class="cx-cx-icon" @click="emits('click', $event)"
   >
     <slot>
       <Icon v-if="name" :icon="name" :width="size" :height="size" class="cx-icon__svg" />

@@ -35,13 +35,13 @@
       <div class="calendar" @mouseover="onMouseOver">
         <div
           v-for="item in calendarItems"
-          :class="['day', `is-${item.state}`, isToday(item.day) && 'is-today']"
           :key="item.id"
+          :class="['day', `is-${item.state}`, isToday(item.day) && 'is-today']"
           :data-id="String(item.id)"
           :data-date="`${dayjs(item.day).format('YYYY-MM-DD')} ${weekdayStr(item.day)}`"
           @click="goStandup(item)"
         />
-        <div class="empty" ref="containerRightRef" />
+        <div ref="containerRightRef" class="empty" />
       </div>
     </CxScrollbar>
     <div class="legends">

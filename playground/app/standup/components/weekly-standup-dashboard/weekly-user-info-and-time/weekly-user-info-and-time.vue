@@ -1,9 +1,9 @@
 <template>
-  <div class="cx-weekly-user-info-and-time user-tag" v-if="user">
+  <div v-if="user" class="cx-weekly-user-info-and-time user-tag">
     <div class="avatar">
       <img :src="user?.avatarUrl" />
     </div>
-    <div class="user-name" v-if="user.name">
+    <div v-if="user.name" class="user-name">
       <div class="name">{{ user.name }}</div>
     </div>
   </div>

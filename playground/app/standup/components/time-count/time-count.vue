@@ -1,7 +1,7 @@
 <template>
   <div class="cx-time-count time-stamp">
     <span class="time">{{ displayTime }}</span>
-    <span class="weekday" v-if="props.weekday">{{ displayWeekday }}</span>
+    <span v-if="props.weekday" class="weekday">{{ displayWeekday }}</span>
   </div>
 </template>
 

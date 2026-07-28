@@ -5,7 +5,7 @@
     :group="group"
     :idx="idx"
     :view-type="viewType"
-    @mousedown.stop="goDashboardPage(standup)" class="cx-standup-card"
+    class="cx-standup-card" @mousedown.stop="goDashboardPage(standup)"
   >
     <template v-if="isWeeklyMeeting" #card-title>
       <div class="time" :title="dayjs(standup.meetingDate).format('YYYY-MM-DD')">

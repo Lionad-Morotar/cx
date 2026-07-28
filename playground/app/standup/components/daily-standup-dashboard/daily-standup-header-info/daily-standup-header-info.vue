@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.b()" ref="compRef">
+  <div ref="compRef" :class="ns.b()">
     <UButton
       ref="prevUserButtonRef"
       variant="link"

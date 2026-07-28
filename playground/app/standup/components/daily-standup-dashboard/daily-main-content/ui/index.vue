@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.b()" ref="compRef">
+  <div ref="compRef" :class="ns.b()">
     <!-- 昨天 -->
     <cx-dashboard-card
       data-focus-id="yesterday-dashboard-card"
@@ -10,11 +10,11 @@
       theme-color="#fbad15"
     >
       <cx-view-issues-board
-        data-focus-id="yesterday-dashboard-card-issue"
         v-for="issue in filteredYesterdayList"
+        :key="`yesterday-${issue.id}`"
+        data-focus-id="yesterday-dashboard-card-issue"
         :due-date="yesterday"
         :issue="issue"
-        :key="`yesterday-${issue.id}`"
       />
     </cx-dashboard-card>
 
@@ -29,11 +29,11 @@
       theme-color="#1890ff"
     >
       <cx-view-issues-board
-        data-focus-id="today-dashboard-card-issue"
         v-for="issue in filteredTodayList"
+        :key="`today-${issue.id}`"
+        data-focus-id="today-dashboard-card-issue"
         :due-date="today"
         :issue="issue"
-        :key="`today-${issue.id}`"
       />
     </cx-dashboard-card>
 
@@ -47,13 +47,13 @@
       :is-loading="curUserRelatedIssusByDateReq.isLoading"
       theme-color="#ff4c4f"
     >
-      <template #after-title v-if="enableSwitchTodoDataType">
+      <template v-if="enableSwitchTodoDataType" #after-title>
         <img class="switch-icon" :src="IconSwitch" @click="switchTodoDataType" />
       </template>
-      <template #icons v-if="isCurStandupInProgress">
+      <template v-if="isCurStandupInProgress" #icons>
         <span class="switch-edit-type" @click="toggle()">切换</span>
       </template>
-      <cx-todo-card :use="content" ref="todoCardRef" :disabled="isTodoDisabled" :type="editType" />
+      <cx-todo-card ref="todoCardRef" :use="content" :disabled="isTodoDisabled" :type="editType" />
     </cx-dashboard-card>
   </div>
 </template>

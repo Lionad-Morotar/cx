@@ -10,11 +10,11 @@
             {{ dayjs(standup.meetingDate).format(isWeeklyMeeting ? 'MM / DD' : 'DD') }}
           </div>
         </slot>
-        <span class="progress-state" v-if="standup.state === 'IN_PROGRESS'" type="success"
+        <span v-if="standup.state === 'IN_PROGRESS'" class="progress-state" type="success"
           >进行中</span
         >
-        <span class="progress-state" v-else-if="standup.state === 'ENDED'">已结束</span>
-        <span class="progress-state" v-else type="info" plain>未进行</span>
+        <span v-else-if="standup.state === 'ENDED'" class="progress-state">已结束</span>
+        <span v-else class="progress-state" type="info" plain>未进行</span>
       </div>
       <div class="day-content">
         <div class="line">
@@ -45,10 +45,10 @@
           <div class="value">{{ displayDuration }}</div>
         </div>
       </div>
-      <div class="icon-tip" v-if="isWeeklyMeeting">
+      <div v-if="isWeeklyMeeting" class="icon-tip">
         {{ displayMeetingOrder(props.idx) }}
       </div>
-      <div class="icon-tip" v-else>{{ weekdayENShort }}</div>
+      <div v-else class="icon-tip">{{ weekdayENShort }}</div>
     </template>
     <template v-if="props.viewType === 'list-item'">
       <CxSvgIcon v-if="standup.state === 'IN_PROGRESS'" class="icon-face" icon-class="meh-fill" />

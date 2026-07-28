@@ -1,5 +1,5 @@
 <template>
-  <h5 v-text="`更改行列（${col} x ${row}）`" class="cx-grids-form" />
+  <h5 class="cx-grids-form" v-text="`更改行列（${col} x ${row}）`" />
   <div
     class="mt-2"
     :class="[

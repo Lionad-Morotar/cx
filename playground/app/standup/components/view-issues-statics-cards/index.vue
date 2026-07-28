@@ -6,7 +6,7 @@
           <img class="fold-icon" :class="isFold ? 'is-close' : 'is-open'" :src="IconArrow" />
         </div>
         <div class="title">指标汇总统计</div>
-        <div class="side-title" v-if="issueSyncTime">统计截止时间：{{ issueSyncTime }}</div>
+        <div v-if="issueSyncTime" class="side-title">统计截止时间：{{ issueSyncTime }}</div>
       </div>
     </template>
     <template #content>
@@ -24,7 +24,7 @@
             <div class="text-con" :class="isLoading && 'is-loading'">
               <div class="title">{{ item.name }}</div>
               <div class="value">
-                {{ item.value }}<span class="meter" v-if="item.meter" v-text="item.meter()" />
+                {{ item.value }}<span v-if="item.meter" class="meter" v-text="item.meter()" />
               </div>
             </div>
           </div>

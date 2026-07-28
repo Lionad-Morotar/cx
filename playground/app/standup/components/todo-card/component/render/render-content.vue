@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.e('line-content')" @click="focus" class="cx-render-content">
+  <div :class="ns.e('line-content')" class="cx-render-content" @click="focus">
     <!-- maybe refactor with https://www.npmjs.com/package/rich-string-parser -->
     <template v-if="content?.mention?.length">
       <template v-for="tag in content.mention" :key="tag.id">
@@ -14,10 +14,10 @@
       </template>
     </template>
     <span
-      :class="ns.e('line-content-text')"
       v-bind="$attrs"
-      :contenteditable="isEditable"
       ref="contentRef"
+      :class="ns.e('line-content-text')"
+      :contenteditable="isEditable"
       .spellcheck="false"
       >{{ text }}</span
     >

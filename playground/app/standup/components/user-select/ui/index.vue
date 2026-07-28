@@ -6,10 +6,10 @@
           <div v-if="user.id === 'padding'" class="member is-empty" />
           <div
             v-else
+            :key="user.id + user.name"
             class="member"
             :class="[checkIsSelected(user) ? 'is-current' : '', isAbsent(user) ? 'is-absent' : '']"
             :title="getUserA11yTitle(user)"
-            :key="user.id + user.name"
             @click="select(user)"
           >
             <div class="avatar">

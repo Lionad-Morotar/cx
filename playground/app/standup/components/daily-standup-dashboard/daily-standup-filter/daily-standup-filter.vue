@@ -1,5 +1,5 @@
 <template>
-  <div :class="ns.b()" ref="compRef">
+  <div ref="compRef" :class="ns.b()">
     <div
       v-for="filter in filters"
       :key="filter.name"

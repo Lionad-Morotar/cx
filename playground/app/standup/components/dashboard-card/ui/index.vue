@@ -16,9 +16,9 @@
         <div class="side-title-con">
           <transition name="el-fade-in">
             <UIcon
+              v-if="props.isLoading"
               name="i-lucide-loader-circle"
               class="is-loading animate-spin"
-              v-if="props.isLoading"
             />
           </transition>
           <slot name="icons" />
@@ -31,27 +31,27 @@
     <template v-if="props.isLoading">
       <slot name="loading">
         <div
-          class="contents is-full-content"
           v-if="props.isLoading"
           v-cx-skeleton
+          class="contents is-full-content"
           cx-skeleton-delay="150"
         />
       </slot>
     </template>
     <template v-else>
       <slot name="content">
-        <div class="contents is-full-content" v-if="props.fullContent">
+        <div v-if="props.fullContent" class="contents is-full-content">
           <slot name="default">
-            <div class="empty-con" ref="emptyFirstRef">
+            <div ref="emptyFirstRef" class="empty-con">
               <img class="image" :src="EmptyStrImage" />
               <div class="title">暂时没有内容哦~</div>
             </div>
           </slot>
         </div>
-        <CxScrollbar class="contents-wrapper" v-else>
+        <CxScrollbar v-else class="contents-wrapper">
           <div class="contents">
             <slot name="default">
-              <div class="empty-con" ref="emptySecondRef">
+              <div ref="emptySecondRef" class="empty-con">
                 <img class="image" :src="EmptyStrImage" />
                 <div class="title">暂时没有内容哦~</div>
               </div>

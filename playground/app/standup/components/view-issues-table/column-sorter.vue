@@ -1,5 +1,5 @@
 <template>
-  <span class="cx-column-sorter sorter" v-if="sorts.length">
+  <span v-if="sorts.length" class="cx-column-sorter sorter">
     <template v-for="sort in sorts" :key="sort">
       <div :class="[sort, isActive(sort) && 'is-active']" @click="active(sort)" />
     </template>
