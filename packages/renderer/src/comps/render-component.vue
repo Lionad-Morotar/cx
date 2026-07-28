@@ -13,7 +13,7 @@
     >
       <cx-render-component-with-bindings
         v-if="comp"
-        :set-ref="(ref: any) => setRef(ref)"
+        :set-ref="(ref: unknown) => setRef(ref)"
         :component-type="compType"
         :component-directives="directives"
         :comp-i-d="comp.id"
@@ -32,7 +32,7 @@
     <cx-render-component-with-bindings
       v-else-if="comp"
       :key="`${comp.id}-${comp.key}`"
-      :set-ref="(ref: any) => setRef(ref)"
+      :set-ref="(ref: unknown) => setRef(ref)"
       :component-type="compType"
       :component-directives="directives"
       :comp-i-d="comp.id"
@@ -98,10 +98,14 @@ import type { Component } from 'vue'
 import type {
   CxComponentSlot,
   CxComponentRuntime,
-  CxEmitter,
   CxLoaderInstance,
-  CxEventKey,
 } from '@lionad/cx-definition'
+
+/**
+ * 插槽生成函数的上下文：运行时 slots 函数会读取 comp 与 cx，
+ * 类型上比 CxComponentRuntime.slots 声明的入参多了 cx 字段
+ */
+type SlotContext = { comp: CxComponentRuntime; cx: CxLoaderInstance }
 
 defineOptions({
   name: 'CxRenderComponent',
@@ -114,7 +118,6 @@ defineOptions({
 const _isMounted = useMounted()
 const isMounted = ref(false)
 
-const emits = defineEmits(['update:component'])
 const cx = inject<CxLoaderInstance>('cx')
 if (!cx) {
   throw new Error(
@@ -124,19 +127,20 @@ if (!cx) {
 
 const refs = inject<CxLoaderInstance>('cx')!.refs
 
-let setRefTick: any
-const setRef = async (ref: any) => {
+// setTimeout 在浏览器返回 number、Node 返回 Timeout；用 ReturnType 对齐宿主环境
+let setRefTick: ReturnType<typeof setTimeout> | undefined
+const setRef = async (ref: unknown) => {
   await until(_isMounted).toBeTruthy()
   if (setRefTick) {
     clearTimeout(setRefTick)
   }
   setRefTick = setTimeout(() => {
-    const lastRef = refs.get(unref(comp)!.id) || ({} as any)
+    const lastRef = refs.get(unref(comp)!.id) || ({} as { ref?: unknown; data?: CxComponentRuntime })
     lastRef.ref = ref
     if (!lastRef.data) {
       lastRef.data = comp.value
     }
-    refs.set(unref(comp)!.id, lastRef)
+    refs.set(unref(comp)!.id, lastRef as { ref: unknown; data: CxComponentRuntime })
     isMounted.value = true
   }, 0)
 }
@@ -152,7 +156,9 @@ const props = withDefaults(
   defineProps<{
     component?: CxComponentRuntime | string
   }>(),
-  {},
+  {
+    component: undefined,
+  },
 )
 const isDebug = inject('is-cx-debug', false)
 fakeTouch(isDebug)
@@ -219,7 +225,7 @@ const compType = computed(() => {
 // 所以等加载完毕后重新初始化一下 data
 cx.hooks.on('comp:async-comp:loaded', resetAsyncComponentInitialData)
 onBeforeUnmount(() => cx.hooks.off('comp:async-comp:loaded', resetAsyncComponentInitialData))
-async function resetAsyncComponentInitialData({ comp: loadedComp }: any) {
+async function resetAsyncComponentInitialData({ comp: loadedComp }: { comp: CxComponentRuntime }) {
   if (!comp.value) {
     return // console.error('[ERR] skip async-comp:loaded, no comp value found')
   }
@@ -227,11 +233,13 @@ async function resetAsyncComponentInitialData({ comp: loadedComp }: any) {
     await nextTick()
     try {
       if (isObject(comp.value?.data) && comp.value?.data) {
+        // ctx 字段名为 component（物料 props 初始值函数按 ctx.component 取值），
+        // 与 CxPropCTX 声明的 comp 字段名不同；运行时反射容忍，类型用 unknown 断言越过
         const initial = cloneDeep(
           await cxUtils.getData(loadedComp.key, {}, {
             component: readonly(comp.value),
             data: readonly(comp.value.data),
-          } as any),
+          } as unknown as Parameters<typeof cxUtils.getData>[2]),
         )
         const sourceData = cloneDeep(comp.value.data)
         deepMerge(comp.value.data, deepMerge(initial, sourceData))
@@ -261,7 +269,7 @@ const directives = computed(() => {
       }
       return h
     },
-    {} as Record<string, any>,
+    {} as Record<string, unknown>,
   )
   // console.log('[debug] directives', comp.value.key, res)
   return res
@@ -314,7 +322,7 @@ watchImmediate(
   },
   { deep: true },
 )
-const bindDatas = ref<Record<string, any>>({})
+const bindDatas = ref<Record<string, unknown>>({})
 const cleanDataBinds = useCleanups()
 useMountedWatchImmediate(
   () => dataConfig.value,
@@ -324,9 +332,10 @@ useMountedWatchImmediate(
     const binds = unref(dataConfig)?.binds || {}
     Object.entries(binds).map((bind) => {
       const parsed = cx.utils.parseDataBind(bind[1] as string)
-      const [mainCate, compID, subCate, propKey] = parsed
+      // parsed 形如 [分类, 组件ID, 子分类, 属性键]，仅消费 compID 与 propKey
+      const [, compID, , propKey] = parsed
       const targetCompData = unref(cx.datas.compsIdMap)?.[compID!]?.data || {}
-      Object.entries(targetCompData).map(([k, value]) => {
+      Object.entries(targetCompData).map(([k]) => {
         if (k !== propKey) return
         const stop = watch(
           () => targetCompData[k],
@@ -358,7 +367,7 @@ const compDatas = computed(() => {
   const data = {
     ...rawData,
     ...bindDatas.value,
-  } as Record<string, any>
+  } as Record<string, unknown>
 
   return useOmit(data, [
     // vue comp props
@@ -384,10 +393,12 @@ const compEvents = computed(() => {
   const id = comp.value.id
   // 这里监听的所有定义事件和原生事件，不知道会不会有性能问题
   const keys = [...compEmitNames.value, ...nativeEmitNames.value]
-  const eventsMap = {} as Record<string | CxEventKey, () => void>
+  // compEmitNames/nativeEmitNames 返回 string，eventsMap 键类型收窄为 string；
+  // cxEmitter 的 eventKey: string 即可满足，无需 CxEventKey
+  const eventsMap = {} as Record<string, (...args: unknown[]) => void>
   try {
-    keys.forEach((k) => {
-      const broadcast = (...args: any[]) => {
+    keys.forEach((k: string) => {
+      const broadcast = (...args: unknown[]) => {
         unref(cx).hooks.emit('comp:cx-event:emit', {
           id,
           event: k,
@@ -395,8 +406,7 @@ const compEvents = computed(() => {
         })
         return cxEmitter({
           comp: unref(comp)!,
-          // FIXME type
-          eventKey: k as any,
+          eventKey: k,
           args,
         })
       }
@@ -431,7 +441,7 @@ const _compSlots = computed(() => {
   if (comp.value.slots) {
     return (
       isFunction(comp.value.slots)
-        ? comp.value.slots({ comp: readonly(comp.value)!, cx: readonly(cx) } as any)
+        ? comp.value.slots({ comp: readonly(comp.value)!, cx: readonly(cx) } as SlotContext)
         : comp.value.slots
     ) as CxComponentSlot[]
   }
@@ -440,11 +450,16 @@ const _compSlots = computed(() => {
   // compMeta 即 getMeta 的返回值（_cx_meta 本体），直接取 slots；
   // 此前误写为 compMeta.value?._cx_meta?.slots（多套一层），导致元数据声明的
   // 插槽永不生效、全部回落默认插槽
-  const metaSlots = compMeta.value?.slots as any
+  // metaSlots 运行时形态为 函数/数组/对象三者之一（CxMeta.slots 类型仅声明了对象形态）
+  const metaSlots = compMeta.value?.slots as
+    | CxComponentSlot[]
+    | Record<string, CxComponentSlot>
+    | ((ctx: SlotContext) => CxComponentSlot[] | Record<string, CxComponentSlot>)
+    | undefined
   if (metaSlots) {
     return (
       isFunction(metaSlots)
-        ? metaSlots({ comp: readonly(comp.value)!, cx: readonly(cx) } as any)
+        ? metaSlots({ comp: readonly(comp.value)!, cx: readonly(cx) } as SlotContext)
         : isArray(metaSlots)
           ? metaSlots
           : // 此处不能加 async：mapValues 不会 await，async 回调会让每个插槽变成
@@ -452,7 +467,7 @@ const _compSlots = computed(() => {
             mapValues(metaSlots, (v, k) => ({
               key: k,
               ...(isFunction(v)
-                ? v({ comp: readonly(comp.value!), cx: readonly(cx) } as any)
+                ? v({ comp: readonly(comp.value!), cx: readonly(cx) } as SlotContext)
                 : {
                     name: v.name || k,
                     description: v.description || '',
