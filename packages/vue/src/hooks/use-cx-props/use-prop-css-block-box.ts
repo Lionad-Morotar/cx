@@ -19,7 +19,7 @@ import { watchEffect } from 'vue'
 export * from './use-cx-styles/config'
 
 export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends (...args: any[]) => any ? T[P] : DeepPartial<T[P]>
+  [P in keyof T]?: T[P] extends (...args: unknown[]) => unknown ? T[P] : DeepPartial<T[P]>
 }
 
 const CSSDefaultValue = [
@@ -97,7 +97,8 @@ const genUseCxStyleUnified =
       },
     })
 
-    const touch = (x: any) => unref(x)
+    // 触发 values 的响应式依赖追踪（读取使其成为依赖源）；参数为 ref/computed
+    const touch = (x: MaybeRef<unknown>) => unref(x)
     touch(values)
 
     const isEnabled = ref(true)
@@ -156,7 +157,7 @@ const genUseCxStyleUnified =
     }
     whenever(() => !isEnabled.value, reset)
 
-    const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+    const onChangeFn = ref<((x: string) => void) | undefined>(opts.onChange)
     const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
     // todo perf when onChangeFn is not null
     watch(
@@ -448,7 +449,7 @@ export const useCxStyleBox = (_opts: UseCxStyleOptions) => {
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+  const onChangeFn = ref<((x: string) => void) | undefined>(opts.onChange)
   const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
@@ -599,7 +600,7 @@ export const useCxStyleSpacing = (_opts: UseCxStyleOptions) => {
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+  const onChangeFn = ref<((x: string) => void) | undefined>(opts.onChange)
   const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
@@ -790,7 +791,7 @@ export const useCxStyleLayout = (_opts: UseCxStyleOptions) => {
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+  const onChangeFn = ref<((x: string) => void) | undefined>(opts.onChange)
   const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
@@ -850,7 +851,11 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
     _opts || {},
   )
 
-  const align = ref<'' | 'left' | 'center' | 'right'>('')
+  type FontAlign = '' | 'left' | 'center' | 'right'
+  type FontWeight = '' | 'light' | 'regular' | 'medium' | 'bold'
+  type FontCosm = '' | 'normal' | 'italic' | 'oblique'
+
+  const align = ref<FontAlign>('')
   const alignOptions = CSSDefaultValue.concat([
     { value: 'left', label: '左对齐' },
     { value: 'center', label: '居中' },
@@ -881,7 +886,7 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
     { value: '8xl', label: '超大8' },
   ])
 
-  const weight = ref<'' | 'light' | 'regular' | 'medium' | 'bold'>('')
+  const weight = ref<FontWeight>('')
   const weightOptions = CSSDefaultValue.concat([
     { value: 'normal', label: '正常' },
     { value: 'light', label: '细' },
@@ -889,7 +894,7 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
     { value: 'bold', label: '粗' },
   ])
 
-  const cosm = ref<'' | 'normal' | 'italic' | 'oblique'>('')
+  const cosm = ref<FontCosm>('')
   const cosmOptions = CSSDefaultValue.concat([
     { value: 'normal', label: '正常' },
     { value: 'italic', label: '斜体' },
@@ -936,10 +941,10 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
     },
     set(x: [string, string, string, string, string, string, string]) {
       lineHeight.value = x[0]
-      align.value = x[1] as any
+      align.value = x[1] as FontAlign
       size.value = x[2]
-      weight.value = x[3] as any
-      cosm.value = x[4] as any
+      weight.value = x[3] as FontWeight
+      cosm.value = x[4] as FontCosm
       family.value = x[5]
       familySubset.value = x[6]
     },
@@ -975,10 +980,10 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
       string,
     ]
     lineHeight.value = l
-    align.value = a as any
+    align.value = a as FontAlign
     size.value = s
-    weight.value = w as any
-    cosm.value = c as any
+    weight.value = w as FontWeight
+    cosm.value = c as FontCosm
     family.value = f
     familySubset.value = fs
   }
@@ -1000,7 +1005,7 @@ export const useCxStyleFont = (_opts: UseCxStyleOptions) => {
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
+  const onChangeFn = ref<((x: string) => void) | undefined>(opts.onChange)
   const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
@@ -1152,24 +1157,31 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
   const toggleEnable = useHooks(() => (isEnabled.value = !isEnabled.value))
 
   const isConfigured = computed(() => {
-    const changed = []
-    ;['o', 'c', 'f'].map((x) => {
+    const changed: string[] = []
+    // values 形如 { b:[...], o, c, f }，逐项检查是否有非空配置
+    ;(['o', 'c', 'f'] as const).forEach((x) => {
       if ((values.value as unknown as Record<string, string>)[x] !== '') {
         changed.push(x)
       }
     })
-    values.value.b &&
-      values.value.b.map((x) => {
+    if (values.value.b) {
+      values.value.b.forEach((x) => {
         if (x !== '') {
           changed.push(x)
         }
       })
+    }
     return changed.length > 0
   })
 
   const getZipValue = () => {
     return {
-      b: [bgType.value || '', bgColorName.value || '', bgColorStrength.value || ''],
+      // b 与 CxComponentStyle['c']['b'] 的三元组对齐
+      b: [bgType.value || '', bgColorName.value || '', bgColorStrength.value || ''] as [
+        string,
+        string,
+        string,
+      ],
       o: opacity.value || '',
       c: cursor.value || '',
       f: filter.value || '',
@@ -1202,8 +1214,9 @@ export const useCxStyleCosm = (_opts: UseCxStyleOptions<CxComponentStyle['c']>) 
   }
   whenever(() => !isEnabled.value, reset)
 
-  const onChangeFn = ref<((x: any) => void) | undefined>(opts.onChange)
-  const onChange = (fn: (x: string) => void) => (onChangeFn.value = fn)
+  // Cosm 的 getZipValue 返回对象（{ b, o, c, f }），与前 5 个 hook 的 string 不同
+  const onChangeFn = ref<((x: CxComponentStyle['c']) => void) | undefined>(opts.onChange)
+  const onChange = (fn: (x: CxComponentStyle['c']) => void) => (onChangeFn.value = fn)
   // todo perf when onChangeFn is not null
   watch(
     values,
