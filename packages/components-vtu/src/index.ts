@@ -98,3 +98,6 @@ export const CxVtuBundle: CxMaterialBundle = {
   name: 'vtu',
   materials: [...CxVtu],
 }
+
+// --- 流式增量渲染预设 ---
+export * from './stream-triggers'
