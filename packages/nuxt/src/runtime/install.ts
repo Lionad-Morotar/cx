@@ -15,6 +15,7 @@ export const installCxBundles = async (cx: CxLoaderInstance, _nuxtApp: NuxtApp) 
       comp._cx_meta.type = 'local'
       // defineCxComponent 产物（组件对象挂 _cx_meta）与 installComponent 的 meta 形态签名不符，
       // 运行时行为与历史一致（该调用自始以宽松类型通过）
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cx.installComponent(comp._cx_meta.key, comp as any)
     }
   }

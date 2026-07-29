@@ -10,6 +10,8 @@ import { installCxBundles } from './install'
 export default defineNuxtPlugin({
   name: 'cx',
   enforce: 'pre',
+  // defineNuxtPlugin setup 入参是 Nuxt 注入的 NuxtApp，框架类型不可达，用 any 收口
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async setup(nuxtApp: any) {
     const cx = new CxLoader()
 
