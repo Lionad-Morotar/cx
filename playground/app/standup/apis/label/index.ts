@@ -1,4 +1,4 @@
-import { cachedRequest } from '../../utils/cyber'
+import { apiQuery } from '../../utils/query-client'
 
 import type { Request } from '..'
 
@@ -23,9 +23,5 @@ export type LabelEvent = {
  * 获取标签列表
  */
 export const apiLabelListAll: Request<never, Label[]> = () => {
-  return cachedRequest({
-    method: 'POST',
-    url: '/labels',
-    data: {},
-  })
+  return apiQuery('/labels', {})
 }
