@@ -8,7 +8,7 @@ import type { ArrayTriggerConfig } from '@lionad/cx-stream'
  * 列定义也可能随行数据一起流式传输，不扫描会使截断点落后于它。
  */
 const config: ArrayTriggerConfig = {
-  key: def.key,
+  key: def._cx_meta.key,
   arrayKey: 'data',
   extraScanPaths: [['data', 'columns', '*']],
 }
