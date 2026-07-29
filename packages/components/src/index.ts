@@ -16,3 +16,6 @@ export const CxComponentsBundle: CxMaterialBundle = {
   name: 'components',
   materials: [CxPage, CxGrid, CxCalendar, CxUserStyle, ...CxBasics],
 }
+
+// --- 流式增量渲染预设 ---
+export * from './stream-triggers'
