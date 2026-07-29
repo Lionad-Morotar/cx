@@ -1,4 +1,5 @@
 import type { CxComponentRuntime } from '@lionad/cx-definition'
+import type { CxStreamNode } from '@lionad/cx-stream'
 
 // dev 物料验收页共享：从物料 _cx_meta 构造示例 data + CxRender node。
 // 提取自 /dev/components.vue，供 v2/v4 验收页复用。
@@ -74,4 +75,23 @@ export function toItem(comp: { _cx_meta: CxMeta }): DevItem {
     node.components = { default: [textNode('示例内容')] }
   }
   return { meta, node }
+}
+
+/**
+ * 把流式管线的 CxStreamNode 规整为 CxRender 可消费的最小运行时节点。
+ * CxRender 只需 id/key/data（props 由 data 展开绑定）；流式节点的 id 可缺省，
+ * 此处回填稳定 id，使增量帧与终态帧落在同一组件实例上原地更新而非重建。
+ */
+export function toRenderNode(spec: CxStreamNode): CxComponentRuntime {
+  return {
+    id: spec.id ?? 'stream-node',
+    key: spec.key,
+    name: spec.name ?? spec.key,
+    data: spec.data ?? {},
+    props: {},
+    emits: {},
+    exposes: {},
+    parents: [],
+    components: {},
+  } as CxComponentRuntime
 }

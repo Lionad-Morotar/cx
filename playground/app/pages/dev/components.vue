@@ -23,11 +23,21 @@
             <span class="card-name">{{ item.meta.name }}</span>
             <code class="card-key">{{ item.meta.key }}</code>
             <span v-if="item.meta.headless" class="badge">headless</span>
+            <!-- 流式回放：内置物料均无增量 trigger，回放演示围栏闭合一次性渲染 -->
+            <button
+              v-else
+              class="replay-btn"
+              :data-testid="`replay-${item.meta.key}`"
+              :title="replayTitle(replayOf(item))"
+              @click="replayOf(item).toggle()"
+            >
+              {{ replayIcon(replayOf(item)) }}
+            </button>
           </header>
           <p class="card-desc">{{ item.meta.description }}</p>
           <div class="card-preview">
-            <CxRender v-if="!item.meta.headless" :components="[item.node]" />
-            <span v-else class="muted">无可见 UI（逻辑型物料）</span>
+            <span v-if="item.meta.headless" class="muted">无可见 UI（逻辑型物料）</span>
+            <DevCardPreview v-else :node="item.node" :replay="replayOf(item)" />
           </div>
         </article>
       </div>
@@ -36,69 +46,20 @@
 </template>
 
 <script setup lang="ts">
-import { CxBasics, CxCalendar, CxGrid, CxPage, CxUserStyle } from '@lionad/cx-components'
-import type { CxComponentRuntime } from '@lionad/cx-definition'
+import {
+  CxBasics,
+  CxCalendar,
+  createComponentsTriggerRegistry,
+  CxGrid,
+  CxPage,
+  CxUserStyle,
+} from '@lionad/cx-components'
+import { toItem, type CxMeta, type DevItem } from '~/dev/material-utils'
+import { replayIcon, replayTitle, useCardReplay, type CardReplay } from '~/dev/use-card-replay'
 
 defineOptions({ name: 'PageDevComponents' })
 
-interface CxMeta {
-  key: string
-  name: string
-  description?: string
-  headless?: boolean
-  props?: Record<string, { initial?: unknown; type?: string }>
-  slots?: unknown
-}
-
-// 从物料 props 的 initial 构造默认 data，供 CxRender 渲染示例；
-// 文本类（short）初始为空串时回填示例文本，否则 preview 只渲染出一个占位空格
-function buildDefaultData(meta: CxMeta): Record<string, unknown> {
-  const data: Record<string, unknown> = {}
-  for (const [k, p] of Object.entries(meta.props || {})) {
-    if (p?.initial !== undefined) {
-      data[k] = p.initial === '' && p.type === 'short' ? `${meta.name}示例` : p.initial
-    }
-  }
-  return data
-}
-
-function textNode(content: string): CxComponentRuntime {
-  return {
-    id: `dev-text-${content}`,
-    key: 'cx-text',
-    name: '文本',
-    aliasKeys: [],
-    data: { content },
-    props: {},
-    emits: {},
-    exposes: {},
-    parents: [],
-    components: {},
-  } as CxComponentRuntime
-}
-
-function toItem(comp: { _cx_meta: CxMeta }): { meta: CxMeta; node: CxComponentRuntime } {
-  const meta = comp._cx_meta
-  const node = {
-    id: `dev-${meta.key}`,
-    key: meta.key,
-    name: meta.name,
-    aliasKeys: [],
-    data: buildDefaultData(meta),
-    props: {},
-    emits: {},
-    exposes: {},
-    parents: [],
-    components: {},
-  } as CxComponentRuntime
-  // 有 default slot 的容器塞示例文本，避免空壳看不出效果
-  if (meta.slots) {
-    node.components = { default: [textNode('示例内容')] }
-  }
-  return { meta, node }
-}
-
-const groups: { name: string; items: ReturnType<typeof toItem>[] }[] = [
+const groups: { name: string; items: DevItem[] }[] = [
   {
     name: '基础物料',
     items: (CxBasics as unknown as { _cx_meta: CxMeta }[]).map(toItem),
@@ -111,7 +72,18 @@ const groups: { name: string; items: ReturnType<typeof toItem>[] }[] = [
   },
 ]
 
-const log = (meta: CxMeta, item: CxComponentRuntime) => console.log(meta, item)
+// 每卡一个回放实例（setup 期建全，模板只读）；内置物料判定零 trigger，
+// 空注册表使回放全程无增量帧，演示「围栏闭合一次性渲染」的诚实行为
+const registry = createComponentsTriggerRegistry()
+const replays = new Map<string, CardReplay>()
+for (const group of groups) {
+  for (const item of group.items) {
+    replays.set(item.meta.key, useCardReplay(item.node, { registry }))
+  }
+}
+const replayOf = (item: DevItem): CardReplay => replays.get(item.meta.key)!
+
+const log = (meta: CxMeta, node: unknown) => console.log(meta, node)
 </script>
 
 <style scoped>
@@ -188,6 +160,22 @@ const log = (meta: CxMeta, item: CxComponentRuntime) => console.log(meta, item)
   background: #fff7ed;
   padding: 1px 6px;
   border-radius: 4px;
+}
+.replay-btn {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  color: #2563eb;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+.replay-btn:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
 }
 .card-desc {
   font-size: 12px;

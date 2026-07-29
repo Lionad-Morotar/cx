@@ -1,9 +1,6 @@
-import type { CxStreamNode } from '@lionad/cx-stream'
-import type { CxComponentRuntime } from '@lionad/cx-definition'
-
 import { compositeChunks, compositeMeta } from './stream-mock.generated'
 
-// /dev/stream 验收页的确定性剧本与 cx 协议装配。
+// /dev/stream 验收页的确定性剧本。
 // 抽成独立模块（而非内联进页面）有两个原因：
 // 1. 无头测试可直接驱动这些纯数据/纯函数，不必挂载 Nuxt 页面与定时器；
 // 2. 页面 setup 只保留回放引擎与面板渲染，控制在可读行数内。
@@ -46,25 +43,4 @@ export function cropScenarioChunks(n: number): string[] {
     break
   }
   return out
-}
-
-// --- CxStreamNode → CxRender 节点适配 ---
-
-/**
- * 把流式管线的 CxStreamNode 规整为 CxRender 可消费的最小运行时节点。
- * CxRender 只需 id/key/data（props 由 data 展开绑定）；流式节点的 id 可缺省，
- * 此处回填稳定 id，使增量帧与终态帧落在同一组件实例上原地更新而非重建。
- */
-export function toRenderNode(spec: CxStreamNode): CxComponentRuntime {
-  return {
-    id: spec.id ?? 'stream-node',
-    key: spec.key,
-    name: spec.name ?? spec.key,
-    data: spec.data ?? {},
-    props: {},
-    emits: {},
-    exposes: {},
-    parents: [],
-    components: {},
-  } as CxComponentRuntime
 }

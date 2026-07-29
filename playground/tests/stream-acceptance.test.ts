@@ -14,12 +14,12 @@ import {
 import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-components-vtu'
 
 import { compositeMeta } from '../app/dev/stream-mock.generated'
+import { toRenderNode } from '../app/dev/material-utils'
 import {
   cropScenarioChunks,
   MAX_COMPONENTS,
   STREAM_CHUNKS,
   STREAM_SCRIPT,
-  toRenderNode,
 } from '../app/dev/stream-scenario'
 
 // /dev/stream 验收页的无头契约：以「一根不断生长的字符串」驱动管线，

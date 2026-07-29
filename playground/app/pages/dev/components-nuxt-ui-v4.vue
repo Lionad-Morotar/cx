@@ -27,11 +27,27 @@
             <span class="card-name">{{ item.meta.name }}</span>
             <code class="card-key">{{ item.meta.key }}</code>
             <span v-if="item.meta.headless" class="badge">headless</span>
+            <!-- 流式回放：按 40 tokens/秒复现该物料从 0 增量渲染的过程 -->
+            <template v-else>
+              <span
+                v-if="replayOf(item).partialCount.value !== null"
+                class="badge badge--replay"
+                >{{ replayOf(item).partialCount.value }} 项</span
+              >
+              <button
+                class="replay-btn"
+                :data-testid="`replay-${item.meta.key}`"
+                :title="replayTitle(replayOf(item))"
+                @click="replayOf(item).toggle()"
+              >
+                {{ replayIcon(replayOf(item)) }}
+              </button>
+            </template>
           </header>
           <p class="card-desc">{{ item.meta.description }}</p>
           <div class="card-preview">
-            <CxRender v-if="!item.meta.headless" :components="[item.node]" />
-            <span v-else class="muted">无可见 UI（逻辑型物料）</span>
+            <span v-if="item.meta.headless" class="muted">无可见 UI（逻辑型物料）</span>
+            <DevCardPreview v-else :node="item.node" :replay="replayOf(item)" />
           </div>
         </article>
       </div>
@@ -40,8 +56,13 @@
 </template>
 
 <script setup lang="ts">
-import { CxNuxtUIV4 } from '@lionad/cx-components-nuxt-ui-v4'
-import { toItem, type CxMeta } from '~/dev/material-utils'
+import {
+  CxNuxtUIV4,
+  createNuxtUiV4TriggerRegistry,
+  mainArrayOf,
+} from '@lionad/cx-components-nuxt-ui-v4'
+import { toItem, type CxMeta, type DevItem } from '~/dev/material-utils'
+import { replayIcon, replayTitle, useCardReplay, type CardReplay } from '~/dev/use-card-replay'
 import { groupByCategory, type CategoryGroup } from '~/dev/nuxt-ui-v4-categories'
 
 defineOptions({ name: 'PageDevComponentsNuxtUiV4' })
@@ -50,6 +71,22 @@ defineOptions({ name: 'PageDevComponentsNuxtUiV4' })
 // groupByCategory 按官方分类装配成 6 组，未映射 key 会抛错强制补全映射
 const materials = CxNuxtUIV4 as unknown as { _cx_meta: CxMeta }[]
 const groups: CategoryGroup[] = groupByCategory(materials.map(toItem))
+
+// 每卡一个回放实例（setup 期建全，模板只读）；共用一个注册表实例
+const registry = createNuxtUiV4TriggerRegistry()
+const replays = new Map<string, CardReplay>()
+for (const group of groups) {
+  for (const item of group.items) {
+    replays.set(
+      item.meta.key,
+      useCardReplay(item.node, {
+        registry,
+        countOf: (node) => mainArrayOf(node)?.length ?? null,
+      }),
+    )
+  }
+}
+const replayOf = (item: DevItem): CardReplay => replays.get(item.meta.key)!
 
 const log = (meta: CxMeta, node: unknown) => console.log(meta, node)
 </script>
@@ -126,6 +163,26 @@ const log = (meta: CxMeta, node: unknown) => console.log(meta, node)
   background: #fff7ed;
   padding: 1px 6px;
   border-radius: 4px;
+}
+.badge--replay {
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+.replay-btn {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  color: #2563eb;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+.replay-btn:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
 }
 .card-desc {
   font-size: 12px;

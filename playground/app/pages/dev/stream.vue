@@ -143,7 +143,8 @@ import {
   type CxStreamNode,
 } from '@lionad/cx-stream'
 import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-components-vtu'
-import { cropScenarioChunks, MAX_COMPONENTS, toRenderNode } from '~/dev/stream-scenario'
+import { toRenderNode } from '~/dev/material-utils'
+import { cropScenarioChunks, MAX_COMPONENTS } from '~/dev/stream-scenario'
 
 defineOptions({ name: 'PageDevStream' })
 
