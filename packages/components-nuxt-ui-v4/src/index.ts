@@ -155,3 +155,6 @@ export const CxNuxtUIV4Bundle: CxMaterialBundle = {
   name: 'nuxt-ui-v4',
   materials: [...CxNuxtUIV4],
 }
+
+// --- 流式增量渲染预设 ---
+export * from './stream-triggers'
