@@ -78,6 +78,11 @@ export function useCardReplay(node: ReplaySourceNode, options: UseCardReplayOpti
     matchTrigger: matchCxTrigger,
   })
 
+  // 物料是否具备流式语义（增量 trigger）：页面据此门控回放按钮——无 trigger
+  // 的组件播放全程无增量帧，回放无演示价值。key 与注册表同一条契约链
+  // （matchCxTrigger 按 node.key 匹配），与 extractor 行为同源。
+  const hasTrigger = options.registry.has(node.key)
+
   const phase = ref<ReplayPhase>('idle')
   const partial = ref<CxStreamNode | null>(null)
   const sawPartial = ref(false)
@@ -138,7 +143,18 @@ export function useCardReplay(node: ReplaySourceNode, options: UseCardReplayOpti
     return node ? (options.countOf?.(node) ?? null) : null
   })
 
-  return { phase, partial, partialCount, sawPartial, play, reset, toggle }
+  /**
+   * 卡片 footer 说明文案：仅播完且全程无增量帧时出现——无增量 trigger 的
+   * 物料流式期间无可展示中间态，完整 JSON 闭合后一次性渲染，向用户说明
+   * 这不是卡住。playing/idle 或有增量帧时为 null。
+   */
+  const doneNote = computed(() =>
+    phase.value === 'done' && !sawPartial.value
+      ? '无增量 trigger，围栏闭合一次性渲染'
+      : null,
+  )
+
+  return { phase, partial, partialCount, sawPartial, hasTrigger, doneNote, play, reset, toggle }
 }
 
 export type CardReplay = ReturnType<typeof useCardReplay>

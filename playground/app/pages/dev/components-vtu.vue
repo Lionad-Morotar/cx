@@ -27,8 +27,9 @@
             <span class="card-name">{{ item.meta.name }}</span>
             <code class="card-key">{{ item.meta.key }}</code>
             <span v-if="item.meta.headless" class="badge">headless</span>
-            <!-- 流式回放：按 40 tokens/秒复现该物料从 0 增量渲染的过程 -->
-            <template v-else>
+            <!-- 流式回放：仅数组增长型物料（有增量 trigger）提供；按 40 tokens/秒
+                 复现该物料从 0 增量渲染的过程 -->
+            <template v-else-if="replayOf(item).hasTrigger">
               <span
                 v-if="replayOf(item).partialCount.value !== null"
                 class="badge badge--replay"
@@ -49,6 +50,9 @@
             <span v-if="item.meta.headless" class="muted">无可见 UI（逻辑型物料）</span>
             <DevCardPreview v-else :node="item.node" :replay="replayOf(item)" />
           </div>
+          <footer v-if="replayOf(item).doneNote.value" class="card-foot">
+            <span class="replay-note">{{ replayOf(item).doneNote.value }}</span>
+          </footer>
         </article>
       </div>
     </section>
@@ -199,6 +203,13 @@ const log = (meta: CxMeta, node: unknown) => console.log(meta, node)
   align-items: center;
   justify-content: center;
   overflow: auto;
+}
+.card-foot {
+  margin-top: 8px;
+}
+.replay-note {
+  font-size: 11px;
+  color: #c2410c;
 }
 .muted {
   font-size: 12px;

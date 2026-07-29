@@ -23,21 +23,13 @@
             <span class="card-name">{{ item.meta.name }}</span>
             <code class="card-key">{{ item.meta.key }}</code>
             <span v-if="item.meta.headless" class="badge">headless</span>
-            <!-- 流式回放：内置物料均无增量 trigger，回放演示围栏闭合一次性渲染 -->
-            <button
-              v-else
-              class="replay-btn"
-              :data-testid="`replay-${item.meta.key}`"
-              :title="replayTitle(replayOf(item))"
-              @click="replayOf(item).toggle()"
-            >
-              {{ replayIcon(replayOf(item)) }}
-            </button>
           </header>
           <p class="card-desc">{{ item.meta.description }}</p>
           <div class="card-preview">
             <span v-if="item.meta.headless" class="muted">无可见 UI（逻辑型物料）</span>
-            <DevCardPreview v-else :node="item.node" :replay="replayOf(item)" />
+            <!-- 内置物料判定零增量 trigger（见包内 stream-triggers 判定注释），
+                 不提供流式回放 -->
+            <CxRender v-else :components="[item.node]" />
           </div>
         </article>
       </div>
@@ -46,16 +38,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  CxBasics,
-  CxCalendar,
-  createComponentsTriggerRegistry,
-  CxGrid,
-  CxPage,
-  CxUserStyle,
-} from '@lionad/cx-components'
+import { CxBasics, CxCalendar, CxGrid, CxPage, CxUserStyle } from '@lionad/cx-components'
 import { toItem, type CxMeta, type DevItem } from '~/dev/material-utils'
-import { replayIcon, replayTitle, useCardReplay, type CardReplay } from '~/dev/use-card-replay'
 
 defineOptions({ name: 'PageDevComponents' })
 
@@ -71,17 +55,6 @@ const groups: { name: string; items: DevItem[] }[] = [
       .map(toItem),
   },
 ]
-
-// 每卡一个回放实例（setup 期建全，模板只读）；内置物料判定零 trigger，
-// 空注册表使回放全程无增量帧，演示「围栏闭合一次性渲染」的诚实行为
-const registry = createComponentsTriggerRegistry()
-const replays = new Map<string, CardReplay>()
-for (const group of groups) {
-  for (const item of group.items) {
-    replays.set(item.meta.key, useCardReplay(item.node, { registry }))
-  }
-}
-const replayOf = (item: DevItem): CardReplay => replays.get(item.meta.key)!
 
 const log = (meta: CxMeta, node: unknown) => console.log(meta, node)
 </script>
@@ -160,22 +133,6 @@ const log = (meta: CxMeta, node: unknown) => console.log(meta, node)
   background: #fff7ed;
   padding: 1px 6px;
   border-radius: 4px;
-}
-.replay-btn {
-  margin-left: auto;
-  width: 24px;
-  height: 24px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #fff;
-  color: #2563eb;
-  font-size: 11px;
-  line-height: 1;
-  cursor: pointer;
-}
-.replay-btn:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
 }
 .card-desc {
   font-size: 12px;

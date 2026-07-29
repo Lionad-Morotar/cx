@@ -78,6 +78,11 @@ describe('卡片回放 · 剧本装配', () => {
 })
 
 describe('卡片回放 · 有 trigger 组件的增量收敛', () => {
+  it('有 trigger 组件 hasTrigger 为 true，供页面门控回放按钮', () => {
+    const replay = useCardReplay(tableNode, { registry: createVtuTriggerRegistry() })
+    expect(replay.hasTrigger).toBe(true)
+  })
+
   it('播放期间增量帧出现、项数单调递增、终拍落终态', () => {
     const replay = useCardReplay(tableNode, {
       registry: createVtuTriggerRegistry(),
@@ -117,6 +122,11 @@ describe('卡片回放 · 有 trigger 组件的增量收敛', () => {
 })
 
 describe('卡片回放 · 无 trigger 组件的一次性渲染', () => {
+  it('无 trigger 组件 hasTrigger 为 false，供页面隐藏回放按钮', () => {
+    const replay = useCardReplay(textNode, { registry: createComponentsTriggerRegistry() })
+    expect(replay.hasTrigger).toBe(false)
+  })
+
   it('全程无增量帧，播完落终态且 sawPartial 留痕为 false', () => {
     const replay = useCardReplay(textNode, { registry: createComponentsTriggerRegistry() })
     replay.play()
@@ -126,6 +136,26 @@ describe('卡片回放 · 无 trigger 组件的一次性渲染', () => {
     }
     expect(replay.phase.value).toBe('done')
     expect(replay.sawPartial.value).toBe(false)
+  })
+
+  it('doneNote：仅播完且全程无增量帧时出现（卡片 footer 说明文案）', () => {
+    const replay = useCardReplay(textNode, { registry: createComponentsTriggerRegistry() })
+    expect(replay.doneNote.value).toBeNull()
+    replay.play()
+    for (let i = 0; i < ticksToEnd(textNode); i++) vi.advanceTimersByTime(TICK_MS)
+    expect(replay.phase.value).toBe('done')
+    expect(replay.doneNote.value).toBeTruthy()
+    // 重播后说明随增量状态清零
+    replay.toggle()
+    expect(replay.doneNote.value).toBeNull()
+  })
+
+  it('有 trigger 组件播完后 doneNote 保持为 null（正常增量渲染，无需说明）', () => {
+    const replay = useCardReplay(tableNode, { registry: createVtuTriggerRegistry() })
+    replay.play()
+    for (let i = 0; i < ticksToEnd(tableNode); i++) vi.advanceTimersByTime(TICK_MS)
+    expect(replay.phase.value).toBe('done')
+    expect(replay.doneNote.value).toBeNull()
   })
 
   it('终态下 toggle 重播：播完再次落终态', () => {
