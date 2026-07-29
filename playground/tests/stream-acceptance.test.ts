@@ -11,7 +11,7 @@ import {
   type CxSpec,
   type CxStreamNode,
 } from '@lionad/cx-stream'
-import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-components-vtu'
+import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-comps-vtu'
 
 import { compositeMeta } from '../app/dev/stream-mock.generated'
 import { toRenderNode } from '../app/dev/material-utils'

@@ -1,5 +1,5 @@
 <template>
-  <!-- /dev/components-nuxt-ui-v4：@lionad/cx-components-nuxt-ui-v4 物料 schema 驱动渲染验收。
+  <!-- /dev/components-nuxt-ui-v4：@lionad/cx-comps-nuxt-ui-v4 物料 schema 驱动渲染验收。
        按 Nuxt UI v4 官方分类（Layout / Element / Form / Data / Navigation / Overlay）分组展示，
        分类骨架来自官方组件文档（2026-07-22 抓取 ui.nuxt.com/docs/components）。 -->
   <main class="page-dev-components-nuxt-ui-v4 page">
@@ -64,7 +64,7 @@ import {
   CxNuxtUIV4,
   createNuxtUiV4TriggerRegistry,
   mainArrayOf,
-} from '@lionad/cx-components-nuxt-ui-v4'
+} from '@lionad/cx-comps-nuxt-ui-v4'
 import { toItem, type CxMeta, type DevItem } from '~/dev/material-utils'
 import { replayIcon, replayTitle, useCardReplay, type CardReplay } from '~/dev/use-card-replay'
 import { groupByCategory, type CategoryGroup } from '~/dev/nuxt-ui-v4-categories'

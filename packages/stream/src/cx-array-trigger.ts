@@ -4,7 +4,7 @@
  * 大量组件的核心数据是 data 下的一个数组（行/数据点/图片/指标/标记/选项），
  * 增量语义同构：截断到「括号已平衡」的完整元素，残缺尾部（jsonrepair 补全的）
  * 不纳入。工厂把声明式字段配置转为 IncrementalTrigger，组件库只需提供自己的
- * 配置表（如 @lionad/cx-components-vtu 各组件目录的 stream-trigger.ts）。
+ * 配置表（如 @lionad/cx-comps-vtu 各组件目录的 stream-trigger.ts）。
  */
 
 import type { IncrementalTrigger, MatchesPerPath } from './core/incremental'

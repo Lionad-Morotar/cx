@@ -1,5 +1,5 @@
 <template>
-  <!-- /dev/components-vtu：@lionad/cx-components-vtu 物料 schema 驱动渲染验收。
+  <!-- /dev/components-vtu：@lionad/cx-comps-vtu 物料 schema 驱动渲染验收。
        按 vtu 官方分类（Data Display / Code & Terminal / Media / Social / Forms & Input / Workflow）
        分组展示，分类骨架来自 vtu 的 histoire storyGroups。 -->
   <main class="page-dev-components-vtu page">
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { CxVtu, createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-components-vtu'
+import { CxVtu, createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-comps-vtu'
 import { toItem, type CxMeta, type DevItem } from '~/dev/material-utils'
 import { replayIcon, replayTitle, useCardReplay, type CardReplay } from '~/dev/use-card-replay'
 import { groupByCategory, type CategoryGroup } from '~/dev/vtu-categories'

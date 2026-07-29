@@ -91,7 +91,7 @@ describe('cx eslint config', () => {
       eslint.isPathIgnored(resolve(repoRoot, 'playground/app/pages/index.vue')),
     ).resolves.toBe(true)
     await expect(
-      eslint.isPathIgnored(resolve(repoRoot, 'packages/components/src/index.ts')),
+      eslint.isPathIgnored(resolve(repoRoot, 'packages/comps/src/index.ts')),
     ).resolves.toBe(true)
     await expect(
       eslint.isPathIgnored(resolve(repoRoot, 'packages/definition/tests/loader.test.ts')),
@@ -108,7 +108,7 @@ describe('cx eslint config', () => {
     const eslint = makeEslint(createConfig({ ignores: ['custom-dir/**'] }))
     await expect(eslint.isPathIgnored(resolve(repoRoot, 'custom-dir/a.ts'))).resolves.toBe(true)
     await expect(
-      eslint.isPathIgnored(resolve(repoRoot, 'packages/components/src/index.ts')),
+      eslint.isPathIgnored(resolve(repoRoot, 'packages/comps/src/index.ts')),
     ).resolves.toBe(false)
   })
 })

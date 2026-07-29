@@ -45,7 +45,7 @@
 
 ### `as any` 与 `: any` 在物料层泛滥
 
-- 现状：`packages/components-nuxt-ui-v4/src/nuxt-ui-2/` 下几乎所有物料文件的 `hidden`、`slots`、`pickData` 回调参数都标注为 `({ cmpt }: any)` 或 `({ data }: any)`
+- 现状：`packages/comps-nuxt-ui-v4/src/nuxt-ui-2/` 下几乎所有物料文件的 `hidden`、`slots`、`pickData` 回调参数都标注为 `({ cmpt }: any)` 或 `({ data }: any)`
 - 文件示例：`badge/index.ts:16,22,28`、`button/index.ts:69,75,102`、`table/index.ts:87,97,136,206`、`select-menu/index.ts:49,56,63,121`、`alert/index.ts:63,65,91`
 - 影响：
   - 物料层是组件契约的“权威定义”，类型描述缺失会让所有消费物料的编辑器/面板失去静态校验
@@ -114,7 +114,7 @@
 - 症状：异步组件 loader 解析后，把 `installedAsync[installKey] = ...` 推迟到 `setTimeout(() => cmpts.forEach(...))` 中执行，目的是“等待异步组件渲染结束”，但没有同步 await 渲染完成
 - 文件：`packages/definition/src/loader/index.ts:352-360`
 - 触发：异步组件渲染时长 > 一个 tick 时，组件树会读到不完整的 `_cx_meta`
-- 规避：当前 playground 主要用本地 `@lionad/cx-components` 同步物料，未触发异步加载路径
+- 规避：当前 playground 主要用本地 `@lionad/cx-comps` 同步物料，未触发异步加载路径
 - 修复路径：用 `nextTick` + `app.runWithContext` 包裹注册；或显式返回 Promise 让 `installComponent` 等待
 
 ### `runtime.ts` 的 `calcSlots` 有未实现的 debounce
@@ -201,11 +201,11 @@
   - 升级 vue 前先在 `pnpm-workspace.yaml:8` 同步 pin 版本
   - 改动 `vite.config.ts` alias 时必须同步跑 `pnpm test` 验证 vue 解析路径未漂移
   - 任何引入新 vue peer 依赖（如新的 vue ecosystem 包）的 PR 都要复跑全量测试
-- 测试覆盖空白：没有针对“vue 单例身份”的回归测试；目前靠 `packages/components-nuxt-ui-v4/tests/materials.test.ts` 的物料挂载间接验证
+- 测试覆盖空白：没有针对“vue 单例身份”的回归测试；目前靠 `packages/comps-nuxt-ui-v4/tests/materials.test.ts` 的物料挂载间接验证
 
 ### `vendor/shims/` 离线化的 Nuxt 虚拟模块
 
-- 文件：`packages/components-nuxt-ui-v4/vendor/shims/imports.ts`、`app.config.ts`、`ui-colors.d.ts`、`nuxt-schema.d.ts`
+- 文件：`packages/comps-nuxt-ui-v4/vendor/shims/imports.ts`、`app.config.ts`、`ui-colors.d.ts`、`nuxt-schema.d.ts`
 - 易碎原因：
   - vendored nuxt-ui v2 组件依赖 `#imports`、`#app`、`#build/app.config`、`#ui-colors`、`nuxt/schema` 等虚拟模块；离线 shim 给出降级实现
   - `imports.ts` 的 `useId` 用进程内 `idSeed` 递增，SSR 场景下服务端和客户端 id 不一致会导致 hydration mismatch
@@ -214,7 +214,7 @@
 - 安全修改：
   - shim 改动需要同步 `vite.config.ts:15-25` 的 alias 指向
   - 任何物料层升级（nuxt-ui v2 → v3）都需要重新评估 shim 完整性
-- 测试覆盖：`packages/components-nuxt-ui-v4/tests/materials.test.ts` 仅 smoke 测试 cx-button/badge/alert 三个物料
+- 测试覆盖：`packages/comps-nuxt-ui-v4/tests/materials.test.ts` 仅 smoke 测试 cx-button/badge/alert 三个物料
 
 ### `runtime.ts` 的撤销（cancel）钩子链
 
@@ -275,7 +275,7 @@
 
 ### `vue-tsgo`、`vue-tsc`、`tsgo` 三套类型检查工具并存
 
-- 风险：`@lionad/cx-definition` 用 `tsgo --noEmit`；`@lionad/cx-vue`/`@lionad/cx-render`/`@lionad/cx-components`/`@lionad/cx-components-nuxt-ui-v4` 用 `vue-tsgo --tsdk ...`；playground 用 `nuxi prepare && vue-tsc`
+- 风险：`@lionad/cx-definition` 用 `tsgo --noEmit`；`@lionad/cx-vue`/`@lionad/cx-render`/`@lionad/cx-comps`/`@lionad/cx-comps-nuxt-ui-v4` 用 `vue-tsgo --tsdk ...`；playground 用 `nuxi prepare && vue-tsc`
 - 影响：三套工具对模板类型检查的覆盖度不同，vue-tsgo 是相对新的工具，行为可能未稳定
 - 迁移计划：选一套作为单一来源（推荐 vue-tsgo，符合 Vite+ 工具链），其余工具的配置项收敛
 
@@ -309,7 +309,7 @@
 
 ### 缺少物料变更影响分析工具
 
-- 问题：40+ 物料分散在 `packages/components/` 和 `packages/components-nuxt-ui-v4/`，无自动化工具回答“改了这个 prop 类型会影响哪些物料”
+- 问题：40+ 物料分散在 `packages/comps/` 和 `packages/comps-nuxt-ui-v4/`，无自动化工具回答“改了这个 prop 类型会影响哪些物料”
 - 建议：写一份 `scripts/analyze-materials.mjs`，用 ts-morph 扫描所有 normalize() 调用点，输出 prop → 物料的反向索引
 
 ## 测试覆盖空白

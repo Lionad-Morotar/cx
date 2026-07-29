@@ -10,11 +10,11 @@ cx/
 │   ├── definition/                 # schema 与 loader 核心（底层）
 │   ├── vue/                        # Vue 运行时 composables 与共享组件
 │   ├── renderer/                   # 渲染器（递归 schema → Vue 树）
-│   ├── components/                 # 自研基础物料（block / text / grid …）
-│   ├── components-nuxt-ui-v2/      # Nuxt UI v2 物料库
-│   ├── components-nuxt-ui-v4/      # vendored Nuxt UI v2 物料库
+│   ├── comps/                      # 自研基础物料（block / text / grid …）
+│   ├── comps-nuxt-ui-v2/           # Nuxt UI v2 物料库
+│   ├── comps-nuxt-ui-v4/           # vendored Nuxt UI v2 物料库
 │   │   └── vendor/                 # vendored 第三方源码 + 离线 shim（不参与 lint/fmt）
-│   ├── components-vtu/             # tool-ui-vue（vtu）工具调用组件物料库
+│   ├── comps-vtu/                  # tool-ui-vue（vtu）工具调用组件物料库
 │   └── nuxt/                       # Nuxt 模块入口（顶层）
 ├── playground/                     # 开发沙箱 + EAP 站会迁移 demo
 │   ├── app/                        # Nuxt app 目录（页面、插件、standup 业务）
@@ -48,16 +48,16 @@ cx/
 ### `packages/renderer/`
 
 - **用途：** 渲染器组件（5 个 SFC + 一个透明包装器）。
-- **包含：** `src/cmpts/`（`render.vue`、`render-component.vue`、`render-component-with-bindings.vue`、`render-components.vue`、`transparent-render.vue`、`info.vue`、`index.ts`）、`src/event/`（事件兼容转发 + `native-event.ts`）、`src/styles/`、`src/utils/`、`src/shims.d.ts`。
-- **关键文件：** `src/cmpts/render.vue`（CxRender 顶层）、`src/cmpts/index.ts`（CxRenderCmpts 物料集）。
+- **包含：** `src/comps/`（`render.vue`、`render-component.vue`、`render-component-with-bindings.vue`、`render-components.vue`、`transparent-render.vue`、`info.vue`、`index.ts`）、`src/event/`（事件兼容转发 + `native-event.ts`）、`src/styles/`、`src/utils/`、`src/shims.d.ts`。
+- **关键文件：** `src/comps/render.vue`（CxRender 顶层）、`src/comps/index.ts`（CxRenderComps 物料集）。
 
-### `packages/components/`
+### `packages/comps/`
 
 - **用途：** 自研基础物料。
 - **包含：** `src/basic/`（block / figure / header / h1~h5 / p / logic / datas / text）、`src/grid/`（含 `config/` `panel/` `utils/`）、`src/calendar/`（含 `panel/` `src/ui/`）、`src/page/`、`src/user-style/`、`src/styles/`、`src/index.ts`；`tests/materials.test.ts`（物料 smoke）。
 - **关键文件：** `src/basic/index.ts`（聚合 11 个基础物料，演示 `normalize()` 用法）、`src/grid/index.ts`（动态 slots 计算 demo）。
 
-### `packages/components-nuxt-ui-v4/`
+### `packages/comps-nuxt-ui-v4/`
 
 - **用途：** 基于 vendored Nuxt UI v2 的物料库 + 离线 shim。
 - **包含：**
@@ -103,8 +103,8 @@ cx/
 - `packages/definition/src/index.ts`：definition 库入口（聚合所有子模块）。
 - `packages/vue/src/index.ts`：vue 库入口。
 - `packages/renderer/src/index.ts`：renderer 库入口（含样式副作用 `import './styles/index.scss'`）。
-- `packages/components/src/index.ts`：components 库入口。
-- `packages/components-nuxt-ui-v4/src/index.ts`：nuxt-ui 物料库入口。
+- `packages/comps/src/index.ts`：components 库入口。
+- `packages/comps-nuxt-ui-v4/src/index.ts`：nuxt-ui 物料库入口。
 - `packages/nuxt/src/module.ts`：Nuxt 模块入口。
 - `playground/nuxt.config.ts`：playground 应用入口。
 - `playground/app/app.vue`：playground Nuxt 根组件。
@@ -116,7 +116,7 @@ cx/
 - `pnpm-workspace.yaml`：工作区声明 + overrides（vite / vitest / vue）。
 - `packages/*/tsconfig.json`：子包 TS 配置（仅追加 `rootDir` / `types` / `paths`）。
 - `packages/*/vite.config.ts`：子包 `vp pack` 配置（neverBundle 列表）。
-- `packages/components-nuxt-ui-v4/tsconfig.json` 与 `vite.config.ts`：含 Nuxt 虚拟模块 paths/alias。
+- `packages/comps-nuxt-ui-v4/tsconfig.json` 与 `vite.config.ts`：含 Nuxt 虚拟模块 paths/alias。
 - `playground/nuxt.config.ts`：ssr:false、模块注册、css、devServer。
 
 **核心逻辑：**
@@ -124,16 +124,16 @@ cx/
 - `packages/definition/src/loader/index.ts`：CxLoader 主体。
 - `packages/definition/src/normalize/component.ts`：normalize API。
 - `packages/definition/src/events/cx-emitter.ts`：事件总线。
-- `packages/renderer/src/cmpts/render.vue`：CxRender 顶层渲染。
-- `packages/renderer/src/cmpts/render-component.vue`：递归渲染单节点。
+- `packages/renderer/src/comps/render.vue`：CxRender 顶层渲染。
+- `packages/renderer/src/comps/render-component.vue`：递归渲染单节点。
 - `packages/nuxt/src/module.ts` 与 `packages/nuxt/src/runtime/install.ts`：物料装配。
 
 **测试：**
 
 - `packages/definition/tests/normalize.test.ts`、`runtime-algorithms.test.ts`
 - `packages/vue/tests/use-request.test.ts`
-- `packages/components/tests/materials.test.ts`
-- `packages/components-nuxt-ui-v4/tests/materials.test.ts`
+- `packages/comps/tests/materials.test.ts`
+- `packages/comps-nuxt-ui-v4/tests/materials.test.ts`
 - `playground/tests/`：`mock-contract.test.ts`、`materials-smoke.test.ts`、`server-write-routes.test.ts`、`cyber-envelope.test.ts`、`utils-*.test.ts`、`setup.ts`
 - 测试运行入口：根 `pnpm test` → `vp test`；类型检查 `pnpm typecheck`。
 
@@ -141,16 +141,16 @@ cx/
 
 **包名（package.json `name`）：** 全部以 `@lionad/cx-` 为 scope 前缀。
 
-- `@lionad/cx-definition`、`@lionad/cx-vue`、`@lionad/cx-render`、`@lionad/cx-components`、`@lionad/cx-components-nuxt-ui-v4`、`@lionad/cx-nuxt`。
+- `@lionad/cx-definition`、`@lionad/cx-vue`、`@lionad/cx-render`、`@lionad/cx-comps`、`@lionad/cx-comps-nuxt-ui-v4`、`@lionad/cx-nuxt`。
 - `cx-playground`（playground 私有，不带 scope）。
 
 **文件：**
 
-- **SFC**：lowercase-kebab，业务文件以 `index.vue` 为主名（`packages/components/src/grid/src/index.vue`、`packages/components-nuxt-ui-v4/src/nuxt-ui-2/button/src/index.vue`）；编辑器表单类放 `panel/*.vue`（如 `grid/panel/grids-form.vue`、`card-tabs/panel/tabs.vue`）。
+- **SFC**：lowercase-kebab，业务文件以 `index.vue` 为主名（`packages/comps/src/grid/src/index.vue`、`packages/comps-nuxt-ui-v4/src/nuxt-ui-2/button/src/index.vue`）；编辑器表单类放 `panel/*.vue`（如 `grid/panel/grids-form.vue`、`card-tabs/panel/tabs.vue`）。
 - **TS 模块**：`index.ts` 作为桶文件；按职责命名（`cx-emitter.ts`、`script-manager.ts`、`native-event.ts`、`use-request.ts`）。
 - **目录**：lowercase-kebab；每个物料/概念一个目录（`button/`、`accordion/`、`use-cx-slot/`）。
 - **Vue 组件名**：组件内 `defineOptions({ name: 'CxRender' })` 以 `Cx` 前缀大驼峰；物料 `key` 字段是 `cx-<kebab>`（如 `cx-button`、`cx-grid`、`cx-simple-card`）。
-- **物料数组导出**：默认导出物料数组（`packages/components-nuxt-ui-v4/src/nuxt-ui-2/index.ts` 同时做命名导出与 default 数组导出）。
+- **物料数组导出**：默认导出物料数组（`packages/comps-nuxt-ui-v4/src/nuxt-ui-2/index.ts` 同时做命名导出与 default 数组导出）。
 - **composable**：`use-cx-<thing>` 目录 + `index.ts`；运行时 hooks 仓库 `packages/vue/src/hooks/use-cx-*`。
 
 **目录约定：**
@@ -169,19 +169,19 @@ cx/
 
 **新增一个 cx 物料（基础物料）：**
 
-- 入口：`packages/components/src/<category>/<name>/index.ts`，参考 `packages/components/src/grid/index.ts` 模板——`normalize({ name, key, icon, description, component, props, slots?, ... })`。
-- 实现 SFC：`packages/components/src/<category>/<name>/src/index.vue`。
-- 表单 panel：`packages/components/src/<category>/<name>/panel/<form>.vue`（可选）。
-- 桶文件注册：在 `packages/components/src/<category>/index.ts` 加 `export`，并在 `packages/components/src/index.ts` 按分类暴露。
-- 烟雾测试：在 `packages/components/tests/materials.test.ts` 加一个挂载 smoke。
+- 入口：`packages/comps/src/<category>/<name>/index.ts`，参考 `packages/comps/src/grid/index.ts` 模板——`normalize({ name, key, icon, description, component, props, slots?, ... })`。
+- 实现 SFC：`packages/comps/src/<category>/<name>/src/index.vue`。
+- 表单 panel：`packages/comps/src/<category>/<name>/panel/<form>.vue`（可选）。
+- 桶文件注册：在 `packages/comps/src/<category>/index.ts` 加 `export`，并在 `packages/comps/src/index.ts` 按分类暴露。
+- 烟雾测试：在 `packages/comps/tests/materials.test.ts` 加一个挂载 smoke。
 
 **新增一个基于 Nuxt UI 的物料：**
 
-- 入口：`packages/components-nuxt-ui-v4/src/nuxt-ui-2/<name>/index.ts`，参考 `button/index.ts`。
-- 实现 SFC：`packages/components-nuxt-ui-v4/src/nuxt-ui-2/<name>/src/index.vue`。
+- 入口：`packages/comps-nuxt-ui-v4/src/nuxt-ui-2/<name>/index.ts`，参考 `button/index.ts`。
+- 实现 SFC：`packages/comps-nuxt-ui-v4/src/nuxt-ui-2/<name>/src/index.vue`。
 - 插槽绑定：`<name>/slots/index.ts`（如需），参考 `button/slots/`。
-- 桶注册：在 `packages/components-nuxt-ui-v4/src/nuxt-ui-2/index.ts` 加命名导出 + 加入默认导出数组。
-- 测试：`packages/components-nuxt-ui-v4/tests/materials.test.ts`。
+- 桶注册：在 `packages/comps-nuxt-ui-v4/src/nuxt-ui-2/index.ts` 加命名导出 + 加入默认导出数组。
+- 测试：`packages/comps-nuxt-ui-v4/tests/materials.test.ts`。
 
 **新增一个 composable（运行时 hook）：**
 
@@ -211,7 +211,7 @@ cx/
 
 ## 特殊目录
 
-**`packages/components-nuxt-ui-v4/vendor/`**
+**`packages/comps-nuxt-ui-v4/vendor/`**
 
 - **用途：** vendored Nuxt UI v2 源码 + 离线 shim，让物料库脱离 Nuxt 运行时也能独立打包测试。
 - **生成：** 否（手工 vendored，按 MIT 协议携带原版 `LICENSE.md`）。

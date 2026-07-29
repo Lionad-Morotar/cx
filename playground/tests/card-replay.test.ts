@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createComponentsTriggerRegistry } from '@lionad/cx-components'
-import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-components-vtu'
+import { createComponentsTriggerRegistry } from '@lionad/cx-comps'
+import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-comps-vtu'
 import {
   REPLAY_CHARS_PER_SEC,
   replayScriptOf,

@@ -1,4 +1,4 @@
-# @lionad/cx-components-nuxt-ui-v2
+# @lionad/cx-comps-nuxt-ui-v2
 
 Nuxt UI 物料组件库（内置 vendored nuxt-ui v2）
 

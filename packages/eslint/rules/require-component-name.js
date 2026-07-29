@@ -74,7 +74,7 @@ function deriveBaseName(segments) {
  * @param {string} filename 物理路径（允许相对路径，允许 \ 分隔）
  * @param {{ prefix?: string, packagePrefixes?: Record<string, string> }} [options]
  *   prefix 为组件名推导的必填项，缺失时抛错（layout/page 推导不需要）；
- *   packagePrefixes 按包名覆盖前缀（物料包中缀体系，如 components-nuxt-ui-v4 → cx-nuxt-ui-v4）
+ *   packagePrefixes 按包名覆盖前缀（物料包中缀体系，如 comps-nuxt-ui-v4 → cx-nuxt-ui-v4）
  */
 export function deriveComponentName(filename, options = {}) {
   const prefix = options.prefix
@@ -236,7 +236,7 @@ export default {
         type: 'object',
         properties: {
           prefix: { type: 'string' },
-          // 按包名覆盖前缀（物料包中缀体系）：{ 'components-nuxt-ui-v4': 'cx-nuxt-ui-v4' }
+          // 按包名覆盖前缀（物料包中缀体系）：{ 'comps-nuxt-ui-v4': 'cx-nuxt-ui-v4' }
           packagePrefixes: {
             type: 'object',
             additionalProperties: { type: 'string' },

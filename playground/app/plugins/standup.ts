@@ -3,7 +3,7 @@ import { RouterLink } from 'vue-router'
 import { vCxSkeleton } from '~/standup/utils/skeleton'
 import CxSvgIcon from '~/standup/components/cx-svg-icon.vue'
 import CxCard from '~/standup/components/cx-card.vue'
-import { CxBasics } from '@lionad/cx-components'
+import { CxBasics } from '@lionad/cx-comps'
 
 // CxScrollbar：滚动容器物料，业务组件模板直接 <CxScrollbar> 用，替代 el-scrollbar
 const CxScrollbar = (CxBasics as readonly any[]).find((x) => x?._cx_meta?.key === 'cx-scrollbar')

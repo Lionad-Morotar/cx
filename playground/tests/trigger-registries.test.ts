@@ -8,19 +8,19 @@ import {
 import {
   COMPONENTS_STREAM_TRIGGERS,
   createComponentsTriggerRegistry,
-} from '@lionad/cx-components'
+} from '@lionad/cx-comps'
 import {
   CxVtu,
   createVtuTriggerRegistry,
   mainArrayOf,
   VTU_STREAM_TRIGGERS,
-} from '@lionad/cx-components-vtu'
+} from '@lionad/cx-comps-vtu'
 import {
   createNuxtUiV4TriggerRegistry,
   CxNuxtUIV4,
   mainArrayOf as mainArrayOfV4,
   NUXT_UI_V4_STREAM_TRIGGERS,
-} from '@lionad/cx-components-nuxt-ui-v4'
+} from '@lionad/cx-comps-nuxt-ui-v4'
 import { buildDefaultData, type CxMeta } from '../app/dev/material-utils'
 
 // 物料库 trigger 注册表的判定型验收（与页面/定时器解耦的无头契约）：

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { CxNuxtUIV2 } from '@lionad/cx-components-nuxt-ui-v2'
+import { CxNuxtUIV2 } from '@lionad/cx-comps-nuxt-ui-v2'
 
 import { toItem, type CxMeta } from '../app/dev/material-utils'
 import { groupByCategory, NUTS_UI_V2_CATEGORY_ORDER } from '../app/dev/nuxt-ui-v2-categories'

@@ -40,7 +40,7 @@
 
 - Vue 组件名以 `Cx` 前缀 + PascalCase：`CxText`、`CxHeader`、`CxLogic`、`CxRender`、`CxNuxtUI`、`CxDashboardCard`
 - normalize 的 `key` 字段用 kebab-case 且以 `cx-` 开头：`cx-text`、`cx-dashboard-card`、`cx-time-count`
-- SFC 内强制 `defineOptions({ name: 'CxXxx' })` 与 key 的 PascalCase 一致（见 `packages/components/src/basic/src/text.vue:16`、`packages/components/src/basic/src/block.vue:10`）
+- SFC 内强制 `defineOptions({ name: 'CxXxx' })` 与 key 的 PascalCase 一致（见 `packages/comps/src/basic/src/text.vue:16`、`packages/comps/src/basic/src/block.vue:10`）
 
 ## 代码风格
 
@@ -57,7 +57,7 @@
 - Oxlint 配置位于 `vite.config.ts:38` 的 `lint` 字段；ESLint 配置为共享子包 `@lionad/cx-eslint-config`（`packages/eslint`），根 `eslint.config.mjs` 直接引用其默认预设
 - 分工：Oxlint 随 `vp check` 求快；ESLint 提供 Vue/TS/Vitest 生态完整规则，`pnpm lint` 独立跑，两者重叠处以 ESLint 为准
 - 格式化一律归 Oxfmt：ESLint 经 eslint-config-prettier 关闭全部格式类规则，不写格式相关规则配置
-- 忽略：`dist/**`、`packages/components-nuxt-ui-v2/vendor/**`、`packages/components-nuxt-ui-v4/vendor/**`、`packages/components/src/calendar/vendor/el-calendar/**`、`playground/.output/**`、`playground/.nuxt/**`
+- 忽略：`dist/**`、`packages/comps-nuxt-ui-v2/vendor/**`、`packages/comps-nuxt-ui-v4/vendor/**`、`packages/comps/src/calendar/vendor/el-calendar/**`、`playground/.output/**`、`playground/.nuxt/**`
 - 禁用注释优先使用行内形式：`// eslint-disable-next-line @typescript-eslint/no-explicit-any`（见 `playground/tests/utils-label.test.ts:35`）；多行元素盖不住属性行时用文件级注释并注明 Why（见 `packages/renderer/src/comps/render-component.vue:2`）
 - 存量治理期：`no-explicit-any`、`no-unused-vars`、`vue/return-in-computed-property` 等 9 条规则在 cx 预设中降级为 warn（清单与治理优先级见 `packages/eslint/index.js` 的 `LEGACY_WARN_RULES`），治理后恢复 error；**新增代码按 error 标准写**
 - `typescript-eslint` 不支持仓库锁定的 TS 7.0（加载即抛错）：`packages/eslint` 包内把 `typescript` 重定向到 `npm:typescript@^6` 副本喂给 lint，typecheck 链路的 TS 7 不受影响
@@ -103,13 +103,13 @@ import type { CxComponentRuntime, ComponentProps, ... } from '../types'
 
 - Nuxt 自动导入：`~/standup/...`、`~~/...`（仅 playground 内，见 `playground/app/plugins/standup-materials.ts:3`）
 - 测试统一经根 `vite.config.ts:11` 的 `resolve.alias` 强制 `vue` 单实例（避免 `EMPTY_OBJ` 身份分裂）
-- vendored Nuxt 虚拟模块别名：`#app`、`#imports`、`#build/app.config`、`#ui-colors`、`nuxt/schema` 全部指向 `packages/components-nuxt-ui-v4/vendor/shims/*.ts`，让 vitest 离线工作
+- vendored Nuxt 虚拟模块别名：`#app`、`#imports`、`#build/app.config`、`#ui-colors`、`nuxt/schema` 全部指向 `packages/comps-nuxt-ui-v4/vendor/shims/*.ts`，让 vitest 离线工作
 
 **禁止：** 从子包深层路径导入其他子包：错误 `import { useRequest } from '@lionad/cx-vue/src/hooks/use-request'`；正确 `import { useRequest } from '@lionad/cx-vue'`。
 
 ## Vue SFC 约定
 
-**块顺序：** `<template>` → `<script setup lang="ts">` → `<style lang="...">`（见 `packages/components/src/basic/src/text.vue`、`packages/components-nuxt-ui-v4/src/nuxt-ui-2/select/src/index.vue:1,31,89`）
+**块顺序：** `<template>` → `<script setup lang="ts">` → `<style lang="...">`（见 `packages/comps/src/basic/src/text.vue`、`packages/comps-nuxt-ui-v4/src/nuxt-ui-2/select/src/index.vue:1,31,89`）
 
 **`<script setup>`：**
 
@@ -128,9 +128,9 @@ import type { CxComponentRuntime, ComponentProps, ... } from '../types'
 
 **样式：**
 
-- 子包库组件：`<style lang="scss">` + `@layer cx { @include b('block-name') { ... } }`（见 `packages/components/src/basic/src/text.vue:38-77`、`packages/components/src/basic/src/block.vue:18-28`）
+- 子包库组件：`<style lang="scss">` + `@layer cx { @include b('block-name') { ... } }`（见 `packages/comps/src/basic/src/text.vue:38-77`、`packages/comps/src/basic/src/block.vue:18-28`）
 - 域内组件（playground 站会）：`<style lang="scss">` 或 `<style lang="less" scoped>`（见 `playground/app/standup/components/time-count/time-count.vue:48`）
-- BEM 经 `useCxBEM('block-name')` 生成类名：`ns.b()`、`ns.e('content')`、`ns.is('truncate', props.truncate)`（`packages/components/src/basic/src/text.vue:18`、`packages/vue/src/bem/index.ts:6-93`）
+- BEM 经 `useCxBEM('block-name')` 生成类名：`ns.b()`、`ns.e('content')`、`ns.is('truncate', props.truncate)`（`packages/comps/src/basic/src/text.vue:18`、`packages/vue/src/bem/index.ts:6-93`）
 - Tailwind 经 `@apply` 在 `@layer cx` 内使用：`@apply relative min-h-6 text-sm text-neutral-700 dark:text-neutral-300;`
 - 命名空间默认 `cx`（`useCxBEM`），可切换：`useBEM` = `p-*`、`useBem` = `p-*`（小写别名）
 
@@ -169,7 +169,7 @@ import type { CxComponentRuntime, ComponentProps, ... } from '../types'
   - `console.info('[standup-materials] 25 materials installed')`（`playground/app/plugins/standup-materials.ts:24`）
 - `[WARN]` / `[info]` 前缀：可恢复异常
   - `console.warn('[standup-materials] cx instance not found, skip material install')`
-  - `console.warn('[info] loop counts too large:', num, 'will be reset to ' + dftLoop)`（`packages/components/src/basic/src/logic.vue:43`）
+  - `console.warn('[info] loop counts too large:', num, 'will be reset to ' + dftLoop)`（`packages/comps/src/basic/src/logic.vue:43`）
 - `[ERR]` 前缀：不可恢复错误，常伴随 `throw`
   - `console.error('[ERR] no key in cmpt, skip', cmpt)`（`packages/definition/src/utils/datas.ts:199`）
   - `console.error('[ERR] parent not found', cmpt)`（`packages/definition/src/utils/datas.ts:255`）
@@ -237,7 +237,7 @@ import type { CxComponentRuntime, ComponentProps, ... } from '../types'
 
 - 顶层 `index.ts` 一律用 `export * from './subdir'`，禁止 default + named 混用导致名字冲突
 - 物料组件采用「单文件 default + normalize」模式：`export default normalize({ key: 'cx-xxx', ... })`（`playground/app/standup/components/time-count/index.ts:4`）
-- 上游桶文件以 `export { default as CxXxx } from './xxx'` 重命名导出（`packages/components/src/index.ts:1-5`、`playground/app/standup/components/index.ts:1-13`）
+- 上游桶文件以 `export { default as CxXxx } from './xxx'` 重命名导出（`packages/comps/src/index.ts:1-5`、`playground/app/standup/components/index.ts:1-13`）
 
 **桶文件：** 强制使用
 

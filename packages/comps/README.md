@@ -1,4 +1,4 @@
-# @lionad/cx-components
+# @lionad/cx-comps
 
 基础物料组件库
 

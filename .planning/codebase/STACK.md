@@ -69,7 +69,7 @@ allowBuilds:
 - ESLint 10 + `@lionad/cx-eslint-config`（`packages/eslint` 共享子包） — 深度规则层（Vue/TS/Vitest 生态完整规则），与 Oxlint 并存；`pnpm lint` 独立跑；包内 `typescript` 重定向到 `npm:typescript@^6`（typescript-eslint 8.x 不支持 TS 7.0）
 - `vp pack` — 子包产物打包（tsdown / rolldown 内核；`packages/*/vite.config.ts` 的 `pack` 段配置插件、alias、neverBundle 清单）
 - `vue-tsgo@0.3.0` + `tsgo`（TypeScript 7 原生 Go 实现）— 类型检查工具，命令为 `pnpm -r run typecheck`
-- `vue-tsc@^3.3.7` — 仅 `packages/{vue,renderer,components,components-nuxt-ui-v4}` 的 `build` 脚本调用 `vue-tsc -p tsconfig.build.json` 生成 `.d.ts`
+- `vue-tsc@^3.3.7` — 仅 `packages/{vue,renderer,comps,comps-nuxt-ui-v4}` 的 `build` 脚本调用 `vue-tsc -p tsconfig.build.json` 生成 `.d.ts`
 - `nuxt-module-build build` — `packages/nuxt` 的构建入口（来自 `@nuxt/module-builder`）
 - `unplugin-vue@^7.2.0` — 根 `vite.config.ts` 用 `unplugin-vue/vite`（dev/test 场景）；子包 `pack` 段用 `unplugin-vue/rolldown`（生产打包场景）
 
@@ -81,9 +81,9 @@ allowBuilds:
 - `@vue/shared@^3.5.40` — `packages/definition` 直接依赖（共享工具）
 - `@vueuse/core@^14.3.0` — 全部子包 peerDeps；`packages/definition` 用 `useMemoize` 缓存远程 metadata；playground 锁定 `^13.9.0`
 - `lodash-es@^4.18.1` + `@types/lodash-es` — 几乎所有子包依赖（`camelCase` 等工具）
-- `dayjs@^1.11.21` — 日期处理（`packages/vue`、`packages/components`、`playground`）
+- `dayjs@^1.11.21` — 日期处理（`packages/vue`、`packages/comps`、`playground`）
 - `uuid@^14.0.1` + `@types/uuid` — `packages/definition/src/loader` 用于 script 标签 ID 生成（`script-manager.ts`）
-- `zod@^4.4.3` — schema 校验（`packages/definition`、`packages/components`、`packages/components-nuxt-ui-v4`）
+- `zod@^4.4.3` — schema 校验（`packages/definition`、`packages/comps`、`packages/comps-nuxt-ui-v4`）
 
 **definition 包特有：**
 
@@ -101,7 +101,7 @@ allowBuilds:
 - `vue-concurrency@5.0.3` — 并发控制（锁定 5.0.3）
 - `use-semantic-version@^0.0.7` — 语义版本工具
 
-**components-nuxt-ui-v4 包特有（Nuxt UI 物料依赖）：**
+**comps-nuxt-ui-v4 包特有（Nuxt UI 物料依赖）：**
 
 - `@headlessui/vue@^1.7.23` — 无样式行为层组件（vendored nuxt-ui v2 上游依赖）
 - `@popperjs/core@^2.11.8` — 浮层定位
@@ -124,9 +124,9 @@ allowBuilds:
 - `@vueuse/router@^13.9.0` — 路由 composables
 - `mitt@^3.0.1` — 站会事件总线（与 definition 同源）
 
-**Vendored 第三方源码（`packages/components-nuxt-ui-v4/vendor/`）：**
+**Vendored 第三方源码（`packages/comps-nuxt-ui-v4/vendor/`）：**
 
-- Nuxt UI v2 全量源码（MIT） — 标记 `@ts-nocheck`，不参与 lint/format/typecheck 质量门；`packages/components-nuxt-ui-v4/vendor/bridge.ts` 为显式导入入口
+- Nuxt UI v2 全量源码（MIT） — 标记 `@ts-nocheck`，不参与 lint/format/typecheck 质量门；`packages/comps-nuxt-ui-v4/vendor/bridge.ts` 为显式导入入口
 - 配套 shim 在 `vendor/shims/`：`imports.ts`（离线 useId/useState/useAppConfig/useNuxtApp）、`app.config.ts`、`ui-colors.d.ts`、`nuxt-schema.d.ts`
 - 根 `vite.config.ts` 通过 alias 把 `#app` / `#imports` / `#build/app.config` / `#ui-colors` / `nuxt/schema` 强制指向上述 shim，使非 Nuxt 消费方也能打包
 
@@ -143,8 +143,8 @@ allowBuilds:
 - `vite.config.ts`（每个子包） — `vp pack` 入口，配置 `unplugin-vue/rolldown` 插件、`deps.neverBundle`（peer 依赖保持外置）、Nuxt 虚拟模块 alias
 - `tsconfig.base.json` — 全仓基准 TS 配置：`target: ES2023`、`module: ESNext`、`moduleResolution: bundler`、`strict: true`、`noUncheckedIndexedAccess: true`、`verbatimModuleSyntax: true`、`noEmit: true`
 - `tsconfig.json`（每个子包） — 继承 base，加入 `rootDir` / `types` / `include`
-- `tsconfig.build.json`（vue / renderer / components / components-nuxt-ui-v4） — 在子包 tsconfig 之上开启 `emitDeclarationOnly`，输出 `.d.ts` 到 `dist/`
-- `playground/nuxt.config.ts` — modules 注册 `@nuxt/ui`（须先于 `@lionad/cx-nuxt`）与 `@lionad/cx-nuxt`；`ssr: false`；css 引入 `~/assets/css/main.css`（tailwindcss + @nuxt/ui）、`@lionad/cx-components/style.css` 与 `~/standup/styles/index.less`；`devServer.port: 3209` + `host: '0.0.0.0'`（LAN 暴露）；`compatibilityDate: '2026-07-19'`
+- `tsconfig.build.json`（vue / renderer / comps / comps-nuxt-ui-v4） — 在子包 tsconfig 之上开启 `emitDeclarationOnly`，输出 `.d.ts` 到 `dist/`
+- `playground/nuxt.config.ts` — modules 注册 `@nuxt/ui`（须先于 `@lionad/cx-nuxt`）与 `@lionad/cx-nuxt`；`ssr: false`；css 引入 `~/assets/css/main.css`（tailwindcss + @nuxt/ui）、`@lionad/cx-comps/style.css` 与 `~/standup/styles/index.less`；`devServer.port: 3209` + `host: '0.0.0.0'`（LAN 暴露）；`compatibilityDate: '2026-07-19'`
 
 **npm 脚本（root `package.json`）：**
 
@@ -160,7 +160,7 @@ pnpm dev:playground # pnpm -C playground dev — 启动 Nuxt dev server (port 32
 **npm 脚本（子包）：**
 
 - `packages/definition`：`build: vp pack`、`typecheck: tsgo --noEmit`
-- `packages/{vue,renderer,components,components-nuxt-ui-v4}`：`build: vp pack && vue-tsc -p tsconfig.build.json`、`typecheck: vue-tsgo --tsdk ../../node_modules/.pnpm/typescript@7.0.2/node_modules/typescript --noEmit`
+- `packages/{vue,renderer,comps,comps-nuxt-ui-v4}`：`build: vp pack && vue-tsc -p tsconfig.build.json`、`typecheck: vue-tsgo --tsdk ../../node_modules/.pnpm/typescript@7.0.2/node_modules/typescript --noEmit`
 - `packages/nuxt`：`build: nuxt-module-build build`、`typecheck: tsgo --noEmit`、`prepublishOnly: nuxt-module-build build`
 - `playground`：`dev: nuxt dev --host 0.0.0.0 --port 3209`、`build: nuxt build`、`typecheck: nuxi prepare && vue-tsc --noEmit -p .nuxt/tsconfig.json`、`gen:mocks: node scripts/generate-mocks.mjs`
 

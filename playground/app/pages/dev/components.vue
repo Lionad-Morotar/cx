@@ -1,5 +1,5 @@
 <template>
-  <!-- /dev/components：@lionad/cx-components 物料的 schema 驱动渲染验收页 -->
+  <!-- /dev/components：@lionad/cx-comps 物料的 schema 驱动渲染验收页 -->
   <main class="page-dev-components page">
     <header class="page-header">
       <h1 class="title">cx components</h1>
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { CxBasics, CxCalendar, CxGrid, CxPage, CxUserStyle } from '@lionad/cx-components'
+import { CxBasics, CxCalendar, CxGrid, CxPage, CxUserStyle } from '@lionad/cx-comps'
 import { toItem, type CxMeta, type DevItem } from '~/dev/material-utils'
 
 defineOptions({ name: 'PageDevComponents' })

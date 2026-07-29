@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { CxVtu } from '@lionad/cx-components-vtu'
+import { CxVtu } from '@lionad/cx-comps-vtu'
 import { toItem, type CxMeta } from '../app/dev/material-utils'
 import { VTU_OFFICIAL_KEYS, groupByCategory } from '../app/dev/vtu-categories'
 

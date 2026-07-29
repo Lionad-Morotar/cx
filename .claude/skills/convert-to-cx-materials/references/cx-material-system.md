@@ -6,13 +6,13 @@
 ## 1. 依赖链与子包角色
 
 ```
-definition ──▶ vue ──▶ renderer ──▶ components / components-nuxt-ui-v2 / components-nuxt-ui-v4 / components-vtu ──▶ nuxt
+definition ──▶ vue ──▶ renderer ──▶ comps / comps-nuxt-ui-v2 / comps-nuxt-ui-v4 / comps-vtu ──▶ nuxt
 ```
 
 - `@lionad/cx-definition`：schema 层。`normalize()`、`CxLoader`、类型系统、事件总线。零 Vue 渲染依赖（vue 是 peer）。
 - `@lionad/cx-vue`：Vue 运行时 composables（`useCxBEM`、`useCx*`、scoped-css、style-* 等）+ 共享组件（`CxIcon`/`CxEmpty`）。
 - `@lionad/cx-render`：`<CxRender>` 递归渲染器 + bundle `CxRenderBundle`。入口副作用 `import './styles/index.scss'`。
-- `packages/components*`：物料包。每个导出 `CxXxxBundle: CxMaterialBundle`。
+- `packages/comps*`：物料包。每个导出 `CxXxxBundle: CxMaterialBundle`。
 - `@lionad/cx-nuxt`：Nuxt module。不 import 任何物料包本体，按开关生成虚拟模块装配清单。
 
 ## 2. 物料契约：`normalize()`
@@ -133,8 +133,8 @@ props 键名 ⊆ `ComponentProps<component>`、emits 键名 ⊆ 组件 emits、e
 
 ```bash
 pnpm install                                  # 新增 workspace 包后链接
-pnpm -F @lionad/cx-components-<lib> build     # vp pack + vue-tsc（产 dist/index.mjs + d.ts）
-pnpm -F @lionad/cx-components-<lib> typecheck # vue-tsgo --noEmit
+pnpm -F @lionad/cx-comps-<lib> build     # vp pack + vue-tsc（产 dist/index.mjs + d.ts）
+pnpm -F @lionad/cx-comps-<lib> typecheck # vue-tsgo --noEmit
 pnpm -F @lionad/cx-nuxt build                 # nuxt-module-build build（改了 module.ts 后必跑）
 pnpm -C playground exec nuxi prepare          # 改 materials 开关后刷新 #build/cx-bundles.mjs
 pnpm exec vp test <path>                      # 单文件/单包测试（pnpm test 不接受位置参数，用 vp test）

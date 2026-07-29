@@ -1,5 +1,5 @@
 {
-  "name": "@lionad/cx-components-vtu",
+  "name": "@lionad/cx-comps-vtu",
   "version": "0.1.0",
   "description": "cx material components wrapping tool-ui-vue (vtu) tool-call widgets",
   "license": "MIT",

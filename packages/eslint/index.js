@@ -149,7 +149,7 @@ const LEGACY_WARN_RULES = {
  * cx monorepo 开箱即用预设：治理范围收敛 + 存量治理降级。
  *
  * 扫描范围策略：先只 lint definition / nuxt / renderer / skills / stream / vue 六个核心包——
- * 物料包（components*）含大量 vendored 移植与存量代码、playground 是演示沙箱，
+ * 物料包（comps*）含大量 vendored 移植与存量代码、playground 是演示沙箱，
  * 待核心包存量治理收敛后按包逐步放开（黑名单制：放开即删行）。
  * 测试文件不 lint：mock/fixture 的 any 与宽松表达式是测试固有形态，生产向规则对它是噪音。
  */
@@ -158,12 +158,12 @@ export default createConfig({
     // 测试文件（含核心包内 tests/）
     '**/*.test.{ts,mts,js,mjs}',
     '**/tests/**',
-    // 沙箱与物料包（vendored 忽略随之冗余，保留注释备查：components*/vendor、calendar/vendor/el-calendar）
+    // 沙箱与物料包（vendored 忽略随之冗余，保留注释备查：comps*/vendor、calendar/vendor/el-calendar）
     'playground/**',
-    'packages/components/**',
-    'packages/components-nuxt-ui-v2/**',
-    'packages/components-nuxt-ui-v4/**',
-    'packages/components-vtu/**',
+    'packages/comps/**',
+    'packages/comps-nuxt-ui-v2/**',
+    'packages/comps-nuxt-ui-v4/**',
+    'packages/comps-vtu/**',
     // 基建包自身不在首批治理范围（自研规则的形态样例会触发自扫描）
     'packages/eslint/**',
   ],
@@ -176,17 +176,17 @@ export default createConfig({
       // @theme 注册），存量约 35 处无可迁移目标——待设计系统落地后恢复 error 并分期治理
       'cx/no-hardcoded-color': 'off',
       'cx/no-tracking-marker': 'error',
-      // 物料包中缀体系：components/v2/renderer 等为 cx-*，v4/vtu 带包中缀
+      // 物料包中缀体系：comps/v2/renderer 等为 cx-*，v4/vtu 带包中缀
       'cx/require-component-name': [
         'error',
         {
           prefix: 'cx',
           packagePrefixes: {
-            'components-nuxt-ui-v4': 'cx-nuxt-ui-v4',
-            'components-vtu': 'cx-vtu',
+            'comps-nuxt-ui-v4': 'cx-nuxt-ui-v4',
+            'comps-vtu': 'cx-vtu',
           },
           // v4 物料是 Nuxt UI v4 薄包装：根为 U* 组件，DOM 类体系由被包装组件控制
-          skipRootClassPackages: ['components-nuxt-ui-v4'],
+          skipRootClassPackages: ['comps-nuxt-ui-v4'],
         },
       ],
       // 与 require-component-name 的 kebab fixer 循环打架；Cx 命名 PascalCase 由其 case 宽容接管

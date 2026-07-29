@@ -1,4 +1,4 @@
-# 案例：tool-ui-vue (vtu) → `@lionad/cx-components-vtu`
+# 案例：tool-ui-vue (vtu) → `@lionad/cx-comps-vtu`
 
 > 本次会话把 vtu 转成 cx 物料的实战记录。当作「别人踩过的坑 + 已验证的取值」清单。
 > 通用模板在 `conversion-playbook.md`，cx 机制在 `cx-material-system.md`。
@@ -56,7 +56,7 @@ vtu 组件普遍必填 `id`，且 cx 灌入的 attrs 含 `cmpt`/`data-*`/无 `_`
 
 ## 验证证据
 
-- 全量 `pnpm test`：**27 文件 / 172 用例**（含 components-vtu 18 + vtu-categories 2 + cx-bundles 自动覆盖）绿。
+- 全量 `pnpm test`：**27 文件 / 172 用例**（含 comps-vtu 18 + vtu-categories 2 + cx-bundles 自动覆盖）绿。
 - 全仓 `pnpm typecheck` 绿；`pnpm check` 0 errors。
 - 包 `vp pack` 产 dist 40.76kB。
 - 浏览器实证 `/dev/components-vtu` 6 分类 29 卡带样式：chart 真实柱状图、shiki 语法高亮+行号+语言徽标、diff +/- 着色、`¥12,800.00 +12.5%` 货币格式 + sparkline、terminal ANSI、markdown 文章（标题/加粗/列表/代码/标签/作者头像）。

@@ -1,6 +1,6 @@
-# @lionad/cx-components-nuxt-ui-v4
+# @lionad/cx-comps-nuxt-ui-v4
 
-cx 物料组件库，基于 Nuxt UI v4。对齐 `@lionad/cx-components-nuxt-ui-v2` 的物料概念，采用 v4 组件 API。
+cx 物料组件库，基于 Nuxt UI v4。对齐 `@lionad/cx-comps-nuxt-ui-v2` 的物料概念，采用 v4 组件 API。
 
 ## 架构：Nuxt 宿主依赖型 library
 

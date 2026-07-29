@@ -8,7 +8,7 @@
 目录形态（每物料一个目录，必有 `index.ts` + `src/index.vue`；按需加 `slots/`/`types/`/`panel/`）：
 
 ```
-packages/components-<lib>/
+packages/comps-<lib>/
 ├── package.json
 ├── tsconfig.json
 ├── tsconfig.build.json
@@ -23,11 +23,11 @@ packages/components-<lib>/
 └── tests/materials.test.ts      # §7
 ```
 
-`package.json`（复刻 `packages/components`，改 name/deps）：
+`package.json`（复刻 `packages/comps`，改 name/deps）：
 
 ```json
 {
-  "name": "@lionad/cx-components-<lib>",
+  "name": "@lionad/cx-comps-<lib>",
   "version": "0.1.0",
   "type": "module",
   "sideEffects": false,
@@ -204,9 +204,9 @@ export function useVtuProps<T extends object>(
 ```ts
 export type CxBuiltinMaterialSet = 'render' | 'components' | 'nuxt-ui-v2' | 'nuxt-ui-v4' | '<lib>'
 // BUILTIN_BUNDLES 加：
-  <lib>: { package: '@lionad/cx-components-<lib>', namedExport: 'CxLibBundle' },
+  <lib>: { package: '@lionad/cx-comps-<lib>', namedExport: 'CxLibBundle' },
 // setup 内条件样式注入（仿 v-calendar）：
-if (options.injectStyles && specs.some((s) => s.package === '@lionad/cx-components-<lib>')) {
+if (options.injectStyles && specs.some((s) => s.package === '@lionad/cx-comps-<lib>')) {
   nuxt.options.css.push('<被包装库 style 入口，如 @lionad/<lib>/style.css>')
 }
 ```
@@ -215,7 +215,7 @@ if (options.injectStyles && specs.some((s) => s.package === '@lionad/cx-componen
 
 ## §7 playground 接入 + 验收页 + 分类契约
 
-1. `playground/package.json` dependencies 加 `"@lionad/cx-components-<lib>": "workspace:*"`（必须——虚拟模块在宿主上下文解析）。
+1. `playground/package.json` dependencies 加 `"@lionad/cx-comps-<lib>": "workspace:*"`（必须——虚拟模块在宿主上下文解析）。
 2. `playground/nuxt.config.ts` 的 `materials` 数组加 `'<lib>'`。
 3. `playground/app/dev/<lib>-categories.ts`：`CATEGORY_ORDER` + `OFFICIAL_KEYS`（目标库官方分类清单）+ `CATEGORY_BY_KEY`（一次性建全所有 key 映射，增量安全）+ `groupByCategory`（未映射 key 抛错）。
 4. `playground/app/pages/dev/components-<lib>.vue`：复刻 v4 页——`import { CxLib }` → `materials.map(toItem)` → `groupByCategory` → 每组 `<CxRender v-if="!item.meta.headless" :components="[item.node]" />`。预览容器加 `max-height + overflow:auto` 收口高物料。
@@ -249,7 +249,7 @@ it('groupByCategory 全覆盖不抛错', () => {
 
 ## §9 构建/验证工作流（含 dev server 时序竞态）
 
-- 新建/改物料包后：`pnpm install`（链接）→ 改完源码 `pnpm -F @lionad/cx-components-<lib> build`（playground 吃 dist）。
+- 新建/改物料包后：`pnpm install`（链接）→ 改完源码 `pnpm -F @lionad/cx-comps-<lib> build`（playground 吃 dist）。
 - 改 materials 开关后：`pnpm -C playground exec nuxi prepare`（刷新 `#build/cx-bundles.mjs`）。
 - **dev server 时序竞态**：重启 dev server 后，Vite 首次请求才触发依赖预优化（重依赖库优化耗时长）；优化完成前访问页面会 `Failed to fetch dynamically imported module ...entry.js` 或整页 500。
   自动化截图前轮询 dev log 的 `dependencies optimized` 再导航；导航前可先 `navigate about:blank` 丢弃旧 module graph 避免粘住失效 `?v=` hash。
@@ -263,5 +263,5 @@ case-insensitive FS 上 `git add WRONGCASE.md`（磁盘为 `RightCase.md`）会�
 
 ## §11 分批提交（垂直切片，每 commit 可独立构建/测试）
 
-推荐顺序：① 既有格式化漂移单独 `style:` → ② `feat(components-<lib>): 新物料包`（含 `pnpm-lock.yaml`，lockfile 与可解析的新包同 commit）→
+推荐顺序：① 既有格式化漂移单独 `style:` → ② `feat(comps-<lib>): 新物料包`（含 `pnpm-lock.yaml`，lockfile 与可解析的新包同 commit）→
 ③ `feat(cx-nuxt): 注册 + 样式注入` → ④ `feat(playground): 验收页 + 分类契约` → ⑤ `docs: 依赖链/包清单`。

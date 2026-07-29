@@ -1,6 +1,6 @@
 # el-calendar vendor
 
-从 [element-plus@2.14.3](https://github.com/element-plus/element-plus/tree/2.14.3/packages/components/calendar/src) 内化的 calendar 组件，使 `cx-calendar` 彻底脱离 element-plus 依赖。
+从 [element-plus@2.14.3](https://github.com/element-plus/element-plus/tree/2.14.3/packages/comps/calendar/src) 内化的 calendar 组件，使 `cx-calendar` 彻底脱离 element-plus 依赖。
 
 ## 为什么 vendor
 
@@ -35,4 +35,4 @@ vendor/
 
 ## 升级
 
-如需同步上游修复，按 `2.14.3` tag 重新下载 `packages/components/calendar/src` 覆盖 `el-calendar/`，并重新本地化 import 路径；shims 视新依赖按需补齐。
+如需同步上游修复，按 `2.14.3` tag 重新下载 `packages/comps/calendar/src` 覆盖 `el-calendar/`，并重新本地化 import 路径；shims 视新依赖按需补齐。

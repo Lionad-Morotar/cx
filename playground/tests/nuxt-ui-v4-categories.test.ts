@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { CxNuxtUIV4 } from '@lionad/cx-components-nuxt-ui-v4'
+import { CxNuxtUIV4 } from '@lionad/cx-comps-nuxt-ui-v4'
 
 import { toItem, type CxMeta } from '../app/dev/material-utils'
 import {

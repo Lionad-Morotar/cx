@@ -1,5 +1,5 @@
 <template>
-  <!-- /dev/components-nuxt-ui-v2：@lionad/cx-components-nuxt-ui-v2 物料 schema 驱动渲染验收。
+  <!-- /dev/components-nuxt-ui-v2：@lionad/cx-comps-nuxt-ui-v2 物料 schema 驱动渲染验收。
        按 Nuxt UI 官方分类（Elements / Form / Data / Layout / Navigation / Overlay）分组展示，
        分类骨架来自 vendored 源码 vendor/src/runtime/components/ 的 6 大目录。 -->
   <main class="page-dev-components-nuxt-ui-v2 page">
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { CxNuxtUIV2 } from '@lionad/cx-components-nuxt-ui-v2'
+import { CxNuxtUIV2 } from '@lionad/cx-comps-nuxt-ui-v2'
 import { toItem, type CxMeta } from '~/dev/material-utils'
 import { groupByCategory, type CategoryGroup } from '~/dev/nuxt-ui-v2-categories'
 

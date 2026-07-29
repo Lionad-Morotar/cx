@@ -1,4 +1,4 @@
-# @lionad/cx-components-vtu
+# @lionad/cx-comps-vtu
 
 cx 物料包：把 [tool-ui-vue (vtu)](https://github.com/Lionad-Morotar/tool-ui-vue) 的工具调用组件包装为 cx schema 驱动渲染系统的物料。
 

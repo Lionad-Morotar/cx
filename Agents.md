@@ -1,6 +1,6 @@
 # Agents.md
 
-Schema 驱动的 Vue 组件渲染系统：从低代码组件定义（schema）到运行时渲染的完整链路。共 8 个子包，形成 definition → vue → renderer → components / components-nuxt-ui-v2 / components-nuxt-ui-v4 / components-vtu → nuxt 的依赖链，外加 `playground` 开发沙箱。
+Schema 驱动的 Vue 组件渲染系统：从低代码组件定义（schema）到运行时渲染的完整链路。共 8 个子包，形成 definition → vue → renderer → comps / comps-nuxt-ui-v2 / comps-nuxt-ui-v4 / comps-vtu → nuxt 的依赖链，外加 `playground` 开发沙箱。
 
 - 现实层你有无限时间和资源，不要因上下文压缩简化任务执行
 - 本仓库使用 Vite+（Vite 8 / Vitest / Oxlint / Oxfmt / tsdown）作为构建工具链，TypeScript 7 作为类型检查

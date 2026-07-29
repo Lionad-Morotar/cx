@@ -32,10 +32,10 @@ const testConfig = createConfig().concat({
       {
         prefix: 'cx',
         packagePrefixes: {
-          'components-nuxt-ui-v4': 'cx-nuxt-ui-v4',
-          'components-vtu': 'cx-vtu',
+          'comps-nuxt-ui-v4': 'cx-nuxt-ui-v4',
+          'comps-vtu': 'cx-vtu',
         },
-        skipRootClassPackages: ['components-nuxt-ui-v4'],
+        skipRootClassPackages: ['comps-nuxt-ui-v4'],
       },
     ],
     // 与 require-component-name 的 case 宽容冲突，预设同款关闭
@@ -68,10 +68,10 @@ function sfc(script: string, template = '<div>content</div>') {
 
 describe('require-component-name：路径推导', () => {
   it('物料包 index 回退父目录，src 容器段再上溯', () => {
-    expect(deriveComponentName('packages/components/src/accordion/src/index.vue', { prefix: 'cx' })).toBe(
+    expect(deriveComponentName('packages/comps/src/accordion/src/index.vue', { prefix: 'cx' })).toBe(
       'cx-accordion',
     )
-    expect(deriveComponentName('packages/components/src/grid/panel/grids-form.vue', { prefix: 'cx' })).toBe(
+    expect(deriveComponentName('packages/comps/src/grid/panel/grids-form.vue', { prefix: 'cx' })).toBe(
       'cx-grids-form',
     )
   })
@@ -79,22 +79,22 @@ describe('require-component-name：路径推导', () => {
   it('packagePrefixes 按包覆盖前缀（v4/vtu 中缀体系）', () => {
     const options = {
       prefix: 'cx',
-      packagePrefixes: { 'components-nuxt-ui-v4': 'cx-nuxt-ui-v4', 'components-vtu': 'cx-vtu' },
+      packagePrefixes: { 'comps-nuxt-ui-v4': 'cx-nuxt-ui-v4', 'comps-vtu': 'cx-vtu' },
     }
-    expect(deriveComponentName('packages/components-nuxt-ui-v4/src/accordion/index.vue', options)).toBe(
+    expect(deriveComponentName('packages/comps-nuxt-ui-v4/src/accordion/index.vue', options)).toBe(
       'cx-nuxt-ui-v4-accordion',
     )
-    expect(deriveComponentName('packages/components-vtu/src/linked-in-post/index.vue', options)).toBe(
+    expect(deriveComponentName('packages/comps-vtu/src/linked-in-post/index.vue', options)).toBe(
       'cx-vtu-linked-in-post',
     )
   })
 
   it('缺 prefix 抛错（fail-loud 防漏配）', () => {
-    expect(() => deriveComponentName('packages/components/src/alert/index.vue')).toThrow(/prefix/)
+    expect(() => deriveComponentName('packages/comps/src/alert/index.vue')).toThrow(/prefix/)
   })
 
   it('非目标路径返回 null', () => {
-    expect(deriveComponentName('packages/components/src/utils/helper.ts', { prefix: 'cx' })).toBeNull()
+    expect(deriveComponentName('packages/comps/src/utils/helper.ts', { prefix: 'cx' })).toBeNull()
     expect(deriveComponentName('scripts/build.mjs', { prefix: 'cx' })).toBeNull()
   })
 
@@ -105,7 +105,7 @@ describe('require-component-name：路径推导', () => {
 })
 
 describe('require-component-name：SFC 行为', () => {
-  const alertPath = 'packages/components/src/alert/index.vue'
+  const alertPath = 'packages/comps/src/alert/index.vue'
 
   it('script setup 缺 name：fixer 在最后一个 import 后插入 PascalCase defineOptions', async () => {
     const code = sfc(
@@ -149,7 +149,7 @@ describe('require-component-name：SFC 行为', () => {
     const code = sfc(
       ['<script setup lang="ts">', "defineOptions({ name: 'CxNuxtUIV4Accordion' })", '</script>'].join('\n'),
     )
-    const result = await lint('packages/components-nuxt-ui-v4/src/accordion/index.vue', code)
+    const result = await lint('packages/comps-nuxt-ui-v4/src/accordion/index.vue', code)
     expect(cxHits(result, 'cx/require-component-name')).toHaveLength(0)
   })
 
@@ -225,13 +225,13 @@ describe('require-component-name：SFC 行为', () => {
       ['<script setup lang="ts">', "defineOptions({ name: 'CxNuxtUIV4Accordion' })", '</script>'].join('\n'),
       '<UAccordion :items="items" />',
     )
-    const result = await lint('packages/components-nuxt-ui-v4/src/accordion/index.vue', code)
+    const result = await lint('packages/comps-nuxt-ui-v4/src/accordion/index.vue', code)
     expect(cxHits(result, 'cx/require-component-name')).toHaveLength(0)
   })
 })
 
 describe('no-hardcoded-color', () => {
-  const widgetPath = 'packages/components/src/widget/index.vue'
+  const widgetPath = 'packages/comps/src/widget/index.vue'
 
   it('hex/rgb 硬编码命中，suggestions 经 option 文案兜底', async () => {
     const hits = cxHits(
@@ -279,7 +279,7 @@ describe('no-hardcoded-color', () => {
 })
 
 describe('no-tracking-marker', () => {
-  const helperPath = 'packages/components/src/widget/helpers.ts'
+  const helperPath = 'packages/comps/src/widget/helpers.ts'
 
   it('阶段编号注释命中', async () => {
     const code = '// Phase 1: 初始化\nexport const a = 1\n'

@@ -20,7 +20,7 @@ import {
   withDirectives,
 } from 'vue'
 import type { Directive } from 'vue'
-import { CxBasics } from '@lionad/cx-components'
+import { CxBasics } from '@lionad/cx-comps'
 
 const INSTANCE_KEY = Symbol('cx-skeleton-instance')
 

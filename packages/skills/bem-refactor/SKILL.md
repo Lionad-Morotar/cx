@@ -32,7 +32,7 @@ cx 的 BEM 由 JS 与 SCSS 两侧共享同一命名空间 `cx`，生成 `cx-<blo
 
 - 组件结构和层级关系
 - 现有 class 命名方式
-- 所属包（`components` 基础组件 vs `components-nuxt-ui-v2` 薄包装层）
+- 所属包（`comps` 基础组件 vs `comps-nuxt-ui-v2` 薄包装层）
 
 ### 2. 确定 Block 名称
 
@@ -195,7 +195,7 @@ defineProps<{
 
 ## 注意事项
 
-1. **两种组件模式**：`packages/components` 基础组件有完整样式；`packages/components-nuxt-ui-v2` 是薄包装层，仅 `ns.b()` 挂根元素，style 留空占位
+1. **两种组件模式**：`packages/comps` 基础组件有完整样式；`packages/comps-nuxt-ui-v2` 是薄包装层，仅 `ns.b()` 挂根元素，style 留空占位
 2. **分层放置**：静态工具类写模板 `class`，BEM 语义类写 `:class`，SCSS 仅放状态组合（`when`）、伪类、动画、第三方覆盖等模板做不到的规则；`class` 与 `:class` 共存是正常模式
 3. **`@layer cx`**：所有组件样式包在 `@layer cx` 内，确保级联优先级可控
 4. **`@use` 而非 `@import`**：`@use '@lionad/cx-vue/styles' as *;` 是唯一入口

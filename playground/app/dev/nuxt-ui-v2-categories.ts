@@ -1,7 +1,7 @@
 import type { DevItem } from './material-utils'
 
 // Nuxt UI v2 物料的官方分类装配。
-// 分类骨架来自 vendored 源码 packages/components-nuxt-ui-v2/vendor/src/runtime/components/
+// 分类骨架来自 vendored 源码 packages/comps-nuxt-ui-v2/vendor/src/runtime/components/
 // 下的 6 大目录（data / elements / forms / layout / navigation / overlays），
 // 命名采用用户引用的 v4 文档习惯（overlays → Overlay）。
 

@@ -142,7 +142,7 @@ import {
   useStreamChunks,
   type CxStreamNode,
 } from '@lionad/cx-stream'
-import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-components-vtu'
+import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-comps-vtu'
 import { toRenderNode } from '~/dev/material-utils'
 import { cropScenarioChunks, MAX_COMPONENTS } from '~/dev/stream-scenario'
 

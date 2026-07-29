@@ -46,7 +46,7 @@ pnpm check             # fmt + lint + 类型检查（= vp check）
 **排除：**
 
 - `playground/tests/setup.ts`（被 setupFiles 引用，本身不是测试）
-- `dist/**`、`packages/components-nuxt-ui-v4/vendor/**`、`playground/.output/**`、`playground/.nuxt/**`（lint/fmt/test 共同忽略）
+- `dist/**`、`packages/comps-nuxt-ui-v4/vendor/**`、`playground/.output/**`、`playground/.nuxt/**`（lint/fmt/test 共同忽略）
 
 **命名：**
 
@@ -60,8 +60,8 @@ pnpm check             # fmt + lint + 类型检查（= vp check）
 | `packages/definition/tests/normalize.test.ts`            | 单元             | `normalize` / `toJSON` schema 装配             |
 | `packages/definition/tests/runtime-algorithms.test.ts`   | 单元（算法表征） | `cloneComponent` / `makeTree`                  |
 | `packages/vue/tests/use-request.test.ts`                 | 单元（行为）     | `useRequest` 注入栈 + 数据合并                 |
-| `packages/components/tests/materials.test.ts`            | smoke            | `CxBasics` 物料挂载与 normalize                |
-| `packages/components-nuxt-ui-v4/tests/materials.test.ts` | smoke            | `CxNuxtUI` vendored 物料挂载                   |
+| `packages/comps/tests/materials.test.ts`            | smoke            | `CxBasics` 物料挂载与 normalize                |
+| `packages/comps-nuxt-ui-v4/tests/materials.test.ts` | smoke            | `CxNuxtUI` vendored 物料挂载                   |
 | `playground/tests/cyber-envelope.test.ts`                | 契约             | `request` 包络处理（ofetch/ElMessage mock）    |
 | `playground/tests/mock-contract.test.ts`                 | 契约             | `mocks/data/*.json` 数据层契约                 |
 | `playground/tests/server-write-routes.test.ts`           | 集成             | server 写路由全链路（mock-event + mock-store） |
@@ -77,8 +77,8 @@ cx/
 ├── packages/
 │   ├── definition/tests/         # schema 装配 + 核心算法
 │   ├── vue/tests/                # composable 行为
-│   ├── components/tests/         # 基础物料 smoke
-│   └── components-nuxt-ui-v4/tests/  # vendored 物料 smoke
+│   ├── comps/tests/              # 基础物料 smoke
+│   └── comps-nuxt-ui-v4/tests/   # vendored 物料 smoke
 └── playground/
     └── tests/
         ├── setup.ts              # 全局 setup（h3 自动导入挂载 + fetch 桩）
@@ -276,7 +276,7 @@ const stubCmpt = { render: () => null } as unknown as Component
 **复杂挂载桩：**
 
 ```typescript
-// 来自 packages/components-nuxt-ui-v4/tests/materials.test.ts:11-30
+// 来自 packages/comps-nuxt-ui-v4/tests/materials.test.ts:11-30
 const fakeCmpt = (key: string) => ({ id: `test-${key}`, key, data: {}, components: {} })
 
 const mountMaterial = (cmpt, props = {}, opts = {}) =>
@@ -336,7 +336,7 @@ pnpm test -- --coverage
 
 - 物料组件可挂载、props 归一化不炸、`_cx_meta` 装配完整
 - 不深入断言渲染细节，只验证「**不爆** + **关键文本出现**」
-- 例：`packages/components/tests/materials.test.ts`、`packages/components-nuxt-ui-v4/tests/materials.test.ts`、`playground/tests/materials-smoke.test.ts`
+- 例：`packages/comps/tests/materials.test.ts`、`packages/comps-nuxt-ui-v4/tests/materials.test.ts`、`playground/tests/materials-smoke.test.ts`
 
 **集成测试：**
 
@@ -395,7 +395,7 @@ it('无 to 时为无限生成器，调用方自行截断', () => {
 **Vue 组件挂载 + 指令桩：**
 
 ```typescript
-// 来自 packages/components/tests/materials.test.ts:11-22
+// 来自 packages/comps/tests/materials.test.ts:11-22
 const mountWithCx = (component, props = {}, opts = {}) =>
   mount(component, {
     props,

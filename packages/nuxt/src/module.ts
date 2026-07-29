@@ -30,10 +30,10 @@ export interface CxNuxtModuleOptions {
 // 兼容形态的物料集 → bundle 声明映射；纯字符串表，cx-nuxt 不依赖任何物料包
 const BUILTIN_BUNDLES: Record<CxBuiltinMaterialSet, CxBundleSpec> = {
   render: { package: '@lionad/cx-render', namedExport: 'CxRenderBundle' },
-  components: { package: '@lionad/cx-components', namedExport: 'CxComponentsBundle' },
-  'nuxt-ui-v2': { package: '@lionad/cx-components-nuxt-ui-v2', namedExport: 'CxNuxtUIV2Bundle' },
-  'nuxt-ui-v4': { package: '@lionad/cx-components-nuxt-ui-v4', namedExport: 'CxNuxtUIV4Bundle' },
-  vtu: { package: '@lionad/cx-components-vtu', namedExport: 'CxVtuBundle' },
+  components: { package: '@lionad/cx-comps', namedExport: 'CxComponentsBundle' },
+  'nuxt-ui-v2': { package: '@lionad/cx-comps-nuxt-ui-v2', namedExport: 'CxNuxtUIV2Bundle' },
+  'nuxt-ui-v4': { package: '@lionad/cx-comps-nuxt-ui-v4', namedExport: 'CxNuxtUIV4Bundle' },
+  vtu: { package: '@lionad/cx-comps-vtu', namedExport: 'CxVtuBundle' },
 }
 
 /**
@@ -163,7 +163,7 @@ const module: NuxtModule<CxNuxtModuleOptions> = defineNuxtModule<CxNuxtModuleOpt
     // 该依赖归属 v2 物料包，无条件注入会对未装 v-calendar 的宿主产生解析负担
     if (
       options.injectStyles &&
-      specs.some((s) => s.package === '@lionad/cx-components-nuxt-ui-v2')
+      specs.some((s) => s.package === '@lionad/cx-comps-nuxt-ui-v2')
     ) {
       nuxt.options.css.push('v-calendar/dist/style.css')
     }
