@@ -4,7 +4,7 @@
  * Why 直接读文件而非走 server：数据契约由生成脚本保证，应脱离 nitro 环境独立可验；
  * 包络形态由 server/utils/mock-store 的 ok/fail 单测覆盖。
  */
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -281,7 +281,16 @@ describe('Memo 契约', () => {
 })
 
 describe('敏感信息红线', () => {
-  it('全部数据文件不含任何受限字样', () => {
+  // 受限词属内部命名，明文不入库：清单由 git-ignored 的 redline.local.json 注入，
+  // 仓库内任何形态（含编码）都可被还原，缺失时跳过以免快照泄露扫描目标
+  const REDLINE_PATH = join(__dirname, 'redline.local.json')
+  const hasRedline = existsSync(REDLINE_PATH)
+
+  if (!hasRedline) {
+    console.warn('[mock-contract] 缺少 playground/tests/redline.local.json，敏感信息红线测试跳过')
+  }
+
+  it.skipIf(!hasRedline)('全部数据文件不含任何受限字样', () => {
     const FILES = [
       'users',
       'project',
@@ -292,19 +301,10 @@ describe('敏感信息红线', () => {
       'memos',
       'sync-time',
     ]
-    // 扫描目标由本地清单注入，明文不入库
-    const BANNED = [
-      '<redacted>',
-      '<redacted>',
-      '<redacted>',
-      '<redacted>',
-      '<redacted>',
-      '<redacted>',
-      '<redacted>',
-    ]
+    const { banned } = JSON.parse(readFileSync(REDLINE_PATH, 'utf-8')) as { banned: string[] }
     for (const name of FILES) {
       const text = readFileSync(join(DATA_DIR, `${name}.json`), 'utf-8').toLowerCase()
-      for (const word of BANNED) {
+      for (const word of banned) {
         expect(text.includes(word), `${name}.json 命中受限字样：${word}`).toBe(false)
       }
     }

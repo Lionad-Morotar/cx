@@ -9,3 +9,6 @@ dist/
 
 # 系统
 .DS_Store
+
+# 本地注入的受限清单（含内部命名明文，任何形态入库都可被还原）
+playground/tests/redline.local.json
