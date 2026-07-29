@@ -1,7 +1,7 @@
 import mitt from 'mitt'
 
 /** 翻译函数类型：(key, data?) => string */
-type TranslateFn = (key: string, data?: unknown) => string
+export type TranslateFn = (key: string, data?: unknown) => string
 
 export const cxTranslateFn = {
   value: null as TranslateFn | null,

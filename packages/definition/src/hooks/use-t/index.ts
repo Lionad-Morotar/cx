@@ -1,6 +1,7 @@
 import { cxTranslateFn } from '../../events/i18n'
+import type { TranslateFn } from '../../events/i18n'
 
-const processData = (key: string, data: any) => {
+const processData = (key: string, data: unknown) => {
   // console.log('[info] processData', processData)
   let text = key
   if (!text) {
@@ -9,7 +10,7 @@ const processData = (key: string, data: any) => {
   if (cxTranslateFn.value) {
     text = cxTranslateFn.value(key, data)
   }
-  if (typeof data === 'object') {
+  if (data && typeof data === 'object') {
     if (text !== key) {
       return text
     }
@@ -26,7 +27,7 @@ const processData = (key: string, data: any) => {
 }
 
 export function useTranslator() {
-  const translate: any = function (key: string, data?: any) {
+  const translate: TranslateFn = function (key: string, data?: unknown) {
     if (!key) return key
     return processData(key, data)
   }
