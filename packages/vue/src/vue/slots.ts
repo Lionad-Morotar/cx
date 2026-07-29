@@ -20,7 +20,7 @@ export const useCompSlots = (prefix: string) => {
         }
         return acc
       },
-      {} as Record<string, any>,
+      {} as Record<string, unknown>,
     )
     return ret
   })

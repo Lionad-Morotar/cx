@@ -15,7 +15,10 @@ const props = withDefaults(
     component?: CxComponentRuntime
     info?: string
   }>(),
-  {},
+  {
+    component: undefined,
+    info: undefined,
+  },
 )
 
 const component = props?.component || ({} as CxComponentRuntime)

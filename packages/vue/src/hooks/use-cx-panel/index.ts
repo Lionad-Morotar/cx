@@ -21,16 +21,13 @@ type PropsWithDefaults<Base, Defaults> = Base & {
  */
 export const useCxPanel = <
   T = unknown,
-  ExtraProps = {
-    // nothing
-  },
+  ExtraProps = Record<string, never>,
 >(
   defaultValue?: T,
   // extra?: Record<string, unknown>
 ) => {
   const cx = inject<CxLoaderInstance>('cx')!
   const instance = getCurrentInstance()!
-  // @ts-ignore * ComponentEmits not capable with @vue/compiler-sfc
   const emits = instance.emit as ComponentEmits<{
     // cxCompRuntime.data
     'update:data': [x: CxComponentRuntime['data']]
@@ -49,9 +46,7 @@ export const useCxPanel = <
         valueKey: string
       } & ExtraProps
     >,
-    {
-      // ...extra,
-    }
+    Record<string, never>
   >
 
   const value = computed({

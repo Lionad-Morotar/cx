@@ -6,18 +6,18 @@ import { useAsync } from '../use-task'
  * 请求函数形态（宿主应用注入的 API 调用器）。
  * 原代码从 '@cx/apis/types' 导入，该路径在 p-ray 中不存在（幻影 import）。
  */
-export type CxRequestFn = <Res = any>(opts: Record<string, any>) => Promise<Res>
+export type CxRequestFn = <Res = unknown>(opts: Record<string, unknown>) => Promise<Res>
 /** 响应包装形态：getData 按 objects → data.data → data 的顺序回退取数 */
-export type CxResponse<T = any> = {
+export type CxResponse<T = unknown> = {
   objects?: T
   data?: T & { data?: T }
-  [key: string]: any
+  [key: string]: unknown
 }
 
 type UseRequestOpts = {
   method?: string
   url: string
-  data?: any
+  data?: unknown
   // 声明副作用函数，请求成功后执行，可以用于清理缓存等操作
   effect?: () => void
 }
@@ -86,7 +86,7 @@ function _useRequest<Req = unknown, Res = unknown>(
   // 默认的取数据方法，从请求中取得实际的数据内容（不包含 code、success 等），
   // 应当从这里移除，放到使用方实现
   const getData = (fn: typeof apiNormal | typeof apiCached) => async (t: Req) => {
-    const res = (await fn(t)) as any
+    const res = (await fn(t)) as CxResponse
     return (res?.objects || res?.data?.data || res?.data || res) as unknown as Res
   }
 

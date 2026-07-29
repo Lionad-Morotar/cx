@@ -7,7 +7,7 @@
         name="slot-start"
         v-bind="{ innerSlotKey: `${slot.key}-start` }"
       />
-      <template v-for="(_, csIDX) in compChilds[slot.key!] ?? []">
+      <template v-for="(_, csIDX) in compChilds[slot.key!] ?? []" :key="csIDX">
         <component
           :is="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-start`]"
           v-if="innerSlots[`${slot.key}-${compChilds[slot.key!]![csIDX]!.id}-start`]"
@@ -44,6 +44,7 @@
 
 <script setup lang="ts">
 import { inject, type Ref, computed, reactive, unref } from 'vue'
+import type { Component } from 'vue'
 import CxRenderComponent from './render-component.vue'
 import CxTransparentRender from './transparent-render.vue'
 import type { CxComponentRuntime, CxComponentSlot, CxLoaderInstance } from '@lionad/cx-definition'
@@ -53,7 +54,7 @@ defineOptions({ name: 'CxRenderComponents' })
 const props = withDefaults(
   defineProps<{
     compID: CxComponentRuntime['id']
-    slotWrapper: any
+    slotWrapper: Component
     slot: CxComponentSlot
   }>(),
   {},
@@ -76,7 +77,7 @@ const compChilds = computed((): Record<string, CxComponentRuntime[]> => {
  * @example 外部组件可做如下修改
  * innerSlots['default-<compId>'] = 'div'
  */
-const innerSlots = reactive({} as Record<string, any>)
+const innerSlots = reactive({} as Record<string, Component | undefined>)
 
 const getSlotNames = () => {
   const slotKey = props.slot.key

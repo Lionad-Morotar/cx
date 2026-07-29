@@ -1,4 +1,4 @@
-import { has, genUseHooks } from '@lionad/cx-definition'
+import { has } from '@lionad/cx-definition'
 import type { CxComponentRuntime, CxComponentSlot } from '@lionad/cx-definition'
 import { computed, unref, inject } from 'vue'
 

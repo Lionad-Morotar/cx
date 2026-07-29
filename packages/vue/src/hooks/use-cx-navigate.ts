@@ -8,7 +8,7 @@ import type { InjectionKey } from 'vue'
  * 物料（cx-navigate）经 useCxNavigate 消费，未注入时 noop + 警告，与
  * provideCxToast/provideCxMedia 同构。
  */
-export type CxNavigateTarget = string | { path?: string; query?: Record<string, any> }
+export type CxNavigateTarget = string | { path?: string; query?: Record<string, unknown> }
 
 export interface CxNavigateProvider {
   push: (to: CxNavigateTarget) => void

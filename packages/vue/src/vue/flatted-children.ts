@@ -2,8 +2,8 @@ import { isVNode } from 'vue'
 import { isArray, isFunction, isObject } from '@vue/shared'
 import type { VNode, VNodeChild, VNodeNormalizedChildren } from 'vue'
 
-export type VNodeChildAtom = Exclude<VNodeChild, Array<any>>
-export type RawSlots = Exclude<VNodeNormalizedChildren, Array<any> | null | string>
+export type VNodeChildAtom = Exclude<VNodeChild, Array<unknown>>
+export type RawSlots = Exclude<VNodeNormalizedChildren, Array<unknown> | null | string>
 
 export type FlattenVNodes = Array<VNodeChildAtom | RawSlots>
 
@@ -31,7 +31,7 @@ export const flattedChildren = async (
           console.log('childs', childs)
           result.push(
             ...childs.flatMap((x) =>
-              // @ts-ignore
+              // @ts-expect-error x 是 RawSlots（函数形态），TS 无法从联合收窄到可调用
               isFunction(x) ? x() : x,
             ),
           )

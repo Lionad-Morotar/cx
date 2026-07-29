@@ -5,13 +5,13 @@ import { useLocalStorage, useSessionStorage, useVModel } from '@vueuse/core'
 import type { AnyFn, UseVModelOptions } from '@vueuse/core'
 import type { Ref } from 'vue'
 
-export function useCxState<P extends Record<string, any>, K extends keyof P>(
+export function useCxState<P extends Record<string, unknown>, K extends keyof P>(
   props: P,
   key: K,
   emits?: AnyFn,
   options?: UseVModelOptions<P[K], false> & {
     useVModel?: boolean
-    ref?: Ref<any>
+    ref?: Ref<unknown>
     storage?: 'local-storage' | 'default' | 'session-storage'
     storageKey?: string
   },

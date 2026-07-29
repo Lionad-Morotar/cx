@@ -33,7 +33,7 @@ withDefaults(
     touchable?: boolean
     active?: boolean
   }>(),
-  { size: 16 },
+  { name: undefined, size: 16, title: undefined },
 )
 
 const emits = defineEmits(['click'])

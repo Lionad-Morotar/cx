@@ -20,13 +20,11 @@ const sizes = ['3xs', '2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'] as cons
 
 type Size = (typeof sizes)[number]
 
-type InferSize<From extends Size, To extends Size> = Size[]
-
 /** 生成从 x 到 y 的尺码区间（含两端） */
 export const useSize = <X extends Size, Y extends Size>(x: X, y: Y) => {
   const indexX = sizes.indexOf(x)
   const indexY = sizes.indexOf(y)
-  return indexX === -1 || indexY === -1 ? [] : (sizes.slice(indexX, indexY + 1) as InferSize<X, Y>)
+  return indexX === -1 || indexY === -1 ? [] : sizes.slice(indexX, indexY + 1)
 }
 
 export const useSizeOptions = (x: Size, y: Size) => {

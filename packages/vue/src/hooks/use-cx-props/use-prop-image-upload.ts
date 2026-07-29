@@ -9,11 +9,11 @@ type UseCxStateParams = Parameters<typeof useCxState>
 
 const getDefaultValue = () => Object.freeze({ url: '', fit: 'cover' })
 
-const fallback = (...args: any[]) => {
+const fallback = (...args: unknown[]) => {
   return args.find((x) => !isNil(x)) || null
 }
 
-const clean = (value: Ref<CxImageUploadPropValue>, defaultOverride: Record<string, any>) => {
+const clean = (value: Ref<CxImageUploadPropValue>, defaultOverride: Record<string, unknown>) => {
   const defaultValue = getDefaultValue()
   if (isString(value.value) || isNil(value.value)) {
     value.value = Object.assign(

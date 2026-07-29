@@ -47,7 +47,7 @@ export const useAnysort = <T>(opts: UseSortOptions<T>) => {
       // anysort@2 的 anysort() 不再原地排序（返回比较结果），此处排序静默失效；
       // 恢复排序需改用 anysort.splice(records, criteria).sorted（编辑器排序路径）。
       // 验收页 table 默认无排序（sorts=[]）走 else 分支，不经过此处。
-      anysort(records.value, ...(sortPlugins.value as any))
+      anysort(records.value, ...sortPlugins.value)
     } else {
       records.value = [...opts.records.value]
     }

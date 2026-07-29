@@ -38,7 +38,7 @@ export const useQuery = (selector: string, opts: UseQueryOpts = {}) => {
   const count = ref(0)
   let tick: ReturnType<typeof setInterval> | undefined
   const stop = () => {
-    tick && clearInterval(tick)
+    if (tick) clearInterval(tick)
   }
   const start = () => {
     tick = setInterval(

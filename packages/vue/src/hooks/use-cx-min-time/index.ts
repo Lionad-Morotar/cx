@@ -1,7 +1,7 @@
 /**
  * 使异步函数至少运行某段时间
  */
-export const useCxMinTime = <Fn extends (...args: any) => any>(fn: Fn, time = 350) => {
+export const useCxMinTime = <Fn extends (...args: unknown[]) => unknown>(fn: Fn, time = 350) => {
   const sleep = (time = 350) => new Promise((resolve) => setTimeout(resolve, time))
 
   type Params = Array<Parameters<typeof fn>> | Parameters<typeof fn>

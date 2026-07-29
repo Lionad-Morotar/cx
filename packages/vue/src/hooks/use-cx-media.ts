@@ -8,7 +8,7 @@ import type { ComputedRef, InjectionKey, MaybeRef } from 'vue'
  * 宿主应用（如 p-ray 的 OSS 实现）经 provideCxMedia 安装。
  */
 export interface CxMediaProvider {
-  upload: (file: File, opts?: Record<string, any>) => Promise<{ url: string } & Record<string, any>>
+  upload: (file: File, opts?: Record<string, unknown>) => Promise<{ url: string } & Record<string, unknown>>
   getPreviewURL: (url: MaybeRef<string | undefined>) => ComputedRef<string>
 }
 

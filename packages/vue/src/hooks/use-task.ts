@@ -13,7 +13,7 @@ type Generator = Parameters<typeof useTaskOriginal>[0]
  * @see https://github.com/MartinMalinda/vue-concurrency/issues/106
  */
 export function useTask(
-  cb: Generator | AsyncGenerator<any, any, any>,
+  cb: Generator | AsyncGenerator<unknown, unknown, unknown>,
   concurrency: 'drop' | 'restartable' | 'keepLatest' | null = 'drop',
 ) {
   const task = useTaskOriginal(cb as Generator)
@@ -33,7 +33,7 @@ type UseAsyncOptions<Result> = {
 type UseAsyncError = Error & {
   cause: {
     code: 'concurrent' | 'callback-execution-error'
-    values: any
+    values: unknown
     cause: unknown
   }
 }
@@ -44,7 +44,7 @@ type UseAsyncError = Error & {
 export function useAsync<
   Result,
   Args extends unknown[] = [],
-  Options extends UseAsyncOptions<Result> = {},
+  Options extends UseAsyncOptions<Result> = Record<string, never>,
 >(
   bindFuncOrPromise: Promise<Result> | ((...args: Args) => Promise<Result>),
   options?: Partial<Options>,
@@ -163,6 +163,9 @@ export function useAsync<
 
     states.isLoading = true
 
+    // running/result/resolve 三者类型约束联动：收窄 resolve 会与 states.running（Promise<Result>）
+    // 及 states.result（Result | null）声明矛盾，留待 running 状态机单独治理
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let execRunningResolve: any
     let onAbort: (() => void) | undefined
     states.running = new Promise((r) => (execRunningResolve = r))
@@ -256,7 +259,7 @@ export function useAsync<
   })
 
   const fakeArgs = [] as unknown as Args
-  isPromise && exec(...fakeArgs)
+  if (isPromise) exec(...fakeArgs)
 
   function reset() {
     const isValid = checkConcurrent(...fakeArgs)
