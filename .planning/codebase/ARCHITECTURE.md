@@ -25,7 +25,7 @@ cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：�
                                │ `installCxBundles` 按开关装配物料
                                ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│   物料层（render / components / nuxt-ui-v4）                          │
+│   物料层（render / components / nuxt-ui-v4 / vtu / element-plus）     │
 │   `packages/renderer/src/comps/index.ts`        （CxRenderComps）     │
 │   `packages/comps/src/index.ts`            （CxBasics / Grid …） │
 │   `packages/comps-nuxt-ui-v4/src/index.ts` （CxNuxtUI / Card …） │
@@ -57,7 +57,9 @@ cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：�
 依赖链（单向，从下往上读）：
 
 ```text
-definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt-ui-v2 / comps-nuxt-ui-v4 / comps-vtu ──▶ nuxt
+definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt-ui-v2 / comps-nuxt-ui-v4 / comps-vtu / comps-element-plus ──▶ nuxt
+                                       ▲
+                                       └── cx-stream（流式增量预设，物料包侧依赖）
 ```
 
 - `@lionad/cx-definition`：最底层、零 Vue 渲染依赖（仅 peer dep vue / `@vueuse/core`），定义 `CxLoader`、`normalize`、事件总线、`CxComponentRuntime` 类型系统。
@@ -66,6 +68,7 @@ definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt
 - `@lionad/cx-comps`：cx 自研基础物料（block / text / header / grid / calendar / page / user-style）。
 - `@lionad/cx-comps-nuxt-ui-v4`：vendored Nuxt UI v2 物料，配合离线 shim，脱离 Nuxt 运行时也可打包。
 - `@lionad/cx-comps-vtu`：包装 [tool-ui-vue（vtu）](https://github.com/Lionad-Morotar/tool-ui-vue) 的 29 个 AI 工具调用组件为 cx 物料；vtu 为纯 npm Vue 库，无需 vendor/shim，样式经 cx-nuxt 条件注入 `@lionad/vtu-components/style.css`（其 `@source` 由宿主 Tailwind v4 处理）。
+- `@lionad/cx-comps-element-plus`：包装 Element Plus 的 27 件组件为 cx 物料（六类冻结）；同为纯 npm 库包装范式，桥接层 `useEpProps` 剥离 cx 内部键、保留 class/监听器；变更上行不声明 emits meta、走 `nativeEvents ∩ _cx_events` 原生通道。**EP 样式不在 cx-nuxt 模块侧注入**（其 unlayered 全局元素 reset 会胜宿主 `@layer utilities`），须由宿主以 `@import 'element-plus/dist/index.css' layer(cx-ep)` 压入层序最前的 `cx-ep` 层（详见包 README）。
 - `@lionad/cx-nuxt`：Nuxt 模块入口，把上述所有能力零配置注入宿主。
 
 ## 组件职责
@@ -80,6 +83,8 @@ definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt
 | `CxRenderComponent`             | 单节点渲染器；解析 `cmpt.key` 为 Vue 组件、合并 `data` / `events` / `slots`            | `packages/renderer/src/comps/render-component.vue`                                                                                |
 | `CxRenderComponents`            | 插槽集合渲染器；按 `slot.key` 拉子组件并递归                                           | `packages/renderer/src/comps/render-components.vue`                                                                               |
 | `CxRenderComponentWithBindings` | 把 cx-styles（margin/padding/border/font/round/cosom/breakpoint）与指令绑到具体组件上  | `packages/renderer/src/comps/render-component-with-bindings.vue`                                                                  |
+| `useEpProps`                    | 把 cx 灌入 attrs 提纯为 EP 可消费 props：剥离 `comp`/`data-*`/`_*`，保留 class/style/on*（无 id 回退，区别于 vtu） | `packages/comps-element-plus/src/shared/use-ep-props.ts`                                                                          |
+| `CxElementPlusBundle`           | Element Plus 27 件物料自描述 bundle（`name: 'element-plus'`），供 cx-nuxt 按 bundle 装配  | `packages/comps-element-plus/src/index.ts`                                                                                        |
 | Nuxt module                     | `defineNuxtModule` 入口；注册 `CxRender`、注入 server/client plugin                    | `packages/nuxt/src/module.ts`                                                                                                     |
 | `installCxBundles`              | 按选项 `materials: ['render','components','nuxt-ui']` 安装物料集                       | `packages/nuxt/src/runtime/install.ts`                                                                                            |
 | Vendored shim                   | 离线化 Nuxt 虚拟模块（`#imports` / `#app` / `useState` / `useId`）                     | `packages/comps-nuxt-ui-v4/vendor/shims/imports.ts`                                                                          |
@@ -152,6 +157,15 @@ definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt
   - `vendor/`：vendored Nuxt UI v2 源码 + 离线 shim（`shims/imports.ts`、`shims/app.config.ts`、`shims/ui-colors.d.ts`、`shims/nuxt-schema.d.ts`）
 - **依赖：** `@lionad/cx-definition`、`@lionad/cx-vue`、`@headlessui/vue`、`@popperjs/core`、`@vueuse/integrations`、`fuse.js`、`ohash`、`tailwind-merge`、`v-calendar`、`vue-demi`、`defu`。
 - **特殊：** 通过 `vendor/shims/` 在脱离 Nuxt 时仍可独立打包测试；在真实 Nuxt 宿主里则由 Nuxt 解析虚拟模块。
+
+### comps-element-plus 层（`packages/comps-element-plus/src/`）
+
+- **职责：** 包装 Element Plus 组件为 cx 物料（六类 27 件冻结：基础反馈 / 数据展示 / 导航版式 / 表单 / 表格 / 插槽容器）。
+- **位置：** `packages/comps-element-plus/src/`
+- **包含：** 每个物料 `<comp>/index.ts`（`define` 出口）+ `<comp>/src/index.vue`（包装 SFC）；`shared/use-ep-props.ts`（attrs 桥接）；`table/stream-trigger.ts` + `stream-triggers.ts`（流式增量预设，`createEpTriggerRegistry`/`mainArrayOf`）；`tests/`（桥接单测 + 各类 smoke + 27 件契约冻结）。
+- **依赖：** `@lionad/cx-definition`、`@lionad/cx-vue`、`@lionad/cx-stream`、`element-plus`（`^2.14.3`）。
+- **关键约定：** 包装 SFC 一律 `inheritAttrs:false` + `useAttrs` + `useEpProps` + `v-bind`；表单物料不声明 emits meta，变更走原生事件通道；`card` 的对象形态 slots meta 须同时声明 `default` 与 `header`（渲染器 `mapValues` 只产出声明键）。
+- **样式：** 不由 cx-nuxt 注入；宿主须按层序契约 `@import 'element-plus/dist/index.css' layer(cx-ep)`（见上约束与包 README）。
 
 ### nuxt 层（`packages/nuxt/src/`）
 
@@ -250,6 +264,7 @@ definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt
 - **markRaw 不可省略：** 所有进入 `CxLoader.installed` 的组件都经 `hmrFreeFreezing`（`markRaw` + 非开发模式 `Object.freeze`）防止 Vue 把组件当作响应式对象代理。
 - **远程物料仅客户端：** server plugin 不调 `cx.init(url, ...)`；任何带"网络请求 / window 访问"的物料初始化必须限定在 client plugin 或 `import.meta.client` 分支。
 - **CSS 分层：** 渲染器样式位于 `@layer cx`（`packages/renderer/src/comps/render.vue`、`packages/renderer/src/styles/index.scss`），保证不与宿主样式打架。
+- **EP 样式宿主侧分层：** Element Plus 全量 css 为 unlayered 且含全局元素 reset，若由 cx-nuxt 模块直接 `push` 进 `nuxt.options.css` 会按级联规则胜宿主 `@layer utilities`（实测把 nuxt-ui 按钮背景重置为透明）。故模块侧不注入，宿主须以 `@layer cx-ep, theme, base, components, utilities;` 固定层序、再以 `@import 'element-plus/dist/index.css' layer(cx-ep)` 把 EP css 压入最低层——元素 reset 输给宿主工具类，而 EP 自身 `.el-*` 类选择器无竞争仍生效。`layer()` 导入经 Vite 内联后层块真实落入 `cx-ep`（CSSOM 可验）。
 - **TypeScript 严格：** `tsconfig.base.json` 开启 `strict`、`noUncheckedIndexedAccess`、`verbatimModuleSyntax`、`noEmit`。子包 tsconfig 仅追加 `rootDir` / `types` / `paths`。
 - **零运行时圆形依赖：** 包间依赖严格单向（见依赖链）。`CxRender` ↔ `CxRenderComponent` 在同一包内互相引用是 Vue SFC 编译期模板解析，不是循环 import。
 

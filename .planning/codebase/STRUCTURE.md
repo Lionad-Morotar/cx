@@ -6,15 +6,18 @@
 
 ```text
 cx/
-├── packages/                       # 8 个子包，单向依赖链
+├── packages/                       # 11 个子包，单向依赖链
 │   ├── definition/                 # schema 与 loader 核心（底层）
 │   ├── vue/                        # Vue 运行时 composables 与共享组件
 │   ├── renderer/                   # 渲染器（递归 schema → Vue 树）
+│   ├── stream/                     # 流式结构化渲染管线（cx-stream，物料包侧依赖）
 │   ├── comps/                      # 自研基础物料（block / text / grid …）
 │   ├── comps-nuxt-ui-v2/           # Nuxt UI v2 物料库
 │   ├── comps-nuxt-ui-v4/           # vendored Nuxt UI v2 物料库
 │   │   └── vendor/                 # vendored 第三方源码 + 离线 shim（不参与 lint/fmt）
 │   ├── comps-vtu/                  # tool-ui-vue（vtu）工具调用组件物料库
+│   ├── comps-element-plus/         # Element Plus 组件物料库（schema 驱动包装）
+│   ├── eslint/                     # 共享 lint 配置
 │   └── nuxt/                       # Nuxt 模块入口（顶层）
 ├── playground/                     # 开发沙箱 + EAP 站会迁移 demo
 │   ├── app/                        # Nuxt app 目录（页面、插件、standup 业务）
@@ -68,6 +71,12 @@ cx/
   - `tests/materials.test.ts`。
 - **关键文件：** `src/nuxt-ui-2/index.ts`（聚合 40+ 物料默认导出）、`vendor/shims/imports.ts`（离线 Nuxt 替身）。
 
+### `packages/comps-element-plus/`
+
+- **用途：** 包装 Element Plus 组件为 cx 物料（六类 27 件冻结），对齐 vtu 的纯 npm 库包装范式。
+- **包含：** 每物料 `<comp>/index.ts` + `<comp>/src/index.vue`；`shared/use-ep-props.ts`（attrs 桥接）；`table/stream-trigger.ts` + `stream-triggers.ts`（流式增量预设）；`tests/`（桥接单测 + 各类 smoke + 27 件契约冻结）。
+- **关键文件：** `src/index.ts`（`CxElementPlus` 数组 + `CxElementPlusBundle` + `export * from './stream-triggers'`）、`src/shared/use-ep-props.ts`、`README.md`（含宿主侧 `layer(cx-ep)` 样式契约）。
+
 ### `packages/nuxt/`
 
 - **用途：** Nuxt 模块入口，零配置集成。
@@ -105,6 +114,8 @@ cx/
 - `packages/renderer/src/index.ts`：renderer 库入口（含样式副作用 `import './styles/index.scss'`）。
 - `packages/comps/src/index.ts`：components 库入口。
 - `packages/comps-nuxt-ui-v4/src/index.ts`：nuxt-ui 物料库入口。
+- `packages/comps-element-plus/src/index.ts`：Element Plus 物料库入口（含 stream-triggers 再导出）。
+- `packages/stream/src/index.ts`：cx-stream 管线入口。
 - `packages/nuxt/src/module.ts`：Nuxt 模块入口。
 - `playground/nuxt.config.ts`：playground 应用入口。
 - `playground/app/app.vue`：playground Nuxt 根组件。

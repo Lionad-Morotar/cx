@@ -26,6 +26,14 @@
       </div>
     </section>
 
+    <!-- Element Plus 物料验收：27 件物料经 schema 驱动渲染（S7 验收区） -->
+    <section class="section">
+      <h2 class="section-title">Element Plus 物料 · schema 驱动渲染</h2>
+      <div class="demo">
+        <CxRender :components="elementPlusComps" />
+      </div>
+    </section>
+
     <!-- cx 基础渲染链路验收（原有 demo） -->
     <section class="section">
       <h2 class="section-title">基础物料 · schema 驱动渲染</h2>
@@ -81,6 +89,111 @@ const comps = ref<CxComponentRuntime[]>([
           components: {},
         },
       ] as CxComponentRuntime[],
+    },
+  } as CxComponentRuntime,
+])
+
+// Element Plus 物料 schema 驱动渲染：card(header+default 插槽) → space 排布 → button/input/table/alert
+const elementPlusComps = ref<CxComponentRuntime[]>([
+  {
+    id: 'ep-card-root',
+    key: 'cx-element-plus-card',
+    name: '卡片',
+    aliasKeys: [],
+    data: { shadow: 'always' },
+    props: {},
+    emits: {},
+    exposes: {},
+    parents: [],
+    components: {
+      header: [
+        {
+          id: 'ep-header-tag',
+          key: 'cx-element-plus-tag',
+          name: '标签',
+          aliasKeys: [],
+          data: { label: '验收', type: 'success', effect: 'dark' },
+          props: {},
+          emits: {},
+          exposes: {},
+          parents: ['ep-card-root'],
+          components: {},
+        },
+      ],
+      default: [
+        {
+          id: 'ep-space',
+          key: 'cx-element-plus-space',
+          name: '间距',
+          aliasKeys: [],
+          data: { direction: 'vertical', size: 'large' },
+          props: {},
+          emits: {},
+          exposes: {},
+          parents: ['ep-card-root'],
+          components: {
+            default: [
+              {
+                id: 'ep-btn',
+                key: 'cx-element-plus-button',
+                name: '按钮',
+                aliasKeys: [],
+                data: { label: '主要按钮', type: 'primary' },
+                props: {},
+                emits: {},
+                exposes: {},
+                parents: ['ep-space'],
+                components: {},
+              },
+              {
+                id: 'ep-input',
+                key: 'cx-element-plus-input',
+                name: '输入框',
+                aliasKeys: [],
+                data: { modelValue: 'schema 注入的输入值', placeholder: '请输入' },
+                props: {},
+                emits: {},
+                exposes: {},
+                parents: ['ep-space'],
+                components: {},
+              },
+              {
+                id: 'ep-table',
+                key: 'cx-element-plus-table',
+                name: '表格',
+                aliasKeys: [],
+                data: {
+                  columns: [
+                    { key: 'name', label: '名称' },
+                    { key: 'role', label: '角色' },
+                  ],
+                  data: [
+                    { name: 'Alice', role: '管理员' },
+                    { name: 'Bob', role: '成员' },
+                  ],
+                },
+                props: {},
+                emits: {},
+                exposes: {},
+                parents: ['ep-space'],
+                components: {},
+              },
+              {
+                id: 'ep-alert',
+                key: 'cx-element-plus-alert',
+                name: '警告',
+                aliasKeys: [],
+                data: { title: 'Element Plus 物料经 CxRender 渲染成功', type: 'success' },
+                props: {},
+                emits: {},
+                exposes: {},
+                parents: ['ep-space'],
+                components: {},
+              },
+            ],
+          },
+        },
+      ],
     },
   } as CxComponentRuntime,
 ])
