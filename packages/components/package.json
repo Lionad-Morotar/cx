@@ -27,6 +27,7 @@
   "dependencies": {
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-render": "workspace:*",
+    "@lionad/cx-stream": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
     "dayjs": "^1.11.21",
     "lodash-es": "^4.18.1",

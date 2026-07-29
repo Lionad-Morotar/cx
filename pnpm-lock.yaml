@@ -172,6 +172,9 @@ importers:
       '@lionad/cx-render':
         specifier: workspace:*
         version: link:../renderer
+      '@lionad/cx-stream':
+        specifier: workspace:*
+        version: link:../stream
       '@lionad/cx-vue':
         specifier: workspace:*
         version: link:../vue
@@ -279,6 +282,9 @@ importers:
       '@lionad/cx-definition':
         specifier: workspace:*
         version: link:../definition
+      '@lionad/cx-stream':
+        specifier: workspace:*
+        version: link:../stream
       '@lionad/cx-vue':
         specifier: workspace:*
         version: link:../vue
