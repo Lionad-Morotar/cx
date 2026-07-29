@@ -26,3 +26,4 @@ export * from './vue/usePendingTypewriter'
 
 // --- cx 协议预设 ---
 export * from './cx'
+export * from './cx-array-trigger'
