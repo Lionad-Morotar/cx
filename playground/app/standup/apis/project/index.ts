@@ -1,4 +1,4 @@
-import { request, cachedRequest } from '../../utils/cyber'
+import { apiMutate, apiQuery } from '../../utils/query-client'
 
 import type { Request } from '..'
 
@@ -33,12 +33,8 @@ export type Project = {
  * 设置默认项目
  */
 export const apiSetDefaultProject: Request<string, unknown> = async (id) => {
-  return request({
-    method: 'POST',
-    url: '/project/select',
-    data: {
-      projectId: id,
-    },
+  return apiMutate('/project/select', {
+    projectId: id,
   })
 }
 
@@ -46,20 +42,12 @@ export const apiSetDefaultProject: Request<string, unknown> = async (id) => {
  * 获取用户设置的默认项目ID
  */
 export const apiGetDefaultProjectID: Request<null, { projectId: string }> = async () => {
-  return request({
-    method: 'POST',
-    url: '/user/setting',
-    data: {},
-  })
+  return apiQuery('/user/setting', {})
 }
 
 /**
  * 获取项目详情
  */
 export const apiGetProjectDetail: Request<Partial<Project>, Project> = async (data) => {
-  return request({
-    method: 'POST',
-    url: '/project/detail',
-    data,
-  })
+  return apiQuery('/project/detail', data)
 }

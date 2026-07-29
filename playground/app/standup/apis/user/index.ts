@@ -1,4 +1,4 @@
-import { request } from '../../utils/cyber'
+import { apiQuery } from '../../utils/query-client'
 
 import type { Request } from '..'
 
@@ -19,9 +19,5 @@ export type Users = User[]
  * 获取用户列表
  */
 export const apiUserList: Request<never, User[]> = () => {
-  return request({
-    method: 'POST',
-    url: '/users',
-    data: {},
-  })
+  return apiQuery('/users', {})
 }

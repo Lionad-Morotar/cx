@@ -1,4 +1,4 @@
-import { request } from '../../utils/cyber'
+import { apiMutate } from '../../utils/query-client'
 
 import type { Request } from '..'
 
@@ -9,11 +9,7 @@ export const apiUpdateStandupParticipants: Request<{
   id: string
   participants: string[]
 }> = async (data) => {
-  return request({
-    method: 'POST',
-    url: '/standup/participants',
-    data: {
-      ...data,
-    },
+  return apiMutate('/standup/participants', {
+    ...data,
   })
 }

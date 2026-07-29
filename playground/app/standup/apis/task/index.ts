@@ -1,4 +1,4 @@
-import { request } from '../../utils/cyber'
+import { apiMutate, apiQuery } from '../../utils/query-client'
 import type { PagerArg, RequestPager } from '..'
 
 import type { IssueLine } from '..'
@@ -68,31 +68,19 @@ type ResTaskList = {
  * 获取任务列表
  */
 export const apiTaskList: RequestPager<PagerArg, ResTaskList> = async (data) => {
-  return request({
-    method: 'POST',
-    url: '/issues/list',
-    data: data || {},
-  })
+  return apiQuery('/issues/list', data || {})
 }
 
 /**
  * 手动触发议题数据同步
  */
 export const apiSyncIssues = async () => {
-  return request({
-    method: 'POST',
-    url: '/issues/sync',
-    data: {},
-  })
+  return apiMutate('/issues/sync', {})
 }
 
 /**
  * 更新 gitlab issue 的标题字段
  */
 export const apiChangeIssueTitle = async (data: { id: string; title: string }) => {
-  return request({
-    method: 'POST',
-    url: '/issues/title',
-    data,
-  })
+  return apiMutate('/issues/title', data)
 }

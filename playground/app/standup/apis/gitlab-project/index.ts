@@ -1,4 +1,4 @@
-import { cachedRequest } from '../../utils/cyber'
+import { apiQuery } from '../../utils/query-client'
 
 import type { RequestPager, PagerArg } from '..'
 
@@ -23,12 +23,8 @@ type ResGitlabProjectList = {
  * 获取仓库列表
  */
 export const apiGitlabProjectList: RequestPager<PagerArg, ResGitlabProjectList> = async (data) => {
-  return cachedRequest({
-    method: 'POST',
-    url: '/gitlab-projects',
-    data: {
-      searchString: '',
-      ...data,
-    },
+  return apiQuery('/gitlab-projects', {
+    searchString: '',
+    ...data,
   })
 }

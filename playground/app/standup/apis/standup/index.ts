@@ -1,5 +1,5 @@
 import { v4 as uuidV4 } from 'uuid'
-import { request, cachedRequest } from '../../utils/cyber'
+import { apiMutate, apiQuery, queryClient } from '../../utils/query-client'
 import { cloneDeep } from 'lodash-es'
 
 import type { Request } from '..'
@@ -45,13 +45,9 @@ export const apiGetStandups: Request<
   },
   Standups
 > = async (data) => {
-  return cachedRequest({
-    method: 'POST',
-    url: '/standup/list',
-    data: {
-      type: 'day',
-      ...data,
-    },
+  return apiQuery('/standup/list', {
+    type: 'day',
+    ...data,
   })
 }
 
@@ -68,14 +64,11 @@ export const apiStartStandup: Request<
     id: string
   }
 > = async (data) => {
-  ;(cachedRequest as any)?.clear()
-  return request({
-    method: 'POST',
-    url: '/standup/start',
-    data: {
-      type: 'day',
-      ...data,
-    },
+  // 写后失效：开会后站会列表与详情必须重取
+  queryClient.invalidateQueries()
+  return apiMutate('/standup/start', {
+    type: 'day',
+    ...data,
   })
 }
 
@@ -88,14 +81,11 @@ export const apiStopStandup: Request<
   },
   null
 > = async (data) => {
-  ;(cachedRequest as any)?.clear()
-  return request({
-    method: 'POST',
-    url: '/standup/end',
-    data: {
-      type: 'day',
-      ...data,
-    },
+  // 写后失效：散会后站会列表与详情必须重取
+  queryClient.invalidateQueries()
+  return apiMutate('/standup/end', {
+    type: 'day',
+    ...data,
   })
 }
 
@@ -108,12 +98,8 @@ export const apiGetStandupDetail: Request<
   },
   Standup
 > = async (data) => {
-  const res = await cachedRequest({
-    method: 'POST',
-    url: '/standup/detail',
-    data: {
-      ...data,
-    },
+  const res = await apiQuery('/standup/detail', {
+    ...data,
   })
   const ret = cloneDeep(res)
   try {
@@ -128,13 +114,9 @@ export const apiGetStandupDetail: Request<
  * 获取站会数据同步时间
  */
 export const apiGetSyncTime: Request<string, string> = async (id) => {
-  return cachedRequest({
-    method: 'POST',
-    url: '/standup/sync-time',
-    data: {
-      type: 'day',
-      id,
-    },
+  return apiQuery('/standup/sync-time', {
+    type: 'day',
+    id,
   })
 }
 
@@ -152,15 +134,11 @@ export const apiGetStandupRelatedIssues: Request<
   },
   Issue[]
 > = async (data) => {
-  return cachedRequest({
-    method: 'POST',
-    url: '/issues/user-list',
-    data: {
-      initData: false,
-      type: 'day',
-      allUser: false,
-      ...data,
-    },
+  return apiQuery('/issues/user-list', {
+    initData: false,
+    type: 'day',
+    allUser: false,
+    ...data,
   })
 }
 
@@ -176,14 +154,10 @@ export const apiCreateStandupMemo: Request<
   },
   unknown
 > = async (data) => {
-  return request({
-    method: 'POST',
-    url: '/standup/memo/create',
-    data: {
-      type: 'day',
-      ...data,
-      contents: data?.contents || [],
-    },
+  return apiMutate('/standup/memo/create', {
+    type: 'day',
+    ...data,
+    contents: data?.contents || [],
   })
 }
 
@@ -192,13 +166,9 @@ export const apiCreateStandupMemo: Request<
  */
 export const apiGetStandupMemo = (disabled: boolean) =>
   (async (data) => {
-    const res = await cachedRequest({
-      method: 'POST',
-      url: '/standup/memo/get',
-      data: {
-        type: 'day',
-        ...data,
-      },
+    const res = await apiQuery('/standup/memo/get', {
+      type: 'day',
+      ...data,
     })
     try {
       res.data.contents = JSON.parse(res.data?.problem || '[]')
@@ -215,13 +185,9 @@ export const apiGetStandupMemo = (disabled: boolean) =>
         const createReq = await apiCreateStandupMemo(data as any)
         if ((createReq?.data as any)?.id) {
           console.info('[INFO] create success, retry get')
-          const res = await request({
-            method: 'POST',
-            url: '/standup/memo/get',
-            data: {
-              type: 'day',
-              ...data,
-            },
+          const res = await apiMutate('/standup/memo/get', {
+            type: 'day',
+            ...data,
           })
           res.data.contents = JSON.parse(res?.data?.problem || '[]')
           res.data.contents = res.data.contents.map((x: any) => {
@@ -265,14 +231,11 @@ export const apiUpdateStandupMemo: Request<
   },
   unknown
 > = async (data) => {
-  ;(cachedRequest as any)?.clear()
-  return request({
-    method: 'POST',
-    url: '/standup/memo/update',
-    data: {
-      type: 'day',
-      ...data,
-      contents: data?.contents || [],
-    },
+  // 写后失效：记录更新后站会数据必须重取
+  queryClient.invalidateQueries()
+  return apiMutate('/standup/memo/update', {
+    type: 'day',
+    ...data,
+    contents: data?.contents || [],
   })
 }
