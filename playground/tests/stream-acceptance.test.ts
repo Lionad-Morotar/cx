@@ -11,12 +11,11 @@ import {
   type CxSpec,
   type CxStreamNode,
 } from '@lionad/cx-stream'
+import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-components-vtu'
 
 import { compositeMeta } from '../app/dev/stream-mock.generated'
 import {
-  createDemoRegistry,
   cropScenarioChunks,
-  mainArrayOf,
   MAX_COMPONENTS,
   STREAM_CHUNKS,
   STREAM_SCRIPT,
@@ -109,7 +108,7 @@ describe('stream 验收 · 三态漏斗（多围栏）', () => {
 describe('stream 验收 · 增量渲染', () => {
   it('首个围栏流式期间增量行数单调递增，闭合时达到完整行数', () => {
     const extractor = createIncrementalExtractor<CxSpec>({
-      registry: createDemoRegistry(),
+      registry: createVtuTriggerRegistry(),
       matchTrigger: matchCxTrigger,
     })
     // 完整行数从终态 spec 语义获取：首个围栏即 data-table
@@ -145,7 +144,7 @@ describe('stream 验收 · 增量渲染', () => {
 
   it('后续围栏流式期间增量产物切换到当前组件，不冻结在首个组件', () => {
     const extractor = createIncrementalExtractor<CxSpec>({
-      registry: createDemoRegistry(),
+      registry: createVtuTriggerRegistry(),
       matchTrigger: matchCxTrigger,
     })
     // chart 是第 2 个围栏：specs 为 1 且 pendingSources 为 1 的帧即其流式窗口
@@ -170,7 +169,7 @@ describe('stream 验收 · 增量渲染', () => {
     // chart 的必需字段 xKey/series 排在数据数组之后，数据点流式期间
     // partial 缺失它们会导致组件无法渲染；与生成侧转译器同一推导语义兜底
     const extractor = createIncrementalExtractor<CxSpec>({
-      registry: createDemoRegistry(),
+      registry: createVtuTriggerRegistry(),
       matchTrigger: matchCxTrigger,
     })
     const partialJson = [

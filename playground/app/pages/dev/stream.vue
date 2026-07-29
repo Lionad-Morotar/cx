@@ -142,13 +142,8 @@ import {
   useStreamChunks,
   type CxStreamNode,
 } from '@lionad/cx-stream'
-import {
-  createDemoRegistry,
-  cropScenarioChunks,
-  mainArrayOf,
-  MAX_COMPONENTS,
-  toRenderNode,
-} from '~/dev/stream-scenario'
+import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-components-vtu'
+import { cropScenarioChunks, MAX_COMPONENTS, toRenderNode } from '~/dev/stream-scenario'
 
 defineOptions({ name: 'PageDevStream' })
 
@@ -223,7 +218,7 @@ const pendingSource = computed(() => detection.value.pendingSources?.[0] ?? '')
 // --- 增量渲染：partialSpec 为当前可渲染的部分 Spec ---
 const { partialSpec, reset: resetExtractor } = useIncrementalTree(
   computed(() => pendingSource.value),
-  { registry: createDemoRegistry(), matchTrigger: matchCxTrigger },
+  { registry: createVtuTriggerRegistry(), matchTrigger: matchCxTrigger },
 )
 const partialNode = computed(() => toCxNode(partialSpec.value))
 
