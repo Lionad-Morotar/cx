@@ -25,24 +25,29 @@ import { computed } from 'vue'
  */
 defineOptions({ name: 'CxCxActions' })
 
+/** 动作项：label 必填，click 为自带点击回调（与 dropdown-menu actions 兼容） */
+type CxAction = { label: string; click?: (button: CxAction, $event: MouseEvent) => void }
+
 const emits = defineEmits(['after-click', 'hover', 'unhover'])
 
 const props = withDefaults(
   defineProps<{
-    actions?: any[]
+    // 兼容 dropdown-menu actions：单组 CxAction[] 或分组 CxAction[][]，运行时自动归一
+    actions?: CxAction[] | CxAction[][]
   }>(),
   { actions: () => [] },
 )
 
 const groupedActions = computed(() => {
   const acts = props.actions
-  const isGroup = acts?.[0]?.[0]
-  const ret = isGroup ? acts : [acts]
-  return ret.filter((g: any) => g && g.length > 0)
+  // 首元素是否为数组 → 分组形态；否则包一层数组归一为单组
+  const isGroup = Array.isArray(acts?.[0])
+  const ret = isGroup ? (acts as CxAction[][]) : [acts as CxAction[]]
+  return ret.filter((g) => g && g.length > 0)
 })
 
 // 先触发按钮自带 click，再广播 after-click（与原组件一致的执行序）
-const onClick = async ($event: MouseEvent, button: any) => {
+const onClick = async ($event: MouseEvent, button: CxAction) => {
   await button?.click?.(button, $event)
   emits('after-click', button, $event)
 }
