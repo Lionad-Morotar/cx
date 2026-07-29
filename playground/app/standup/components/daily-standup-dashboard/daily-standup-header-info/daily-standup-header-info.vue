@@ -28,7 +28,7 @@
       />
       <template #content>
         <div class="standup-by-year-popover">
-          <cx-view-standup-github-grid :monthCount="6" />
+          <cx-view-standup-github-grid :month-count="6" />
         </div>
       </template>
     </UPopover>

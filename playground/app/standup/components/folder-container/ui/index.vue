@@ -1,11 +1,11 @@
 <template>
   <div :class="[ns.b(), ns.is('fold', states.isFold), ns.is('unfold', !states.isFold)]">
     <div :class="ns.e('header')">
-      <slot name="header" :isFold="states.isFold" :fn="compExpose" :toggle="toggle" />
+      <slot name="header" :is-fold="states.isFold" :fn="compExpose" :toggle="toggle" />
       <slot
         v-if="showDefaultIcons"
         name="icon"
-        :isFold="states.isFold"
+        :is-fold="states.isFold"
         :fn="compExpose"
         :toggle="toggle"
       >
@@ -27,11 +27,11 @@
           />
         </template>
       </slot>
-      <slot name="header-right" :isFold="states.isFold" :fn="compExpose" :toggle="toggle" />
+      <slot name="header-right" :is-fold="states.isFold" :fn="compExpose" :toggle="toggle" />
     </div>
     <div ref="contentWrapperRef" :class="ns.e('content-wrapper')" :style="styles">
-      <slot name="default" :isFold="states.isFold" :fn="compExpose" :toggle="toggle" />
-      <slot name="content" :isFold="states.isFold" :fn="compExpose" :toggle="toggle" />
+      <slot name="default" :is-fold="states.isFold" :fn="compExpose" :toggle="toggle" />
+      <slot name="content" :is-fold="states.isFold" :fn="compExpose" :toggle="toggle" />
     </div>
   </div>
 </template>
