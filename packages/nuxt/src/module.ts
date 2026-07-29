@@ -16,7 +16,13 @@ export interface CxBundleSpec {
 }
 
 /** 内置物料集名称（兼容形态）：映射到对应物料包的 bundle 声明，不 import 物料包本体 */
-export type CxBuiltinMaterialSet = 'render' | 'components' | 'nuxt-ui-v2' | 'nuxt-ui-v4' | 'vtu'
+export type CxBuiltinMaterialSet =
+  | 'render'
+  | 'components'
+  | 'nuxt-ui-v2'
+  | 'nuxt-ui-v4'
+  | 'vtu'
+  | 'element-plus'
 
 export interface CxNuxtModuleOptions {
   /** 物料 bundle 声明列表（插件化形态）；与 materials 同时提供时 bundles 优先 */
@@ -34,6 +40,7 @@ const BUILTIN_BUNDLES: Record<CxBuiltinMaterialSet, CxBundleSpec> = {
   'nuxt-ui-v2': { package: '@lionad/cx-comps-nuxt-ui-v2', namedExport: 'CxNuxtUIV2Bundle' },
   'nuxt-ui-v4': { package: '@lionad/cx-comps-nuxt-ui-v4', namedExport: 'CxNuxtUIV4Bundle' },
   vtu: { package: '@lionad/cx-comps-vtu', namedExport: 'CxVtuBundle' },
+  'element-plus': { package: '@lionad/cx-comps-element-plus', namedExport: 'CxElementPlusBundle' },
 }
 
 /**
@@ -93,6 +100,9 @@ const BUNDLE_OPTIMIZE_DEPS: Record<CxBuiltinMaterialSet, string[]> = {
   // vtu-components 的重组件依赖（shiki/leaflet/chart.js 等）不预声明：
   // 引用它们的组件按需加载，预声明只会拖慢冷启动；待运行期观测到再补
   vtu: ['@lionad/vtu-components', '@vueuse/router'],
+  // element-plus 经物料包装层全入口具名导入，首趟对扫描器不可见，预声明消除冷启动重载；
+  // dayjs / lodash-es 等深路径已在基线表覆盖
+  'element-plus': ['element-plus'],
 }
 
 /** 内置物料包名 → 物料集名反查；自定义 bundles 的包名不会命中 */
@@ -161,17 +171,18 @@ const module: NuxtModule<CxNuxtModuleOptions> = defineNuxtModule<CxNuxtModuleOpt
 
     // v-calendar 样式仅 v2 bundle（date-picker 物料）启用时注入：
     // 该依赖归属 v2 物料包，无条件注入会对未装 v-calendar 的宿主产生解析负担
-    if (
-      options.injectStyles &&
-      specs.some((s) => s.package === '@lionad/cx-comps-nuxt-ui-v2')
-    ) {
+    if (options.injectStyles && specs.some((s) => s.package === '@lionad/cx-comps-nuxt-ui-v2')) {
       nuxt.options.css.push('v-calendar/dist/style.css')
     }
 
-    // vtu 样式不在模块侧注入：按 VTU 安装契约（见 tool-ui-vue skill），消费者须在入口 css 的
-    // `@import "tailwindcss"` 之后 `@import "@lionad/vtu-components/style.css"`，由其内置 @theme 注册颜色
-    // token、@source 扫描 dist 生成工具类。模块侧自行扫描会因缺 @theme 致颜色工具类不生成（边框回退
-    // currentColor 发黑、bg/text 色丢失），故弃用扫描方案，交还宿主入口 css 负责。
+    // element-plus 与 vtu 样式均不在模块侧注入，交还宿主入口 css 负责：
+    // - vtu：宿主须在 `@import "tailwindcss"` 之后 `@import "@lionad/vtu-components/style.css"`，
+    //   由其内置 @theme 注册颜色 token、@source 扫描 dist 生成工具类（模块侧扫描因缺 @theme 会致
+    //   颜色工具类不生成，边框回退 currentColor 发黑、bg/text 色丢失，故弃用）
+    // - element-plus：其全量 css 含全局元素 reset 且为 unlayered，模块侧直接 push 会按级联规则
+    //   胜宿主的 @layer utilities（如把 nuxt-ui 按钮背景重置为透明）。须由宿主以
+    //   `@import 'element-plus/dist/index.css' layer(cx-ep)` 压入层序最前的 cx-ep 层
+    //   （见 @lionad/cx-comps-element-plus README 装配契约），元素 reset 方能输给宿主工具类
 
     // 虚拟模块桥接：仅启用的包出现在 import 语句中——未启用的物料包不会被构建期
     // 解析（v4 物料依赖宿主 @nuxt/ui 的 #components，未启用即不解析，维持真 opt-in）
