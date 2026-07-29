@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@lionad/cx-comps": "workspace:*",
+    "@lionad/cx-comps-element-plus": "workspace:*",
     "@lionad/cx-comps-nuxt-ui-v2": "workspace:*",
     "@lionad/cx-comps-nuxt-ui-v4": "workspace:*",
     "@lionad/cx-comps-vtu": "workspace:*",
@@ -28,6 +29,7 @@
     "chinese-workday": "^1.10.0",
     "dayjs": "^1.11.21",
     "deindent": "^0.1.0",
+    "element-plus": "^2.14.3",
     "html-escaper": "^3.0.3",
     "lodash-es": "^4.18.1",
     "mitt": "^3.0.1",

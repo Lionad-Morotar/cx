@@ -1,0 +1,42 @@
+{
+  "name": "@lionad/cx-comps-element-plus",
+  "version": "0.1.0",
+  "description": "cx material components wrapping Element Plus",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack && vue-tsc -p tsconfig.build.json",
+    "typecheck": "vue-tsgo --tsdk ../../node_modules/.pnpm/typescript@7.0.2/node_modules/typescript --noEmit"
+  },
+  "dependencies": {
+    "@lionad/cx-definition": "workspace:*",
+    "@lionad/cx-stream": "workspace:*",
+    "@lionad/cx-vue": "workspace:*",
+    "element-plus": "^2.14.3"
+  },
+  "devDependencies": {
+    "@vueuse/core": "^14.3.0",
+    "typescript": "^6.0.3",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.7"
+  },
+  "peerDependencies": {
+    "@vueuse/core": "^13.0.0 || ^14.0.0",
+    "vue": "^3.5.0"
+  }
+}
