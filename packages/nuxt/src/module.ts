@@ -1,4 +1,11 @@
-import { addComponent, addPlugin, addTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
+import {
+  addComponent,
+  addPlugin,
+  addTemplate,
+  createResolver,
+  defineNuxtModule,
+  extendViteConfig,
+} from '@nuxt/kit'
 
 import type { NuxtModule } from '@nuxt/schema'
 
@@ -28,6 +35,73 @@ const BUILTIN_BUNDLES: Record<CxBuiltinMaterialSet, CxBundleSpec> = {
   'nuxt-ui-v4': { package: '@lionad/cx-components-nuxt-ui-v4', namedExport: 'CxNuxtUIV4Bundle' },
   vtu: { package: '@lionad/cx-components-vtu', namedExport: 'CxVtuBundle' },
 }
+
+/**
+ * dev 冷启动依赖预构建声明：workspace 链接的物料源码与三方物料库的深路径导入
+ * （dayjs plugin/locale、lodash-es 子路径）对 Vite 扫描器首趟不可见，运行期才被发现，
+ * 会触发 re-optimize 与整页重载；预先声明消除冷启动多次重载。
+ * 基线表派生自 cx-nuxt 自身依赖链（cx-definition + cx-vue），恒可解析；
+ * 物料集增量按内置物料集条件注入——宿主未安装对应物料包时预构建会解析失败，
+ * 故不能无条件注入；自定义 bundles 形态的依赖链本模块无从得知，不予管理。
+ */
+const BASE_OPTIMIZE_DEPS = [
+  // cx-definition 运行时依赖
+  'bignumber.js',
+  'kareem',
+  'mitt',
+  'nanoid',
+  'nativebird',
+  'uuid',
+  'zod',
+  // cx 源码内 lodash-es 深路径导入
+  'lodash-es',
+  'lodash-es/camelCase',
+  'lodash-es/cloneDeep',
+  'lodash-es/isFunction',
+  'lodash-es/kebabCase',
+  'lodash-es/upperFirst',
+  // cx-vue 运行时依赖
+  '@iconify/vue',
+  'anysort',
+  'use-semantic-version',
+  'vue-concurrency',
+  // dayjs 及物料内引用的 plugin/locale（dayjs 由 cx-vue 声明，随任一物料安装）
+  'dayjs',
+  'dayjs/locale/zh-cn',
+  'dayjs/plugin/duration',
+  'dayjs/plugin/isSameOrAfter',
+  'dayjs/plugin/isSameOrBefore',
+  'dayjs/plugin/localeData',
+  'dayjs/plugin/relativeTime',
+  'dayjs/plugin/weekday',
+]
+
+/** 各内置物料集需追加预构建的依赖；render/components 无超出基线的依赖，空表即核验结论 */
+const BUNDLE_OPTIMIZE_DEPS: Record<CxBuiltinMaterialSet, string[]> = {
+  render: [],
+  components: [],
+  'nuxt-ui-v2': [
+    '@headlessui/vue',
+    '@popperjs/core',
+    '@vueuse/integrations/useFuse',
+    'fuse.js',
+    'tailwind-merge',
+    'v-calendar',
+    'vue-demi',
+  ],
+  'nuxt-ui-v4': ['@internationalized/date'],
+  // vtu-components 的重组件依赖（shiki/leaflet/chart.js 等）不预声明：
+  // 引用它们的组件按需加载，预声明只会拖慢冷启动；待运行期观测到再补
+  vtu: ['@lionad/vtu-components', '@vueuse/router'],
+}
+
+/** 内置物料包名 → 物料集名反查；自定义 bundles 的包名不会命中 */
+const BUNDLE_SET_BY_PACKAGE: Record<string, CxBuiltinMaterialSet> = Object.fromEntries(
+  (Object.keys(BUILTIN_BUNDLES) as CxBuiltinMaterialSet[]).map((name) => [
+    BUILTIN_BUNDLES[name].package,
+    name,
+  ]),
+)
 
 /**
  * cx Nuxt module：注册 CxRender 渲染器，按宿主启用的物料 bundle 生成装配清单
@@ -115,6 +189,27 @@ const module: NuxtModule<CxNuxtModuleOptions> = defineNuxtModule<CxNuxtModuleOpt
     nuxt.options.runtimeConfig.public.cx = {
       materials: specs.map((s) => s.package),
     }
+
+    // 仅 client dev 注入：optimizeDeps 是依赖预构建开关，生产构建与 server bundle 不消费此字段
+    extendViteConfig(
+      (config) => {
+        config.optimizeDeps ||= {}
+        config.optimizeDeps.include ||= []
+        const declared = new Set(config.optimizeDeps.include)
+        for (const dep of BASE_OPTIMIZE_DEPS) {
+          declared.add(dep)
+        }
+        for (const spec of specs) {
+          const setName = BUNDLE_SET_BY_PACKAGE[spec.package]
+          if (!setName) continue
+          for (const dep of BUNDLE_OPTIMIZE_DEPS[setName]) {
+            declared.add(dep)
+          }
+        }
+        config.optimizeDeps.include = [...declared]
+      },
+      { client: true, dev: true },
+    )
   },
 })
 
