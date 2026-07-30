@@ -1,10 +1,18 @@
-/* EP css 含全局元素 reset（button{background:transparent} 等）且为 unlayered，
-   会按级联规则胜宿主的 @layer utilities，污染 nuxt-ui/tailwind 按钮。
-   将其压入 cx-ep 层并置于层序最前（最低优先级）：元素 reset 输给宿主工具类，
-   而 EP 自身 .el-* 类选择器因所在元素无宿主工具类竞争，仍正常生效。
-   此层序声明必须早于 @import 'tailwindcss'（其展开的 theme/base/components/utilities 层序），
-   方能使 cx-ep 排在 utilities 之前。cx-nuxt 模块侧不再注入 EP css（委托宿主，同 vtu 哲学）。 */
-@layer cx-ep, theme, base, components, utilities;
+/* EP css 含全局元素 reset（button{background:transparent} 等）且为 unlayered；@import 带 layer()
+   会把其内 unlayered 规则一并压入 cx-ep 层。层序须同时满足两个相反约束，单一"压到最低层"做不到：
+   - EP 元素 reset 必须赢 tailwind preflight 的同元素 reset（在 @layer base），否则 EP 自家
+     .el-button 的蓝背景被 preflight 的 transparent 跨层盖掉（@layer 间层序胜特异性，与类特异性无关）；
+   - EP 元素 reset 又必须赢宿主 nuxt-ui 按钮的**背景工具类**，否则 EP reset 反过来把宿主按钮擦透明——
+     注意 nuxt-ui v4 组件类经 tv()+@source 实际落在 utilities 层（其包内未填充 @layer components，
+     该槽为空；"宿主组件类在 components"是错误归因，勿据此刻意往 components 注入规则）。
+   故 cx-ep 落在「utilities 之后」即可同时满足：赢其前的 base（EP 组件类同层内凭特异性再赢 reset，
+   蓝按钮回归）与 utilities（EP reset 盖过 nuxt-ui 背景工具类，但因 cx-ep 内同时有 .el-button--* 高特异
+   规则、EP 自身外观不丢）。零污染的真正前提是宿主 nuxt-ui 按钮的背景由 utilities 工具类提供、且 EP
+   reset 与 EP 组件类同在 cx-ep 层、且全仓不用工具类去覆盖 nuxt-ui/EP 组件外观（域样式走 scoped/inline，
+   unlayered 免疫层序——隐式耦合，新增"用工具类覆盖组件外观"的代码会破坏此平衡）。
+   末尾 components 槽暂为空占位，不影响上述闭合。此层序声明必须早于 @import 'tailwindcss'。
+   cx-nuxt 模块侧不再注入 EP css（委托宿主，同 vtu 哲学）。 */
+@layer theme, base, utilities, cx-ep, components;
 @import 'tailwindcss';
 /* VTU 文档化安装契约：紧跟 @import "tailwindcss" 之后 @import 其 style.css，
    使内置 @theme 注册 shadcn 颜色 token、@source 扫描 dist 生成全部工具类（含颜色）。
