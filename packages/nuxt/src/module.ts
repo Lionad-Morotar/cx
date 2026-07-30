@@ -23,6 +23,7 @@ export type CxBuiltinMaterialSet =
   | 'nuxt-ui-v4'
   | 'vtu'
   | 'element-plus'
+  | 'naive-ui'
 
 export interface CxNuxtModuleOptions {
   /** 物料 bundle 声明列表（插件化形态）；与 materials 同时提供时 bundles 优先 */
@@ -41,6 +42,7 @@ const BUILTIN_BUNDLES: Record<CxBuiltinMaterialSet, CxBundleSpec> = {
   'nuxt-ui-v4': { package: '@lionad/cx-comps-nuxt-ui-v4', namedExport: 'CxNuxtUIV4Bundle' },
   vtu: { package: '@lionad/cx-comps-vtu', namedExport: 'CxVtuBundle' },
   'element-plus': { package: '@lionad/cx-comps-element-plus', namedExport: 'CxElementPlusBundle' },
+  'naive-ui': { package: '@lionad/cx-comps-naive-ui', namedExport: 'CxNaiveUiBundle' },
 }
 
 /**
@@ -103,6 +105,9 @@ const BUNDLE_OPTIMIZE_DEPS: Record<CxBuiltinMaterialSet, string[]> = {
   // element-plus 经物料包装层全入口具名导入，首趟对扫描器不可见，预声明消除冷启动重载；
   // dayjs / lodash-es 等深路径已在基线表覆盖
   'element-plus': ['element-plus'],
+  // naive-ui 同为包装层全入口具名导入；其依赖链（css-render / vueuc / date-fns 等）
+  // 随 naive-ui 预构建同 chunk 解析，单条声明即可
+  'naive-ui': ['naive-ui'],
 }
 
 /** 内置物料包名 → 物料集名反查；自定义 bundles 的包名不会命中 */
@@ -183,6 +188,9 @@ const module: NuxtModule<CxNuxtModuleOptions> = defineNuxtModule<CxNuxtModuleOpt
     //   胜宿主的 @layer utilities（如把 nuxt-ui 按钮背景重置为透明）。须由宿主以
     //   `@import 'element-plus/dist/index.css' layer(cx-ep)` 压入层序最前的 cx-ep 层
     //   （见 @lionad/cx-comps-element-plus README 装配契约），元素 reset 方能输给宿主工具类
+    // - naive-ui：CSS-in-JS（css-render 于组件渲染期注入 <style> 标签），无 dist css 文件，
+    //   模块侧与宿主侧均无需注入；样式全部作用于 n-* 前缀类选择器，无全局元素 reset，
+    //   故不参与 @layer 层序安排（与 vtu/element-plus 的委托形态均不同）
 
     // 虚拟模块桥接：仅启用的包出现在 import 语句中——未启用的物料包不会被构建期
     // 解析（v4 物料依赖宿主 @nuxt/ui 的 #components，未启用即不解析，维持真 opt-in）
