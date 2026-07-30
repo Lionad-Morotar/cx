@@ -74,7 +74,6 @@ const comps = ref<CxComponentRuntime[]>([
           emits: {},
           exposes: {},
           parents: ['demo-root'],
-          components: {},
         },
         {
           id: 'demo-btn',
@@ -86,11 +85,10 @@ const comps = ref<CxComponentRuntime[]>([
           emits: {},
           exposes: {},
           parents: ['demo-root'],
-          components: {},
         },
       ] as CxComponentRuntime[],
     },
-  } as CxComponentRuntime,
+  } as unknown as CxComponentRuntime,
 ])
 
 // Element Plus 物料 schema 驱动渲染：card(header+default 插槽) → space 排布 → button/input/table/alert
@@ -117,7 +115,6 @@ const elementPlusComps = ref<CxComponentRuntime[]>([
           emits: {},
           exposes: {},
           parents: ['ep-card-root'],
-          components: {},
         },
       ],
       default: [
@@ -143,7 +140,6 @@ const elementPlusComps = ref<CxComponentRuntime[]>([
                 emits: {},
                 exposes: {},
                 parents: ['ep-space'],
-                components: {},
               },
               {
                 id: 'ep-input',
@@ -155,7 +151,6 @@ const elementPlusComps = ref<CxComponentRuntime[]>([
                 emits: {},
                 exposes: {},
                 parents: ['ep-space'],
-                components: {},
               },
               {
                 id: 'ep-table',
@@ -176,7 +171,6 @@ const elementPlusComps = ref<CxComponentRuntime[]>([
                 emits: {},
                 exposes: {},
                 parents: ['ep-space'],
-                components: {},
               },
               {
                 id: 'ep-alert',
@@ -188,14 +182,13 @@ const elementPlusComps = ref<CxComponentRuntime[]>([
                 emits: {},
                 exposes: {},
                 parents: ['ep-space'],
-                components: {},
               },
             ],
           },
         },
       ],
     },
-  } as CxComponentRuntime,
+  } as unknown as CxComponentRuntime,
 ])
 
 // 站会迁移物料（dashboard-card）的 schema 驱动渲染
@@ -222,11 +215,10 @@ const standupMaterialComps = ref<CxComponentRuntime[]>([
           emits: {},
           exposes: {},
           parents: ['standup-card-root'],
-          components: {},
         },
       ] as CxComponentRuntime[],
     },
-  } as CxComponentRuntime,
+  } as unknown as CxComponentRuntime,
 ])
 </script>
 

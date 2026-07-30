@@ -1,5 +1,5 @@
 <template>
-  <!-- /dev：物料验收页索引，聚合四类 cx 物料的 schema 驱动渲染验收入口 -->
+  <!-- /dev：物料验收页索引，聚合各 cx 物料集的 schema 驱动渲染验收入口 -->
   <main class="page-dev page">
     <header class="page-header">
       <h1 class="title">dev · 物料验收</h1>
@@ -41,6 +41,11 @@ const links = [
     to: '/dev/components-vtu',
     name: 'cx components · vtu',
     desc: 'tool-ui-vue 工具组件物料，按官方分类（Data Display / Code & Terminal / Media / Social / Forms & Input / Workflow）组织',
+  },
+  {
+    to: '/dev/components-element-plus',
+    name: 'cx components · element-plus',
+    desc: 'Element Plus 物料，按包冻结六类（基础反馈 / 数据展示 / 导航版式 / 表单 / 表格 / 插槽容器）组织',
   },
   {
     to: '/dev/stream',
