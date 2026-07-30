@@ -38,4 +38,14 @@ export default define({
       initial: 1,
     },
   },
+  // emits 与 SFC defineEmits 同集合:声明后 cx 渲染器 getEmits 命中,
+  // 经 _cx_events 把 action/change/update:modelValue 接到 host(否则交互事件永不接线)
+  emits: {
+    action: {
+      name: '操作触发',
+      description: '用户点击 actions 按钮,载荷为 (actionId, 当前选择值),宿主据此回写对话',
+    },
+    change: { name: '选择变更', description: '受控选择值变化(单选 id / 多选 id 数组)' },
+    'update:modelValue': { name: 'v-model 同步', description: '选择值双向同步' },
+  },
 })

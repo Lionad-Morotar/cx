@@ -48,4 +48,9 @@ export default define({
       ],
     },
   },
+  // emits 与 SFC defineEmits 同集合:声明后 cx 渲染器 getEmits 命中,经 _cx_events 接到 host
+  emits: {
+    confirm: { name: '确认', description: '用户点击确认按钮,宿主回写「确认执行」' },
+    cancel: { name: '取消', description: '用户点击取消按钮,宿主回写「取消执行」' },
+  },
 })
