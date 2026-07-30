@@ -5,10 +5,12 @@ import { CxNuxtUIV2 } from '@lionad/cx-comps-nuxt-ui-v2'
 import { CxNuxtUIV4 } from '@lionad/cx-comps-nuxt-ui-v4'
 import { CxVtu } from '@lionad/cx-comps-vtu'
 import { CxElementPlus } from '@lionad/cx-comps-element-plus'
+import { CxNaiveUi } from '@lionad/cx-comps-naive-ui'
 import { groupByCategory as groupV2 } from '../app/dev/nuxt-ui-v2-categories'
 import { groupByCategory as groupV4 } from '../app/dev/nuxt-ui-v4-categories'
 import { groupByCategory as groupVtu } from '../app/dev/vtu-categories'
 import { groupByCategory as groupEp } from '../app/dev/element-plus-categories'
+import { groupByCategory as groupNaive } from '../app/dev/naive-ui-categories'
 import { toItem, type CxMeta } from '../app/dev/material-utils'
 
 // dev 验收页改版前的特征基线：锁定五集的 group 数与 item 总数。
@@ -48,6 +50,12 @@ describe('dev 验收页特征基线（改版前锁定）', () => {
 
   it('element-plus：6 组 27 件', () => {
     const groups = groupEp(asMetas(CxElementPlus).map(toItem))
+    expect(groups.length).toBe(6)
+    expect(groups.reduce((s, g) => s + g.items.length, 0)).toBe(27)
+  })
+
+  it('naive-ui：6 组 27 件', () => {
+    const groups = groupNaive(asMetas(CxNaiveUi).map(toItem))
     expect(groups.length).toBe(6)
     expect(groups.reduce((s, g) => s + g.items.length, 0)).toBe(27)
   })

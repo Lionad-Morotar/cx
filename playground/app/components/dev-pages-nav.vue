@@ -24,6 +24,7 @@ const links = [
   { to: '/dev/components-nuxt-ui-v4', label: 'nuxt-ui v4' },
   { to: '/dev/components-vtu', label: 'vtu' },
   { to: '/dev/components-element-plus', label: 'element-plus' },
+  { to: '/dev/components-naive-ui', label: 'naive-ui' },
   { to: '/dev/stream', label: 'stream 流式' },
 ] as const
 </script>

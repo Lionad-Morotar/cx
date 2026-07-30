@@ -25,7 +25,7 @@ cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：�
                                │ `installCxBundles` 按开关装配物料
                                ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│   物料层（render / components / nuxt-ui-v4 / vtu / element-plus）     │
+│   物料层（render / components / nuxt-ui-v4 / vtu / element-plus / naive-ui） │
 │   `packages/renderer/src/comps/index.ts`        （CxRenderComps）     │
 │   `packages/comps/src/index.ts`            （CxBasics / Grid …） │
 │   `packages/comps-nuxt-ui-v4/src/index.ts` （CxNuxtUI / Card …） │
@@ -57,7 +57,7 @@ cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：�
 依赖链（单向，从下往上读）：
 
 ```text
-definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt-ui-v2 / comps-nuxt-ui-v4 / comps-vtu / comps-element-plus ──▶ nuxt
+definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt-ui-v2 / comps-nuxt-ui-v4 / comps-vtu / comps-element-plus / comps-naive-ui ──▶ nuxt
                                        ▲
                                        └── cx-stream（流式增量预设，物料包侧依赖）
 ```
@@ -69,6 +69,7 @@ definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt
 - `@lionad/cx-comps-nuxt-ui-v4`：vendored Nuxt UI v2 物料，配合离线 shim，脱离 Nuxt 运行时也可打包。
 - `@lionad/cx-comps-vtu`：包装 [tool-ui-vue（vtu）](https://github.com/Lionad-Morotar/tool-ui-vue) 的 29 个 AI 工具调用组件为 cx 物料；vtu 为纯 npm Vue 库，无需 vendor/shim，样式经 cx-nuxt 条件注入 `@lionad/vtu-components/style.css`（其 `@source` 由宿主 Tailwind v4 处理）。
 - `@lionad/cx-comps-element-plus`：包装 Element Plus 的 27 件组件为 cx 物料（六类冻结）；同为纯 npm 库包装范式，桥接层 `useEpProps` 剥离 cx 内部键、保留 class/监听器；变更上行不声明 emits meta、走 `nativeEvents ∩ _cx_events` 原生通道。**EP 样式不在 cx-nuxt 模块侧注入**（其 unlayered 全局元素 reset 会胜宿主 `@layer utilities`），须由宿主以 `@import 'element-plus/dist/index.css' layer(cx-ep)` 压入层序最前的 `cx-ep` 层（详见包 README）。
+- `@lionad/cx-comps-naive-ui`：包装 Naive UI 的 27 件组件为 cx 物料（六类冻结，与 EP 同分类骨架）；桥接层 `useNaiveUiProps` 同形剥离 cx 内部键。naive-ui 双向约定为 `value` + `update:value`（非 `modelValue`），配置键直接取 naive prop 名；变更上行分三族——**透传族**（NInput/NInputNumber/NSelect 声明 onChange 函数型 prop，v-bind 直达）、**桥接族**（NSwitch/NRate/NSlider/NRadioGroup/NCheckboxGroup 经 `useNaiveChangeBridge` 剥离 on* 后 `@update:value → attrs.onChange`）、**formatted-value 桥接族**（NDatePicker 载荷为格式化字符串）。**naive-ui 为 CSS-in-JS**（css-render 渲染期注入、引用计数随组件卸载移除），无 dist css 文件，模块侧与宿主侧均无需注入、不参与 `@layer` 层序安排。
 - `@lionad/cx-nuxt`：Nuxt 模块入口，把上述所有能力零配置注入宿主。
 
 ## 组件职责
@@ -85,6 +86,8 @@ definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt
 | `CxRenderComponentWithBindings` | 把 cx-styles（margin/padding/border/font/round/cosom/breakpoint）与指令绑到具体组件上  | `packages/renderer/src/comps/render-component-with-bindings.vue`                                                                  |
 | `useEpProps`                    | 把 cx 灌入 attrs 提纯为 EP 可消费 props：剥离 `comp`/`data-*`/`_*`，保留 class/style/on*（无 id 回退，区别于 vtu） | `packages/comps-element-plus/src/shared/use-ep-props.ts`                                                                          |
 | `CxElementPlusBundle`           | Element Plus 27 件物料自描述 bundle（`name: 'element-plus'`），供 cx-nuxt 按 bundle 装配  | `packages/comps-element-plus/src/index.ts`                                                                                        |
+| `useNaiveUiProps` / `useNaiveChangeBridge` | naive-ui attrs 提纯桥 + 自定义控件族变更上行桥（剥离 onChange/onInput，`update:value → attrs.onChange`） | `packages/comps-naive-ui/src/shared/`                                                                                             |
+| `CxNaiveUiBundle`               | Naive UI 27 件物料自描述 bundle（`name: 'naive-ui'`），供 cx-nuxt 按 bundle 装配          | `packages/comps-naive-ui/src/index.ts`                                                                                            |
 | Nuxt module                     | `defineNuxtModule` 入口；注册 `CxRender`、注入 server/client plugin                    | `packages/nuxt/src/module.ts`                                                                                                     |
 | `installCxBundles`              | 按选项 `materials: ['render','components','nuxt-ui']` 安装物料集                       | `packages/nuxt/src/runtime/install.ts`                                                                                            |
 | Vendored shim                   | 离线化 Nuxt 虚拟模块（`#imports` / `#app` / `useState` / `useId`）                     | `packages/comps-nuxt-ui-v4/vendor/shims/imports.ts`                                                                          |
@@ -166,6 +169,15 @@ definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt
 - **依赖：** `@lionad/cx-definition`、`@lionad/cx-vue`、`@lionad/cx-stream`、`element-plus`（`^2.14.3`）。
 - **关键约定：** 包装 SFC 一律 `inheritAttrs:false` + `useAttrs` + `useEpProps` + `v-bind`；表单物料不声明 emits meta，变更走原生事件通道；`card` 的对象形态 slots meta 须同时声明 `default` 与 `header`（渲染器 `mapValues` 只产出声明键）。
 - **样式：** 不由 cx-nuxt 注入；宿主须按层序契约 `@import 'element-plus/dist/index.css' layer(cx-ep)`（见上约束与包 README）。
+
+### comps-naive-ui 层（`packages/comps-naive-ui/src/`）
+
+- **职责：** 包装 Naive UI 组件为 cx 物料（六类 27 件冻结：基础反馈 4 / 数据展示 6 / 导航版式 5 / 表单 9 / 表格 1 / 插槽容器 2）。
+- **位置：** `packages/comps-naive-ui/src/`
+- **包含：** 每个物料 `<comp>/index.ts`（`define` 出口）+ `<comp>/src/index.vue`（包装 SFC）；`shared/use-naive-ui-props.ts`（attrs 桥接）+ `shared/use-naive-change-bridge.ts`（桥接族变更上行）；`data-table/stream-trigger.ts` + `stream-triggers.ts`（流式增量预设，`createNaiveUiTriggerRegistry`/`mainArrayOf`）；`tests/`（桥接单测 + 各类 smoke + 27 件契约冻结）。
+- **依赖：** `@lionad/cx-definition`、`@lionad/cx-vue`、`@lionad/cx-stream`、`naive-ui`（`^2.44.1`）。
+- **关键约定：** 包装 SFC 一律 `inheritAttrs:false` + `useAttrs` + `useNaiveUiProps` + `v-bind`；值注入配置键取 naive prop 名（`value`/`formattedValue`，非 `modelValue`）；不声明 emits meta；naive 主题形态经 inline CSS 变量表达（button 除外，其模板硬编码 BEM 修饰类）；NDatePicker 包装层守卫非法 `formattedValue`（date-fns 解析抛 RangeError 会致整棵子树为空）；`card` 的对象形态 slots meta 须同时声明 `default` 与 `header`。
+- **样式：** CSS-in-JS（css-render 渲染期注入、引用计数随卸载移除），模块侧与宿主侧均无 css 注入，不参与 `@layer` 层序安排。
 
 ### nuxt 层（`packages/nuxt/src/`）
 

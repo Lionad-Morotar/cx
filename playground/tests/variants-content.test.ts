@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   compsVariants,
   elementPlusVariants,
+  naiveUiVariants,
   nuxtUiV2Variants,
   nuxtUiV4Variants,
   vtuVariants,
@@ -66,6 +67,17 @@ describe('element-plus 集手写 variants', () => {
   it('≥3 件物料有 ≥2 个 variant，label 均非空', () => {
     expect(multiVariantKeys(elementPlusVariants).length).toBeGreaterThanOrEqual(3)
     for (const defs of Object.values(elementPlusVariants)) {
+      for (const def of defs) {
+        expect(def.label.trim().length).toBeGreaterThan(0)
+      }
+    }
+  })
+})
+
+describe('naive-ui 集手写 variants', () => {
+  it('≥3 件物料有 ≥2 个 variant，label 均非空', () => {
+    expect(multiVariantKeys(naiveUiVariants).length).toBeGreaterThanOrEqual(3)
+    for (const defs of Object.values(naiveUiVariants)) {
       for (const def of defs) {
         expect(def.label.trim().length).toBeGreaterThan(0)
       }

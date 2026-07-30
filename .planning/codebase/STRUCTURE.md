@@ -17,6 +17,7 @@ cx/
 │   │   └── vendor/                 # vendored 第三方源码 + 离线 shim（不参与 lint/fmt）
 │   ├── comps-vtu/                  # tool-ui-vue（vtu）工具调用组件物料库
 │   ├── comps-element-plus/         # Element Plus 组件物料库（schema 驱动包装）
+│   ├── comps-naive-ui/             # Naive UI 组件物料库（schema 驱动包装，CSS-in-JS 零 css 装配）
 │   ├── eslint/                     # 共享 lint 配置
 │   └── nuxt/                       # Nuxt 模块入口（顶层）
 ├── playground/                     # 开发沙箱 + EAP 站会迁移 demo
@@ -77,6 +78,12 @@ cx/
 - **包含：** 每物料 `<comp>/index.ts` + `<comp>/src/index.vue`；`shared/use-ep-props.ts`（attrs 桥接）；`table/stream-trigger.ts` + `stream-triggers.ts`（流式增量预设）；`tests/`（桥接单测 + 各类 smoke + 27 件契约冻结）。
 - **关键文件：** `src/index.ts`（`CxElementPlus` 数组 + `CxElementPlusBundle` + `export * from './stream-triggers'`）、`src/shared/use-ep-props.ts`、`README.md`（含宿主侧 `layer(cx-ep)` 样式契约）。
 
+### `packages/comps-naive-ui/`
+
+- **用途：** 包装 Naive UI 组件为 cx 物料（六类 27 件冻结），对齐 EP/vtu 的纯 npm 库包装范式；naive-ui 为 CSS-in-JS，无 css 装配契约。
+- **包含：** 每物料 `<comp>/index.ts` + `<comp>/src/index.vue`；`shared/use-naive-ui-props.ts`（attrs 桥接）+ `shared/use-naive-change-bridge.ts`（桥接族变更上行）；`data-table/stream-trigger.ts` + `stream-triggers.ts`（流式增量预设）；`tests/`（桥接单测 + 各类 smoke + 27 件契约冻结）。
+- **关键文件：** `src/index.ts`（`CxNaiveUi` 数组 + `CxNaiveUiBundle` + stream-triggers 具名导出）、`src/shared/use-naive-change-bridge.ts`、`README.md`（CSS-in-JS 零装配契约 + 组件清单 + 未收录清单）。
+
 ### `packages/nuxt/`
 
 - **用途：** Nuxt 模块入口，零配置集成。
@@ -115,6 +122,7 @@ cx/
 - `packages/comps/src/index.ts`：components 库入口。
 - `packages/comps-nuxt-ui-v4/src/index.ts`：nuxt-ui 物料库入口。
 - `packages/comps-element-plus/src/index.ts`：Element Plus 物料库入口（含 stream-triggers 再导出）。
+- `packages/comps-naive-ui/src/index.ts`：Naive UI 物料库入口（含 stream-triggers 具名导出）。
 - `packages/stream/src/index.ts`：cx-stream 管线入口。
 - `packages/nuxt/src/module.ts`：Nuxt 模块入口。
 - `playground/nuxt.config.ts`：playground 应用入口。

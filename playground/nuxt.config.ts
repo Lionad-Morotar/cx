@@ -3,12 +3,13 @@
 
 export default defineNuxtConfig({
   // @nuxt/ui 须在 cx-nuxt 之前注册：standup 业务组件模板裸用 U* 组件与 useToast
-  // cx-nuxt 内联 module options：dev 验收启用 v2(cx-*) + v4(cx-nuxt-ui-v4-*) + vtu(cx-vtu-*) + element-plus(cx-element-plus-*) 物料
+  // cx-nuxt 内联 module options：dev 验收启用 v2(cx-*) + v4(cx-nuxt-ui-v4-*) + vtu(cx-vtu-*)
+  // + element-plus(cx-element-plus-*) + naive-ui(cx-naive-ui-*) 物料
   modules: [
     '@nuxt/ui',
     [
       '@lionad/cx-nuxt',
-      { materials: ['render', 'components', 'nuxt-ui-v2', 'nuxt-ui-v4', 'vtu', 'element-plus'] },
+      { materials: ['render', 'components', 'nuxt-ui-v2', 'nuxt-ui-v4', 'vtu', 'element-plus', 'naive-ui'] },
     ],
   ],
   // cx 是客户端渲染系统；站会组件 setup 顶层访问 window/localStorage
