@@ -297,8 +297,6 @@ function select(key: string) {
 .item-name {
   flex: 1 1 auto;
   min-width: 0;
-  /* 显式字号（继承自 .sidebar-item 同值），使三级排版层级 group<item<variant 自描述可断言 */
-  font-size: 13px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
