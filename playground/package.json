@@ -12,6 +12,7 @@
   "dependencies": {
     "@lionad/cx-comps": "workspace:*",
     "@lionad/cx-comps-element-plus": "workspace:*",
+    "@lionad/cx-comps-naive-ui": "workspace:*",
     "@lionad/cx-comps-nuxt-ui-v2": "workspace:*",
     "@lionad/cx-comps-nuxt-ui-v4": "workspace:*",
     "@lionad/cx-comps-vtu": "workspace:*",
@@ -33,6 +34,7 @@
     "html-escaper": "^3.0.3",
     "lodash-es": "^4.18.1",
     "mitt": "^3.0.1",
+    "naive-ui": "^2.44.1",
     "number-to-chinese-words": "^1.0.20",
     "nuxt": "^4.5.0",
     "tailwindcss": "^4.3.3",

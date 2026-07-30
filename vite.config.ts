@@ -47,10 +47,11 @@ export default defineConfig({
     environment: 'happy-dom',
     server: {
       deps: {
-        // element-plus 默认 externalize 会经原生 import 解析出第二份 vue（与 hard alias
-        // 归一的 SFC/测试侧副本分属双实例），跨实例依赖收集静默失效——ElInput 等含内部
-        // watch 的控件对测试侧响应式源永不触发。内联使其与 SFC 同走 vite 管线共享单实例
-        inline: [/element-plus/],
+        // element-plus / naive-ui 默认 externalize 会经原生 import 解析出第二份 vue（与 hard
+        // alias 归一的 SFC/测试侧副本分属双实例），跨实例依赖收集静默失效——ElInput / NInput
+        // 等含内部 watch 的控件对测试侧响应式源永不触发。内联使其与 SFC 同走 vite 管线共享单实例。
+        // naive-ui 额外带 css-render import-time 副作用，externalize 路径下副作用也与测试侧分轨
+        inline: [/element-plus/, /naive-ui/],
       },
     },
   },
