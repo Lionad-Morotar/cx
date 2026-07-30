@@ -9,13 +9,19 @@ export interface CxMeta {
   name: string
   description?: string
   headless?: boolean
-  props?: Record<string, { initial?: unknown; type?: string }>
+  props?: Record<string, { name?: string; initial?: unknown; type?: string }>
   slots?: unknown
 }
 
 export interface DevItem {
   meta: CxMeta
   node: CxComponentRuntime
+}
+
+/** 验收页 sidebar 分组形状：各物料集 categories 模块的返回值均与之结构等价 */
+export interface ShowcaseGroup {
+  name: string
+  items: DevItem[]
 }
 
 // 从物料 props 的 initial 构造默认 data，供 CxRender 渲染示例。
@@ -48,22 +54,40 @@ export function textNode(content: string): CxComponentRuntime {
   } as CxComponentRuntime
 }
 
-export function toItem(comp: { _cx_meta: CxMeta }): DevItem {
-  const meta = comp._cx_meta
+export interface SampleNodeOptions {
+  /** data 覆盖：浅合并于各 prop initial 之上（嵌套数组如 columns 整替，不深合） */
+  dataOverride?: Record<string, unknown>
+  /** 节点 id；缺省 `dev-<key>`，variant 块传 `dev-<key>-v<index>` 保实例唯一 */
+  id?: string
+}
+
+/**
+ * 从物料 meta 构造可渲染示例节点（toItem 的泛化）：
+ * data 取各 prop initial 后浅合并 dataOverride；声明 default slot 的容器类
+ * 注入示例文本子节点——数据驱动组件（breadcrumb/select 等用 #item 或无 default slot）
+ * 靠 props initial 渲染，注入 default 会 fallback 显示遮蔽真实组件。
+ */
+export function buildSampleNode(meta: CxMeta, options: SampleNodeOptions = {}): CxComponentRuntime {
+  const data = buildDefaultData(meta)
+  if (options.dataOverride) {
+    Object.assign(data, options.dataOverride)
+  }
   const node = {
-    id: `dev-${meta.key}`,
+    id: options.id ?? `dev-${meta.key}`,
     key: meta.key,
     name: meta.name,
     aliasKeys: [],
-    data: buildDefaultData(meta),
+    data,
     props: {},
     emits: {},
     exposes: {},
     parents: [],
     components: {},
   } as CxComponentRuntime
-  // 仅当物料声明 default slot 时才塞示例文本（容器类）；数据驱动组件（breadcrumb/select 等
-  // 用 #item 或无 default slot）靠 props initial 渲染，注入 default 会 fallback 显示遮蔽真实组件
+  // 声明 default slot 的容器类注入示例文本以填充内容；数据驱动组件（breadcrumb/select 等用
+  // #item 或无 default slot）靠 props initial 渲染，注入 default 会 fallback 显示遮蔽真实组件。
+  // 注：对「桥接默认 slot + 有 label prop」的包装（如 v4 button），因渲染器恒渲染声明的 slot 键，
+  // wrapper 的 #default 恒被提供而遮蔽 label——此展示限制源自包装/渲染器架构，与本构造无关。
   const slotsMeta = meta.slots as any
   let hasDefaultSlot = false
   if (Array.isArray(slotsMeta)) {
@@ -74,7 +98,11 @@ export function toItem(comp: { _cx_meta: CxMeta }): DevItem {
   if (hasDefaultSlot) {
     node.components = { default: [textNode('示例内容')] }
   }
-  return { meta, node }
+  return node
+}
+
+export function toItem(comp: { _cx_meta: CxMeta }): DevItem {
+  return { meta: comp._cx_meta, node: buildSampleNode(comp._cx_meta) }
 }
 
 /**

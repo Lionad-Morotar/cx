@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 import { defineConfig } from 'vite-plus'
 import Vue from 'unplugin-vue/vite'
 
@@ -9,6 +11,9 @@ export default defineConfig({
   plugins: [Vue()],
   resolve: {
     alias: {
+      // Nuxt srcDir 别名离线化：playground app 内 SFC 以 `~/dev/*` 引用共享模块，
+      // vitest 管线无 Nuxt 解析器，此处等价指回 srcDir（相对 import.meta.url 可移植）
+      '~': fileURLToPath(new URL('./playground/app', import.meta.url)),
       // 测试环境单 vue 实例：pnpm 的 typescript peer 风味会产生两个物理 vue 副本，
       // 导致 EMPTY_OBJ 单例身份分裂（useTemplateRef 崩溃），此处强制归一
       vue: '/Users/lionad/Github/Lionad-Morotar/cx/node_modules/.pnpm/vue@3.5.26_typescript@7.0.2/node_modules/vue',
