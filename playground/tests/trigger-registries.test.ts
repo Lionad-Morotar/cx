@@ -119,19 +119,16 @@ describe('vtu trigger 判定 · 数组增长型收敛', () => {
     }
   })
 
-  it.each(VTU_STREAM_TRIGGERS.map((c) => [c.key, c] as const))(
-    '%s 真实样本前缀播放增量收敛',
-    (_key, config) => {
-      const meta = vtuMeta.get(config.key)
-      expect(meta, `${config.key} 物料定义应存在`).toBeTruthy()
-      expectConverges(
-        createVtuTriggerRegistry,
-        vtuCount,
-        config.key,
-        realDataOf(meta!, config.arrayKey),
-      )
-    },
-  )
+  it.each(
+    VTU_STREAM_TRIGGERS.flatMap((c) => {
+      const array = arraySectionOf(c)
+      return array ? [[c.key, c, array.arrayKey] as const] : []
+    }),
+  )('%s 真实样本前缀播放增量收敛', (_key, config, arrayKey) => {
+    const meta = vtuMeta.get(config.key)
+    expect(meta, `${config.key} 物料定义应存在`).toBeTruthy()
+    expectConverges(createVtuTriggerRegistry, vtuCount, config.key, realDataOf(meta!, arrayKey))
+  })
 
   it('判定不适用的 15 件物料不进注册表', () => {
     const registry = createVtuTriggerRegistry()

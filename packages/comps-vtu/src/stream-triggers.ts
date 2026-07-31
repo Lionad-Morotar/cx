@@ -1,4 +1,4 @@
-import { createArrayTrigger, createTriggerRegistry } from '@lionad/cx-stream'
+import { compileTrigger, createTriggerRegistry } from '@lionad/cx-stream'
 
 import chartConfig from './chart/stream-trigger'
 import dataTableConfig from './data-table/stream-trigger'
@@ -15,7 +15,12 @@ import questionFlowConfig from './question-flow/stream-trigger'
 import statsDisplayConfig from './stats-display/stream-trigger'
 import weatherWidgetConfig from './weather-widget/stream-trigger'
 
-import type { ArrayTriggerConfig, CxSpec, TriggerRegistry } from '@lionad/cx-stream'
+import type {
+  ArraySectionConfig,
+  CxSpec,
+  StreamTriggerConfig,
+  TriggerRegistry,
+} from '@lionad/cx-stream'
 
 /**
  * vtu 全部数组增长型物料的流式增量配置（29 件物料中判定适用的 14 件）。
@@ -31,7 +36,7 @@ import type { ArrayTriggerConfig, CxSpec, TriggerRegistry } from '@lionad/cx-str
  * contact-card/link-preview（标量内容）、message-draft（收件人为次要小数组，
  * 正文标量）、approval-card（metadata 为辅助对象）。
  */
-export const VTU_STREAM_TRIGGERS: ArrayTriggerConfig[] = [
+export const VTU_STREAM_TRIGGERS: StreamTriggerConfig[] = [
   dataTableConfig,
   chartConfig,
   imageGalleryConfig,
@@ -56,7 +61,7 @@ export const VTU_STREAM_TRIGGERS: ArrayTriggerConfig[] = [
 export function createVtuTriggerRegistry(): TriggerRegistry<CxSpec> {
   const registry = createTriggerRegistry<CxSpec>()
   for (const config of VTU_STREAM_TRIGGERS) {
-    registry.register(config.key, createArrayTrigger(config))
+    registry.register(config.key, compileTrigger(config))
   }
   return registry
 }
@@ -67,7 +72,10 @@ export function mainArrayOf(node: {
   data?: Record<string, unknown>
 }): unknown[] | null {
   const config = VTU_STREAM_TRIGGERS.find((c) => c.key === node.key)
-  if (!config) return null
-  const arr = node.data?.[config.arrayKey]
+  const arraySection = config?.sections.find(
+    (s): s is ArraySectionConfig => s.kind === 'array',
+  )
+  if (!arraySection) return null
+  const arr = node.data?.[arraySection.arrayKey]
   return Array.isArray(arr) ? arr : null
 }

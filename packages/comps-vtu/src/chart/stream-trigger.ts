@@ -1,6 +1,6 @@
 import def from './index'
 
-import type { ArrayTriggerConfig } from '@lionad/cx-stream'
+import type { StreamTriggerConfig } from '@lionad/cx-stream'
 
 /**
  * 与生成侧转译器同一语义：首字段作 xKey，其余字段作 series。
@@ -18,11 +18,16 @@ function deriveChartTailFields(completeRows: unknown[]): Record<string, unknown>
 }
 
 /** 图表流式增量规则：主数组为数据点 data.data，系列定义 data.series 为次增长路径 */
-const config: ArrayTriggerConfig = {
+const config: StreamTriggerConfig = {
   key: def._cx_meta.key,
-  arrayKey: 'data',
-  extraScanPaths: [['data', 'series', '*']],
-  deriveTailFields: deriveChartTailFields,
+  sections: [
+    {
+      kind: 'array',
+      arrayKey: 'data',
+      extraScanPaths: [['data', 'series', '*']],
+      deriveTailFields: deriveChartTailFields,
+    },
+  ],
 }
 
 export default config
