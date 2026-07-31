@@ -89,9 +89,9 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
   const arraySection = config.sections.find(
     (section): section is ArraySectionConfig => section.kind === 'array',
   )
-  if (config.sections.some((section) => section.kind === 'region')) {
-    throw new Error('compileTrigger: region 形态尚未实现')
-  }
+  const regionSection = config.sections.find(
+    (section): section is RegionSectionConfig => section.kind === 'region',
+  )
   if (config.stateBranch?.emptyPassthrough) {
     throw new Error('compileTrigger: stateBranch 尚未实现')
   }
@@ -102,6 +102,14 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
     mainPath = ['data', arraySection.arrayKey, '*']
     scanPaths.push(mainPath, ...(arraySection.extraScanPaths ?? []))
   }
+  const slotPaths = new Map<string, ScanPath>()
+  if (regionSection) {
+    for (const slot of regionSection.slots) {
+      const path: ScanPath = ['components', slot, '*']
+      slotPaths.set(slot, path)
+      scanPaths.push(path)
+    }
+  }
 
   return {
     scanPaths,
@@ -111,6 +119,7 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
 
       let produced = false
       let data = node.data
+      let components = node.components
 
       if (arraySection && mainPath) {
         const complete = matchesPerPath.get(JSON.stringify(mainPath))?.length ?? 0
@@ -131,9 +140,29 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
         }
       }
 
+      // 声明 slot 计数 0 即无条件从分组移除：跨截断点区域经 jsonrepair 补成
+      // 的残缺项不依赖管线物理截断兜底，契约层自行剔除。未声明 slot 不属
+      // region 字段域，原样保留；components 为数组形态（非分组）时不干预。
+      if (regionSection && components && !Array.isArray(components)) {
+        const filtered: Record<string, CxStreamNode[]> = {}
+        for (const [slot, items] of Object.entries(components)) {
+          const path = slotPaths.get(slot)
+          if (!path) {
+            filtered[slot] = items
+            continue
+          }
+          const count = matchesPerPath.get(JSON.stringify(path))?.length ?? 0
+          if (count > 0) {
+            filtered[slot] = items.slice(0, count)
+            produced = true
+          }
+        }
+        components = filtered
+      }
+
       if (!produced) return null
 
-      return { ...node, data }
+      return { ...node, data, components }
     },
   }
 }
