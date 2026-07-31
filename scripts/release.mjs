@@ -13,7 +13,8 @@
  */
 
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 // ─── 配置 ────────────────────────────────────────────────────
@@ -48,6 +49,37 @@ const dryRun = args.includes('--dry-run')
 
 // ─── 发布 ────────────────────────────────────────────────────
 
+/**
+ * tarball 完整性实测（仅 dry-run）：`pnpm publish --dry-run` 的 SKIP 输出不展示
+ * 文件清单，打包工具链 silent 丢文件无从发现——pnpm 12 alpha 实测会把 files
+ * 白名单内产物清空（仅剩 main + README + package.json 的坍缩态）。实测 tarball
+ * 两处：文件数 > 3（坍缩拦截）、tarball 内 package.json 无 workspace:* 残留。
+ */
+function verifyTarball(pkgDir, pkg) {
+  const tmp = mkdtempSync(join(tmpdir(), 'release-pack-'))
+  try {
+    execFileSync('pnpm', ['pack', '--pack-destination', tmp], {
+      cwd: pkgDir,
+      stdio: 'pipe',
+      shell: process.platform === 'win32',
+    })
+    const tgz = readdirSync(tmp).find((f) => f.endsWith('.tgz'))
+    const listing = execFileSync('tar', ['-tzf', join(tmp, tgz)], { encoding: 'utf8' }).trim().split('\n')
+    if (listing.length <= 3) {
+      console.error(`✗ ${pkg.name} tarball 仅 ${listing.length} 个文件，疑似打包丢产物: ${listing.join(', ')}`)
+      process.exit(1)
+    }
+    const pkgJson = execFileSync('tar', ['-xzf', join(tmp, tgz), '-O', 'package/package.json'], { encoding: 'utf8' })
+    if (/"workspace:/.test(pkgJson)) {
+      console.error(`✗ ${pkg.name} tarball 内 dependencies 仍含 workspace:* 残留（应经 pnpm publish 转换）`)
+      process.exit(1)
+    }
+    console.log(`  tarball 实测 ${listing.length} 个文件，无 workspace:* 残留`)
+  } finally {
+    rmSync(tmp, { recursive: true, force: true })
+  }
+}
+
 const root = process.cwd()
 
 for (const dir of PACKAGES) {
@@ -68,6 +100,8 @@ for (const dir of PACKAGES) {
     ...args,
   ]
   console.log(`\n▸ ${pkg.name}@${pkg.version} (tag: ${channel ?? 'latest'})${dryRun ? ' [dry-run]' : ''}`)
+
+  if (dryRun) verifyTarball(pkgDir, pkg)
 
   try {
     // cwd 设为包目录后裸 `pnpm publish`: `pnpm publish <dir>` 后接 flag 有解析冲突。
