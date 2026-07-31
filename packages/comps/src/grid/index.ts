@@ -44,9 +44,11 @@ export default define({
     // },
   },
   slots: ({ comp }) => {
-    const turn = +comp?.data?.turn || defaultDatas.turn
-    const row = +comp?.data?.rowCount || defaultDatas.rowCount
-    const col = +comp?.data?.colCount || defaultDatas.colCount
+    // comp.data 为 Record<string, unknown>；Number() 与一元 + 语义同一，
+    // TS 7 起一元 + 不再接受 unknown 操作数
+    const turn = Number(comp?.data?.turn) || defaultDatas.turn
+    const row = Number(comp?.data?.rowCount) || defaultDatas.rowCount
+    const col = Number(comp?.data?.colCount) || defaultDatas.colCount
     if (!col || !row) return []
     // const isTurned = turn === 1 || turn === 3
 

@@ -33,6 +33,6 @@
     "eslint": "^10.8.0"
   },
   "scripts": {
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   }
 }

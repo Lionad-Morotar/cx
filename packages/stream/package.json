@@ -21,7 +21,7 @@
   },
   "scripts": {
     "build": "vp pack",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "jsonrepair": "^3.15.0",

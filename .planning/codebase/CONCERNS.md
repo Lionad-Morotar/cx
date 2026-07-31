@@ -99,6 +99,12 @@
   - 1247 行远超 FILE_LEN 300 行的拆分阈值
 - 修复路径：抽取 `createStyleHook({ fields, serialize, unserialize })` 通用工厂；按样式类别拆为 `spacing.ts`、`box.ts`、`font.ts`、`cosm.ts`、`layout.ts` 5 个文件
 
+### renderer 包 28 个 TS7 类型错误（typecheck 门禁唯一红区）
+
+- 现状：`packages/renderer` 三个文件在 typescript 7 下共 28 个类型错误：`render-component-with-bindings.vue` 16 处（`MaybeRef` 不再从 `@vueuse/core` 导出、`_debug_verbose` 全局属性缺失、style* 系列 possibly-undefined、`CxComponentStyle` 不可作索引、4 处失效的 `@ts-expect-error`）、`render-component.vue` 11 处（`SlotContext` 双向转换不重叠、`Component` 联合类型不可赋值、overload 失配）、`render.vue` 1 处（`_debug` 全局属性缺失）
+- 影响：pnpm `-r` 默认 bail 曾使根 typecheck 在更靠前的包失败后永远走不到 renderer，错误自 TS6→7 升级起长期隐藏；门禁恢复后 renderer 是唯一失败包，`pnpm typecheck` 退出码仍为 1
+- 修复路径：与 `types/helper` 的 `@ts-nocheck` 治理同属 TS7 适配工程——逐文件核实 `@ts-expect-error` 是否仍有意义、`SlotContext` 转换改经 `unknown` 中转、全局 `_debug*` 属性补 ambient 声明；治理完成前 typecheck 结果解读为"除本条目外全绿"
+
 ## 已知缺陷
 
 ### `CxLoader.fetchModule` 多分支 Promise 反模式
@@ -273,10 +279,10 @@
 - 影响：IDE 自动解析 TS 版本时可能选错；类型导出在不同 TS 版本下行为差异（尤其是 `verbatimModuleSyntax`）
 - 迁移计划：全仓统一到 `^7.0.0`；移除子包 devDeps 的 typescript 条目，仅在 root 声明
 
-### `vue-tsgo`、`vue-tsc`、`tsgo` 三套类型检查工具并存
+### `vue-tsgo`、`vue-tsc`、`tsc` 三套类型检查工具并存
 
-- 风险：`@lionad/cx-definition` 用 `tsgo --noEmit`；`@lionad/cx-vue`/`@lionad/cx-render`/`@lionad/cx-comps`/`@lionad/cx-comps-nuxt-ui-v4` 用 `vue-tsgo --tsdk ...`；playground 用 `nuxi prepare && vue-tsc`
-- 影响：三套工具对模板类型检查的覆盖度不同，vue-tsgo 是相对新的工具，行为可能未稳定
+- 风险：纯 TS 包（definition/eslint/nuxt/stream）用 `tsc --noEmit`（typescript@7 的原生实现；原脚本写 `tsgo` 但该 bin 不由 typescript@7.0.2 提供，曾长期失效并遮蔽下游包错误）；`@lionad/cx-vue`/`@lionad/cx-render`/`@lionad/cx-comps`/`@lionad/cx-comps-nuxt-ui-v4` 等 Vue 包用 `vue-tsgo --tsdk ...`；playground 用 `nuxi prepare && vue-tsc`
+- 影响：三套工具对模板类型检查的覆盖度不同，vue-tsgo 是相对新的工具，行为可能未稳定；`--tsdk` 硬编码 pnpm 硬链接路径（与本文件首条同类）
 - 迁移计划：选一套作为单一来源（推荐 vue-tsgo，符合 Vite+ 工具链），其余工具的配置项收敛
 
 ### `nativebird`、`kareem`、`mitt`、`vue-concurrency` 等小众依赖

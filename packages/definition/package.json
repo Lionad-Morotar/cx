@@ -21,7 +21,7 @@
   },
   "scripts": {
     "build": "vp pack",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@vue/shared": "^3.5.40",

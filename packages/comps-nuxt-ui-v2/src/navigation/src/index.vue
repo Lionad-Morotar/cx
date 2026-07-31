@@ -54,7 +54,9 @@ useMountedWatch(
     const idx2 =
       props.divideFromMultiple?.findIndex((x) => not(props.items!.find((y) => y.value === x))) || -1
     if (idx2 !== -1) {
-      props.comp.data.divideFromMultiple.splice(idx2, 1)
+      // comp.data 为 Record<string, unknown>；此分支进入时 prop 侧数组已定位到
+      // 失效项，data 侧字段同为数组（同一 divideFromMultiple 契约），断言显式化
+      ;(props.comp.data.divideFromMultiple as unknown[]).splice(idx2, 1)
     }
   },
   { deep: true },

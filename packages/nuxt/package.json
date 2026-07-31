@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "nuxt-module-build build",
-    "typecheck": "tsgo --noEmit",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "nuxt-module-build build"
   },
   "dependencies": {

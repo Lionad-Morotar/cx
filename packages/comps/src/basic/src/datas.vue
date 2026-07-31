@@ -6,6 +6,7 @@
 import { useSleep } from '@lionad/cx-definition'
 
 import { useElementSize } from '@vueuse/core'
+import type { MaybeComputedElementRef, MaybeElement } from '@vueuse/core'
 
 import { inject, ref, computed, provide, onMounted, watch } from 'vue'
 
@@ -44,7 +45,11 @@ onMounted(async () => {
   if (!parent) {
     throw new Error('[test] CxDatas must have a parent component in this testcase')
   }
-  const { width, height } = useElementSize(cx.refs.get(parent)!.ref)
+  // cx.refs.get 的 ref 字段为 unknown（loader 实例类型未收窄）；
+  // 此处父物料即测试容器，其 ref 即元素引用，断言显式化
+  const { width, height } = useElementSize(
+    cx.refs.get(parent)!.ref as MaybeComputedElementRef<MaybeElement>,
+  )
 
   function createGrid() {
     grid.value = []
