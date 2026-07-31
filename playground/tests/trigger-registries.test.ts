@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import {
   createIncrementalExtractor,
   matchCxTrigger,
+  type ArraySectionConfig,
   type CxSpec,
   type CxStreamNode,
+  type StreamTriggerConfig,
 } from '@lionad/cx-stream'
 import {
   COMPONENTS_STREAM_TRIGGERS,
@@ -47,6 +49,11 @@ function metaIndex(materials: unknown): Map<string, CxMeta> {
 
 const vtuMeta = metaIndex(CxVtu)
 const v4Meta = metaIndex(CxNuxtUIV4)
+
+/** 取配置中的数组形态段；region-only 配置返回 null（参数化收敛测试跳过） */
+function arraySectionOf(config: StreamTriggerConfig): ArraySectionConfig | null {
+  return config.sections.find((s): s is ArraySectionConfig => s.kind === 'array') ?? null
+}
 
 /**
  * 从物料真实定义构造剧本 data：buildDefaultData 取全部 props 初值，
@@ -219,19 +226,16 @@ describe('nuxt-ui-v4 trigger 判定 · 数组增长型收敛', () => {
     }
   })
 
-  it.each(NUXT_UI_V4_STREAM_TRIGGERS.map((c) => [c.key, c] as const))(
-    '%s 真实样本前缀播放增量收敛',
-    (_key, config) => {
-      const meta = v4Meta.get(config.key)
-      expect(meta, `${config.key} 物料定义应存在`).toBeTruthy()
-      expectConverges(
-        createNuxtUiV4TriggerRegistry,
-        v4Count,
-        config.key,
-        realDataOf(meta!, config.arrayKey),
-      )
-    },
-  )
+  it.each(
+    NUXT_UI_V4_STREAM_TRIGGERS.flatMap((c) => {
+      const array = arraySectionOf(c)
+      return array ? [[c.key, c, array.arrayKey] as const] : []
+    }),
+  )('%s 真实样本前缀播放增量收敛', (_key, config, arrayKey) => {
+    const meta = v4Meta.get(config.key)
+    expect(meta, `${config.key} 物料定义应存在`).toBeTruthy()
+    expectConverges(createNuxtUiV4TriggerRegistry, v4Count, config.key, realDataOf(meta!, arrayKey))
+  })
 
   it('判定不适用的物料不进注册表（表单控件/交互浮层/页面骨架/标量采样）', () => {
     const registry = createNuxtUiV4TriggerRegistry()
@@ -244,7 +248,6 @@ describe('nuxt-ui-v4 trigger 判定 · 数组增长型收敛', () => {
       'cx-nuxt-ui-v4-context-menu',
       'cx-nuxt-ui-v4-command-palette',
       'cx-nuxt-ui-v4-navigation-menu',
-      'cx-nuxt-ui-v4-footer-columns',
       // 标量/槽容器采样
       'cx-nuxt-ui-v4-button',
       'cx-nuxt-ui-v4-input',
@@ -255,6 +258,109 @@ describe('nuxt-ui-v4 trigger 判定 · 数组增长型收敛', () => {
     for (const key of notApplicable) {
       expect(registry.has(key), `${key} 判定不适用，不应注册`).toBe(false)
     }
+  })
+})
+
+describe('nuxt-ui-v4 region 形态 · 多区容器区域揭示', () => {
+  const REGION_KEYS = [
+    'cx-nuxt-ui-v4-card',
+    'cx-nuxt-ui-v4-footer',
+    'cx-nuxt-ui-v4-header',
+    'cx-nuxt-ui-v4-sidebar',
+  ]
+
+  it('4 件多区容器与 footer-columns 组合件全部进注册表', () => {
+    const registry = createNuxtUiV4TriggerRegistry()
+    for (const key of [...REGION_KEYS, 'cx-nuxt-ui-v4-footer-columns']) {
+      expect(registry.has(key), `${key} 应注册 region 或组合形态 trigger`).toBe(true)
+    }
+  })
+
+  it('card 前缀播放：区域按序列化序渐次揭示，footer 未闭合不渲染', () => {
+    const script = JSON.stringify({
+      id: 'card1',
+      key: 'cx-nuxt-ui-v4-card',
+      data: { title: '周报' },
+      components: {
+        header: [{ key: 'cx-text', data: { content: '头部' } }],
+        default: [{ key: 'cx-text', data: { content: '正文' } }],
+        footer: [{ key: 'cx-text', data: { content: '底部' } }],
+      },
+    })
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createNuxtUiV4TriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+
+    const slotSets: string[][] = []
+    const step = Math.max(1, Math.floor(script.length / 30))
+    for (let i = step; i < script.length; i += step) {
+      const partial = extractor.next(script.slice(0, i)) as CxStreamNode | null
+      const components = partial?.components
+      if (components && !Array.isArray(components)) slotSets.push(Object.keys(components))
+    }
+    const final = extractor.next(script) as CxStreamNode | null
+
+    // 存在 header 已揭示而 footer 未闭合缺席的中间帧（区域独立可判）
+    expect(
+      slotSets.some(
+        (slots) => slots.includes('header') && !slots.includes('footer'),
+      ),
+      '应存在 header 揭示且 footer 缺席的中间帧',
+    ).toBe(true)
+    // 终帧三区齐
+    const finalComponents = final?.components as Record<string, unknown[]>
+    expect(Object.keys(finalComponents)).toEqual(['header', 'default', 'footer'])
+    expect(final?.data?.title).toBe('周报')
+  })
+
+  it('footer-columns 组合形态：columns 数组与 left/right 区域各自渐进', () => {
+    const script = JSON.stringify({
+      id: 'fc1',
+      key: 'cx-nuxt-ui-v4-footer-columns',
+      data: {
+        columns: [
+          { label: '产品', children: [{ label: '组件文档', to: '/docs' }] },
+          { label: '社区', children: [{ label: 'GitHub', to: 'https://github.com' }] },
+        ],
+      },
+      components: {
+        left: [{ key: 'cx-text', data: { content: '左区' } }],
+        right: [{ key: 'cx-text', data: { content: '右区' } }],
+      },
+    })
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createNuxtUiV4TriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+
+    const columnCounts: number[] = []
+    const step = Math.max(1, Math.floor(script.length / 40))
+    for (let i = step; i < script.length; i += step) {
+      const partial = extractor.next(script.slice(0, i)) as CxStreamNode | null
+      const columns = partial?.data?.columns
+      if (Array.isArray(columns)) columnCounts.push(columns.length)
+    }
+    const final = extractor.next(script) as CxStreamNode | null
+
+    expect(columnCounts.length, '应有可观察的列增量窗口').toBeGreaterThan(0)
+    expect(columnCounts[0]).toBeLessThan(2)
+    expect((final?.data?.columns as unknown[]).length).toBe(2)
+    const finalComponents = final?.components as Record<string, unknown[]>
+    expect(Object.keys(finalComponents)).toEqual(['left', 'right'])
+  })
+
+  it('table 空态透传：data:[] 闭合帧产出 partial 而非 lastValid 保持', () => {
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createNuxtUiV4TriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+    const partial = extractor.next(
+      JSON.stringify({ id: 't3', key: 'cx-nuxt-ui-v4-table', data: { data: [] } }),
+    ) as CxStreamNode | null
+
+    expect(partial, '空表闭合应透传节点由 table 内置 empty slot 接管').not.toBeNull()
+    expect(partial?.data?.data).toEqual([])
   })
 })
 
