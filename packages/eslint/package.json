@@ -1,21 +1,14 @@
 {
   "name": "@lionad/cx-eslint-config",
   "version": "0.1.0",
+  "private": true,
   "description": "Shared ESLint flat config for cx monorepo (and downstream projects)",
-  "license": "MIT",
   "type": "module",
   "exports": {
     ".": {
       "types": "./index.d.ts",
       "import": "./index.js"
     }
-  },
-  "files": [
-    "index.js",
-    "index.d.ts"
-  ],
-  "publishConfig": {
-    "access": "public"
   },
   "peerDependencies": {
     "eslint": ">=10"
