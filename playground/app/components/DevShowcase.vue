@@ -399,7 +399,6 @@ function select(key: string) {
   align-items: safe center;
   justify-content: center;
   overflow: auto;
-  max-height: 360px;
 }
 .variant-empty {
   margin-top: 20px;
