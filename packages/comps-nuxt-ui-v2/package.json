@@ -1,8 +1,23 @@
 {
   "name": "@lionad/cx-comps-nuxt-ui-v2",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "description": "cx material components based on Nuxt UI",
-  "license": "MIT",
+  "author": "Lionad-Morotar",
+  "keywords": [
+    "schema-driven",
+    "nuxt-ui",
+    "components",
+    "vue"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lionad-Morotar/cx.git",
+    "directory": "packages/comps-nuxt-ui-v2"
+  },
+  "bugs": {
+    "url": "https://github.com/Lionad-Morotar/cx/issues"
+  },
+  "homepage": "https://github.com/Lionad-Morotar/cx#readme",
   "files": [
     "dist"
   ],

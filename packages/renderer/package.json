@@ -1,8 +1,23 @@
 {
   "name": "@lionad/cx-render",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "description": "cx renderer: schema-driven Vue renderer",
-  "license": "MIT",
+  "author": "Lionad-Morotar",
+  "keywords": [
+    "schema-driven",
+    "renderer",
+    "low-code",
+    "vue"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lionad-Morotar/cx.git",
+    "directory": "packages/renderer"
+  },
+  "bugs": {
+    "url": "https://github.com/Lionad-Morotar/cx/issues"
+  },
+  "homepage": "https://github.com/Lionad-Morotar/cx#readme",
   "files": [
     "dist"
   ],

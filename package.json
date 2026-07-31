@@ -8,7 +8,10 @@
     "typecheck": "pnpm -r run typecheck",
     "check": "vp check",
     "dev:playground": "pnpm -C playground dev",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prebuild": "pnpm test",
+    "prerelease": "pnpm run build",
+    "release": "node scripts/release.mjs"
   },
   "devDependencies": {
     "@lionad/cx-eslint-config": "workspace:*",

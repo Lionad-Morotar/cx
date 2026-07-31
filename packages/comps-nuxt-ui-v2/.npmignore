@@ -1,0 +1,2 @@
+# pnpm 12 alpha 的 pack 在缺少包级 .npmignore 时会回退用根 .gitignore 过滤 files 白名单
+#（dist/ 规则会清空类型声明等产物，仅存 main 入口）；此文件切断回退，pnpm 修复后可移除

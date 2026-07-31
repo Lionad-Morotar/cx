@@ -1,8 +1,24 @@
 {
   "name": "@lionad/cx-stream",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "description": "Streaming structured-render pipeline: incrementally parse incomplete LLM JSON into renderable cx component trees",
-  "license": "MIT",
+  "author": "Lionad-Morotar",
+  "keywords": [
+    "streaming",
+    "llm",
+    "incremental-json",
+    "schema-driven",
+    "vue"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lionad-Morotar/cx.git",
+    "directory": "packages/stream"
+  },
+  "bugs": {
+    "url": "https://github.com/Lionad-Morotar/cx/issues"
+  },
+  "homepage": "https://github.com/Lionad-Morotar/cx#readme",
   "files": [
     "dist"
   ],

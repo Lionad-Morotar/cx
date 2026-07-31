@@ -1,8 +1,23 @@
 {
   "name": "@lionad/cx-definition",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "description": "cx schema layer: component meta types, normalize, loader",
-  "license": "MIT",
+  "author": "Lionad-Morotar",
+  "keywords": [
+    "schema-driven",
+    "low-code",
+    "component-definition",
+    "vue"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lionad-Morotar/cx.git",
+    "directory": "packages/definition"
+  },
+  "bugs": {
+    "url": "https://github.com/Lionad-Morotar/cx/issues"
+  },
+  "homepage": "https://github.com/Lionad-Morotar/cx#readme",
   "files": [
     "dist"
   ],

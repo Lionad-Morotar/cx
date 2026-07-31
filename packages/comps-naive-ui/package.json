@@ -1,8 +1,23 @@
 {
   "name": "@lionad/cx-comps-naive-ui",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "description": "cx material components wrapping Naive UI",
-  "license": "MIT",
+  "author": "Lionad-Morotar",
+  "keywords": [
+    "schema-driven",
+    "naive-ui",
+    "components",
+    "vue"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lionad-Morotar/cx.git",
+    "directory": "packages/comps-naive-ui"
+  },
+  "bugs": {
+    "url": "https://github.com/Lionad-Morotar/cx/issues"
+  },
+  "homepage": "https://github.com/Lionad-Morotar/cx#readme",
   "files": [
     "dist"
   ],

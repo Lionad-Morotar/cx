@@ -1,8 +1,24 @@
 {
   "name": "@lionad/cx-comps-vtu",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "description": "cx material components wrapping tool-ui-vue (vtu) tool-call widgets",
-  "license": "MIT",
+  "author": "Lionad-Morotar",
+  "keywords": [
+    "schema-driven",
+    "tool-ui",
+    "tool-call",
+    "widgets",
+    "vue"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lionad-Morotar/cx.git",
+    "directory": "packages/comps-vtu"
+  },
+  "bugs": {
+    "url": "https://github.com/Lionad-Morotar/cx/issues"
+  },
+  "homepage": "https://github.com/Lionad-Morotar/cx#readme",
   "files": [
     "dist"
   ],

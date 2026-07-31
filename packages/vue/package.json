@@ -1,8 +1,23 @@
 {
   "name": "@lionad/cx-vue",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha.0",
   "description": "cx Vue runtime: composables and shared runtime components",
-  "license": "MIT",
+  "author": "Lionad-Morotar",
+  "keywords": [
+    "vue",
+    "composables",
+    "schema-driven",
+    "runtime"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lionad-Morotar/cx.git",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/Lionad-Morotar/cx/issues"
+  },
+  "homepage": "https://github.com/Lionad-Morotar/cx#readme",
   "files": [
     "dist",
     "src/styles"
