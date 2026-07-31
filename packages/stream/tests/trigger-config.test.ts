@@ -79,18 +79,6 @@ describe('compileTrigger 数组形态', () => {
     expect(compileTrigger(tableConfig).buildPartial(spec, matches)).toBeNull()
   })
 
-  // 中间态守卫：stateBranch 形态编译落地前必须显式拒绝，
-  // 静默忽略会让声明退化为纯数组形态且无任何报错。
-  it('stateBranch.emptyPassthrough 显式 throw（编译落地前的防静默退化守卫）', () => {
-    expect(() =>
-      compileTrigger({
-        key: 'k',
-        sections: [{ kind: 'array', arrayKey: 'data' }],
-        stateBranch: { emptyPassthrough: true },
-      }),
-    ).toThrow(/stateBranch 尚未实现/)
-  })
-
   // 契约上限为至多一个 array 形态：find 只取首个会让第二个数组永不切分，
   // 与静默退化同害，必须显式拒绝。
   it('多 array 形态显式 throw（超出契约上限）', () => {
@@ -103,6 +91,105 @@ describe('compileTrigger 数组形态', () => {
         ],
       }),
     ).toThrow(/至多一个 array/)
+  })
+})
+
+describe('compileTrigger stateBranch 空态透传', () => {
+  const tableEmptyConfig: StreamTriggerConfig = {
+    key: 'cx-nuxt-ui-v4-table',
+    sections: [{ kind: 'array', arrayKey: 'data' }],
+    stateBranch: { emptyPassthrough: true },
+  }
+
+  it('scanPaths 追加容器级闭合信号路径（不带 *）', () => {
+    expect(compileTrigger(tableEmptyConfig).scanPaths).toEqual([
+      ['data', 'data', '*'],
+      ['data', 'data'],
+    ])
+  })
+
+  it('空表闭合：透传 partial（携带空数组）而非 null 交 lastValid', () => {
+    // 空态断言依赖容器级闭合信号：主数组闭合且 0 完整行 ⟺ 真空表，
+    // 透传节点由组件内置空态接管渲染
+    const text = '{"key":"cx-nuxt-ui-v4-table","data":{"data":[]}}'
+    const matches = matchesFor(text, [['data', 'data', '*'], ['data', 'data']])
+    const spec: CxSpec = { key: 'cx-nuxt-ui-v4-table', data: { data: [] } }
+
+    const built = asNode(compileTrigger(tableEmptyConfig).buildPartial(spec, matches))
+
+    expect(built).not.toBeNull()
+    expect(built?.data?.data).toEqual([])
+    expect(built).not.toBe(spec)
+  })
+
+  it('主数组未闭合（行传输中）→ null 不干预（暂无数据可能只是还没传到）', () => {
+    const text = '{"key":"cx-nuxt-ui-v4-table","data":{"data":[{"name":"Al'
+    const matches = matchesFor(text, [['data', 'data', '*'], ['data', 'data']])
+    const spec: CxSpec = { key: 'cx-nuxt-ui-v4-table', data: {} }
+
+    expect(compileTrigger(tableEmptyConfig).buildPartial(spec, matches)).toBeNull()
+  })
+
+  it('闭合且含完整行 → 走 array 段正常截断（空态透传不触发）', () => {
+    const text = '{"key":"cx-nuxt-ui-v4-table","data":{"data":[{"name":"Alice"}]}}'
+    const matches = matchesFor(text, [['data', 'data', '*'], ['data', 'data']])
+    const spec: CxSpec = { key: 'cx-nuxt-ui-v4-table', data: { data: [{ name: 'Alice' }] } }
+
+    const built = asNode(compileTrigger(tableEmptyConfig).buildPartial(spec, matches))
+
+    expect(built?.data?.data).toEqual([{ name: 'Alice' }])
+  })
+
+  it('契约前提显式拒绝：无 array 形态时 emptyPassthrough 无法编译闭合信号', () => {
+    expect(() =>
+      compileTrigger({
+        key: 'k',
+        sections: [{ kind: 'region', slots: ['header'] }],
+        stateBranch: { emptyPassthrough: true },
+      }),
+    ).toThrow(/stateBranch 要求 array 形态/)
+  })
+
+  it('组合：空表闭合 + 区域完整 → 空数组透传与区域揭示兼容', () => {
+    const config: StreamTriggerConfig = {
+      key: 'cx-nuxt-ui-v4-footer-columns',
+      sections: [
+        { kind: 'array', arrayKey: 'columns' },
+        { kind: 'region', slots: ['left'] },
+      ],
+      stateBranch: { emptyPassthrough: true },
+    }
+    const paths: ScanPath[] = [
+      ['data', 'columns', '*'],
+      ['components', 'left', '*'],
+      ['data', 'columns'],
+    ]
+    const text =
+      '{"key":"cx-nuxt-ui-v4-footer-columns","data":{"columns":[]},"components":{"left":[{"key":"l1"}]}}'
+    const matches = matchesFor(text, paths)
+    const spec: CxSpec = {
+      key: 'cx-nuxt-ui-v4-footer-columns',
+      data: { columns: [] },
+      components: { left: [{ key: 'l1' }] },
+    }
+
+    const built = asNode(compileTrigger(config).buildPartial(spec, matches))
+
+    expect(built?.data?.columns).toEqual([])
+    expect(built?.components).toEqual({ left: [{ key: 'l1' }] })
+  })
+
+  it('端到端：空表闭合帧产出透传 partial 而非 lastValid 保持', () => {
+    const registry = createTriggerRegistry<CxSpec>()
+    registry.register('cx-nuxt-ui-v4-table', compileTrigger(tableEmptyConfig))
+    const extractor = createIncrementalExtractor({ registry, matchTrigger: matchCxTrigger })
+
+    // 首帧 spec 未完整 → null；闭合帧 → 透传（若走 lastValid 将一直是 null）
+    const built = asNode(
+      extractor.next('{"key":"cx-nuxt-ui-v4-table","data":{"data":[]}}'),
+    )
+
+    expect(built?.data?.data).toEqual([])
   })
 })
 

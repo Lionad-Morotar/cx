@@ -92,15 +92,23 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
   const regionSection = config.sections.find(
     (section): section is RegionSectionConfig => section.kind === 'region',
   )
-  if (config.stateBranch?.emptyPassthrough) {
-    throw new Error('compileTrigger: stateBranch 尚未实现')
+  // 闭合信号与 0 元素断言均编译自主数组路径，无 array 形态时无从生成
+  if (config.stateBranch?.emptyPassthrough && !arraySection) {
+    throw new Error('compileTrigger: stateBranch 要求 array 形态')
   }
 
   const scanPaths: ScanPath[] = []
   let mainPath: ScanPath | null = null
+  let containerPath: ScanPath | null = null
   if (arraySection) {
     mainPath = ['data', arraySection.arrayKey, '*']
     scanPaths.push(mainPath, ...(arraySection.extraScanPaths ?? []))
+    // 容器级路径不带 *：匹配 ⟺ 主数组容器闭合，据此区分
+    // 「闭合且 0 元素」（真空表，透传空态）与「尚未开始传输」（保持 lastValid）
+    if (config.stateBranch?.emptyPassthrough) {
+      containerPath = ['data', arraySection.arrayKey]
+      scanPaths.push(containerPath)
+    }
   }
   const slotPaths = new Map<string, ScanPath>()
   if (regionSection) {
@@ -121,8 +129,9 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
       let data = node.data
       let components = node.components
 
+      let complete = 0
       if (arraySection && mainPath) {
-        const complete = matchesPerPath.get(JSON.stringify(mainPath))?.length ?? 0
+        complete = matchesPerPath.get(JSON.stringify(mainPath))?.length ?? 0
         if (complete > 0) {
           const rows = (node.data?.[arraySection.arrayKey] as unknown[] | undefined) ?? []
           const completeRows = rows.slice(0, complete)
@@ -136,6 +145,16 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
             }
           }
           data = next
+          produced = true
+        }
+      }
+
+      // 空态透传：主数组闭合且 0 完整行时放行节点（携带空数组），组件内置
+      // 空态接管渲染；空态内容属组件契约，trigger 只负责揭示时机
+      if (!produced && containerPath && complete === 0) {
+        const closed = (matchesPerPath.get(JSON.stringify(containerPath))?.length ?? 0) > 0
+        if (closed) {
+          data = node.data ? { ...node.data } : node.data
           produced = true
         }
       }
