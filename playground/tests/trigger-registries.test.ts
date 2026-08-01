@@ -26,9 +26,10 @@ import {
 import { buildDefaultData, type CxMeta } from '../app/dev/material-utils'
 
 // 物料库 trigger 注册表的判定型验收（与页面/定时器解耦的无头契约）：
-// - YES 判定（数组增长型）：每个 config 的 key 都在注册表内，且前缀播放时
-//   增量帧「出现 → 项数单调递增 → 终态收敛到完整行数」
-// - NO 判定（标量/容器/表单控件/交互浮层）：key 不进注册表
+// - vtu：29 件全适用——数组增长型 14 件前缀播放「出现 → 项数单调递增 →
+//   终态收敛完整行数」；标量主体形态 15 件（article + 长主体 7 + 短属性 7）
+//   属性闭合切分，包内 e2e 覆盖，此层断言注册完备性
+// - nuxt-ui-v4 / components：维持数组增长型 YES / 其余 NO 的原判定
 //
 // 剧本数据取自物料真实定义（_cx_meta.props 的 initial，与页面卡片回放
 // 同一条 buildDefaultData 数据路径），主数组以真实数组循环扩充到 4 项——
@@ -130,10 +131,13 @@ describe('vtu trigger 判定 · 数组增长型收敛', () => {
     expectConverges(createVtuTriggerRegistry, vtuCount, config.key, realDataOf(meta!, arrayKey))
   })
 
-  it('判定不适用的 14 件物料不进注册表', () => {
+  it('29 件物料全部注册：14 数组增长型 + 15 标量主体形态，判定完备无遗漏', () => {
     const registry = createVtuTriggerRegistry()
-    // 社媒贴文（单体对象）/ 代码三件 / 标量媒体五件 / message-draft / approval-card
-    const notApplicable = [
+    // 标量主体形态 15 件：article 首例 + 长主体 7 件（社媒贴文/代码三件/
+    // message-draft，空壳挂载 + 骨架占位）+ 短属性 7 件（媒体/引用/联系卡/
+    // 链接预览/审批卡，空壳挂载 + 属性揭示）
+    const scalarKeys = [
+      'cx-vtu-article',
       'cx-vtu-terminal',
       'cx-vtu-code-block',
       'cx-vtu-code-diff',
@@ -149,11 +153,15 @@ describe('vtu trigger 判定 · 数组增长型收敛', () => {
       'cx-vtu-message-draft',
       'cx-vtu-approval-card',
     ]
-    for (const key of notApplicable) {
-      expect(registry.has(key), `${key} 判定不适用，不应注册`).toBe(false)
+    for (const key of scalarKeys) {
+      expect(registry.has(key), `${key} 标量主体形态应注册`).toBe(true)
     }
-    // 29 件物料 = 15 适用（14 数组增长型 + article 标量主体）+ 14 不适用，判定完备无遗漏
-    expect(VTU_STREAM_TRIGGERS.length + notApplicable.length).toBe(29)
+    const arrayCount = VTU_STREAM_TRIGGERS.filter((c) =>
+      c.sections.some((s) => s.kind === 'array'),
+    ).length
+    expect(arrayCount).toBe(14)
+    expect(scalarKeys).toHaveLength(15)
+    expect(VTU_STREAM_TRIGGERS.length).toBe(29)
   })
 })
 
