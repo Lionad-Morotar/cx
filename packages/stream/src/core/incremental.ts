@@ -148,15 +148,26 @@ export function createIncrementalExtractor<TSpec = unknown>(
     if (!furthest) return lastValid
 
     const truncated = text.slice(0, furthest.end + 1) + closingBrackets(furthest.path)
+    // 终态判定：原文无需修复即完整 JSON（纯 JSON 剧本播完、围栏闭合后的
+    // 完整文本）时完整帧必须出帧——末尾扎堆闭合的短字段若被节流窗口压掉，
+    // 流结束后的终态会停在缺字段的中间态，再无后续 delta 把它补出
+    let complete: unknown = null
+    try {
+      complete = JSON.parse(text)
+    } catch {
+      // 未完整：走截断帧节流路径
+    }
     const windowDone =
-      lastEmitDelta === null || deltaCount - lastEmitDelta >= (pendingTrigger?.frameStride ?? 1)
+      complete !== null ||
+      lastEmitDelta === null ||
+      deltaCount - lastEmitDelta >= (pendingTrigger?.frameStride ?? 1)
     const due = pendingEmit && windowDone
     // 截断产物未变且窗口未到期：帧必然不变，跳过解析与构造
     if (truncated === lastTruncated && !due) return lastValid
 
     let parsed: unknown
     try {
-      parsed = safeJsonParse(truncated, { maxRepairLength: config.maxRepairLength })
+      parsed = complete ?? safeJsonParse(truncated, { maxRepairLength: config.maxRepairLength })
     } catch {
       return lastValid
     }
@@ -170,7 +181,9 @@ export function createIncrementalExtractor<TSpec = unknown>(
 
     lastTruncated = truncated
     const stridePassed =
-      lastEmitDelta === null || deltaCount - lastEmitDelta >= (matched[1].frameStride ?? 1)
+      complete !== null ||
+      lastEmitDelta === null ||
+      deltaCount - lastEmitDelta >= (matched[1].frameStride ?? 1)
     if (stridePassed) {
       lastEmitDelta = deltaCount
       pendingEmit = false

@@ -612,6 +612,38 @@ describe('compileTrigger scalar 经真实管线端到端', () => {
     expect(d7?.data?.content).toBe('x')
   })
 
+  it('frameStride 终态兜底：完整 JSON 输入无视节流窗口直出完整帧', () => {
+    const registry = createTriggerRegistry<CxSpec>()
+    registry.register(
+      'cx-vtu-article',
+      compileTrigger({ ...articleConfig, frameStride: 10 }),
+    )
+    const extractor = createIncrementalExtractor({ registry, matchTrigger: matchCxTrigger })
+
+    // d1：首帧空壳（lastEmitDelta=1）
+    const shell = asNode(extractor.next('{"key":"cx-vtu-article"'))
+    expect(shell?.data).toHaveProperty('type', 'md')
+
+    // d2-d3：type/title 扎堆闭合，窗口（10）远未到期 → 全被节流，帧保持空壳
+    extractor.next('{"key":"cx-vtu-article","data":{"type":"md"')
+    const d3 = extractor.next('{"key":"cx-vtu-article","data":{"type":"md","title":"周报"')
+    expect(d3).toBe(shell)
+
+    // d4：完整 JSON（末尾 readingTime 短字段殿后）。窗口未到期（4-1<10），
+    // 但输入已完整——终态必须直出完整帧，否则回放播完停在缺字段中间态
+    const done = asNode(
+      extractor.next(
+        '{"key":"cx-vtu-article","data":{"type":"md","title":"周报","content":"正文","readingTime":3}}',
+      ),
+    )
+    expect(done?.data).toEqual({
+      type: 'md',
+      title: '周报',
+      content: '正文',
+      readingTime: 3,
+    })
+  })
+
   it('混合注册表：scalar 注册不影响数组形态（空匹配不产帧、行闭合正常）', () => {
     const planConfig: StreamTriggerConfig = {
       key: 'cx-vtu-plan',
