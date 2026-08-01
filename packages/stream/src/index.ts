@@ -13,6 +13,7 @@
 // --- core：纯 TS 管线 ---
 export * from './core/types'
 export * from './core/bracket-scanner'
+export * from './core/stream-events'
 export * from './core/parse'
 export * from './core/fence'
 export * from './core/spec-detector'
