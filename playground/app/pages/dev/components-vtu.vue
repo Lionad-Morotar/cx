@@ -1,7 +1,7 @@
 <template>
   <!-- /dev/components-vtu：@lionad/cx-comps-vtu 物料 schema 驱动渲染验收。
        经 DevShowcase 以 sidebar + 主区多 variants 形态展示；按 vtu 官方 6 分类分组；
-       含增量 trigger 的数组增长型物料经 replay 装配提供流式回放。 -->
+       含增量 trigger 的物料（数组增长型 + 标量主体 article）经 replay 装配提供流式回放。 -->
   <main class="page-dev-components-vtu page">
     <header class="page-header">
       <h1 class="title">cx components · vtu</h1>
