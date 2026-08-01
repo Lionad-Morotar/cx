@@ -43,13 +43,43 @@ export interface StateBranchConfig {
   emptyPassthrough?: boolean
 }
 
+/**
+ * 标量主体形态：组件无增长容器字段，属性「完成」（闭合事件）即切分点。
+ * 截断永远落在闭合事件处，帧内绝无 jsonrepair 伪造的半值；
+ * key 字符串闭合即首个事件，空壳帧随之提前挂载。
+ * 机制取证与策略映射见 docs/research/2026-08-01-scalar-stream-strategies.md。
+ */
+export interface ScalarSectionConfig {
+  kind: 'scalar'
+  /**
+   * 空壳帧兜底（??= 语义，真实字段已传输则不覆盖）。
+   * 标量主体组件常有必填契约（如 article 的 type/content），
+   * key 检出即挂载的空壳帧据此保持契约合法。
+   */
+  fallbackData?: Record<string, unknown>
+  /**
+   * 流式期间以骨架占位的字段清单。未传输（未闭合）的声明字段向 data 注入
+   * `_cx_streaming` 标记而非半值，由组件包装层读标记渲染骨架；
+   * 字段完整到达后标记移除、骨架一次性替换为完整内容。
+   */
+  skeletonFields?: string[]
+}
+
 /** 组件流式声明：多形态组合编译为单个 IncrementalTrigger */
 export interface StreamTriggerConfig {
   /** 物料 meta key 原值（def._cx_meta.key，不用 kebab/camel 往返的派生值） */
   key: string
-  /** 形态组合；契约：至多一个 array 形态 + 至多一个 region 形态 */
-  sections: Array<ArraySectionConfig | RegionSectionConfig>
+  /**
+   * 形态组合；契约：至多一个 array 形态 + 至多一个 region 形态，
+   * scalar 形态独占（与 array/region 组合无现实样本，组合语义留作演进空间）
+   */
+  sections: Array<ArraySectionConfig | RegionSectionConfig | ScalarSectionConfig>
   stateBranch?: StateBranchConfig
+  /**
+   * 出帧节流（delta 数，缺省 1 = 每 delta 都可出帧）。
+   * 短属性扎堆闭合时合并为一帧；末尾等不到窗口的属性由终态 spec 兜底。
+   */
+  frameStride?: number
 }
 
 // 与 cx-array-trigger 的 pickNode 逐字相同是有意复制：跨模块导出共享会让
@@ -92,9 +122,42 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
   const regionSection = config.sections.find(
     (section): section is RegionSectionConfig => section.kind === 'region',
   )
+  const scalarSection = config.sections.find(
+    (section): section is ScalarSectionConfig => section.kind === 'scalar',
+  )
+  // scalar 形态独占：与 array/region 组合时截断源语义冲突（容器边界 vs 闭合
+  // 事件），无现实样本支撑组合语义，显式拒绝优于静默退化
+  if (scalarSection && config.sections.length > 1) {
+    throw new Error('compileTrigger: scalar 形态不与 array/region 组合')
+  }
   // 闭合信号与 0 元素断言均编译自主数组路径，无 array 形态时无从生成
   if (config.stateBranch?.emptyPassthrough && !arraySection) {
     throw new Error('compileTrigger: stateBranch 要求 array 形态')
+  }
+
+  // --- 标量主体形态：无 scanPaths，属性闭合事件经管线 closureFallback 驱动 ---
+  if (scalarSection) {
+    const fallback = scalarSection.fallbackData ?? {}
+    const skeletonFields = scalarSection.skeletonFields ?? []
+    return {
+      scanPaths: [],
+      usesClosureEvents: true,
+      frameStride: config.frameStride,
+      buildPartial: (spec: CxSpec): CxSpec | null => {
+        const node = pickNode(spec, config.key)
+        if (!node) return null
+        // 截断机制保证 data 内值皆完整；fallback 仅补未传输字段（??= 语义）
+        const transmitted = node.data ?? {}
+        const data: Record<string, unknown> = { ...fallback, ...transmitted }
+        // 骨架标记判据只需 parsed data 缺席性：截断保证「缺席 ⟺ 未闭合」，
+        // 未传输的 skeleton 字段注入标记，包装层读标记渲染骨架
+        const streaming = skeletonFields.filter((field) => !(field in transmitted))
+        if (streaming.length > 0) {
+          data._cx_streaming = streaming
+        }
+        return { ...node, data }
+      },
+    }
   }
 
   const scanPaths: ScanPath[] = []

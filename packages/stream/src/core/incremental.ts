@@ -19,6 +19,7 @@
 import { scanBalancedItems } from './bracket-scanner'
 import { fenceBlockPattern } from './fence'
 import { safeJsonParse } from './parse'
+import { furthestEvent, scanStreamEvents } from './stream-events'
 
 import type { PathSegment, ScanMatch, ScanPath } from './types'
 
@@ -34,6 +35,19 @@ export interface IncrementalTrigger<TSpec> {
    * 返回 null 表示数据不足以构造有效结果（管线保持 lastValid）。
    */
   buildPartial: (spec: TSpec, matchesPerPath: MatchesPerPath) => TSpec | null
+  /**
+   * 无 scanPath 匹配时以标量闭合事件为截断源（标量主体形态）。
+   * 声明后管线在 best 为空时对其整段扫描闭合事件、截断至最远闭合点，
+   * 并以空 matchesPerPath 调用 buildPartial——数组/区域形态在空匹配下
+   * 本就返回 null，故本标记只对「空匹配也能产帧」的形态有意义。
+   */
+  usesClosureEvents?: boolean
+  /**
+   * 出帧节流（delta 数）：距上次出帧不足 N 个 delta 时新帧被节流，
+   * 内容并入窗口到期后的下一帧；缺省 1（每 delta 都可出帧）。
+   * 末尾等不到窗口的属性由围栏闭合后的终态 spec 兜底，不影响终态。
+   */
+  frameStride?: number
 }
 
 /** Trigger 注册表（工厂创建，实例间互不污染） */
@@ -103,7 +117,75 @@ export function createIncrementalExtractor<TSpec = unknown>(
   let lastValid: TSpec | null = null
   const fence = config.fence ?? 'json'
 
+  // --- 标量闭合事件分支的跨调用状态 ---
+  // deltaCount：next() 调用计数，frameStride 的「帧」语义单位
+  // lastTruncated：上次参与解析的截断文本——帧不变判据用文本比较而非位置
+  // 记录，换围栏（新 pending 块从头生长）后位置状态会失效，文本比较天然安全
+  // lastEmitDelta 为 null 表示尚未出帧：首帧（空壳挂载）不受节流
+  let deltaCount = 0
+  let lastTruncated: string | null = null
+  let lastEmitDelta: number | null = null
+  let pendingEmit = false
+  let pendingTrigger: IncrementalTrigger<TSpec> | null = null
+
+  // 注册表是否含声明闭合事件的 trigger（标量主体形态）；注册表动态，现用现查
+  function hasClosureTriggers(): boolean {
+    for (const [, trigger] of config.registry.entries()) {
+      if (trigger.usesClosureEvents) return true
+    }
+    return false
+  }
+
+  /**
+   * 无 scanPath 匹配时的回退：标量闭合事件截断 → 空匹配构造帧。
+   * 仅注册表含 usesClosureEvents trigger 时激活，未注册时与既有行为逐位一致；
+   * 非 scalar trigger 在空匹配下 buildPartial 返回 null，天然不产帧。
+   */
+  function closureFallback(text: string): TSpec | null {
+    if (!hasClosureTriggers()) return lastValid
+
+    const furthest = furthestEvent(scanStreamEvents(text))
+    if (!furthest) return lastValid
+
+    const truncated = text.slice(0, furthest.end + 1) + closingBrackets(furthest.path)
+    const windowDone =
+      lastEmitDelta === null || deltaCount - lastEmitDelta >= (pendingTrigger?.frameStride ?? 1)
+    const due = pendingEmit && windowDone
+    // 截断产物未变且窗口未到期：帧必然不变，跳过解析与构造
+    if (truncated === lastTruncated && !due) return lastValid
+
+    let parsed: unknown
+    try {
+      parsed = safeJsonParse(truncated, { maxRepairLength: config.maxRepairLength })
+    } catch {
+      return lastValid
+    }
+    if (!parsed || typeof parsed !== 'object') return lastValid
+
+    const spec = parsed as TSpec
+    const matched = config.matchTrigger(spec, config.registry)
+    if (!matched) return lastValid
+    const partial = matched[1].buildPartial(spec, new Map())
+    if (!partial) return lastValid
+
+    lastTruncated = truncated
+    const stridePassed =
+      lastEmitDelta === null || deltaCount - lastEmitDelta >= (matched[1].frameStride ?? 1)
+    if (stridePassed) {
+      lastEmitDelta = deltaCount
+      pendingEmit = false
+      pendingTrigger = null
+      lastValid = partial
+    } else {
+      // 被节流：内容不丢失，并入窗口到期后的下一帧
+      pendingEmit = true
+      pendingTrigger = matched[1]
+    }
+    return lastValid
+  }
+
   function next(rawText: string): TSpec | null {
+    deltaCount++
     const raw = rawText
     if (!raw) {
       lastValid = null
@@ -126,7 +208,7 @@ export function createIncrementalExtractor<TSpec = unknown>(
     for (const [, trigger] of config.registry.entries()) {
       allPaths.push(...trigger.scanPaths)
     }
-    if (allPaths.length === 0) return lastValid
+    if (allPaths.length === 0) return closureFallback(text)
 
     // --- Step 2: 扫描所有路径，收集匹配 ---
     const matchesPerPath: MatchesPerPath = new Map()
@@ -141,7 +223,7 @@ export function createIncrementalExtractor<TSpec = unknown>(
       }
     }
 
-    if (!best) return lastValid
+    if (!best) return closureFallback(text)
 
     // --- Step 3: 截断至最远匹配 + 补严格闭合括号 ---
     const truncated = text.slice(0, best.end + 1) + closingBrackets(best.path)
@@ -175,6 +257,11 @@ export function createIncrementalExtractor<TSpec = unknown>(
     next,
     reset: () => {
       lastValid = null
+      deltaCount = 0
+      lastTruncated = null
+      lastEmitDelta = null
+      pendingEmit = false
+      pendingTrigger = null
     },
   }
 }

@@ -432,3 +432,217 @@ describe('fromArrayTriggerConfig 迁移同一性', () => {
     expect(built?.data?.series).toEqual([{ key: 'revenue', label: '营收' }])
   })
 })
+
+describe('compileTrigger scalar 形态', () => {
+  const articleConfig: StreamTriggerConfig = {
+    key: 'cx-vtu-article',
+    sections: [
+      {
+        kind: 'scalar',
+        fallbackData: { type: 'md', content: '' },
+        skeletonFields: ['content'],
+      },
+    ],
+    frameStride: 10,
+  }
+
+  it('无 scanPaths、声明闭合事件与节流透传', () => {
+    const trigger = compileTrigger(articleConfig)
+    expect(trigger.scanPaths).toEqual([])
+    expect(trigger.usesClosureEvents).toBe(true)
+    expect(trigger.frameStride).toBe(10)
+  })
+
+  it('buildPartial 恒产帧：无 data 节点 → fallback 填充 + 骨架标记', () => {
+    const built = asNode(compileTrigger(articleConfig).buildPartial({ key: 'cx-vtu-article' }, new Map()))
+    expect(built?.data).toEqual({ type: 'md', content: '', _cx_streaming: ['content'] })
+  })
+
+  it('fallbackData ??= 语义：真实字段已传输则不覆盖', () => {
+    const spec: CxSpec = {
+      key: 'cx-vtu-article',
+      data: { type: 'html', content: '<p>x</p>' },
+    }
+    const built = asNode(compileTrigger(articleConfig).buildPartial(spec, new Map()))
+    expect(built?.data?.type).toBe('html')
+    expect(built?.data?.content).toBe('<p>x</p>')
+    // skeleton 字段已传输 → 不注入标记
+    expect(built?.data).not.toHaveProperty('_cx_streaming')
+  })
+
+  it('skeleton 字段部分传输：只标记未传输字段', () => {
+    const config: StreamTriggerConfig = {
+      key: 'k',
+      sections: [{ kind: 'scalar', skeletonFields: ['content', 'summary'] }],
+    }
+    const built = asNode(
+      compileTrigger(config).buildPartial({ key: 'k', data: { content: '正文' } }, new Map()),
+    )
+    expect(built?.data?._cx_streaming).toEqual(['summary'])
+  })
+
+  it('scalar + array / region 组合显式 throw（截断源语义冲突）', () => {
+    expect(() =>
+      compileTrigger({
+        key: 'k',
+        sections: [{ kind: 'scalar' }, { kind: 'array', arrayKey: 'rows' }],
+      }),
+    ).toThrow(/scalar 形态不与/)
+    expect(() =>
+      compileTrigger({
+        key: 'k',
+        sections: [{ kind: 'scalar' }, { kind: 'region', slots: ['header'] }],
+      }),
+    ).toThrow(/scalar 形态不与/)
+  })
+
+  it('未命中 key 的 spec → null', () => {
+    expect(
+      compileTrigger(articleConfig).buildPartial({ key: 'other', data: {} }, new Map()),
+    ).toBeNull()
+  })
+})
+
+describe('compileTrigger scalar 经真实管线端到端', () => {
+  const articleConfig: StreamTriggerConfig = {
+    key: 'cx-vtu-article',
+    sections: [
+      {
+        kind: 'scalar',
+        fallbackData: { type: 'md', content: '' },
+        skeletonFields: ['content'],
+      },
+    ],
+  }
+
+  function createArticleExtractor(extra?: (registry: ReturnType<typeof createTriggerRegistry<CxSpec>>) => void) {
+    const registry = createTriggerRegistry<CxSpec>()
+    registry.register('cx-vtu-article', compileTrigger(articleConfig))
+    extra?.(registry)
+    return createIncrementalExtractor({ registry, matchTrigger: matchCxTrigger })
+  }
+
+  it('key 检出即空壳帧（首帧不受节流），content 骨架标记在', () => {
+    const extractor = createArticleExtractor()
+    const shell = asNode(extractor.next('{"key":"cx-vtu-article"'))
+    expect(shell).toEqual({
+      key: 'cx-vtu-article',
+      data: { type: 'md', content: '', _cx_streaming: ['content'] },
+    })
+  })
+
+  it('content 流式中段：帧保持同引用且绝无半值', () => {
+    const extractor = createArticleExtractor()
+    extractor.next('{"key":"cx-vtu-article"')
+    const typed = asNode(extractor.next('{"key":"cx-vtu-article","data":{"type":"md","content":"## 概述'))
+    expect(typed?.data).toEqual({ type: 'md', content: '', _cx_streaming: ['content'] })
+
+    // content 持续增长但无新闭合：帧不变（lastValid 同引用），半值不上屏
+    const growing = extractor.next('{"key":"cx-vtu-article","data":{"type":"md","content":"## 概述\n\n正文**加')
+    expect(growing).toBe(typed)
+  })
+
+  it('content 闭合整现、骨架标记移除；title 与 tags 随后揭示', () => {
+    const extractor = createArticleExtractor()
+    extractor.next('{"key":"cx-vtu-article","data":{"type":"md","content":"## 概述')
+
+    const revealed = asNode(
+      extractor.next('{"key":"cx-vtu-article","data":{"type":"md","content":"## 概述\n\n正文","title":"周'),
+    )
+    expect(revealed?.data?.content).toBe('## 概述\n\n正文')
+    expect(revealed?.data).not.toHaveProperty('_cx_streaming')
+    // title 流式中：不注入半值
+    expect(revealed?.data).not.toHaveProperty('title')
+
+    const titled = asNode(
+      extractor.next('{"key":"cx-vtu-article","data":{"type":"md","content":"## 概述\n\n正文","title":"周报","tags":["vue","low-code"]}'),
+    )
+    expect(titled?.data?.title).toBe('周报')
+    expect(titled?.data?.tags).toEqual(['vue', 'low-code'])
+  })
+
+  it('tags 字符串项逐项揭示（截断至项闭合点）', () => {
+    const extractor = createArticleExtractor()
+    const mid = asNode(
+      extractor.next('{"key":"cx-vtu-article","data":{"type":"md","tags":["vue","low'),
+    )
+    expect(mid?.data?.tags).toEqual(['vue'])
+  })
+
+  it('末位数字字段无逗号：由 } 收尾揭示', () => {
+    const extractor = createArticleExtractor()
+    extractor.next('{"key":"cx-vtu-article","data":{"type":"md","readingTime":3')
+    const built = asNode(
+      extractor.next('{"key":"cx-vtu-article","data":{"type":"md","readingTime":3}}'),
+    )
+    expect(built?.data?.readingTime).toBe(3)
+  })
+
+  it('frameStride：窗口内合并、到期补出、首帧立即', () => {
+    const registry = createTriggerRegistry<CxSpec>()
+    registry.register(
+      'cx-vtu-article',
+      compileTrigger({ ...articleConfig, frameStride: 3 }),
+    )
+    const extractor = createIncrementalExtractor({ registry, matchTrigger: matchCxTrigger })
+
+    // d1：首帧（空壳）立即出，不受节流
+    const shell = asNode(extractor.next('{"key":"cx-vtu-article"'))
+    expect(shell?.data).toHaveProperty('type', 'md')
+
+    // d2：type 闭合但距首帧 1 delta < 3 → 节流，帧保持
+    const d2 = extractor.next('{"key":"cx-vtu-article","data":{"type":"md"')
+    expect(d2).toBe(shell)
+
+    // d3：无新闭合（title 流式中），窗口未满 → 帧保持
+    const d3 = extractor.next('{"key":"cx-vtu-article","data":{"type":"md","title":"周')
+    expect(d3).toBe(shell)
+
+    // d4：窗口到期（4-1=3）→ 被节流的 type 帧补出
+    const d4 = asNode(extractor.next('{"key":"cx-vtu-article","data":{"type":"md","title":"周报'))
+    expect(d4).not.toBe(shell)
+
+    // d5-d6：content 闭合但窗口未满（6-4=2 < 3）→ 节流，帧保持
+    extractor.next('{"key":"cx-vtu-article","data":{"type":"md","content":"x"')
+    const d6 = extractor.next('{"key":"cx-vtu-article","data":{"type":"md","content":"x"}')
+    expect(d6).toBe(d4)
+
+    // d7：窗口到期 → content 帧补出
+    const d7 = asNode(extractor.next('{"key":"cx-vtu-article","data":{"type":"md","content":"x"}}'))
+    expect(d7?.data?.content).toBe('x')
+  })
+
+  it('混合注册表：scalar 注册不影响数组形态（空匹配不产帧、行闭合正常）', () => {
+    const planConfig: StreamTriggerConfig = {
+      key: 'cx-vtu-plan',
+      sections: [{ kind: 'array', arrayKey: 'todos' }],
+    }
+    const extractor = createArticleExtractor((registry) => {
+      registry.register('cx-vtu-plan', compileTrigger(planConfig))
+    })
+
+    // plan 围栏早期：闭合事件分支激活但数组形态空匹配 → 无帧（既有行为）
+    const early = extractor.next('{"key":"cx-vtu-plan","data":{"todos":[{"title":"买')
+    expect(early).toBeNull()
+
+    // 行闭合后：数组形态主链正常出帧
+    const row = asNode(
+      extractor.next('{"key":"cx-vtu-plan","data":{"todos":[{"title":"买菜","done":false}'),
+    )
+    expect(row?.data?.todos).toEqual([{ title: '买菜', done: false }])
+
+    // 换到 article 围栏：文本比较判据跨围栏安全，空壳帧正常产出
+    const shell = asNode(extractor.next('{"key":"cx-vtu-article"'))
+    expect(shell?.key).toBe('cx-vtu-article')
+  })
+
+  it('无 scalar 注册的注册表：数组形态早期行为与既有逐位一致（无帧不解析）', () => {
+    const registry = createTriggerRegistry<CxSpec>()
+    registry.register(
+      'cx-vtu-plan',
+      compileTrigger({ key: 'cx-vtu-plan', sections: [{ kind: 'array', arrayKey: 'todos' }] }),
+    )
+    const extractor = createIncrementalExtractor({ registry, matchTrigger: matchCxTrigger })
+    expect(extractor.next('{"key":"cx-vtu-plan","data":{"todos":[{"title":"买')).toBeNull()
+  })
+})
