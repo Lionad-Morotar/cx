@@ -293,6 +293,12 @@
   - `nativebird` `import NPromise from 'nativebird'` 用了 `// @ts-expect-error` 绕过类型（`loader/index.ts:12`）
 - 迁移计划：评估替换为更主流的等价物（`p-limit` 替代 nativebird 的并发；自定义 hook 实现替代 kareem）
 
+### 包源码改动不重建 dist 时 playground 与包名测试双双失真
+
+- 现状：playground dev server 与「包名 import」的测试（如 `playground/tests/trigger-registries.test.ts`）均经 `exports` 消费各包 `dist/` 构建产物；包内测试（`packages/*/tests/`）则直接 import 源码
+- 影响：改包源码后未 `pnpm --filter <pkg> build` 时，包内测试绿（测的是新源码）、dist 级测试也绿（断言与产物同源自洽，如注册表判定清单对照同一旧产物），而 playground 页面行为陈旧——两层测试互相掩盖，只能靠手动页面验证发现（article 流式注册后回放按钮不现身即此路径）
+- 缓解：切片涉及 playground 可见行为时，提交前重建受影响包的 dist 并复跑 dist 级测试；长期可评估给 dist 级测试加「产物新鲜度」前置（比较 src/ 与 dist/ mtime）或将 playground vitest 别名切到源码
+
 ## 缺失关键特性
 
 ### 缺少端到端（E2E）测试

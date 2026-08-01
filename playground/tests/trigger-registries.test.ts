@@ -130,14 +130,13 @@ describe('vtu trigger 判定 · 数组增长型收敛', () => {
     expectConverges(createVtuTriggerRegistry, vtuCount, config.key, realDataOf(meta!, arrayKey))
   })
 
-  it('判定不适用的 15 件物料不进注册表', () => {
+  it('判定不适用的 14 件物料不进注册表', () => {
     const registry = createVtuTriggerRegistry()
-    // 社媒贴文（单体对象）/ article / 代码三件 / 标量媒体五件 / message-draft / approval-card
+    // 社媒贴文（单体对象）/ 代码三件 / 标量媒体五件 / message-draft / approval-card
     const notApplicable = [
       'cx-vtu-terminal',
       'cx-vtu-code-block',
       'cx-vtu-code-diff',
-      'cx-vtu-article',
       'cx-vtu-audio',
       'cx-vtu-image',
       'cx-vtu-video',
@@ -153,7 +152,7 @@ describe('vtu trigger 判定 · 数组增长型收敛', () => {
     for (const key of notApplicable) {
       expect(registry.has(key), `${key} 判定不适用，不应注册`).toBe(false)
     }
-    // 29 件物料 = 14 适用 + 15 不适用，判定完备无遗漏
+    // 29 件物料 = 15 适用（14 数组增长型 + article 标量主体）+ 14 不适用，判定完备无遗漏
     expect(VTU_STREAM_TRIGGERS.length + notApplicable.length).toBe(29)
   })
 })
