@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 import {
   compsVariants,
@@ -8,6 +10,14 @@ import {
   nuxtUiV4Variants,
   vtuVariants,
 } from '../app/dev/variants'
+import {
+  codeTerminalVariants,
+  dataDisplayVariants,
+  formsInputVariants,
+  mediaVariants,
+  socialVariants,
+  workflowVariants,
+} from '../app/dev/variants/vtu'
 
 import type { VariantRegistry } from '../app/dev/variants-utils'
 
@@ -59,6 +69,68 @@ describe('vtu 集手写 variants', () => {
       for (const def of defs) {
         expect(def.label.trim().length).toBeGreaterThan(0)
       }
+    }
+  })
+})
+
+describe('vtu variants 文件组织', () => {
+  // 按 vtu 官方 6 分类拆分（与 vtu-categories 同构），桶文件 spread 合并；
+  // 并集必须等于 vtuVariants 全部 key（防漏件），单文件受 FILE_LEN 约束
+  const categoryModules = [
+    ['data-display', dataDisplayVariants],
+    ['code-terminal', codeTerminalVariants],
+    ['media', mediaVariants],
+    ['social', socialVariants],
+    ['forms-input', formsInputVariants],
+    ['workflow', workflowVariants],
+  ] as const
+
+  it('6 个分类文件并集 = vtuVariants 全部 key，无遗漏无冗余', () => {
+    const merged: VariantRegistry = {}
+    for (const [, registry] of categoryModules) {
+      for (const key of Object.keys(registry)) {
+        expect(merged[key], `${key} 在多个分类文件重复`).toBeUndefined()
+        merged[key] = registry[key]!
+      }
+    }
+    expect(Object.keys(merged).sort()).toEqual(Object.keys(vtuVariants).sort())
+  })
+
+  it('分类 key 与 vtu-categories 官方分组一致', () => {
+    const categoryOf = {
+      'data-display': ['article', 'chart', 'data-table', 'stats-display', 'weather-widget'],
+      'code-terminal': ['code-block', 'code-diff', 'terminal'],
+      media: ['audio', 'image', 'image-gallery', 'item-carousel', 'video'],
+      social: [
+        'approval-card',
+        'citation',
+        'contact-card',
+        'instagram-post',
+        'linkedin-post',
+        'link-preview',
+        'message-draft',
+        'x-post',
+      ],
+      'forms-input': ['option-list', 'parameter-slider', 'preferences-panel'],
+      workflow: ['geo-map', 'plan', 'progress-tracker', 'question-flow', 'order-summary'],
+    } as const
+    for (const [file, registry] of categoryModules) {
+      for (const key of Object.keys(registry)) {
+        const official = key.replace(/^cx-vtu-/, '')
+        expect(
+          (categoryOf[file as keyof typeof categoryOf] as readonly string[]).includes(official),
+          `${key} 不属于 ${file} 分类`,
+        ).toBe(true)
+      }
+    }
+  })
+
+  it('每个分类文件 ≤ 300 行（FILE_LEN 约束）', () => {
+    // __dirname 基（同 mock-contract 惯例）：该 vitest 环境 import.meta.url 非 file scheme
+    const dir = join(__dirname, '..', 'app', 'dev', 'variants', 'vtu')
+    for (const [file] of categoryModules) {
+      const lines = readFileSync(`${dir}/${file}.ts`, 'utf8').split('\n').length
+      expect(lines, `${file}.ts 超 300 行`).toBeLessThanOrEqual(301)
     }
   })
 })
