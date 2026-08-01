@@ -299,6 +299,12 @@
 - 影响：改包源码后未 `pnpm --filter <pkg> build` 时，包内测试绿（测的是新源码）、dist 级测试也绿（断言与产物同源自洽，如注册表判定清单对照同一旧产物），而 playground 页面行为陈旧——两层测试互相掩盖，只能靠手动页面验证发现（article 流式注册后回放按钮不现身即此路径）
 - 缓解：切片涉及 playground 可见行为时，提交前重建受影响包的 dist 并复跑 dist 级测试；长期可评估给 dist 级测试加「产物新鲜度」前置（比较 src/ 与 dist/ mtime）或将 playground vitest 别名切到源码
 
+### vtu 包装层流式判据隐式依赖「渲染器对 data 原样平铺、不做 schema 归一化」
+
+- 现状：comps-vtu 6 件包装层（x-post/instagram-post/linkedin-post/code-block/code-diff/message-draft）的流式骨架与兜底判据基于「`node.data` 原样经 attrs 平铺到物料」——code-diff 三键直查（`attrs.patch == null`）、`_cx_streaming` 标记经 data 注入均由该行为承载；fallback 结构（如 message-draft 的 slack target）同样依赖透传式 useVtuProps 而非白名单
+- 风险：若 renderer/vue 包未来在 data 入口引入 schema 归一化（strip 空串、剔除 undefined、白名单过滤），上述判据会静默改变语义（骨架常亮或永不亮），且现有测试不经渲染器全链路，难以发现
+- 缓解：引入 data 归一化层时同步复核 6 件 wrapper 判据；长期可评估把「data 原样平铺」固化为 renderer 包内的契约测试
+
 ## 缺失关键特性
 
 ### 缺少端到端（E2E）测试
