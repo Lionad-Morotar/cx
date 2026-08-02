@@ -4,22 +4,25 @@ description: |
   把一个 Vue 组件库（外部 npm 包或内部包，如 Nuxt UI、tool-ui-vue/vtu、Element 等）转换为 cx 渲染系统
   （@lionad/cx-render / cx-definition / cx-vue / cx-nuxt）能直接装配、渲染、验收的「物料包（material bundle）」。
   覆盖：调研目标库 → 建包骨架 → 逐组件包装为 normalize 物料 → 接入 cx-nuxt + playground 验收页 → 全量验证。
+  也覆盖物料包建成后的两条成熟度链路：variants 深化展示（验收页全视觉属性对照）与
+  Stream 流式改造（@lionad/cx-stream 增量渲染：数组增长型 / 标量主体形态声明、wrapper 骨架、回放链路）。
 
   使用场景：
   - 用户说"把 X 组件库接进 cx / 做成 cx 物料 / 新建 packages/comps-<lib>"
   - 用户要把一个 UI 库的组件变成低代码编辑器可拖拽、可配置、可 schema 渲染的物料
   - 已有物料包要新增/补齐组件，或要对齐既有 comps / comps-nuxt-ui-v2 / v4 / vtu 的模式
+  - 已有物料要深化验收页展示（variants 全属性对照），或要做流式改造（stream trigger / 骨架 / 回放）
 
   触发关键词：cx 物料、material bundle、normalize、CxMaterialBundle、comps-vtu、comps-nuxt-ui、
-  组件库转物料、包装组件、convert-to-cx-materials
-argument-hint: <组件库名或路径>
+  组件库转物料、包装组件、variants 深化、stream trigger、标量主体形态、流式回放、convert-to-cx-materials
+argument-hint: <组件库名或路径 | 物料包/组件名（深化与流式改造场景）>
 disable-model-invocation: true
 ---
 
 # 把组件库转换为 cx 物料
 
 > 本 SKILL 只给流程骨架 + 不可违反的不变量。cx 的契约/运行时细节、可复制的文件模板、
-> 以及 vtu 这次转换的实战经验，全部渐进式披露在 `references/`，按需读取，不要一次全读。
+> vtu 转换的实战经验、以及物料深化与流式改造的流程判例，全部渐进式披露在 `references/`，按需读取，不要一次全读。
 
 ## 先建立心智模型（30 秒）
 
@@ -54,9 +57,20 @@ cx 是 schema 驱动渲染系统：消费方给一棵 `CxComponentRuntime` 树�
 6. **验证**：包测试（契约 + 可干净挂载者的 smoke）→ 全量 `pnpm test` → 全仓 `pnpm typecheck` → `pnpm check`（含 `--fix`）→
    浏览器实证全量物料带样式渲染 → 重建 dist。
 
+## 物料包建成后的成熟度链路
+
+6 阶段跑通后物料「能渲染」；以下两条链路让物料「好用」，独立可并行、在回放链路汇合，
+完整流程与判例见 [`references/deepen-and-stream.md`](references/deepen-and-stream.md)：
+
+1. **variants 深化**：验收页每物料 ≥2 组展示数据，模板有视觉呈现的属性组间对照；
+   大规模时按官方分类拆目录 + 桶，覆盖语义（浅合并 initial、undefined 抹除）是回放剧本的数据路径。
+2. **Stream 流式改造**：逐件判定形态（数组增长型 vs 标量主体形态）→ `stream-trigger.ts` 声明
+   （fallbackData 按模板无守卫直访链取证而非 zod、skeletonFields 只列必填长字段、frameStride 统一 10）→
+   wrapper 流式骨架（借槽孤例 vs StreamSkeleton 自绘）→ 注册汇聚（回放按钮门控）→ 逐件回放链路测试。
+
 ## 不可违反的不变量（违反=静默失败，先读这里）
 
-这些是本次转换踩实、且与直觉相悖的点。编码前先内化，细节见 references 对应章节。
+这些是转换与流式改造中踩实、且与直觉相悖的点。编码前先内化，细节见 references 对应章节。
 
 1. **json/对象/数组 props 的 `initial` 必须是函数** `initial: () => [...]`，不能写字面量——cx 的 `Initial` 类型对字面量报错，
    且 `buildDefaultData` 对函数会调用取值。（playbook §3）
@@ -70,6 +84,10 @@ cx 是 schema 驱动渲染系统：消费方给一棵 `CxComponentRuntime` 树�
    `nuxi prepare` 刷新虚拟模块 `#build/cx-bundles.mjs`。（playbook §9）
 6. **macOS 大小写不敏感 FS 的 git 陷阱**：`git add` 的文件名大小写必须与磁盘一致，否则编辑不进 commit 且工作树「假 modified」；
    用 `git ls-files` 看索引真实大小写诊断。（playbook §10）
+7. **流式链路不过物料 zod**：写 stream-trigger 的 `fallbackData` 时，推导依据是物料模板的无守卫直访链（缺席即 TypeError），
+   不是 zod schema——管线 parse 只有 JSON.parse/jsonrepair，zod 约束被 fallback 违反也静默通过。（deepen-and-stream §2）
+8. **`skeletonFields` 只列 zod 必填长字段**：`_cx_streaming` 判据是顶层字段在 parsed data 的缺席性，
+   可选字段列入会让标记在完整帧终态常亮、骨架永不消失。（deepen-and-stream §2）
 
 ## 渐进披露地图（按需读，勿全读）
 
@@ -77,11 +95,12 @@ cx 是 schema 驱动渲染系统：消费方给一棵 `CxComponentRuntime` 树�
 | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | cx 物料契约、运行时数据流、Guard 原理、bundle 装配机制、测试范式                                                                                   | [`references/cx-material-system.md`](references/cx-material-system.md)   |
 | 包骨架/包装 SFC/normalize/composable/cx-nuxt/验收页/分类/测试的可复制模板 + props 映射配方 + 构建/验证命令                                         | [`references/conversion-playbook.md`](references/conversion-playbook.md) |
+| 物料包建成后的深化与流式改造：形态判定、scalar 声明三要素、wrapper 骨架、注册汇聚、variants 组织、回放链路测试、分批提交切片                        | [`references/deepen-and-stream.md`](references/deepen-and-stream.md)     |
 | 把 tool-ui-vue(vtu) 转成 `comps-vtu` 的实战案例：useVtuProps 设计、@source 样式集成、json 函数坑、dev server 时序竞态、SSR 边界、事件桥接取舍 | [`references/vtu-case-study.md`](references/vtu-case-study.md)           |
 
 > 转换非 vtu 库时，`vtu-case-study.md` 当作「别人踩过的坑」的清单快速扫一遍即可，不必照搬其 composable 命名。
 
-## 验证清单（交付前逐项打勾）
+## 验证清单（转换交付前逐项打勾）
 
 - [ ] 每个物料 `_cx_meta` + `_cx_install` 完备，key 唯一且匹配 `^cx-<lib>-[a-z0-9-]+$`
 - [ ] `CxXxxBundle.materials.length` == 目标库组件数；分类测试双向差集为空
@@ -90,3 +109,5 @@ cx 是 schema 驱动渲染系统：消费方给一棵 `CxComponentRuntime` 树�
 - [ ] `vp pack` 产 dist；playground 验收页浏览器实证全量物料带样式渲染
 - [ ] 重依赖组件（地图/图表/高亮）在 happy-dom 仅做契约断言，视觉交浏览器（不做假绿断言）
 - [ ] 文档同步：根 README 包表 + `.planning/codebase/{STRUCTURE,ARCHITECTURE}.md` 依赖链/子包计数 + 根 `AGENTS.md`
+
+> 深化与流式改造的交付清单另见 [`references/deepen-and-stream.md` §8](references/deepen-and-stream.md)。

@@ -14,6 +14,9 @@ definition ──▶ vue ──▶ renderer ──▶ comps / comps-nuxt-ui-v2 /
 - `@lionad/cx-render`：`<CxRender>` 递归渲染器 + bundle `CxRenderBundle`。入口副作用 `import './styles/index.scss'`。
 - `packages/comps*`：物料包。每个导出 `CxXxxBundle: CxMaterialBundle`。
 - `@lionad/cx-nuxt`：Nuxt module。不 import 任何物料包本体，按开关生成虚拟模块装配清单。
+- `@lionad/cx-stream`：增量渲染管线（横向能力，不在主依赖链上）。物料包以 `<material>/stream-trigger.ts`
+  声明流式形态（数组增长型 / 标量主体形态）并汇聚注册；playground 验收页消费注册表提供回放。
+  深化与流式改造全流程见 `deepen-and-stream.md`。
 
 ## 2. 物料契约：`normalize()`
 
