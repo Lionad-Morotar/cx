@@ -14,8 +14,9 @@ definition ──▶ vue ──▶ renderer ──▶ comps / comps-nuxt-ui-v2 /
 - `@lionad/cx-render`：`<CxRender>` 递归渲染器 + bundle `CxRenderBundle`。入口副作用 `import './styles/index.scss'`。
 - `packages/comps*`：物料包。每个导出 `CxXxxBundle: CxMaterialBundle`。
 - `@lionad/cx-nuxt`：Nuxt module。不 import 任何物料包本体，按开关生成虚拟模块装配清单。
-- `@lionad/cx-stream`：增量渲染管线（横向能力，不在主依赖链上）。物料包以 `<material>/stream-trigger.ts`
-  声明流式形态（数组增长型 / 标量主体形态）并汇聚注册；playground 验收页消费注册表提供回放。
+- `@lionad/cx-stream`：增量渲染管线（横向能力，不在主依赖链上）。物料包以 stream-trigger 声明
+  流式形态（数组增长型 / 标量主体形态）并汇聚注册——vtu 散置 `<material>/stream-trigger.ts`，
+  comps 集中单文件 `stream-triggers.ts`（组织两态见 deepen-and-stream §4）；playground 验收页消费注册表提供回放。
   深化与流式改造全流程见 `deepen-and-stream.md`。
 
 ## 2. 物料契约：`normalize()`
@@ -33,7 +34,7 @@ normalize({
   props?,          // CxComponentMetaProps —— 编辑器右侧面板控件描述符（见 §4）
   emits?,          // CxComponentMetaEmits（schema 用 zod）
   exposes?,        // CxComponentMetaExposes（schema 用 zod）
-  slots?,          // 数组 | 对象 | 函数 (cmpt) => [...]（动态插槽）
+  slots?,          // 数组 | 对象 | 函数 (comp) => [...]（动态插槽，SlotContext = { comp, cx }）
 })
 ```
 
@@ -67,16 +68,16 @@ props 键名 ⊆ `ComponentProps<component>`、emits 键名 ⊆ 组件 emits、e
 
 ## 3. 运行时数据流（data → props → 渲染）
 
-`packages/renderer/src/cmpts/`：`render.vue`（CxRender，顶层，`provide('cx', cx)` 等）→ `render-component.vue`
-（单节点，`component :is="cmpt.key"` 解析组件）→ `render-component-with-bindings.vue`（绑指令/样式，真正 `h()` 出物料组件）。
+`packages/renderer/src/comps/`：`render.vue`（CxRender，顶层，`provide('cx', cx)` 等）→ `render-component.vue`
+（单节点，`component :is="comp.key"` 解析组件）→ `render-component-with-bindings.vue`（绑指令/样式，真正 `h()` 出物料组件）。
 
-- **data → props**：`cmptDatas = omit({...cmpt.data, ...bindDatas}, ['class','_cx_name','_cx_events','_cx_style','cmpt','_config','_dataConfig','_cx_data_config','_pr','_slotConfig'])`，
-  再 `v-bind="cmptDatas"`。即 data 里除 `_cx_*` 元字段外的键，直接成为物料组件的 attrs。
-- **cmpt 节点**：`render-component-with-bindings` 额外以 prop 形式注入 `cmpt: markRaw(cmpt.value)`（渲染器自身用 `inject('cx-cmpt')`/`inject('cx')` 取上下文）。
-  所以物料包装层经 `useAttrs()` 能同时拿到 data 字段 + `cmpt` + cx 注入的 `class` + `data-is-cx-cmpt`/`data-cx-cmpt-id`/`data-cx-cmpt-key`。
-- **slots**：优先级 `cmpt.slots`（运行时节点）> `meta.slots`（物料定义，支持函数/数组/对象）> 兜底 `[{key:'default'}]`；
-  每个 slot 交给 `render-components` 拉 `cmpt.components[slot.key]` 递归回 `render-component`。
-- **events**：`cmptEvents` 按 `data._cx_events` ∩ meta emits/native events 建监听，经 `cxEmitter` 路由到 `refs.get(target).ref` 调方法。
+- **data → props**：`compDatas = omit({...comp.data, ...bindDatas}, ['class','_cx_name','_cx_events','_cx_style','comp','_config','_dataConfig','_cx_data_config','_pr','_slotConfig'])`
+  （render-component.vue 的 computed），再下传给 with-bindings 展开为 attrs。即 data 里除 `_cx_*` 元字段外的键，直接成为物料组件的 attrs。
+- **comp 节点**：`render-component-with-bindings` 额外以 prop 形式注入 `comp: markRaw(comp.value)`（渲染器各层经 model prop 逐层下传节点，另有 `inject('cx')`/`inject('cx-render-parent')` 取上下文；不存在 `cx-cmpt` 注入键）。
+  所以物料包装层经 `useAttrs()` 能同时拿到 data 字段 + `comp` + cx 注入的 `class` + `data-is-cx-comp`/`data-cx-comp-id`/`data-cx-comp-key`。
+- **slots**：优先级 `comp.slots`（运行时节点）> `meta.slots`（物料定义，支持函数/数组/对象）> 兜底 `[{key:'default'}]`；
+  每个 slot 交给 `render-components` 拉 `comp.components[slot.key]` 递归回 `render-component`。
+- **events**：`compEvents` 按 `data._cx_events` ∩ meta emits/native events 建监听，经 `cxEmitter` 路由到 `refs.get(target).ref` 调方法。
 - **styles**：`render-component-with-bindings` 由 `_cx_style` 算出 cx 编辑器的 box/margin/padding/layout/round/border/font/cosm 类，
   作为 `class` 传给物料组件（这就是为什么包装层会收到 cx 的 class，需要决定保留还是剥离，见 playbook §4）。
 
@@ -105,7 +106,7 @@ props 键名 ⊆ `ComponentProps<component>`、emits 键名 ⊆ 组件 emits、e
 - `addTemplate` 生成 `#build/cx-bundles.mjs`：只把启用的包写进 `import` 语句（未启用不进入构建期解析，真 opt-in）。
 - 样式条件注入：仿 v2 的 `v-calendar/dist/style.css`，`specs.some(s => s.package === '<你的包>')` 时 `nuxt.options.css.push('<被包装库 style>')`。
 
-`packages/nuxt/src/runtime/install.ts`：`for (bundle of cxBundles) for (cmpt of bundle.materials) { cmpt._cx_meta.type='local'; cx.installComponent(cmpt._cx_meta.key, cmpt) }`。
+`packages/nuxt/src/runtime/install.ts`：`for (bundle of cxBundles) for (comp of bundle.materials) { comp._cx_meta.type='local'; cx.installComponent(comp._cx_meta.key, comp) }`。
 `installComponent`（loader）依赖 `this.config!.app`，故必须在 `cx.init(url, { app })` 之后；plugin.client 已保证顺序。
 
 `plugin.client.ts`：`new CxLoader()` → `await cx.init(window.location.href, { app: nuxtApp.vueApp })` → `await installCxBundles` →
@@ -114,12 +115,12 @@ props 键名 ⊆ `ComponentProps<component>`、emits 键名 ⊆ 组件 emits、e
 ## 6. 测试范式
 
 - **物料 smoke**（`packages/<pkg>/tests/materials.test.ts`）：根 `vite.config.ts` 的 `test.include` 自动收集 `packages/*/tests/**/*.test.ts`，env `happy-dom`，setup `playground/tests/setup.ts`。
-  挂载桩（cx 渲染器把 cmpt 当 prop 注入，测试需手动构造）：
+  挂载桩（cx 渲染器把 comp 节点当 prop 注入，测试需手动构造）：
   ```ts
-  const fakeCmpt = (key) => ({ id: `test-${key}`, key, data: {}, components: {} })
-  const mountMaterial = (cmpt, props = {}) =>
-    mount(cmpt, {
-      props: { cmpt: fakeCmpt(cmpt._cx_meta?.key || 'x'), ...props },
+  const fakeComp = (key) => ({ id: `test-${key}`, key, data: {}, components: {} })
+  const mountMaterial = (material, props = {}) =>
+    mount(material, {
+      props: { comp: fakeComp(material._cx_meta?.key || 'x'), ...props },
       global: {
         directives: { cx: { mounted() {} } },
         provide: { cx: undefined, 'is-cx-edit': false, 'is-cx-debug': false },

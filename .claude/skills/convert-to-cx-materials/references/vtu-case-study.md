@@ -20,9 +20,9 @@
 
 ## 包装 composable：`useVtuProps`
 
-vtu 组件普遍必填 `id`，且 cx 灌入的 attrs 含 `cmpt`/`data-*`/无 `_` 前缀冲突（vtu 29 组件无下划线前缀 prop，故 `_` 剥离是纯防御、不误伤）。composable 见 playbook §4，vtu 的具体选择：
+vtu 组件普遍必填 `id`，且 cx 灌入的 attrs 含 `comp`/`data-*`/无 `_` 前缀冲突（vtu 29 组件无下划线前缀 prop，故 `_` 剥离是纯防御、不误伤）。composable 见 playbook §4，vtu 的具体选择：
 
-- 剥离集合 = `{cmpt} ∪ data-* ∪ _*`；保留 class/style。
+- 剥离集合 = `{comp} ∪ data-* ∪ _*`；保留 class/style。
 - id 回退用 `||`（空串兜底，因 vtu id 必填且非空）。
 
 ## props 映射取值样例

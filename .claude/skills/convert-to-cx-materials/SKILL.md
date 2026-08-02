@@ -74,8 +74,8 @@ cx 是 schema 驱动渲染系统：消费方给一棵 `CxComponentRuntime` 树�
 
 1. **json/对象/数组 props 的 `initial` 必须是函数** `initial: () => [...]`，不能写字面量——cx 的 `Initial` 类型对字面量报错，
    且 `buildDefaultData` 对函数会调用取值。（playbook §3）
-2. **包装 SFC 用 `inheritAttrs:false` + 显式 `v-bind`**，并剥离 cx 内部键（`cmpt` 节点、`data-*` 编辑标记、`_` 前缀编辑器键），
-   否则这些键会泄漏到被包装组件根 DOM；id 缺省要回退 `cmpt.id`（多数库 id 必填）。（playbook §4）
+2. **包装 SFC 用 `inheritAttrs:false` + 显式 `v-bind`**，并剥离 cx 内部键（`comp` 节点、`data-*` 编辑标记、`_` 前缀编辑器键），
+   否则这些键会泄漏到被包装组件根 DOM；id 缺省要回退 `comp.id`（多数库 id 必填）。（playbook §4）
 3. **`normalize` 的编译期 Guard 对「包装组件空 `defineProps<{}>()` + 丰富 meta.props」恒真**——因为 SFC 类型不匹配构造签名使
    `ComponentProps=never`。所以放心用 `useAttrs()` 模式，别为过 Guard 去声明 props。（cx-material-system §3）
 4. **样式集成先实证**：被包装库若用「消费方扫描生成 utility」（如 Tailwind v4 `@source`），须经 cx-nuxt 条件注入其 css 并由宿主 Tailwind 处理；

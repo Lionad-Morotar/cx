@@ -161,9 +161,9 @@ import type { CxComponentRuntime } from '@lionad/cx-definition'
 
 /**
  * 把 cx 渲染器经 attrs 灌入的 data 提纯为被包装组件 props。
- * 剥离 cx 内部键：cmpt（运行时节点）、data-*（编辑器选区标记）、_ 前缀（编辑器专用键）。
+ * 剥离 cx 内部键：comp（运行时节点）、data-*（编辑器选区标记）、_ 前缀（编辑器专用键）。
  * 保留 class/style（cx 编辑器样式 + 被包装组件根类合并）。
- * id 缺省回退 cmpt.id：多数库 id 必填，且保证同页多实例唯一。
+ * id 缺省回退 comp.id：多数库 id 必填，且保证同页多实例唯一。
  * 用 `||` 而非 `??`：空串 id 对多数库非法，`||` 能兜底（`??` 会让空串漏过）。
  */
 export function useVtuProps<T extends object>(
@@ -173,18 +173,18 @@ export function useVtuProps<T extends object>(
   return computed(() => {
     const rest: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(attrs)) {
-      if (key === 'cmpt' || key.startsWith('data-') || key.startsWith('_')) continue
+      if (key === 'comp' || key.startsWith('data-') || key.startsWith('_')) continue
       rest[key] = value
     }
-    const cmpt = attrs.cmpt as CxComponentRuntime | undefined
-    rest.id = (rest.id as string | undefined) || cmpt?.id || fallbackId
+    const comp = attrs.comp as CxComponentRuntime | undefined
+    rest.id = (rest.id as string | undefined) || comp?.id || fallbackId
     return rest as T & { id: string }
   })
 }
 ```
 
 > 命名 `useVtuProps` 是 vtu 案例的；换库时改成 `use<Lib>Props`。若你的库没有必填 id，可去掉 id 回退分支。
-> 若你想让 cx 编辑器选区标记也落到 DOM（编辑器集成场景），则不要剥离 `data-cx-cmpt-*`——按需调整剥离集合。
+> 若你想让 cx 编辑器选区标记也落到 DOM（编辑器集成场景），则不要剥离 `data-cx-comp-*`——按需调整剥离集合。
 
 ## §5 逐类型组件配方（json initial 样本必须满足目标库 zod）
 

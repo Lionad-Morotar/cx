@@ -3,7 +3,7 @@
 > 物料包建成（验收页能渲染）之后的两条成熟度链路：
 > variants 深化（验收页全视觉属性对照展示）与 Stream 改造（接入增量渲染管线）。
 > 两者独立可并行，在回放链路汇合——variants 即回放剧本。
-> 本文以 article 先例推广到 vtu 29 件全量的实证为蓝本，路径均以 cx monorepo 根为基准。
+> 本文以 article 先例推广到 vtu 29 件全量、及 comps 基础物料 9 件 scalar 的实证为蓝本，路径均以 cx monorepo 根为基准。
 
 ## 1. 心智模型：两种流式形态
 
@@ -17,6 +17,12 @@
 key 检出即挂载空壳（fallbackData 保契约）、属性闭合即揭示、frameStride 合并短属性扎堆闭合。
 
 先逐件判定形态再动手：schema 里最长、最有内容感的主字段是数组 → array；是字符串 / 对象 → scalar。
+
+comps 包判例（22 件逐件）：9 件 scalar 适用（文本/标题 7 件 + user-style + figure），13 件不适用——
+容器物料（block/scrollbar/page/grid）增长的是槽内 components 树而非 data 数组，两种形态都不覆盖；
+headless 逻辑物料 8 件无可见 UI；calendar props 全部注释无 data。「容器不适用」是 vtu 没有的判据，
+comps 也是「零 array 形态」的整包实证。
+
 机制语义差异（写断言与排查时必须先内化）：
 
 - array 形态截断只认主数组：主数组之后的尾随标量字段不进帧（chart 尾随列推导同款语义），
@@ -47,6 +53,10 @@ key 检出即挂载空壳（fallbackData 保契约）、属性闭合即揭示、
   fallback 按分支并集兜底（email 分支不读 target，残留键无害）；channel 必须入 fallback，
   缺席时组件判别即崩。
 - z.lazy 自引用（x-post quotedPost）不进 fallback，安全。
+- comps 判例（从简）：comps 物料 props 全带 defineProps 默认值（content:''、image:()=>({})），
+  模板直访有默认值兜底、渲染链路不过 zod（双保险），嵌套无守卫直访链不存在——
+  fallback 只给主体字段空壳值作自描述（content:'' / userStyle:'' / image:{}）。
+  物料有 defineProps 默认值时，fallback 的职责从「防崩」退化为「自描述」，从简即可。
 
 合并语义是浅合并 `{ ...fallback, ...transmitted }`：transmitted 的嵌套部分对象整体覆盖
 fallback 对应键，不要指望深合并。
@@ -59,6 +69,8 @@ fallback 对应键，不要指望深合并。
 
 - 列：社媒三件 `['post']`、code-block `['code']`、message-draft `['body']`——必填且有长主体语义。
 - 不列：code-diff（patch/oldCode/newCode 三键全可选）、terminal（stdout/stderr 可选）。
+- comps 判例（整包不列）：9 件物料 props 全带 defineProps 默认值 = 全可选字段，
+  任一列入都会终态常亮，故 skeletonFields 全缺席——「可选字段不列」判据的整包印证。
 
 ### frameStride：统一 10
 
@@ -84,6 +96,11 @@ wrapper 判据两支：
 豁免判例：terminal 不做骨架——stdout/stderr 可选无可靠标记，
 「命令已出、输出待传」是自然中间态，加骨架反而闪。
 
+整包豁免判例：comps 9 件全不做 wrapper 骨架——props 全带默认值（无可靠标记字段，
+列入即终态常亮），且天然空态足够：figure 空 image 有 CxEmptyImage 占位、
+文本类空壳期 displayText 兜底空格。短属性形态的收益即空壳早挂载 + 属性闭合揭示，
+骨架无增量价值——「天然空态 + 无可骨架化字段」是不做骨架的合规路径。
+
 已知机制限制：社媒骨架仅覆盖空壳期。post 顶层字段在 author.name 首个闭合帧即部分出现，
 标记消失后物料直渲；text 是嵌套非必填字段，机制不支持嵌套 skeleton 判据
 （加顶层 'text' 会终态常亮），中间态生长感是接受的取舍。
@@ -94,6 +111,10 @@ wrapper 判据两支：
 ## 4. 注册汇聚与回放按钮
 
 - 物料包侧：`packages/comps-vtu/src/stream-triggers.ts` 汇聚全部声明导出。
+  声明组织两态：vtu 每物料一件 `stream-trigger.ts` 散置物料目录（声明复杂、含 wrapper 骨架配套）；
+  comps 物料包装极简（无骨架、fallback 扁平），集中单文件 `packages/comps/src/stream-triggers.ts`
+  表驱动声明（key 清单 + 工厂函数 + keyOf 从物料 meta 取 key 原值，定义缺失即显式抛错）。
+  物料多且声明异构时散置，少且同构时集中。
 - playground 侧：`playground/tests/trigger-registries.test.ts` 判定测试同步——
   注册表 `has(key)` 门控验收页卡片的回放按钮（replay-btn），断言注册清单与物料清单一致，
   「判定不适用」清单只留真有机制障碍者并写明原因。
