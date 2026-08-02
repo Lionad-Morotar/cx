@@ -29,7 +29,9 @@ import { buildDefaultData, type CxMeta } from '../app/dev/material-utils'
 // - vtu：29 件全适用——数组增长型 14 件前缀播放「出现 → 项数单调递增 →
 //   终态收敛完整行数」；标量主体形态 15 件（article + 长主体 7 + 短属性 7）
 //   属性闭合切分，包内 e2e 覆盖，此层断言注册完备性
-// - nuxt-ui-v4：维持数组增长型 YES / 其余 NO 的原判定（含 region 形态）
+// - nuxt-ui-v4：19 件判定适用——数组增长型 8 + 多区容器 region 4 + 组合 1 +
+//   标量主体 6（alert/avatar/banner/empty/error/user，属性闭合切分，包内单测
+//   覆盖）；51 件不适用（交互控件/浮层/导航 chrome/装饰/数值/槽容器/展示容器）
 // - components：标量主体形态 9 件适用（文本/标题 7 + user-style + figure，
 //   属性闭合切分，包内单测覆盖），13 件维持不适用（容器槽/headless/无 data）
 //
@@ -243,10 +245,10 @@ describe('nuxt-ui-v4 trigger 判定 · 数组增长型收敛', () => {
     expectConverges(createNuxtUiV4TriggerRegistry, v4Count, config.key, realDataOf(meta!, arrayKey))
   })
 
-  it('判定不适用的物料不进注册表（表单控件/交互浮层/页面骨架/标量采样）', () => {
+  it('判定不适用的物料不进注册表（交互控件/浮层/导航/装饰容器采样）', () => {
     const registry = createNuxtUiV4TriggerRegistry()
     const notApplicable = [
-      // 有数组字段但判定不适用：选项属表单控件 / 浮层 / 页面骨架
+      // 有数组字段但判定不适用：选项属交互控件 / 浮层 / 页面骨架
       'cx-nuxt-ui-v4-checkbox-group',
       'cx-nuxt-ui-v4-input-tags',
       'cx-nuxt-ui-v4-listbox',
@@ -254,7 +256,7 @@ describe('nuxt-ui-v4 trigger 判定 · 数组增长型收敛', () => {
       'cx-nuxt-ui-v4-context-menu',
       'cx-nuxt-ui-v4-command-palette',
       'cx-nuxt-ui-v4-navigation-menu',
-      // 标量/槽容器采样
+      // 交互控件 / 展示容器采样（button 动作触发、avatar-group/marquee 槽容器）
       'cx-nuxt-ui-v4-button',
       'cx-nuxt-ui-v4-input',
       'cx-nuxt-ui-v4-modal',
@@ -367,6 +369,61 @@ describe('nuxt-ui-v4 region 形态 · 多区容器区域揭示', () => {
 
     expect(partial, '空表闭合应透传节点由 table 内置 empty slot 接管').not.toBeNull()
     expect(partial?.data?.data).toEqual([])
+  })
+})
+
+describe('nuxt-ui-v4 scalar 形态 · 属性闭合切分', () => {
+  // 标量主体形态 6 件：答复内容型标量物料（alert/avatar/banner/empty/error/user），
+  // 收益是空壳早挂载 + 属性闭合即揭示；包内 scalar-triggers.test.ts 逐件覆盖
+  // 收录/编译/空壳/终态/挂载，此层锁定注册完备性与端到端代表件
+  const SCALAR_KEYS = [
+    'cx-nuxt-ui-v4-alert',
+    'cx-nuxt-ui-v4-avatar',
+    'cx-nuxt-ui-v4-banner',
+    'cx-nuxt-ui-v4-empty',
+    'cx-nuxt-ui-v4-error',
+    'cx-nuxt-ui-v4-user',
+  ]
+
+  it('6 件 scalar 判定适用物料全部注册，注册表恰 19 件', () => {
+    const registry = createNuxtUiV4TriggerRegistry()
+    expect(registry.size).toBe(NUXT_UI_V4_STREAM_TRIGGERS.length)
+    expect(NUXT_UI_V4_STREAM_TRIGGERS).toHaveLength(19)
+    for (const key of SCALAR_KEYS) {
+      expect(registry.has(key), `${key} 标量主体形态应注册`).toBe(true)
+    }
+  })
+
+  it('alert 前缀播放：key 检出即空壳帧，fallback 保契约且无骨架标记', () => {
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createNuxtUiV4TriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+    const shell = extractor.next('{"key":"cx-nuxt-ui-v4-alert"') as CxStreamNode | null
+    expect(shell).toMatchObject({
+      key: 'cx-nuxt-ui-v4-alert',
+      data: { title: '', description: '' },
+    })
+    expect((shell?.data ?? {})['_cx_streaming']).toBeUndefined()
+  })
+
+  it('alert 完整 JSON 终态帧全字段一致（终态兜底直出完整帧）', () => {
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createNuxtUiV4TriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+    const script = JSON.stringify({
+      id: 'a1',
+      key: 'cx-nuxt-ui-v4-alert',
+      data: { title: '部署完成', description: 'v2.4 已上线', color: 'success' },
+    })
+    const final = extractor.next(script) as CxStreamNode | null
+    expect(final, '终态兜底应直出完整帧').not.toBeNull()
+    expect(final?.data).toMatchObject({
+      title: '部署完成',
+      description: 'v2.4 已上线',
+      color: 'success',
+    })
   })
 })
 
