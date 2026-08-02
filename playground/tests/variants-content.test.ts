@@ -18,6 +18,14 @@ import {
   socialVariants,
   workflowVariants,
 } from '../app/dev/variants/vtu'
+import {
+  dataVariants as v4DataVariants,
+  elementVariants as v4ElementVariants,
+  formVariants as v4FormVariants,
+  layoutVariants as v4LayoutVariants,
+  navigationVariants as v4NavigationVariants,
+  overlayVariants as v4OverlayVariants,
+} from '../app/dev/variants/nuxt-ui-v4'
 
 import type { VariantRegistry } from '../app/dev/variants-utils'
 
@@ -128,6 +136,73 @@ describe('vtu variants 文件组织', () => {
   it('每个分类文件 ≤ 300 行（FILE_LEN 约束）', () => {
     // __dirname 基（同 mock-contract 惯例）：该 vitest 环境 import.meta.url 非 file scheme
     const dir = join(__dirname, '..', 'app', 'dev', 'variants', 'vtu')
+    for (const [file] of categoryModules) {
+      const lines = readFileSync(`${dir}/${file}.ts`, 'utf8').split('\n').length
+      expect(lines, `${file}.ts 超 300 行`).toBeLessThanOrEqual(301)
+    }
+  })
+})
+
+describe('nuxt-ui-v4 variants 文件组织', () => {
+  // 按官方 6 分类拆分（与 nuxt-ui-v4-categories 同构），桶文件 spread 合并；
+  // 并集必须等于 nuxtUiV4Variants 全部 key（防漏件），单文件受 FILE_LEN 约束
+  const categoryModules = [
+    ['layout', v4LayoutVariants],
+    ['element', v4ElementVariants],
+    ['form', v4FormVariants],
+    ['data', v4DataVariants],
+    ['navigation', v4NavigationVariants],
+    ['overlay', v4OverlayVariants],
+  ] as const
+
+  it('6 个分类文件并集 = nuxtUiV4Variants 全部 key，无遗漏无冗余', () => {
+    const merged: VariantRegistry = {}
+    for (const [, registry] of categoryModules) {
+      for (const key of Object.keys(registry)) {
+        expect(merged[key], `${key} 在多个分类文件重复`).toBeUndefined()
+        merged[key] = registry[key]!
+      }
+    }
+    expect(Object.keys(merged).sort()).toEqual(Object.keys(nuxtUiV4Variants).sort())
+  })
+
+  it('分类 key 与官方分组一致', () => {
+    const categoryOf = {
+      layout: ['app', 'container', 'error', 'footer', 'header', 'main', 'sidebar', 'theme'],
+      element: [
+        'alert', 'avatar', 'avatar-group', 'badge', 'banner', 'button', 'calendar',
+        'card', 'chip', 'collapsible', 'field-group', 'icon', 'kbd', 'progress',
+        'separator', 'skeleton',
+      ],
+      form: [
+        'checkbox', 'checkbox-group', 'color-picker', 'file-upload', 'form',
+        'form-field', 'input', 'input-date', 'input-menu', 'input-number',
+        'input-rating', 'input-tags', 'input-time', 'listbox', 'pin-input',
+        'radio-group', 'select', 'select-menu', 'slider', 'switch', 'textarea',
+      ],
+      data: ['accordion', 'carousel', 'empty', 'marquee', 'scroll-area', 'table', 'timeline', 'tree', 'user'],
+      navigation: [
+        'breadcrumb', 'command-palette', 'footer-columns', 'link', 'navigation-menu',
+        'pagination', 'stepper', 'tabs',
+      ],
+      overlay: [
+        'context-menu', 'drawer', 'dropdown-menu', 'modal', 'popover', 'slideover',
+        'toast', 'tooltip',
+      ],
+    } as const
+    for (const [file, registry] of categoryModules) {
+      for (const key of Object.keys(registry)) {
+        const official = key.replace(/^cx-nuxt-ui-v4-/, '')
+        expect(
+          (categoryOf[file as keyof typeof categoryOf] as readonly string[]).includes(official),
+          `${key} 不属于 ${file} 分类`,
+        ).toBe(true)
+      }
+    }
+  })
+
+  it('每个分类文件 ≤ 300 行（FILE_LEN 约束）', () => {
+    const dir = join(__dirname, '..', 'app', 'dev', 'variants', 'nuxt-ui-v4')
     for (const [file] of categoryModules) {
       const lines = readFileSync(`${dir}/${file}.ts`, 'utf8').split('\n').length
       expect(lines, `${file}.ts 超 300 行`).toBeLessThanOrEqual(301)
