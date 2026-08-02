@@ -147,6 +147,13 @@
 - 规避：演示场景下预期行为，文档已声明
 - 修复路径：用 SQLite 或 JSON 文件持久化层；或加显式 `/api/reset` 端点提示用户
 
+### 渲染器恒渲染声明槽空占位，遮蔽物料同名 props 的自带呈现
+
+- 症状：渲染器对物料声明的每个 slot 键恒渲染一个容器 div，槽内无 components 时输出空占位；Nuxt UI 物料的 title/description/label 等 props 本由目标组件自带呈现，但包装层把同名声明槽的渲染位置让给了空占位 div，props 内容不显示
+- 实例：nuiv4 alert 的 title/description props 在验收页静态 variant 与流式回放终态同样无文字（2026-08 深化任务实证）；comps v4 button 的 label 遮蔽同族（`playground/app/dev/material-utils.ts` buildSampleNode 注释已录）
+- 影响：仅验收页/回放展示的呈现完整度，不影响 schema 数据契约与流式管线；静态与回放行为一致，非回归
+- 修复路径：渲染器槽渲染改为「槽内无 components 且物料未消费该槽时不输出占位」，或包装层对自带呈现的同名 props 不再声明对应 slot
+
 ## 安全考量
 
 ### Mock 数据历史含真实公司字样（已有红线测试）
