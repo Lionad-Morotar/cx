@@ -1,7 +1,7 @@
 <template>
   <!-- /dev/components-nuxt-ui-v4：@lionad/cx-comps-nuxt-ui-v4 物料 schema 驱动渲染验收。
        经 DevShowcase 以 sidebar + 主区多 variants 形态展示；按 Nuxt UI v4 官方 6 分类分组；
-       含增量 trigger 的 8 件数组增长型物料经 replay 装配提供流式回放。 -->
+       含增量 trigger 的 19 件物料（scalar 6 + array 8 + region 4 + 组合 1）经 replay 装配提供流式回放。 -->
   <main class="page-dev-components-nuxt-ui-v4 page">
     <header class="page-header">
       <h1 class="title">cx components · nuxt-ui v4</h1>
