@@ -29,7 +29,9 @@ import { buildDefaultData, type CxMeta } from '../app/dev/material-utils'
 // - vtu：29 件全适用——数组增长型 14 件前缀播放「出现 → 项数单调递增 →
 //   终态收敛完整行数」；标量主体形态 15 件（article + 长主体 7 + 短属性 7）
 //   属性闭合切分，包内 e2e 覆盖，此层断言注册完备性
-// - nuxt-ui-v4 / components：维持数组增长型 YES / 其余 NO 的原判定
+// - nuxt-ui-v4：维持数组增长型 YES / 其余 NO 的原判定（含 region 形态）
+// - components：标量主体形态 9 件适用（文本/标题 7 + user-style + figure，
+//   属性闭合切分，包内单测覆盖），13 件维持不适用（容器槽/headless/无 data）
 //
 // 剧本数据取自物料真实定义（_cx_meta.props 的 initial，与页面卡片回放
 // 同一条 buildDefaultData 数据路径），主数组以真实数组循环扩充到 4 项——
@@ -368,17 +370,13 @@ describe('nuxt-ui-v4 region 形态 · 多区容器区域揭示', () => {
   })
 })
 
-describe('内置 components trigger 判定 · 零数组增长型物料', () => {
-  it('全部 22 件物料判定不适用：注册表为空且工厂可调用', () => {
-    expect(COMPONENTS_STREAM_TRIGGERS).toEqual([])
+describe('内置 components trigger 判定 · 标量主体形态 9 件', () => {
+  it('9 件 scalar 适用物料全部注册，注册表无遗漏无冗余', () => {
     const registry = createComponentsTriggerRegistry()
-    expect(registry.size).toBe(0)
-
-    // 判定依据逐件成立：文本/标题 7 件为标量 content；figure 为单图；
-    // block/scrollbar/page/grid 为容器槽（子组件在 components 而非 data 数组）；
-    // logic/datas/action/toast/state/computed/navigate/skeleton 为 headless 逻辑物料；
-    // calendar props 全部注释（无 data）；user-style 为单条 CSS 字符串
-    const allKeys = [
+    expect(registry.size).toBe(COMPONENTS_STREAM_TRIGGERS.length)
+    // 标量主体形态 9 件：文本/标题 7 件（content 标量）+ user-style
+    // （CSS 标量，闭合才注入）+ figure（image 对象，照 vtu image 先例）
+    const scalarKeys = [
       'cx-text',
       'cx-header',
       'cx-h1',
@@ -386,8 +384,24 @@ describe('内置 components trigger 判定 · 零数组增长型物料', () => {
       'cx-h3',
       'cx-h4',
       'cx-h5',
-      'cx-block',
+      'cx-user-style',
       'cx-figure',
+    ]
+    expect(scalarKeys).toHaveLength(9)
+    for (const key of scalarKeys) {
+      expect(registry.has(key), `${key} 标量主体形态应注册`).toBe(true)
+    }
+  })
+
+  it('13 件判定不适用不进注册表（容器槽/headless/无 data）', () => {
+    // 判定依据逐件成立：容器 4 件增长的是槽内子组件（components 树）而非
+    // data 数组；headless 逻辑物料 8 件无可见 UI；calendar props 全部注释
+    const registry = createComponentsTriggerRegistry()
+    const notApplicable = [
+      'cx-block',
+      'cx-scrollbar',
+      'cx-page',
+      'cx-grid',
       'cx-logic',
       'cx-datas',
       'cx-action',
@@ -395,16 +409,13 @@ describe('内置 components trigger 判定 · 零数组增长型物料', () => {
       'cx-state',
       'cx-computed',
       'cx-navigate',
-      'cx-scrollbar',
       'cx-skeleton',
       'cx-calendar',
-      'cx-grid',
-      'cx-page',
-      'cx-user-style',
     ]
-    for (const key of allKeys) {
-      expect(registry.has(key), `${key} 判定不适用`).toBe(false)
+    expect(notApplicable).toHaveLength(13)
+    for (const key of notApplicable) {
+      expect(registry.has(key), `${key} 判定不适用，不应注册`).toBe(false)
     }
-    expect(allKeys).toHaveLength(22)
+    // 9 适用 + 13 不适用 = 22 件物料判定完备
   })
 })

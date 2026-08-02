@@ -52,6 +52,21 @@ const textNode = {
   components: {},
 }
 
+// 无 trigger 场景专用节点：cx-text 注册标量主体形态 trigger 后，
+// 以判定维持不适用的 cx-block（容器槽，增长在 components 树而非 data）顶替
+const blockNode = {
+  id: 'dev-cx-block',
+  key: 'cx-block',
+  name: '块',
+  aliasKeys: [],
+  data: {},
+  props: {},
+  emits: {},
+  exposes: {},
+  parents: [],
+  components: {},
+}
+
 /** 播到流结束所需的拍数（+2 裕量覆盖末拍取整） */
 const ticksToEnd = (node: ReplaySourceNode) =>
   Math.ceil(replayScriptOf(node).length / (REPLAY_CHARS_PER_SEC * (TICK_MS / 1000))) + 2
@@ -123,14 +138,14 @@ describe('卡片回放 · 有 trigger 组件的增量收敛', () => {
 
 describe('卡片回放 · 无 trigger 组件的一次性渲染', () => {
   it('无 trigger 组件 hasTrigger 为 false，供页面隐藏回放按钮', () => {
-    const replay = useCardReplay(textNode, { registry: createComponentsTriggerRegistry() })
+    const replay = useCardReplay(blockNode, { registry: createComponentsTriggerRegistry() })
     expect(replay.hasTrigger).toBe(false)
   })
 
   it('全程无增量帧，播完落终态且 sawPartial 留痕为 false', () => {
-    const replay = useCardReplay(textNode, { registry: createComponentsTriggerRegistry() })
+    const replay = useCardReplay(blockNode, { registry: createComponentsTriggerRegistry() })
     replay.play()
-    for (let i = 0; i < ticksToEnd(textNode); i++) {
+    for (let i = 0; i < ticksToEnd(blockNode); i++) {
       vi.advanceTimersByTime(TICK_MS)
       expect(replay.partial.value).toBeNull()
     }
@@ -139,10 +154,10 @@ describe('卡片回放 · 无 trigger 组件的一次性渲染', () => {
   })
 
   it('doneNote：仅播完且全程无增量帧时出现（卡片 footer 说明文案）', () => {
-    const replay = useCardReplay(textNode, { registry: createComponentsTriggerRegistry() })
+    const replay = useCardReplay(blockNode, { registry: createComponentsTriggerRegistry() })
     expect(replay.doneNote.value).toBeNull()
     replay.play()
-    for (let i = 0; i < ticksToEnd(textNode); i++) vi.advanceTimersByTime(TICK_MS)
+    for (let i = 0; i < ticksToEnd(blockNode); i++) vi.advanceTimersByTime(TICK_MS)
     expect(replay.phase.value).toBe('done')
     expect(replay.doneNote.value).toBeTruthy()
     // 重播后说明随增量状态清零
@@ -159,14 +174,14 @@ describe('卡片回放 · 无 trigger 组件的一次性渲染', () => {
   })
 
   it('终态下 toggle 重播：播完再次落终态', () => {
-    const replay = useCardReplay(textNode, { registry: createComponentsTriggerRegistry() })
+    const replay = useCardReplay(blockNode, { registry: createComponentsTriggerRegistry() })
     replay.play()
-    for (let i = 0; i < ticksToEnd(textNode); i++) vi.advanceTimersByTime(TICK_MS)
+    for (let i = 0; i < ticksToEnd(blockNode); i++) vi.advanceTimersByTime(TICK_MS)
     expect(replay.phase.value).toBe('done')
     replay.toggle()
     expect(replay.phase.value).toBe('playing')
     expect(replay.partial.value).toBeNull()
-    for (let i = 0; i < ticksToEnd(textNode); i++) vi.advanceTimersByTime(TICK_MS)
+    for (let i = 0; i < ticksToEnd(blockNode); i++) vi.advanceTimersByTime(TICK_MS)
     expect(replay.phase.value).toBe('done')
   })
 })
