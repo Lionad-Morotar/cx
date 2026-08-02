@@ -3,7 +3,9 @@
 > 物料包建成（验收页能渲染）之后的两条成熟度链路：
 > variants 深化（验收页全视觉属性对照展示）与 Stream 改造（接入增量渲染管线）。
 > 两者独立可并行，在回放链路汇合——variants 即回放剧本。
-> 本文以 article 先例推广到 vtu 29 件全量、comps 基础物料 9 件 scalar、及 nuiv4 70 件（19 trigger：scalar 6 + array 8 + region 4 + 组合 1）的实证为蓝本，路径均以 cx monorepo 根为基准。
+> 本文以 article 先例推广到 vtu 29 件全量、comps 基础物料 9 件 scalar、nuiv4 70 件
+> （19 trigger：scalar 6 + array 8 + region 4 + 组合 1）及 element-plus 27 件
+> （10 trigger：scalar 4 + array 5 + region 1）的实证为蓝本，路径均以 cx monorepo 根为基准。
 
 ## 1. 心智模型：两种流式形态
 
@@ -42,11 +44,31 @@ nuiv4 包判例（70 件逐件，19 件适用：scalar 6 + array 8 + region 4 + 
 - 极短标记类字段（1-3 词 label/text/value）主体性弱排除：badge/chip/kbd/link 同一判据，
   不按官方分类归属判。
 
+element-plus 包判例（27 件逐件，10 件适用：scalar 4 + array 5 + region 1）：
+
+- array 判据复核触发条件：包的既有判定若写于后续包判据演进之前，必须以已判包的同构物料
+  做 key 级对照重审——EP 初判 array 只 table 一件（沿用 vtu 时期「列数据主体」直觉），
+  与 nuiv4 已判 array 的 steps/breadcrumb/descriptions/timeline 逐件对照后翻案收录，
+  四件 items/steps 数组与 nuiv4 同构物料的数据主体完全同形。同构对照法比重新推导
+  判据便宜且不易回摆：同 key 物料在别包已判 array 的，本包默认跟随，除非 props
+  结构给出反证。
+- region 归属的分界在「内容区」而非「有槽」：space 只有 default 单槽且语义是排布工具
+  （子项由宿主页面填充，槽内生长的是未知第三方组件树），判不适用；card 的
+  default/header 是物料自身声明的多内容区，槽内树属物料答复内容的一部分，判 region。
+  分界判据：槽承载的是物料答复内容的组成区（region）还是外部内容的插座位（不适用）。
+- 尾随标量终态兜底升级：scanPath 主路径曾对完整 JSON 输入仍截断止于最远匹配，
+  主数组之后的尾随标量（steps.active/breadcrumb.separator/table.border）从所有帧剔除、
+  终态永久缺字段；主路径补完整 JSON 直出终帧后，array 物料的尾随标量断言从
+  「机制上不进帧」升级为「终帧兜底可查」。存量包断言若按旧语义写成「尾随字段缺席」，
+  升级后会假阳性，复核时一并刷新。
+
 机制语义差异（写断言与排查时必须先内化）：
 
-- array 形态截断只认主数组：主数组之后的尾随标量字段不进帧（chart 尾随列推导同款语义），
-  尾随字段交给完整帧；空主数组无可切分边界，全程无帧、终态 null（页面 done 态切完整节点兜底），
-  vtu 侧未开 emptyPassthrough。nuiv4 判例：table 开了 `stateBranch.emptyPassthrough: true`——
+- array 形态截断只认主数组：增量帧只携带主数组已闭合元素，主数组之后的尾随标量字段
+  不进增量帧；输入为完整 JSON 时主路径直试 `JSON.parse(text)` 成功即以完整 spec 构造
+  终帧，尾随标量随终帧兜底（与 closureFallback 分支同一判据）；生产围栏流
+  （永不完整的中段输入）JSON.parse 必失败维持截断路径。空主数组无可切分边界，全程无帧、
+  终态 null（页面 done 态切完整节点兜底），vtu 侧未开 emptyPassthrough。nuiv4 判例：table 开了 `stateBranch.emptyPassthrough: true`——
   空数组闭合即透传完整帧（UTable 自带空态接管渲染），回放可见 0 项徽标 + 表头空态，
   variants 应含 `{ data: [] }` 空态透传组与声明语义呼应。
 - scalar 形态 frameStride N 按 next() 调用次数（delta 数）计窗，首帧（空壳挂载）不节流，
@@ -144,6 +166,11 @@ wrapper 判据两支：
   等个案配置），包根 stream-triggers.ts 仅做桶汇聚导出 `NUXT_UI_V4_STREAM_TRIGGERS` 数组 +
   `createNuxtUiV4TriggerRegistry()` 工厂——形态归类与 arrayKey 等元信息从该数组同源推导，
   测试与页面共用，声明演进时消费方自动跟随。
+  EP 判例（旧 DSL 迁移新 DSL 的汇聚重写）：包内既有 5 件旧 DSL 集中声明迁移散置新 DSL 时，
+  汇聚文件不重读旧实现逐件改写，而是整体重写——新声明件按 key 字母序单数组导出，
+  头注释声称「判定适用的 N 件」与注册数组自洽（件数断言进包内测试），不适用者按族
+  枚举留判据。重写比重读便宜且切断旧 DSL 形态残留：迁移期最容易出的错是新散置声明
+  与旧集中声明双源并存、注册表取到哪份看导入顺序。
 - playground 侧：`playground/tests/trigger-registries.test.ts` 判定测试同步——
   注册表 `has(key)` 门控验收页卡片的回放按钮（replay-btn），断言注册清单与物料清单一致，
   「判定不适用」清单只留真有机制障碍者并写明原因。
@@ -224,6 +251,20 @@ nuiv4 挂载冒烟与实证环境判例：
 - vue-leaflet 以 `leaflet/dist/leaflet-src.esm` 无扩展名导入，vitest node ESM 解析失败
   （页面端 vite 正常）——geo-map 挂载冒烟豁免，回放管线断言（不经 leaflet）覆盖其剧本。
 
+EP 挂载冒烟与实证环境判例：
+
+- vitest `server.deps.inline` 正则必须限定包路径段（`/node_modules\/element-plus\//`）：
+  裸子串 `/element-plus/` 会命中任何含同名片段的绝对路径——worktree 检出目录 slug
+  带包名片段时，整个检出内的全部模块被误伤为 inline，uuid 等 CJS 包经 vite 管线混排后
+  default 互操作丢失（wrapper.mjs 顶层读 v1 即崩）。症状是与本包无关的测试套件
+  成片崩溃且主仓对照全绿，排查先怀疑检出路径名是否命中了配置里的裸子串。
+- array 断言设计必须按物料 props 序列化序取证：EP table 的 props 声明 columns 在 data
+  之前（与 nuiv4 data-first 相反），列定义先于行生长完整闭合，首行帧即携带全量列——
+  「列渐次揭示」的断言在该序列化序下永远抓不到中间态，按序改断「首行帧列已全量」。
+- 纯槽容器（space）无子内容渲染为空 html：挂载冒烟对声明 default 槽的容器类注入
+  示例文本（与页面 buildSampleNode 同一槽内容路径），否则冒烟恒败。
+- EP 包装层 useAttrs 平铺（与 nuiv4 同款）：挂载经 attrs 传值，无需 comp prop 注入。
+
 dist 新鲜度：playground 测试与 dev server 消费物料包 dist，改包源码必须重建，
 否则包内测试（消费 src）与 playground 测试（消费 dist）互掩，只能靠页面实证发现。
 
@@ -243,6 +284,7 @@ dist 新鲜度：playground 测试与 dev server 消费物料包 dist，改包�
 
 - [ ] 每物料 stream-trigger.ts 三要素齐备；fallback 经模板直访链取证，判别联合按分支并集兜底
 - [ ] 判定表完备性计数校验：trigger 注册数 + 不适用数 = 物料总数，逐件归属有判据
+- [ ] array 判据与已判包同构物料 key 级对照复核（同 key 已判 array 默认跟随，除非 props 结构反证）
 - [ ] 形态互斥归属经主载体判据裁决（scalar vs region 不可兼得，compileTrigger throw 保护）
 - [ ] skeletonFields 只含 zod 必填长字段；无可骨架化字段的物料写明豁免原因
 - [ ] wrapper 骨架判据两支之一成立；豁免物料（如 terminal）写明自然中间态理由
@@ -251,4 +293,7 @@ dist 新鲜度：playground 测试与 dev server 消费物料包 dist，改包�
 - [ ] 裁决不补的物料（零 props / 浮层双预检不通过 / 逻辑型）逐件头注释留痕
 - [ ] 逐件回放链路测试绿（分形态终态断言：scalar 全字段 / array 主数组 / region 槽集 / combo 分离）；
       挂载冒烟按环境判例处理异步、豁免与 stub 契约（作用域槽传对象、attrs 传值）
-- [ ] dist 重建后 playground 侧测试复跑；页面实证回放时序（空壳骨架 → 属性揭示 → 完整物料）
+- [ ] dist 重建后 playground 侧测试复跑；页面实证回放时序（空壳骨架 → 属性揭示 → 完整物料），
+      实证须保证 `document.visibilityState === 'visible'`——后台 tab 定时器节流会把 50ms/tick
+      压成 1s/tick；浏览器窗口无法置前时以 CDP `Emulation.setFocusEmulationEnabled(true)`
+      焦点模拟替代，实证结束恢复
