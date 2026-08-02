@@ -26,6 +26,14 @@ import {
   navigationVariants as v4NavigationVariants,
   overlayVariants as v4OverlayVariants,
 } from '../app/dev/variants/nuxt-ui-v4'
+import {
+  containerVariants as epContainerVariants,
+  dataVariants as epDataVariants,
+  feedbackVariants as epFeedbackVariants,
+  formVariants as epFormVariants,
+  navigationVariants as epNavigationVariants,
+  tableVariants as epTableVariants,
+} from '../app/dev/variants/element-plus'
 
 import type { VariantRegistry } from '../app/dev/variants-utils'
 
@@ -217,6 +225,68 @@ describe('element-plus 集手写 variants', () => {
       for (const def of defs) {
         expect(def.label.trim().length).toBeGreaterThan(0)
       }
+    }
+  })
+})
+
+describe('element-plus variants 文件组织', () => {
+  // 按包冻结六分类拆分（与 element-plus-categories 同构），桶文件 spread 合并；
+  // 并集必须等于 elementPlusVariants 全部 key（防漏件），单文件受 FILE_LEN 约束
+  const categoryModules = [
+    ['feedback', epFeedbackVariants],
+    ['data', epDataVariants],
+    ['navigation', epNavigationVariants],
+    ['form', epFormVariants],
+    ['table', epTableVariants],
+    ['container', epContainerVariants],
+  ] as const
+
+  it('6 个分类文件并集 = elementPlusVariants 全部 key，无遗漏无冗余', () => {
+    const merged: VariantRegistry = {}
+    for (const [, registry] of categoryModules) {
+      for (const key of Object.keys(registry)) {
+        expect(merged[key], `${key} 在多个分类文件重复`).toBeUndefined()
+        merged[key] = registry[key]!
+      }
+    }
+    expect(Object.keys(merged).sort()).toEqual(Object.keys(elementPlusVariants).sort())
+  })
+
+  it('分类 key 与包冻结分组一致', () => {
+    const categoryOf = {
+      feedback: ['button', 'alert', 'result', 'empty'],
+      data: ['avatar', 'badge', 'progress', 'statistic', 'descriptions'],
+      navigation: ['link', 'tag', 'divider', 'steps', 'breadcrumb', 'timeline'],
+      form: [
+        'input',
+        'input-number',
+        'select',
+        'radio-group',
+        'checkbox-group',
+        'switch',
+        'date-picker',
+        'rate',
+        'slider',
+      ],
+      table: ['table'],
+      container: ['card', 'space'],
+    } as const
+    for (const [file, registry] of categoryModules) {
+      for (const key of Object.keys(registry)) {
+        const official = key.replace(/^cx-element-plus-/, '')
+        expect(
+          (categoryOf[file as keyof typeof categoryOf] as readonly string[]).includes(official),
+          `${key} 不属于 ${file} 分类`,
+        ).toBe(true)
+      }
+    }
+  })
+
+  it('每个分类文件 ≤ 300 行（FILE_LEN 约束）', () => {
+    const dir = join(__dirname, '..', 'app', 'dev', 'variants', 'element-plus')
+    for (const [file] of categoryModules) {
+      const lines = readFileSync(`${dir}/${file}.ts`, 'utf8').split('\n').length
+      expect(lines, `${file}.ts 超 300 行`).toBeLessThanOrEqual(301)
     }
   })
 })
