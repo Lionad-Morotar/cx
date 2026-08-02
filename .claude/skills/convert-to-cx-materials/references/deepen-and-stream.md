@@ -4,8 +4,9 @@
 > variants 深化（验收页全视觉属性对照展示）与 Stream 改造（接入增量渲染管线）。
 > 两者独立可并行，在回放链路汇合——variants 即回放剧本。
 > 本文以 article 先例推广到 vtu 29 件全量、comps 基础物料 9 件 scalar、nuiv4 70 件
-> （19 trigger：scalar 6 + array 8 + region 4 + 组合 1）及 element-plus 27 件
-> （10 trigger：scalar 4 + array 5 + region 1）的实证为蓝本，路径均以 cx monorepo 根为基准。
+> （19 trigger：scalar 6 + array 8 + region 4 + 组合 1）、element-plus 27 件
+> （10 trigger：scalar 4 + array 5 + region 1）及 naive-ui 27 件
+> （12 trigger：array 6 + scalar 5 + region 1）的实证为蓝本，路径均以 cx monorepo 根为基准。
 
 ## 1. 心智模型：两种流式形态
 
@@ -62,6 +63,20 @@ element-plus 包判例（27 件逐件，10 件适用：scalar 4 + array 5 + regi
   「机制上不进帧」升级为「终帧兜底可查」。存量包断言若按旧语义写成「尾随字段缺席」，
   升级后会假阳性，复核时一并刷新。
 
+naive-ui 包判例（27 件逐件，12 件适用：array 6 + scalar 5 + region 1）：
+
+- array 判据的「内容条目 vs 静态配置」分界：collapse/steps/timeline/breadcrumb/descriptions
+  的 items 是内容条目数组（答复内容的载体），判 array 与同构包已判物料一致；
+  select/radio-group/checkbox-group 的 options 是控件候选值（静态配置，非答复内容），排除——
+  同为 data 内对象数组，语义分界在「数组元素是答复内容条目还是控件可选值配置」，
+  不按字段形态判。
+- 表单控件整族不适用：input/input-number/switch/select/radio-group/checkbox-group/
+  date-picker/rate/slider 9 件——值字段是用户输入的落点而非 LLM 输出主体，
+  schema 驱动场景控件值由用户交互产生，流式揭示无演示对象。
+- button/tag/badge/progress/divider 沿用极短标记类排除判据；space 排布工具槽不适用
+  （EP 判例同构）；data-table 同构 nuiv4 table 判 array（columns+data 双数组，data 为主数组）。
+- 判定表完备性 12 + 15 = 27 计数校验兜底（nuiv4 判例同款）。
+
 机制语义差异（写断言与排查时必须先内化）：
 
 - array 形态截断只认主数组：增量帧只携带主数组已闭合元素，主数组之后的尾随标量字段
@@ -104,6 +119,9 @@ element-plus 包判例（27 件逐件，10 件适用：scalar 4 + array 5 + regi
   渲染链路 data → attrs 直达 Nuxt UI 组件，目标库内部默认值兜底；包装层自身无模板直访——
   fallback 同样退化为自描述。注意挂载冒烟与回放剧本须**经 attrs 传值**（mount 的 attrs 选项），
   用 props 传值会静默丢失。
+- naive 判例（useAttrs 平铺同构从简）：N* 组件内部默认值兜底 + 包装层无模板直访，
+  fallback 只给主体字段空壳值作自描述；alert content 经 computed `?? ''` 守卫，
+  嵌套无守卫直访链整包不存在。skeletonFields 整包不列（props 全可选，列入终态常亮）。
 
 合并语义是浅合并 `{ ...fallback, ...transmitted }`：transmitted 的嵌套部分对象整体覆盖
 fallback 对应键，不要指望深合并。
@@ -147,6 +165,10 @@ wrapper 判据两支：
 列入即终态常亮），且天然空态足够：figure 空 image 有 CxEmptyImage 占位、
 文本类空壳期 displayText 兜底空格。短属性形态的收益即空壳早挂载 + 属性闭合揭示，
 骨架无增量价值——「天然空态 + 无可骨架化字段」是不做骨架的合规路径。
+
+整包豁免判例（naive 同构）：naive 12 件 trigger 全不做 wrapper 骨架——N* 组件空内容时
+仍渲组件外壳或默认占位（NAlert 空 title/content 有外壳、NAvatar 空 src 有默认头像位），
+天然空态 + props 全可选无可骨架化字段（comps 判例同款双条件）。
 
 已知机制限制：社媒骨架仅覆盖空壳期。post 顶层字段在 author.name 首个闭合帧即部分出现，
 标记消失后物料直渲；text 是嵌套非必填字段，机制不支持嵌套 skeleton 判据
@@ -209,6 +231,14 @@ nuiv4 判例（裁决不补的三种合规终态，均须头注释 + 文档留�
 - array trigger 物料的主数组覆盖项 item 形态必须与其 trigger 声明的 item 形态一致，
   回放剧本才真实（页面回放与测试回放同一 replayScriptOf + buildSampleNode 数据路径）。
 
+naive 判例：
+
+- date-picker 三组 type 的 valueFormat/formattedValue token 必须严格匹配——wrapper 守卫
+  对 token 不匹配的 formattedValue 删除回退空态（防 NDatePicker 内部解析抛错），
+  「默认日期 yyyy-MM-dd / 日期时间 yyyy-MM-dd HH:mm:ss / 月份 yyyy-MM」逐组对齐；
+  写错 token 的 variant 渲染为空输入框，视觉对照静默失效。
+- 展示受限形态裁决不补：divider vertical 在验收卡片固定高度内无对照价值，不收录。
+
 ## 6. 测试范式
 
 trigger 单测（`packages/comps-vtu/tests/scalar-*-triggers.test.ts`）：
@@ -265,6 +295,24 @@ EP 挂载冒烟与实证环境判例：
   示例文本（与页面 buildSampleNode 同一槽内容路径），否则冒烟恒败。
 - EP 包装层 useAttrs 平铺（与 nuiv4 同款）：挂载经 attrs 传值，无需 comp prop 注入。
 
+naive 挂载冒烟与实证环境判例：
+
+- N* 真组件挂载（css-render 在 jsdom 可注入样式），不需 nuiv4 式离线 stub；
+  包装层 useAttrs 平铺经 attrs 传值（nuiv4 同款）。space 纯原生槽容器空槽无 DOM，
+  冒烟注入占位槽内容（EP space 判例同构）。
+- date-picker 值渲染专项：「渲染非空」无法区分「值正确显示」与「守卫回退空态」，
+  须断言日期文本进 input.value；expected 从挂载数据同源取（initial 浅合并产物自身），
+  不写平行常量——initial 改值而常量未同步时断言假绿。
+- CSS-in-JS 取证陷阱：N* 根元素 style 属性序列化全部 --n-* 主题变量（innerHTML 前
+  数百字符被 style 淹没），DOM 取证用 textContent/类名树；naive 内容区类名是
+  n-card-content 单横线（非 BEM 双下划线），录制器选择器按真实 DOM 写，别按 BEM 直觉。
+- 后台 tab intensive throttling 升级条款：hidden 超时后 setInterval 从 1s/tick 进一步
+  压到 1 tick/分钟（8 chars/分钟），回放零帧推进且页面无报错；osascript 前台化浏览器
+  进程不等于 tab 可见（窗口可能在别的 macOS Space，visibilityState 仍 hidden）。
+  可靠做法：当前桌面新建窗口开 tab（新窗口 tab 即活动可见 tab），或 §8 的 CDP 焦点模拟。
+  回放时序取证用页面内 MutationObserver 录制器（DOM 突变回调不被节流），事后一次性
+  取回事件序列，绕开外部轮询的节流盲区。
+
 dist 新鲜度：playground 测试与 dev server 消费物料包 dist，改包源码必须重建，
 否则包内测试（消费 src）与 playground 测试（消费 dist）互掩，只能靠页面实证发现。
 
@@ -295,5 +343,6 @@ dist 新鲜度：playground 测试与 dev server 消费物料包 dist，改包�
       挂载冒烟按环境判例处理异步、豁免与 stub 契约（作用域槽传对象、attrs 传值）
 - [ ] dist 重建后 playground 侧测试复跑；页面实证回放时序（空壳骨架 → 属性揭示 → 完整物料），
       实证须保证 `document.visibilityState === 'visible'`——后台 tab 定时器节流会把 50ms/tick
-      压成 1s/tick；浏览器窗口无法置前时以 CDP `Emulation.setFocusEmulationEnabled(true)`
-      焦点模拟替代，实证结束恢复
+      压成 1s/tick，hidden 超时触发 intensive throttling 更压到 1 tick/分钟；浏览器窗口无法
+      置前时以 CDP `Emulation.setFocusEmulationEnabled(true)` 焦点模拟或在当前桌面新建窗口
+      开 tab 替代，实证结束恢复
