@@ -677,4 +677,28 @@ describe('compileTrigger scalar 经真实管线端到端', () => {
     const extractor = createIncrementalExtractor({ registry, matchTrigger: matchCxTrigger })
     expect(extractor.next('{"key":"cx-vtu-plan","data":{"todos":[{"title":"买')).toBeNull()
   })
+
+  it('数组形态终态兜底：完整 JSON 直出完整帧，主数组后的尾随标量不被截断剔除', () => {
+    const registry = createTriggerRegistry<CxSpec>()
+    registry.register(
+      'cx-vtu-plan',
+      compileTrigger({ key: 'cx-vtu-plan', sections: [{ kind: 'array', arrayKey: 'todos' }] }),
+    )
+    const extractor = createIncrementalExtractor({ registry, matchTrigger: matchCxTrigger })
+
+    // 中间帧：截断止于主数组最远闭合元素，尾随标量尚未传输不进场
+    const mid = asNode(
+      extractor.next('{"key":"cx-vtu-plan","data":{"todos":[{"title":"买菜","done":false}'),
+    )
+    expect(mid?.data?.todos).toEqual([{ title: '买菜', done: false }])
+
+    // 终帧：尾随标量不在任何 scanPath 上，截断路径无从携带，须由完整帧
+    // 兜底——否则回放播完终态永久停在缺字段中间态（如步骤条 active 丢失）
+    const done = asNode(
+      extractor.next(
+        '{"key":"cx-vtu-plan","data":{"todos":[{"title":"买菜","done":false}],"active":1}}',
+      ),
+    )
+    expect(done?.data).toEqual({ todos: [{ title: '买菜', done: false }], active: 1 })
+  })
 })
