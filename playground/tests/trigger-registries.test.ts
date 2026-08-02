@@ -7,10 +7,7 @@ import {
   type CxStreamNode,
   type StreamTriggerConfig,
 } from '@lionad/cx-stream'
-import {
-  COMPONENTS_STREAM_TRIGGERS,
-  createComponentsTriggerRegistry,
-} from '@lionad/cx-comps'
+import { COMPONENTS_STREAM_TRIGGERS, createComponentsTriggerRegistry } from '@lionad/cx-comps'
 import {
   CxVtu,
   createVtuTriggerRegistry,
@@ -29,6 +26,12 @@ import {
   EP_STREAM_TRIGGERS,
   mainArrayOf as mainArrayOfEp,
 } from '@lionad/cx-comps-element-plus'
+import {
+  createNaiveUiTriggerRegistry,
+  CxNaiveUi,
+  mainArrayOf as mainArrayOfNaive,
+  NAIVE_UI_STREAM_TRIGGERS,
+} from '@lionad/cx-comps-naive-ui'
 import { buildDefaultData, type CxMeta } from '../app/dev/material-utils'
 
 // 物料库 trigger 注册表的判定型验收（与页面/定时器解耦的无头契约）：
@@ -38,6 +41,9 @@ import { buildDefaultData, type CxMeta } from '../app/dev/material-utils'
 // - nuxt-ui-v4：19 件判定适用——数组增长型 8 + 多区容器 region 4 + 组合 1 +
 //   标量主体 6（alert/avatar/banner/empty/error/user，属性闭合切分，包内单测
 //   覆盖）；51 件不适用（交互控件/浮层/导航 chrome/装饰/数值/槽容器/展示容器）
+// - naive-ui：12 件判定适用——数组增长型 6 + 标量主体 5 + region 1（card
+//   default/header 双内容槽）；15 件不适用（表单录入 9 + 动作/标记/数值/
+//   装饰/布局容器 6）
 // - components：标量主体形态 9 件适用（文本/标题 7 + user-style + figure，
 //   属性闭合切分，包内单测覆盖），13 件维持不适用（容器槽/headless/无 data）
 // - element-plus：10 件判定适用——数组增长型 5（table 叠加列定义次增长路径 +
@@ -322,9 +328,7 @@ describe('nuxt-ui-v4 region 形态 · 多区容器区域揭示', () => {
 
     // 存在 header 已揭示而 footer 未闭合缺席的中间帧（区域独立可判）
     expect(
-      slotSets.some(
-        (slots) => slots.includes('header') && !slots.includes('footer'),
-      ),
+      slotSets.some((slots) => slots.includes('header') && !slots.includes('footer')),
       '应存在 header 揭示且 footer 缺席的中间帧',
     ).toBe(true)
     // 终帧三区齐
@@ -435,6 +439,131 @@ describe('nuxt-ui-v4 scalar 形态 · 属性闭合切分', () => {
       description: 'v2.4 已上线',
       color: 'success',
     })
+  })
+})
+
+const naiveMeta = metaIndex(CxNaiveUi)
+const naiveCount = (node: CxStreamNode) => mainArrayOfNaive(node)?.length ?? null
+
+describe('naive-ui trigger 判定 · 多形态 12 件', () => {
+  // naive-ui 12 件判定适用——数组增长型 6 件（collapse/steps/timeline/
+  // breadcrumb/descriptions/data-table 内容条目数组逐项揭示，data-table 经
+  // fromArrayTriggerConfig 等价包装融入）+ 标量主体 5 件（alert/result/empty/
+  // avatar/statistic 答复内容标量，属性闭合切分，包内单测覆盖）+ region 1 件
+  // （card default/header 双内容槽渐次揭示）；15 件不适用（表单录入 9 件
+  // options 为控件候选值非内容条目 + 动作/标记/数值/装饰/布局容器 6 件）
+  const ARRAY_KEYS = [
+    'cx-naive-ui-collapse',
+    'cx-naive-ui-steps',
+    'cx-naive-ui-timeline',
+    'cx-naive-ui-breadcrumb',
+    'cx-naive-ui-descriptions',
+    'cx-naive-ui-data-table',
+  ]
+  const SCALAR_KEYS = [
+    'cx-naive-ui-alert',
+    'cx-naive-ui-result',
+    'cx-naive-ui-empty',
+    'cx-naive-ui-avatar',
+    'cx-naive-ui-statistic',
+  ]
+  const REGION_KEYS = ['cx-naive-ui-card']
+
+  it('12 件判定适用物料全部注册，注册表恰 12 件', () => {
+    const registry = createNaiveUiTriggerRegistry()
+    expect(registry.size).toBe(NAIVE_UI_STREAM_TRIGGERS.length)
+    expect(NAIVE_UI_STREAM_TRIGGERS).toHaveLength(12)
+    for (const key of [...ARRAY_KEYS, ...SCALAR_KEYS, ...REGION_KEYS]) {
+      expect(registry.has(key), `${key} 应注册`).toBe(true)
+    }
+  })
+
+  it.each(
+    NAIVE_UI_STREAM_TRIGGERS.flatMap((c) => {
+      const array = arraySectionOf(c)
+      return array ? [[c.key, c, array.arrayKey] as const] : []
+    }),
+  )('%s 真实样本前缀播放增量收敛', (_key, config, arrayKey) => {
+    const meta = naiveMeta.get(config.key)
+    expect(meta, `${config.key} 物料定义应存在`).toBeTruthy()
+    expectConverges(
+      createNaiveUiTriggerRegistry,
+      naiveCount,
+      config.key,
+      realDataOf(meta!, arrayKey),
+    )
+  })
+
+  it('card 前缀播放：区域按序列化序渐次揭示，header 未闭合不渲染', () => {
+    const script = JSON.stringify({
+      id: 'n-card1',
+      key: 'cx-naive-ui-card',
+      data: { size: 'medium' },
+      components: {
+        default: [{ key: 'cx-text', data: { content: '正文' } }],
+        header: [{ key: 'cx-text', data: { content: '头部' } }],
+      },
+    })
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createNaiveUiTriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+
+    const slotSets: string[][] = []
+    const step = Math.max(1, Math.floor(script.length / 30))
+    for (let i = step; i < script.length; i += step) {
+      const partial = extractor.next(script.slice(0, i)) as CxStreamNode | null
+      const components = partial?.components
+      if (components && !Array.isArray(components)) slotSets.push(Object.keys(components))
+    }
+    const final = extractor.next(script) as CxStreamNode | null
+
+    // slots 声明序 default 先于 header：存在 default 已揭示而 header 未闭合
+    // 缺席的中间帧（区域独立可判）
+    expect(
+      slotSets.some((slots) => slots.includes('default') && !slots.includes('header')),
+      '应存在 default 揭示且 header 缺席的中间帧',
+    ).toBe(true)
+    const finalComponents = final?.components as Record<string, unknown[]>
+    expect(Object.keys(finalComponents)).toEqual(['default', 'header'])
+    expect(final?.data?.size).toBe('medium')
+  })
+
+  it('alert 前缀播放：key 检出即空壳帧，fallback 保契约且无骨架标记', () => {
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createNaiveUiTriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+    const shell = extractor.next('{"key":"cx-naive-ui-alert"') as CxStreamNode | null
+    expect(shell).toMatchObject({
+      key: 'cx-naive-ui-alert',
+      data: { title: '', content: '' },
+    })
+    expect((shell?.data ?? {})['_cx_streaming']).toBeUndefined()
+  })
+
+  it('15 件判定不适用族代表不注册（表单/动作/标记/数值/装饰/容器）', () => {
+    // 判定依据逐件成立：表单族选项为控件候选值非答复内容；button 动作触发；
+    // badge/tag 极短标记；progress 数值状态；divider 装饰排版；space 布局容器
+    const registry = createNaiveUiTriggerRegistry()
+    const notApplicable = [
+      'cx-naive-ui-input',
+      'cx-naive-ui-input-number',
+      'cx-naive-ui-select',
+      'cx-naive-ui-switch',
+      'cx-naive-ui-date-picker',
+      'cx-naive-ui-button',
+      'cx-naive-ui-badge',
+      'cx-naive-ui-tag',
+      'cx-naive-ui-progress',
+      'cx-naive-ui-divider',
+      'cx-naive-ui-space',
+    ]
+    expect(notApplicable).toHaveLength(11)
+    for (const key of notApplicable) {
+      expect(registry.has(key), `${key} 判定不适用，不应注册`).toBe(false)
+    }
+    // 12 适用 + 15 不适用 = 27 件物料判定完备（此处负向采样 11 件覆盖各族）
   })
 })
 

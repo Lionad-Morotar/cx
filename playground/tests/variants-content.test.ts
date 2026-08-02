@@ -34,6 +34,14 @@ import {
   navigationVariants as epNavigationVariants,
   tableVariants as epTableVariants,
 } from '../app/dev/variants/element-plus'
+import {
+  containerVariants as naiveContainerVariants,
+  dataVariants as naiveDataVariants,
+  feedbackVariants as naiveFeedbackVariants,
+  formVariants as naiveFormVariants,
+  navigationVariants as naiveNavigationVariants,
+  tableVariants as naiveTableVariants,
+} from '../app/dev/variants/naive-ui'
 
 import type { VariantRegistry } from '../app/dev/variants-utils'
 
@@ -178,24 +186,76 @@ describe('nuxt-ui-v4 variants 文件组织', () => {
     const categoryOf = {
       layout: ['app', 'container', 'error', 'footer', 'header', 'main', 'sidebar', 'theme'],
       element: [
-        'alert', 'avatar', 'avatar-group', 'badge', 'banner', 'button', 'calendar',
-        'card', 'chip', 'collapsible', 'field-group', 'icon', 'kbd', 'progress',
-        'separator', 'skeleton',
+        'alert',
+        'avatar',
+        'avatar-group',
+        'badge',
+        'banner',
+        'button',
+        'calendar',
+        'card',
+        'chip',
+        'collapsible',
+        'field-group',
+        'icon',
+        'kbd',
+        'progress',
+        'separator',
+        'skeleton',
       ],
       form: [
-        'checkbox', 'checkbox-group', 'color-picker', 'file-upload', 'form',
-        'form-field', 'input', 'input-date', 'input-menu', 'input-number',
-        'input-rating', 'input-tags', 'input-time', 'listbox', 'pin-input',
-        'radio-group', 'select', 'select-menu', 'slider', 'switch', 'textarea',
+        'checkbox',
+        'checkbox-group',
+        'color-picker',
+        'file-upload',
+        'form',
+        'form-field',
+        'input',
+        'input-date',
+        'input-menu',
+        'input-number',
+        'input-rating',
+        'input-tags',
+        'input-time',
+        'listbox',
+        'pin-input',
+        'radio-group',
+        'select',
+        'select-menu',
+        'slider',
+        'switch',
+        'textarea',
       ],
-      data: ['accordion', 'carousel', 'empty', 'marquee', 'scroll-area', 'table', 'timeline', 'tree', 'user'],
+      data: [
+        'accordion',
+        'carousel',
+        'empty',
+        'marquee',
+        'scroll-area',
+        'table',
+        'timeline',
+        'tree',
+        'user',
+      ],
       navigation: [
-        'breadcrumb', 'command-palette', 'footer-columns', 'link', 'navigation-menu',
-        'pagination', 'stepper', 'tabs',
+        'breadcrumb',
+        'command-palette',
+        'footer-columns',
+        'link',
+        'navigation-menu',
+        'pagination',
+        'stepper',
+        'tabs',
       ],
       overlay: [
-        'context-menu', 'drawer', 'dropdown-menu', 'modal', 'popover', 'slideover',
-        'toast', 'tooltip',
+        'context-menu',
+        'drawer',
+        'dropdown-menu',
+        'modal',
+        'popover',
+        'slideover',
+        'toast',
+        'tooltip',
       ],
     } as const
     for (const [file, registry] of categoryModules) {
@@ -298,6 +358,69 @@ describe('naive-ui 集手写 variants', () => {
       for (const def of defs) {
         expect(def.label.trim().length).toBeGreaterThan(0)
       }
+    }
+  })
+})
+
+describe('naive-ui variants 文件组织', () => {
+  // 按包冻结 6 分类拆分（与 naive-ui-categories 同构），桶文件 spread 合并；
+  // 并集必须等于 naiveUiVariants 全部 key（防漏件），单文件受 FILE_LEN 约束
+  const categoryModules = [
+    ['feedback', naiveFeedbackVariants],
+    ['data', naiveDataVariants],
+    ['navigation', naiveNavigationVariants],
+    ['form', naiveFormVariants],
+    ['table', naiveTableVariants],
+    ['container', naiveContainerVariants],
+  ] as const
+
+  it('分类文件并集 = naiveUiVariants 全部 key，无遗漏无冗余', () => {
+    const merged: VariantRegistry = {}
+    for (const [, registry] of categoryModules) {
+      for (const key of Object.keys(registry)) {
+        expect(merged[key], `${key} 在多个分类文件重复`).toBeUndefined()
+        merged[key] = registry[key]!
+      }
+    }
+    expect(Object.keys(merged).sort()).toEqual(Object.keys(naiveUiVariants).sort())
+  })
+
+  it('分类 key 与包冻结分组一致', () => {
+    const categoryOf = {
+      feedback: ['button', 'alert', 'result', 'empty'],
+      data: ['avatar', 'badge', 'progress', 'statistic', 'descriptions', 'collapse'],
+      navigation: ['tag', 'divider', 'steps', 'breadcrumb', 'timeline'],
+      form: [
+        'input',
+        'input-number',
+        'switch',
+        'select',
+        'radio-group',
+        'checkbox-group',
+        'date-picker',
+        'rate',
+        'slider',
+      ],
+      table: ['data-table'],
+      container: ['card', 'space'],
+    } as const
+    for (const [file, registry] of categoryModules) {
+      for (const key of Object.keys(registry)) {
+        const official = key.replace(/^cx-naive-ui-/, '')
+        expect(
+          (categoryOf[file as keyof typeof categoryOf] as readonly string[]).includes(official),
+          `${key} 不属于 ${file} 分类`,
+        ).toBe(true)
+      }
+    }
+  })
+
+  it('每个分类文件 ≤ 300 行（FILE_LEN 约束）', () => {
+    // __dirname 基（同 vtu/nuiv4 段惯例）
+    const dir = join(__dirname, '..', 'app', 'dev', 'variants', 'naive-ui')
+    for (const [file] of categoryModules) {
+      const lines = readFileSync(`${dir}/${file}.ts`, 'utf8').split('\n').length
+      expect(lines, `${file}.ts 超 300 行`).toBeLessThanOrEqual(301)
     }
   })
 })
