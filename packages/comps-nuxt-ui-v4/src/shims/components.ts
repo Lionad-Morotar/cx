@@ -8,7 +8,10 @@ const stub = (name: string) =>
   defineComponent({
     name,
     setup(_, { slots }) {
-      return () => h('div', { class: `u-stub u-stub-${name}` }, slots.default?.())
+      // 作用域槽必须以对象调用：真实 U* 渲染槽时总传 scope 对象；无参调用会让
+      // 包装层编译产物 normalizeProps(guardReactiveProps(undefined)) 产出 null，
+      // renderSlot 访问 null.key 崩溃（accordion/carousel/form-field/select-menu 实证）
+      return () => h('div', { class: `u-stub u-stub-${name}` }, slots.default?.({}))
     },
   })
 
