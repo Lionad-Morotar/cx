@@ -288,9 +288,15 @@
 
 ### `vue-tsgo`、`vue-tsc`、`tsc` 三套类型检查工具并存
 
-- 风险：纯 TS 包（definition/eslint/nuxt/stream）用 `tsc --noEmit`（typescript@7 的原生实现；原脚本写 `tsgo` 但该 bin 不由 typescript@7.0.2 提供，曾长期失效并遮蔽下游包错误）；`@lionad/cx-vue`/`@lionad/cx-render`/`@lionad/cx-comps`/`@lionad/cx-comps-nuxt-ui-v4` 等 Vue 包用 `vue-tsgo --tsdk ...`；playground 用 `nuxi prepare && vue-tsc`
+- 风险：纯 TS 包（definition/eslint/nuxt/stream）用 `tsc --noEmit`（typescript@7 的原生实现；原脚本写 `tsgo` 但该 bin 不由 typescript@7.0.2 提供，曾长期失效并遮蔽下游包错误）；`@lionad/cx-vue`/`@lionad/cx-render`/`@lionad/cx-comps`/`@lionad/cx-comps-nuxt-ui-v4` 等 Vue 包用 `vue-tsgo --tsdk ...`；playground 已切 `vue-tsgo --noEmit -p .nuxt/tsconfig.json`（原 vue-tsc 非任何包的声明依赖，仅靠历史残留的根 bin 可跑，干净 install 即 command not found）
 - 影响：三套工具对模板类型检查的覆盖度不同，vue-tsgo 是相对新的工具，行为可能未稳定；`--tsdk` 硬编码 pnpm 硬链接路径（与本文件首条同类）
-- 迁移计划：选一套作为单一来源（推荐 vue-tsgo，符合 Vite+ 工具链），其余工具的配置项收敛
+- 迁移计划：收敛到 vue-tsgo 单一来源（符合 Vite+ 工具链）；剩余为各 Vue 包移除 `--tsdk` 硬编码
+
+### playground 13 个 TS7 类型错误（server/api h3 event 隐式 any）
+
+- 现状：vue-tsgo 下 `server/api/**/*.ts` 13 个 `TS7006: Parameter 'event' implicitly has an 'any' type`（h3 `defineEventHandler` 泛型推导在 TS7 下失效），另有 `app/standup/hooks/use-focus.ts` 1 个 TS2459（@vueuse/core `MaybeRef` 本地声明未导出，版本相关）
+- 影响：`pnpm -F playground typecheck` 退出码为 1；与 renderer 条目同属 TS7 适配工程，治理完成前 playground typecheck 结果解读为「除本条目外全绿」
+- 修复路径：h3 侧升级或逐文件给 `event` 补 `H3Event` 注解；@vueuse/core 升级复核 `MaybeRef` 导出面
 
 ### `nativebird`、`kareem`、`mitt`、`vue-concurrency` 等小众依赖
 
