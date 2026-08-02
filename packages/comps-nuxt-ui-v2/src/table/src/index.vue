@@ -14,6 +14,7 @@ import type { UseTableReturn } from '@lionad/cx-vue'
 import { has } from '@lionad/cx-definition'
 
 import { useAttrs, useTemplateRef, computed } from 'vue'
+import type { UnwrapRef } from 'vue'
 
 import { UTable } from '../../../vendor/bridge'
 
@@ -27,11 +28,13 @@ type UTableProps = ComponentProps<typeof UTable>
 
 const ns = useCxBEM('table')
 const inner = defineProps<{}>()
-const props = useAttrs() as UTableProps & {
+// columns/sorts 承载给 useTable.init 的可见性映射与排序项，须与 init 的参数契约同形；
+// 与 UTableProps 的同名键 Omit 后重声明，避免交叉出「数组 & Ref」的不可达类型。
+const props = useAttrs() as Omit<UTableProps, 'columns' | 'sorts'> & {
   comp: CxComponentRuntime
   datas?: Data[]
-  columns?: UseTableReturn['colsVisible']
-  sorts?: UseTableReturn['colsSort']
+  columns?: UnwrapRef<UseTableReturn['colsVisible']>
+  sorts?: UnwrapRef<UseTableReturn['colsSort']>
   showSelect?: boolean
 }
 const { showSlot } = useCxSlot(props.comp)
@@ -42,10 +45,11 @@ const ui = computed(() => {})
 const attrs = computed(() => ({}))
 
 const table = useTable()
+// colsVisible 空值回退 {}：与旧 [] 在 init 读路径（_colsVisible[col.field]）上等价，均为缺席
 table.init({
   useNewColsVisible: true,
   records: props.datas || [],
-  colsVisible: props.columns || [],
+  colsVisible: props.columns || {},
   colsSort: props.sorts || [],
 })
 
