@@ -16,24 +16,38 @@ export default defineConfig({
       '~': fileURLToPath(new URL('./playground/app', import.meta.url)),
       // 测试环境单 vue 实例：pnpm 的 typescript peer 风味会产生两个物理 vue 副本，
       // 导致 EMPTY_OBJ 单例身份分裂（useTemplateRef 崩溃），此处强制归一
-      vue: '/Users/lionad/Github/Lionad-Morotar/cx/node_modules/.pnpm/vue@3.5.26_typescript@7.0.2/node_modules/vue',
+      // （相对 import.meta.url 可移植：worktree 内解析到本仓副本，硬编码绝对路径会在
+      // worktree 里指回原主仓实例，与 naive-ui 等包解析的副本分属双实例）
+      vue: fileURLToPath(
+        new URL(
+          './node_modules/.pnpm/vue@3.5.26_typescript@7.0.2/node_modules/vue',
+          import.meta.url,
+        ),
+      ),
       // Nuxt 虚拟模块离线化（与 comps-nuxt-ui-v2 的 pack alias 一致）
-      '#app':
-        '/Users/lionad/Github/Lionad-Morotar/cx/packages/comps-nuxt-ui-v2/vendor/shims/imports.ts',
-      '#imports':
-        '/Users/lionad/Github/Lionad-Morotar/cx/packages/comps-nuxt-ui-v2/vendor/shims/imports.ts',
+      '#app': fileURLToPath(
+        new URL('./packages/comps-nuxt-ui-v2/vendor/shims/imports.ts', import.meta.url),
+      ),
+      '#imports': fileURLToPath(
+        new URL('./packages/comps-nuxt-ui-v2/vendor/shims/imports.ts', import.meta.url),
+      ),
       // v4 物料的 U* 组件离线 stub（宿主环境由 @nuxt/ui 提供真实实现）
-      '#components':
-        '/Users/lionad/Github/Lionad-Morotar/cx/packages/comps-nuxt-ui-v4/src/shims/components.ts',
+      '#components': fileURLToPath(
+        new URL('./packages/comps-nuxt-ui-v4/src/shims/components.ts', import.meta.url),
+      ),
       // cx-nuxt 装配清单虚拟模块（playground nuxi prepare 生成物）
-      '#build/cx-bundles.mjs':
-        '/Users/lionad/Github/Lionad-Morotar/cx/playground/.nuxt/cx-bundles.mjs',
-      '#build/app.config':
-        '/Users/lionad/Github/Lionad-Morotar/cx/packages/comps-nuxt-ui-v2/vendor/shims/app.config.ts',
-      '#ui-colors':
-        '/Users/lionad/Github/Lionad-Morotar/cx/packages/comps-nuxt-ui-v2/vendor/shims/ui-colors.d.ts',
-      'nuxt/schema':
-        '/Users/lionad/Github/Lionad-Morotar/cx/packages/comps-nuxt-ui-v2/vendor/shims/nuxt-schema.d.ts',
+      '#build/cx-bundles.mjs': fileURLToPath(
+        new URL('./playground/.nuxt/cx-bundles.mjs', import.meta.url),
+      ),
+      '#build/app.config': fileURLToPath(
+        new URL('./packages/comps-nuxt-ui-v2/vendor/shims/app.config.ts', import.meta.url),
+      ),
+      '#ui-colors': fileURLToPath(
+        new URL('./packages/comps-nuxt-ui-v2/vendor/shims/ui-colors.d.ts', import.meta.url),
+      ),
+      'nuxt/schema': fileURLToPath(
+        new URL('./packages/comps-nuxt-ui-v2/vendor/shims/nuxt-schema.d.ts', import.meta.url),
+      ),
     },
   },
   test: {
