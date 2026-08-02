@@ -241,10 +241,20 @@ export function createIncrementalExtractor<TSpec = unknown>(
     // --- Step 3: 截断至最远匹配 + 补严格闭合括号 ---
     const truncated = text.slice(0, best.end + 1) + closingBrackets(best.path)
 
+    // 终态判定：原文无需修复即完整 JSON 时以完整 spec 构造终帧——主数组/区域
+    // 之后的尾随字段不在任何 scanPath 上，截断路径会把它们从所有帧中剔除，
+    // 终态停在缺字段中间态（与闭合事件分支的完整帧兜底同一判据）
+    let complete: unknown = null
+    try {
+      complete = JSON.parse(text)
+    } catch {
+      // 未完整：走截断路径
+    }
+
     // --- Step 4: jsonrepair + parse ---
     let parsed: unknown
     try {
-      parsed = safeJsonParse(truncated, { maxRepairLength: config.maxRepairLength })
+      parsed = complete ?? safeJsonParse(truncated, { maxRepairLength: config.maxRepairLength })
     } catch {
       return lastValid // 解析失败：保持上次有效状态，避免渲染组件消失
     }
