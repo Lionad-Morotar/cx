@@ -23,6 +23,12 @@ import {
   mainArrayOf as mainArrayOfV4,
   NUXT_UI_V4_STREAM_TRIGGERS,
 } from '@lionad/cx-comps-nuxt-ui-v4'
+import {
+  createEpTriggerRegistry,
+  CxElementPlus,
+  EP_STREAM_TRIGGERS,
+  mainArrayOf as mainArrayOfEp,
+} from '@lionad/cx-comps-element-plus'
 import { buildDefaultData, type CxMeta } from '../app/dev/material-utils'
 
 // 物料库 trigger 注册表的判定型验收（与页面/定时器解耦的无头契约）：
@@ -34,6 +40,10 @@ import { buildDefaultData, type CxMeta } from '../app/dev/material-utils'
 //   覆盖）；51 件不适用（交互控件/浮层/导航 chrome/装饰/数值/槽容器/展示容器）
 // - components：标量主体形态 9 件适用（文本/标题 7 + user-style + figure，
 //   属性闭合切分，包内单测覆盖），13 件维持不适用（容器槽/headless/无 data）
+// - element-plus：10 件判定适用——数组增长型 5（table 叠加列定义次增长路径 +
+//   timeline/steps/breadcrumb/descriptions）+ 多区容器 region 1（card）+
+//   标量主体 4（alert/result/empty/avatar，属性闭合切分，包内单测覆盖）；
+//   17 件不适用（交互控件 10/极短标记 3/宿主标记 1/数值状态 2/单槽布局壳 1）
 //
 // 剧本数据取自物料真实定义（_cx_meta.props 的 initial，与页面卡片回放
 // 同一条 buildDefaultData 数据路径），主数组以真实数组循环扩充到 4 项——
@@ -54,6 +64,7 @@ function metaIndex(materials: unknown): Map<string, CxMeta> {
 
 const vtuMeta = metaIndex(CxVtu)
 const v4Meta = metaIndex(CxNuxtUIV4)
+const epMeta = metaIndex(CxElementPlus)
 
 /** 取配置中的数组形态段；region-only 配置返回 null（参数化收敛测试跳过） */
 function arraySectionOf(config: StreamTriggerConfig): ArraySectionConfig | null {
@@ -474,5 +485,109 @@ describe('内置 components trigger 判定 · 标量主体形态 9 件', () => {
       expect(registry.has(key), `${key} 判定不适用，不应注册`).toBe(false)
     }
     // 9 适用 + 13 不适用 = 22 件物料判定完备
+  })
+})
+
+const epCount = (node: CxStreamNode) => mainArrayOfEp(node)?.length ?? null
+
+describe('element-plus trigger 判定 · 三形态 10 件', () => {
+  it('注册表恰好覆盖全部判定适用的配置，10 件无遗漏无冗余', () => {
+    const registry = createEpTriggerRegistry()
+    expect(registry.size).toBe(EP_STREAM_TRIGGERS.length)
+    expect(EP_STREAM_TRIGGERS).toHaveLength(10)
+    for (const config of EP_STREAM_TRIGGERS) {
+      expect(registry.has(config.key), `${config.key} 应在注册表内`).toBe(true)
+    }
+  })
+
+  it.each(
+    EP_STREAM_TRIGGERS.flatMap((c) => {
+      const array = arraySectionOf(c)
+      return array ? [[c.key, c, array.arrayKey] as const] : []
+    }),
+  )('%s 真实样本前缀播放增量收敛', (_key, config, arrayKey) => {
+    const meta = epMeta.get(config.key)
+    expect(meta, `${config.key} 物料定义应存在`).toBeTruthy()
+    expectConverges(createEpTriggerRegistry, epCount, config.key, realDataOf(meta!, arrayKey))
+  })
+
+  it('table 列定义序列化序领先行数据：首行帧即携带全量列，尾随标量终帧兜底', () => {
+    // EP table props 序为 columns 在前、data 在后：列定义先于行生长完整闭合，
+    // 与 nuiv4 table（data 在前、列尾随需 deriveTailFields 首行键推导）形成
+    // 对照——EP 无需推导，首帧起列定义即完整可用。
+    // 截断窗口取在首行元素闭合点（紧凑序列化保证子串可定位）
+    const meta = epMeta.get('cx-element-plus-table')!
+    const data = realDataOf(meta, 'data')
+    const columns = data.columns as unknown[]
+    const script = JSON.stringify({ id: 't-ep-table', key: 'cx-element-plus-table', data })
+    const firstRowJson = JSON.stringify((data.data as unknown[])[0])
+    const firstRowEnd = script.indexOf(firstRowJson) + firstRowJson.length
+    expect(firstRowEnd).toBeGreaterThan(firstRowJson.length)
+
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createEpTriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+    const first = extractor.next(script.slice(0, firstRowEnd)) as CxStreamNode | null
+    expect(first?.data?.data, '首行闭合即出帧').toHaveLength(1)
+    expect(first?.data?.columns, '首帧即携带全量列定义').toHaveLength(columns.length)
+
+    // data 之后的 border/stripe/size 尾随标量不入增量帧，终态完整帧兜底
+    const final = extractor.next(script) as CxStreamNode | null
+    expect(final?.data?.data).toHaveLength(REAL_ROWS)
+    expect(final?.data?.columns).toHaveLength(columns.length)
+    expect(final?.data?.border).toBe(true)
+  })
+
+  it('17 件判定不适用不进注册表，10 适用 + 17 不适用 = 27 件判定完备', () => {
+    // 差集派生（而非采样列举）：物料增减时计数契约自动跟随，错配即败
+    const registry = createEpTriggerRegistry()
+    const notApplicable = CxElementPlus.map((x) => x._cx_meta.key as string).filter(
+      (key) => !EP_STREAM_TRIGGERS.some((c) => c.key === key),
+    )
+    expect(notApplicable).toHaveLength(17)
+    expect(CxElementPlus).toHaveLength(27)
+    for (const key of notApplicable) {
+      expect(registry.has(key), `${key} 判定不适用，不应注册`).toBe(false)
+    }
+  })
+
+  it('alert 前缀播放：key 检出即空壳帧，fallback 保契约且无骨架标记', () => {
+    // scalar 代表件端到端：空壳早挂载 + 属性闭合切分包内逐件覆盖
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createEpTriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+    const shell = extractor.next('{"key":"cx-element-plus-alert"') as CxStreamNode | null
+    expect(shell).toMatchObject({
+      key: 'cx-element-plus-alert',
+      data: { title: '', description: '' },
+    })
+    expect((shell?.data ?? {})['_cx_streaming']).toBeUndefined()
+  })
+
+  it('card 缺槽剧本：default 闭合即揭示，终帧槽集 ⊆ 声明 slots', () => {
+    // 缺槽是合法剧本：槽位未传不输岀该区，终帧槽集是声明 slots 的子集
+    const script = JSON.stringify({
+      id: 'c1',
+      key: 'cx-element-plus-card',
+      data: { shadow: 'hover' },
+      components: {
+        default: [{ key: 'cx-element-plus-tag', data: { text: '主体' } }],
+      },
+    })
+    const extractor = createIncrementalExtractor<CxSpec>({
+      registry: createEpTriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    })
+    const final = extractor.next(script) as CxStreamNode | null
+    const finalComponents = final?.components as Record<string, unknown[]>
+    expect(Object.keys(finalComponents)).toEqual(['default'])
+    const declared = Object.keys(
+      (epMeta.get('cx-element-plus-card')!.slots ?? {}) as Record<string, unknown>,
+    )
+    for (const slot of Object.keys(finalComponents)) {
+      expect(declared, `终帧槽 ${slot} 应在声明 slots 内`).toContain(slot)
+    }
   })
 })
