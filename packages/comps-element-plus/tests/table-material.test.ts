@@ -80,11 +80,17 @@ describe('流式增量预设', () => {
     expect(registry.size).toBe(EP_STREAM_TRIGGERS.length)
   })
 
-  it('trigger config 主数组为 data，附扫描列定义路径', () => {
+  it('trigger config 主数组为 data，附扫描列定义路径（sections DSL）', () => {
     const config = EP_STREAM_TRIGGERS.find((c) => c.key === TABLE_KEY)
     expect(config).toBeTruthy()
-    expect(config!.arrayKey).toBe('data')
-    expect(config!.extraScanPaths).toEqual([['data', 'columns', '*']])
+    const section = config!.sections[0] as {
+      kind: string
+      arrayKey: string
+      extraScanPaths?: string[][]
+    }
+    expect(section.kind).toBe('array')
+    expect(section.arrayKey).toBe('data')
+    expect(section.extraScanPaths).toEqual([['data', 'columns', '*']])
   })
 
   it('mainArrayOf 取节点主数组，非注册 key 返回 null', () => {
