@@ -96,6 +96,7 @@ import CxRenderComponentWithBindings from './render-component-with-bindings.vue'
 import CxRenderComponents from './render-components.vue'
 import type { Component } from 'vue'
 import type {
+  CxComponentMetaDefined,
   CxComponentSlot,
   CxComponentRuntime,
   CxLoaderInstance,
@@ -149,7 +150,9 @@ const cxEmitter = cx.emitter
 const cxUtils = cx.utils
 const compWrapper = readonly(inject<Component>('cx-render-component-wrapper')!)
 const compErrorWrapper = readonly(inject<Component>('cx-render-error-component-wrapper')!)
-const slotWrapper = readonly(inject<Component>('cx-render-slot-wrapper')!)
+// readonly 防子组件意外修改共享的 wrapper 组件定义；DeepReadonly 映射后与 prop 声明的
+// Component 不再同构，经 unknown 断言回运行时形态（注入值本身未被 readonly 包装物改变）
+const slotWrapper = readonly(inject<Component>('cx-render-slot-wrapper')!) as unknown as Component
 
 const attrs = useAttrs()
 const props = withDefaults(
@@ -225,7 +228,9 @@ const compType = computed(() => {
 // 所以等加载完毕后重新初始化一下 data
 cx.hooks.on('comp:async-comp:loaded', resetAsyncComponentInitialData)
 onBeforeUnmount(() => cx.hooks.off('comp:async-comp:loaded', resetAsyncComponentInitialData))
-async function resetAsyncComponentInitialData({ comp: loadedComp }: { comp: CxComponentRuntime }) {
+// 事件注册表 payload 声明为 CxComponentMetaDefined（loader 发出时组件尚未实例化为
+// CxComponentRuntime）；此处实际只消费 key 字段，对齐注册声明而非运行时形态
+async function resetAsyncComponentInitialData({ comp: loadedComp }: { comp: CxComponentMetaDefined }) {
   if (!comp.value) {
     return // console.error('[ERR] skip async-comp:loaded, no comp value found')
   }
@@ -392,12 +397,12 @@ const compEvents = computed(() => {
   }
   const id = comp.value.id
   // 这里监听的所有定义事件和原生事件，不知道会不会有性能问题
-  const keys = [...compEmitNames.value, ...nativeEmitNames.value]
-  // compEmitNames/nativeEmitNames 返回 string，eventsMap 键类型收窄为 string；
-  // cxEmitter 的 eventKey: string 即可满足，无需 CxEventKey
+  // keys 收窄为 string[]：元素来自 Object.keys 与 schema 反序列化的 _cx_events，
+  // 事件名运行时恒为 string（CxEventKey 的 InjectionKey 分支仅存在于编辑器注入形态）
+  const keys = [...compEmitNames.value, ...nativeEmitNames.value] as string[]
   const eventsMap = {} as Record<string, (...args: unknown[]) => void>
   try {
-    keys.forEach((k: string) => {
+    keys.forEach((k) => {
       const broadcast = (...args: unknown[]) => {
         unref(cx).hooks.emit('comp:cx-event:emit', {
           id,
@@ -438,12 +443,20 @@ const _compSlots = computed(() => {
   // console.log('[debug] compSlots', comp.value.key, comp.value, compMeta.value?._cx_meta)
 
   // 1. 优先按照组件运行时的 slots 属性展示页面
+  // 函数签名断言到渲染器约定：definition 层 slots 声明的函数形态是 (comp) => Record，
+  // 渲染器实际按 SlotContext（comp + cx）双字段对象调用——签名断言表达真实调用约定；
+  // 外层 unknown 中转：readonly(comp.value) 深只读推导与 CxComponentSlot[] 不同构
   if (comp.value.slots) {
     return (
       isFunction(comp.value.slots)
-        ? comp.value.slots({ comp: readonly(comp.value)!, cx: readonly(cx) } as SlotContext)
+        ? (comp.value.slots as unknown as (ctx: SlotContext) => CxComponentSlot[])({
+            // readonly 的深只读推导与 SlotContext 的 mutable 字段声明（parents: string[]
+            // 等）不同构，逐字段 unknown 中转回运行时形态
+            comp: readonly(comp.value)! as unknown as CxComponentRuntime,
+            cx: readonly(cx) as unknown as CxLoaderInstance,
+          })
         : comp.value.slots
-    ) as CxComponentSlot[]
+    ) as unknown as CxComponentSlot[]
   }
 
   // 2. 再按照组件元数据定义的 slots 展示页面
@@ -459,7 +472,10 @@ const _compSlots = computed(() => {
   if (metaSlots) {
     return (
       isFunction(metaSlots)
-        ? metaSlots({ comp: readonly(comp.value)!, cx: readonly(cx) } as SlotContext)
+        ? metaSlots({
+            comp: readonly(comp.value)!,
+            cx: readonly(cx),
+          } as unknown as SlotContext)
         : isArray(metaSlots)
           ? metaSlots
           : // 此处不能加 async：mapValues 不会 await，async 回调会让每个插槽变成
@@ -467,7 +483,10 @@ const _compSlots = computed(() => {
             mapValues(metaSlots, (v, k) => ({
               key: k,
               ...(isFunction(v)
-                ? v({ comp: readonly(comp.value!), cx: readonly(cx) } as SlotContext)
+                ? v({
+                    comp: readonly(comp.value!),
+                    cx: readonly(cx),
+                  } as unknown as SlotContext)
                 : {
                     name: v.name || k,
                     description: v.description || '',

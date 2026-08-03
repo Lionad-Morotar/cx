@@ -5,7 +5,6 @@
 import { has } from '@lionad/cx-definition'
 
 import { watchImmediate } from '@vueuse/core'
-import type { MaybeRef } from '@vueuse/core'
 import {
   resolveDirective,
   resolveComponent,
@@ -13,6 +12,7 @@ import {
   defineComponent,
   inject,
   type Ref,
+  type MaybeRef,
   useAttrs,
   useSlots,
   computed,
@@ -147,7 +147,10 @@ export default defineComponent({
     // const breakpointKeys = breakPointOptions.map(x => x.value)
 
     // * 也许可以把每个组件都做成断点形式
-    const cxRenderRef = inject('cx-render-parent')!
+    // inject 泛型对齐下游消费签名（getCachedCxRenderBreakpointType 的 MaybeRef<HTMLElement | undefined>）；
+    // provide 端 computed 未挂载时返回 null，null/undefined 均由 useCxBreakpointType 的
+    // instanceof 守卫覆盖，此处声明不含 null
+    const cxRenderRef = inject<MaybeRef<HTMLElement | undefined>>('cx-render-parent')!
 
     const pageBreakpointType = computed(() => getCachedCxRenderBreakpointType(unref(cxRenderRef)))
 
@@ -172,14 +175,16 @@ export default defineComponent({
         styleFont = useCxStyleFont({})
         styleCosm = useCxStyleCosm({})
       }
-      styleBox.init(w)
-      styleMargin.init(m)
-      stylePadding.init(p)
-      styleLayout.init(l)
-      styleRound.init(r)
-      styleBorder.init(b)
-      styleFont.init(f)
-      styleCosm.init(c)
+      // 惰性初始化分支保证八个 style composable 已赋值；TS 控制流不跨 if 块
+      // 收窄外层 let（类型仍含 undefined），调用点逐一非空断言
+      styleBox!.init(w)
+      styleMargin!.init(m)
+      stylePadding!.init(p)
+      styleLayout!.init(l)
+      styleRound!.init(r)
+      styleBorder!.init(b)
+      styleFont!.init(f)
+      styleCosm!.init(c)
       // * for debug
       // if (comp.value.data?._cx_name?.startsWith('debug')) {
       //   console.log(
@@ -198,12 +203,15 @@ export default defineComponent({
     }
 
     // todo deep
+    // 源数组 as const：裸数组字面量被推导为联合数组，回调三项参数会互相污染
+    // （breakpointType 混入样式对象类型），tuple 化后各参数获得精确类型
     watchImmediate(
-      () => [
-        has(meta.value?.headless),
-        comp.value?.data?._cx_style,
-        unref(unref(pageBreakpointType)),
-      ],
+      () =>
+        [
+          has(meta.value?.headless),
+          comp.value?.data?._cx_style,
+          unref(unref(pageBreakpointType)),
+        ] as const,
       ([headless, cxStyle, breakpointType]) => {
         if (headless) {
           return
@@ -604,10 +612,8 @@ export default defineComponent({
             {
               ...attrs,
               // componentType 是 Component | string 动态联合类型，标准 VNode props
-              // 未声明 ref/comp 这两个自定义字段，TS 无法收窄；运行时由 Vue 处理
-              // @ts-expect-error dynamic component props not in VNodeProps
+              // 未声明 ref/comp 这两个自定义字段，运行时由 Vue 处理
               ref: props.setRef,
-              // @ts-expect-error dynamic component props not in VNodeProps
               comp: markRaw(comp.value),
             },
             slots,
@@ -618,9 +624,7 @@ export default defineComponent({
               {
                 ...attrs,
                 // 见上 headless 分支：动态组件自定义 props 同理
-                // @ts-expect-error dynamic component props not in VNodeProps
                 ref: props.setRef,
-                // @ts-expect-error dynamic component props not in VNodeProps
                 comp: markRaw(comp.value),
                 // 空样式不下传：styles 由 _cx_style（编辑器样式）驱动，默认空对象；
                 // 空的响应式 style 进入组件链会在 Reka Primitive 的 vnode 归一化阶段
