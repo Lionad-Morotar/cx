@@ -99,12 +99,6 @@
   - 1247 行远超 FILE_LEN 300 行的拆分阈值
 - 修复路径：抽取 `createStyleHook({ fields, serialize, unserialize })` 通用工厂；按样式类别拆为 `spacing.ts`、`box.ts`、`font.ts`、`cosm.ts`、`layout.ts` 5 个文件
 
-### renderer 包 28 个 TS7 类型错误（typecheck 门禁唯一红区）
-
-- 现状：`packages/renderer` 三个文件在 typescript 7 下共 28 个类型错误：`render-component-with-bindings.vue` 16 处（`MaybeRef` 不再从 `@vueuse/core` 导出、`_debug_verbose` 全局属性缺失、style* 系列 possibly-undefined、`CxComponentStyle` 不可作索引、4 处失效的 `@ts-expect-error`）、`render-component.vue` 11 处（`SlotContext` 双向转换不重叠、`Component` 联合类型不可赋值、overload 失配）、`render.vue` 1 处（`_debug` 全局属性缺失）
-- 影响：pnpm `-r` 默认 bail 曾使根 typecheck 在更靠前的包失败后永远走不到 renderer，错误自 TS6→7 升级起长期隐藏；门禁恢复后 renderer 是唯一失败包，`pnpm typecheck` 退出码仍为 1
-- 修复路径：与 `types/helper` 的 `@ts-nocheck` 治理同属 TS7 适配工程——逐文件核实 `@ts-expect-error` 是否仍有意义、`SlotContext` 转换改经 `unknown` 中转、全局 `_debug*` 属性补 ambient 声明；治理完成前 typecheck 结果解读为"除本条目外全绿"
-
 ## 已知缺陷
 
 ### `CxLoader.fetchModule` 多分支 Promise 反模式
@@ -288,9 +282,15 @@
 
 ### `vue-tsgo`、`vue-tsc`、`tsc` 三套类型检查工具并存
 
-- 风险：纯 TS 包（definition/eslint/nuxt/stream）用 `tsc --noEmit`（typescript@7 的原生实现；原脚本写 `tsgo` 但该 bin 不由 typescript@7.0.2 提供，曾长期失效并遮蔽下游包错误）；`@lionad/cx-vue`/`@lionad/cx-render`/`@lionad/cx-comps`/`@lionad/cx-comps-nuxt-ui-v4` 等 Vue 包用 `vue-tsgo --tsdk ...`；playground 已切 `vue-tsgo --noEmit -p .nuxt/tsconfig.json`（原 vue-tsc 非任何包的声明依赖，仅靠历史残留的根 bin 可跑，干净 install 即 command not found）
-- 影响：三套工具对模板类型检查的覆盖度不同，vue-tsgo 是相对新的工具，行为可能未稳定；`--tsdk` 硬编码 pnpm 硬链接路径（与本文件首条同类）
-- 迁移计划：收敛到 vue-tsgo 单一来源（符合 Vite+ 工具链）；剩余为各 Vue 包移除 `--tsdk` 硬编码
+- 风险：纯 TS 包（definition/eslint/nuxt/stream）用 `tsc --noEmit`（typescript@7 的原生实现；原脚本写 `tsgo` 但该 bin 不由 typescript@7.0.2 提供，曾长期失效并遮蔽下游包错误）；Vue 包 typecheck 用 `vue-tsgo --tsdk ...`，playground 已切 `vue-tsgo --noEmit -p .nuxt/tsconfig.json`；Vue 包 build 的 d.ts emit 用 `vue-tsc`（8 个 Vue 包均已声明 devDep `^3.3.7`，包级 bin 解析安全；根 `.bin/vue-tsc` 仍是历史残留 shim，勿在根目录直调）
+- 影响：三套工具对模板类型检查的覆盖度不同；vue-tsgo@0.3.0 实测无 emit 能力（`-p tsconfig.build.json --listEmittedFiles` 产出为空、exit 0 静默），build 的 d.ts emit 只能归 vue-tsc；`--tsdk` 硬编码 pnpm 硬链接路径（与本文件首条同类）
+- 迁移计划：typecheck 归 vue-tsgo、build emit 归 vue-tsc 双轨维持，待 vue-tsgo 支持 declaration emit 后收敛单一来源；剩余为各 Vue 包移除 `--tsdk` 硬编码
+
+### 根 `build` 不得改回 `vp run build`（自指空转 + 双生命周期测试双跑）
+
+- 现状：根 `build` 为 `pnpm -r run build`（pnpm 拓扑序递归，各包无 `prebuild`，测试仅在根 `prebuild` 跑一遍）
+- 历史故障：`vp run build` 在根自指（根 `build` 任务命令即 `vp run build` 自身），vp 任务运行器检测到循环后构建本体空转——dist 长期为开发残留；同时 pnpm 与 vp 各自展开一次 `prebuild` 钩子，`pnpm release` 全链测试双跑。alpha.0 发版实际发布的是历史残留产物
+- 规避：如需恢复 vp 任务编排（缓存收益），须改用 `vp run build -r` 形态并实测构建产物新鲜度与测试遍数
 
 ### playground 13 个 TS7 类型错误（server/api h3 event 隐式 any）
 
