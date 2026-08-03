@@ -4,7 +4,7 @@
     :title="todoCardWeekType === 'curWeek' ? '问题' : '上周问题'"
     :side-title="dayStr()"
     full-content
-    theme-color="#ff4c4f"
+    theme-color="var(--su-state-alert)"
     v-bind="$attrs"
   >
     <template v-if="isEnableSwitchTodoDataType" #after-title>
@@ -109,8 +109,8 @@ const content = useStandupContents(todoCardStandupID, userID, isTodoDisabled, (x
     .c-v-cx-skeleton {
       padding: inherit;
       background: inherit;
-      --el-skeleton-color: #e4e8f4;
-      --el-skeleton-to-color: #d7e2f4;
+      --el-skeleton-color: var(--su-bg-inset);
+      --el-skeleton-to-color: color-mix(in oklab, var(--su-state-now) 16%, var(--su-bg-surface));
     }
   }
 }

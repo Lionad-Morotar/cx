@@ -1,5 +1,6 @@
 <template>
   <div ref="compRef" :class="ns.b()">
+    <cx-theme-toggle data-focus-id="theme-toggle" />
     <UButton ref="goBackBtnRef" @click="router.go(-1)">
       <span>返回</span>
     </UButton>
@@ -15,7 +16,7 @@ import { useRouter } from 'vue-router'
 import { useAsync } from '../../../hooks/use-async'
 import { useCxNamespace } from '../../../utils/namespace'
 /* Import Components */
-import { CxFullscreenButton } from '../..'
+import { CxFullscreenButton, CxThemeToggle } from '../..'
 /* Import States */
 /* Import Utils */
 /* Import APIs */

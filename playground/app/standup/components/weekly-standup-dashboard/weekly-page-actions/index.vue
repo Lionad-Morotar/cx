@@ -1,5 +1,6 @@
 <template>
   <div class="cx-weekly-page-actions buttons-con">
+    <cx-theme-toggle data-focus-id="theme-toggle" />
     <div v-if="isToday" class="meeting-spent-time-count">
       <img class="time-icon" :src="IconTime" />
       <cx-time-tick v-if="isCurStandupInProgress" :from="meetingDate" format="HH:mm:ss" />
@@ -29,6 +30,7 @@ import { useAsync } from '../../../hooks/use-async'
 import { apiStopStandup } from '../../../apis'
 import CxTimeTick from '../../time-tick'
 import CxFullscreenButton from '../../fullscreen-button'
+import CxThemeToggle from '../../theme-toggle'
 import { useStandupDetail } from '../../../states/standups'
 import { dayjs } from '../../../utils'
 
@@ -91,14 +93,14 @@ const stopStandupReq = useAsync(async () => {
     padding: 8px 12px;
     width: auto;
     height: 34px;
-    background: #e2f9e7;
+    background: color-mix(in oklab, var(--su-state-live) 16%, var(--su-bg-surface));
     border-radius: 4px;
 
     .time-icon {
       width: 16px;
       height: 16px;
-      color: #20ce86;
-      fill: #20ce86;
+      color: var(--su-state-live);
+      fill: var(--su-state-live);
     }
     .time {
       font-size: 14px;

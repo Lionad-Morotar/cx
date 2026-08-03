@@ -21,6 +21,7 @@
         ref="timeSelectRef"
         data-focus-id="calendar-select"
         class="time-count"
+        split
         weekday
         :run="isCurStandupInProgress"
         :time="isCurStandupInProgress ? () => dayjs() : standup.meetingDate"
@@ -182,18 +183,24 @@ defineExpose({
 <style>
 .cx-daily-standup-header-info {
   display: grid;
-  grid-template-columns: 160px 30px 330px 30px 160px;
+  grid-template-columns: 160px 30px minmax(330px, 1fr) 30px 160px;
   place-items: center;
   place-content: center;
   width: 100%;
   height: 100%;
-  font-size: 18px;
+  /* 右侧让出 page-header-right 悬浮操作簇（返回/全屏）的空间，避免末列按钮与其叠压 */
+  padding: 0 clamp(96px, 9vw, 150px);
+  box-sizing: border-box;
+  font-size: 16px;
 
   .time-count {
-    border-radius: var(--el-border-radius-base);
+    border-radius: var(--su-radius-control);
     cursor: pointer;
-    .weekday {
-      font-size: 18px;
+    padding: 4px 10px;
+    transition: background var(--su-dur) var(--su-ease);
+
+    &:hover {
+      background: var(--su-bg-raised);
     }
   }
 
@@ -202,11 +209,13 @@ defineExpose({
     align-self: end;
 
     &.is-disabled {
-      color: #d9d9d9;
+      color: var(--su-ink-3);
+      opacity: 0.6;
     }
 
     & > span {
-      font-size: 18px;
+      font-size: 16px;
+      font-weight: 600;
     }
   }
 
@@ -214,17 +223,27 @@ defineExpose({
   .next-standup-icon {
     padding: 3px;
     cursor: pointer;
-    border-radius: var(--el-border-radius-base);
+    border-radius: var(--su-radius-control);
+    color: var(--su-ink-2);
+    transition:
+      color var(--su-dur) var(--su-ease),
+      background var(--su-dur) var(--su-ease);
+
+    &:hover {
+      color: var(--su-ink);
+      background: var(--su-bg-raised);
+    }
 
     &.is-disabled {
-      color: #d9d9d9;
+      color: var(--su-ink-3);
+      opacity: 0.5;
     }
   }
 
   .today-tag {
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
+    background: var(--su-bg-raised);
+    border: 1px solid var(--su-border);
+    border-radius: var(--su-radius-control);
     width: 44px;
     height: 24px;
     display: flex;

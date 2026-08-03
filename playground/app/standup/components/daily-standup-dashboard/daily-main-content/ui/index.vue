@@ -7,7 +7,7 @@
       title="昨天"
       :time="dayStr(yesterday)"
       :is-loading="curUserRelatedIssusByDateReq.isLoading"
-      theme-color="#fbad15"
+      theme-color="var(--su-state-narrative)"
     >
       <cx-view-issues-board
         v-for="issue in filteredYesterdayList"
@@ -26,7 +26,7 @@
       title="今天"
       :time="dayStr(today)"
       :is-loading="curUserRelatedIssusByDateReq.isLoading"
-      theme-color="#1890ff"
+      theme-color="var(--su-state-now)"
     >
       <cx-view-issues-board
         v-for="issue in filteredTodayList"
@@ -45,7 +45,7 @@
       :side-title="dayStr()"
       full-content
       :is-loading="curUserRelatedIssusByDateReq.isLoading"
-      theme-color="#ff4c4f"
+      theme-color="var(--su-state-alert)"
     >
       <template v-if="enableSwitchTodoDataType" #after-title>
         <img class="switch-icon" :src="IconSwitch" @click="switchTodoDataType" />

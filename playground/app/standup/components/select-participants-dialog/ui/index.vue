@@ -121,7 +121,7 @@ const {
 .select-participants-dialog {
   :deep(.el-dialog__footer) {
     background: unset;
-    border-top: 1px solid #dcdee2;
+    border-top: 1px solid var(--su-border-strong);
   }
 
   .dialog-content {
@@ -149,7 +149,7 @@ const {
       .title {
         flex: 1;
         font-size: 13px;
-        color: #898989;
+        color: var(--su-ink-3);
       }
       .actions {
         display: flex;
@@ -171,7 +171,7 @@ const {
       opacity 0.3s;
 
     &:hover {
-      background-color: #f0f3fa;
+      background-color: var(--su-bg-inset);
 
       .actions {
         display: flex;
@@ -221,7 +221,7 @@ const {
   }
 
   .to-select-panel {
-    border-right: solid 1px #dcdfe6;
+    border-right: solid 1px var(--su-border-strong);
 
     .input-wrapper {
       padding: 8px 18px;
@@ -230,7 +230,7 @@ const {
       .el-input__wrapper,
       :deep(.el-input__wrapper) {
         box-shadow: none;
-        border: solid 1px #dcdfe6;
+        border: solid 1px var(--su-border-strong);
       }
     }
     .panel {
@@ -241,7 +241,7 @@ const {
       top: 1.5px;
     }
     .absent-button {
-      color: #f13737;
+      color: var(--su-state-alert);
     }
   }
 
@@ -249,7 +249,7 @@ const {
     padding: 6px 0 0 0;
 
     .remove-button {
-      color: #337ffb;
+      color: var(--su-state-now);
     }
   }
 }

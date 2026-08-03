@@ -129,9 +129,9 @@ defineExpose({
   box-sizing: border-box;
   width: var(--user-item-width);
   height: var(--user-item-width);
-  background: white;
+  background: var(--su-bg-raised);
   border-radius: 50%;
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   transition:
     transform 0.2s ease-in-out,
     box-shadow 0.25s ease-out,
@@ -143,7 +143,7 @@ defineExpose({
   }
 
   &:not(.is-empty, .is-absent):hover {
-    box-shadow: 0 2px 13px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--su-shadow-raised);
     transform: scale(1.5);
     z-index: 2;
   }
@@ -153,7 +153,7 @@ defineExpose({
     height: calc(var(--user-item-width) * 0.55);
     border-radius: 50%;
     overflow: hidden;
-    background: white;
+    background: var(--su-bg-raised);
     user-select: none;
 
     img {
@@ -169,8 +169,7 @@ defineExpose({
     opacity: 0;
   }
   &.is-current {
-    /* border: solid 0.5px #1890ff; */
-    box-shadow: 0 6px 26px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 26px color-mix(in oklab, var(--su-state-now) 45%, transparent);
     transform: scale(1.5);
     z-index: 1;
   }

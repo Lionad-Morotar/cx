@@ -203,21 +203,25 @@ defineExpose({
     align-items: center;
     gap: 4px;
     box-sizing: border-box;
-    width: 90px;
+    width: auto;
+    padding: 0 14px;
+    white-space: nowrap;
     height: 30px;
-    background: #f5f6fa;
-    border-radius: 15px;
+    background: var(--su-bg-inset);
+    border-radius: var(--su-radius-pill);
     font-size: 12px;
-    color: #1f1f1f;
+    color: var(--su-ink);
+    border: solid 1px transparent;
     cursor: pointer;
     transition: 0.2s;
 
     &:hover {
-      background: #1890ff16;
+      background: var(--su-state-now-soft);
     }
     &.is-active {
-      background: #1890ff;
-      color: white;
+      background: var(--su-state-now);
+      color: var(--su-ink-invert);
+      font-weight: 600;
     }
   }
 }

@@ -44,7 +44,7 @@
           <slot name="default">
             <div ref="emptyFirstRef" class="empty-con">
               <img class="image" :src="EmptyStrImage" />
-              <div class="title">暂时没有内容哦~</div>
+              <div class="title">暂无内容</div>
             </div>
           </slot>
         </div>
@@ -53,7 +53,7 @@
             <slot name="default">
               <div ref="emptySecondRef" class="empty-con">
                 <img class="image" :src="EmptyStrImage" />
-                <div class="title">暂时没有内容哦~</div>
+                <div class="title">暂无内容</div>
               </div>
             </slot>
           </div>
@@ -117,16 +117,36 @@ const styles = computed(() => {
 </script>
 
 <style>
+/* 看板卡：主题色经 props 注入 --color，顶部色带 + 同色辉光构成叙事，
+   色带为顶缘绝对定位层，不参与几何（非侧条） */
 .cx-dashboard-card {
   position: relative;
   display: grid;
-  grid-template: 70px minmax(0, 1fr) / minmax(0, 1fr);
+  grid-template: 64px minmax(0, 1fr) / minmax(0, 1fr);
   box-sizing: border-box;
-  border-radius: 8px;
-  background-color: #eff2fb;
-  box-shadow: 10px 10px 32px rgba(121, 121, 121, 0.3);
+  border-radius: var(--su-radius-card);
+  border: 1px solid var(--su-border);
+  background-color: var(--su-bg-surface);
+  box-shadow: var(--su-shadow-card);
   width: clamp(451px, 33%, 500px);
   max-width: 100%;
+  overflow: hidden;
+  transition: box-shadow var(--su-dur) var(--su-ease), border-color var(--su-dur) var(--su-ease);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--color, var(--su-accent));
+  }
+
+  &:hover {
+    box-shadow: 0 8px 28px color-mix(in oklab, var(--color, var(--su-accent)) 22%, transparent);
+    border-color: color-mix(in oklab, var(--color, var(--su-accent)) 35%, var(--su-border));
+  }
 
   .header {
     display: grid;
@@ -134,7 +154,7 @@ const styles = computed(() => {
     align-items: center;
     gap: 1em;
     padding: 0 24px;
-    padding-top: 12px;
+    padding-top: 14px;
 
     .title-con {
       display: flex;
@@ -142,9 +162,10 @@ const styles = computed(() => {
       gap: 6px;
     }
     .title {
-      font-size: 22px;
-      color: #373737;
-      font-weight: 600;
+      font-size: 20px;
+      color: var(--su-ink);
+      font-weight: 700;
+      letter-spacing: 0.02em;
     }
 
     .side-title-con {
@@ -153,12 +174,12 @@ const styles = computed(() => {
       gap: 6px;
 
       :deep(.el-icon) {
-        color: var(--color, #031d5b55);
+        color: color-mix(in oklab, var(--color, var(--su-accent)) 60%, var(--su-ink-3));
       }
 
       .side-title {
-        color: #031d5b;
-        opacity: 0.4;
+        color: var(--su-ink-2);
+        font-variant-numeric: tabular-nums;
       }
     }
     .icon-quote {
@@ -169,7 +190,7 @@ const styles = computed(() => {
         display: block;
         width: 12px;
         height: 30px;
-        background: var(--color, #031d5b);
+        background: var(--color, var(--su-accent));
         clip-path: polygon(0 0, 100% 0, 100% 50%, 0% 100%);
       }
     }
@@ -208,10 +229,16 @@ const styles = computed(() => {
         width: 200px;
       }
       .title {
-        font-size: 18px;
-        color: #373737;
+        font-size: 16px;
+        color: var(--su-ink-2);
       }
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-dashboard-card {
+    transition: none;
   }
 }
 </style>

@@ -40,14 +40,14 @@ const isCurStandupInProgress = computed(() => standup.value.state === 'IN_PROGRE
   padding: 8px 16px;
   width: auto;
   height: 40px;
-  background: #ecf1f5;
+  background: var(--su-bg-inset);
   border-radius: 20px;
 
   .avatar {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: white;
+    background: var(--su-bg-raised);
 
     img {
       width: 100%;
@@ -63,9 +63,16 @@ const isCurStandupInProgress = computed(() => standup.value.state === 'IN_PROGRE
   }
 }
 .time-stamp {
+  .time {
+    font-family: var(--su-font-display);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+  }
   .weekday {
     font-size: 20px;
     font-weight: 500;
+    color: var(--su-ink-2);
   }
 }
 </style>

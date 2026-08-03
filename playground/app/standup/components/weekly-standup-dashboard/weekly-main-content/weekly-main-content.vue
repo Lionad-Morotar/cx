@@ -332,14 +332,14 @@ defineExpose({
   box-sizing: border-box;
   padding: 18px;
   height: 100%;
-  background: #f0f2fb;
+  background: var(--su-bg-inset);
   border-radius: 8px;
-  box-shadow: 10px 10px 32px 0 rgba(121, 121, 121, 0.3);
+  box-shadow: var(--su-shadow-card);
   border-top-left-radius: 0;
 
   .issues-view-statics,
   .issues-section {
-    background: white;
+    background: var(--su-bg-raised);
     box-shadow: unset;
     border-radius: 8px;
   }
@@ -351,7 +351,7 @@ defineExpose({
     .cx-card__header {
       .cx-card__name {
         font-size: 18px;
-        color: #262626;
+        color: var(--su-ink);
         font-weight: 600;
       }
     }
@@ -381,13 +381,13 @@ defineExpose({
 
       .title {
         font-size: 18px;
-        color: #262626;
+        color: var(--su-ink);
         font-weight: 600;
       }
 
       .side-title {
         font-size: 13px;
-        color: #838991;
+        color: var(--su-ink-3);
         font-weight: 400;
       }
     }
@@ -407,7 +407,7 @@ defineExpose({
     .el-input__wrapper {
       border-radius: 8px;
       box-shadow: none;
-      border: solid 1px #e5e8ef;
+      border: solid 1px var(--su-bg-inset);
     }
   }
 }
