@@ -1,0 +1,212 @@
+/* 展示字体：Archivo 可变子集（数字 + 拉丁 + 少量符号，见 scripts/subset-display-font.mjs）。
+   保留 wght/wdth 双轴，供大字号展示排版调字重与字宽 */
+@font-face {
+  font-family: 'Standup Display';
+  src: url('../assets/fonts/standup-display.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+
+/* ==========================================================================
+   standup 双主题 token 系统
+   --------------------------------------------------------------------------
+   色彩策略：Full palette。中性色统一向品牌色相（270，紫灰）微倾，不用纯黑白；
+   五个命名角色承担状态叙事：
+     LIVE      进行中 / 品牌主色（高能电绿）
+     DONE      已结束（冷调沉淀蓝）
+     NOW       今天 / 当前（高亮天青）
+     ALERT     问题 / 风险（珊瑚红）
+     NARRATIVE 昨天 / 过去（琥珀）
+   主题机制：@nuxtjs/color-mode 在 <html> 挂 .dark 类；本文件只声明变量与
+   color-scheme，不写组件样式。所有值用 OKLCH，接近亮度极值时压低彩度。
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- 表面与墨色（浅底：冷调纸白） --- */
+  --su-bg-page: oklch(0.965 0.006 270);
+  --su-bg-surface: oklch(0.992 0.004 270);
+  --su-bg-raised: oklch(0.999 0.003 270);
+  --su-bg-inset: oklch(0.945 0.008 270);
+  --su-bg-overlay: oklch(0.992 0.004 270 / 0.92);
+
+  --su-ink: oklch(0.24 0.02 270);
+  --su-ink-2: oklch(0.45 0.02 270);
+  --su-ink-3: oklch(0.52 0.015 270);
+  --su-ink-invert: oklch(0.985 0.004 270);
+
+  --su-border: oklch(0.55 0.03 270 / 0.18);
+  --su-border-strong: oklch(0.55 0.03 270 / 0.34);
+  --su-divider: oklch(0.55 0.03 270 / 0.1);
+
+  --su-ring: oklch(0.45 0.15 250);
+  --su-shadow-card: 0 1px 2px oklch(0.3 0.03 270 / 0.06), 0 4px 16px oklch(0.3 0.03 270 / 0.05);
+  --su-shadow-raised: 0 2px 6px oklch(0.3 0.03 270 / 0.1), 0 12px 32px oklch(0.3 0.03 270 / 0.1);
+
+  /* --- 状态角色（浅底：L≈0.45-0.5 保白字对比 ≥4.5） --- */
+  --su-state-live: oklch(0.47 0.16 145);
+  --su-state-done: oklch(0.45 0.14 250);
+  --su-state-now: oklch(0.47 0.12 230);
+  --su-state-alert: oklch(0.47 0.17 25);
+  --su-state-narrative: oklch(0.5 0.14 60);
+  --su-state-pending: oklch(0.45 0.02 270);
+  --su-state-teal: oklch(0.47 0.11 200);
+
+  /* soft：状态色的浅底形态（chip / 悬浮底） */
+  --su-state-live-soft: oklch(0.52 0.17 145 / 0.12);
+  --su-state-done-soft: oklch(0.48 0.14 250 / 0.1);
+  --su-state-now-soft: oklch(0.5 0.12 230 / 0.1);
+  --su-state-alert-soft: oklch(0.52 0.18 25 / 0.1);
+  --su-state-narrative-soft: oklch(0.55 0.14 60 / 0.12);
+  --su-state-pending-soft: oklch(0.55 0.02 270 / 0.08);
+
+  /* glow：悬浮 / 呼吸信号的光晕 */
+  --su-state-live-glow: oklch(0.52 0.17 145 / 0.28);
+  --su-state-done-glow: oklch(0.48 0.14 250 / 0.24);
+  --su-state-now-glow: oklch(0.5 0.12 230 / 0.24);
+  --su-state-alert-glow: oklch(0.52 0.18 25 / 0.24);
+
+  /* --- 品牌主操作色 = LIVE --- */
+  --su-accent: var(--su-state-live);
+  --su-accent-soft: var(--su-state-live-soft);
+
+  /* --- 形状 / 动效 / 字体 --- */
+  --su-radius-card: 12px;
+  --su-radius-control: 8px;
+  --su-radius-pill: 999px;
+
+  --su-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --su-dur: 240ms;
+  --su-dur-slow: 420ms;
+
+  --su-font-display:
+    'Standup Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* --- 表面与墨色（暗底：紫灰炭黑，Arc 式冷暗） --- */
+  --su-bg-page: oklch(0.165 0.018 270);
+  --su-bg-surface: oklch(0.21 0.02 270);
+  --su-bg-raised: oklch(0.25 0.022 270);
+  --su-bg-inset: oklch(0.145 0.016 270);
+  --su-bg-overlay: oklch(0.18 0.02 270 / 0.92);
+
+  --su-ink: oklch(0.93 0.012 270);
+  --su-ink-2: oklch(0.72 0.015 270);
+  --su-ink-3: oklch(0.65 0.016 270);
+  --su-ink-invert: oklch(0.17 0.02 270);
+
+  --su-border: oklch(0.85 0.02 270 / 0.12);
+  --su-border-strong: oklch(0.85 0.02 270 / 0.24);
+  --su-divider: oklch(0.85 0.02 270 / 0.07);
+
+  --su-ring: oklch(0.78 0.13 230);
+  --su-shadow-card: 0 1px 2px oklch(0 0 0 / 0.3), 0 4px 16px oklch(0 0 0 / 0.25);
+  --su-shadow-raised: 0 2px 6px oklch(0 0 0 / 0.4), 0 12px 32px oklch(0 0 0 / 0.35);
+
+  /* --- 状态角色（暗底：提亮加彩，信号灯质感） --- */
+  --su-state-live: oklch(0.82 0.2 145);
+  --su-state-done: oklch(0.7 0.13 250);
+  --su-state-now: oklch(0.78 0.12 230);
+  --su-state-alert: oklch(0.72 0.16 25);
+  --su-state-narrative: oklch(0.8 0.14 75);
+  --su-state-pending: oklch(0.62 0.02 270);
+  --su-state-teal: oklch(0.78 0.11 200);
+
+  --su-state-live-soft: oklch(0.82 0.2 145 / 0.14);
+  --su-state-done-soft: oklch(0.7 0.13 250 / 0.12);
+  --su-state-now-soft: oklch(0.78 0.12 230 / 0.12);
+  --su-state-alert-soft: oklch(0.72 0.16 25 / 0.12);
+  --su-state-narrative-soft: oklch(0.8 0.14 75 / 0.14);
+  --su-state-pending-soft: oklch(0.62 0.02 270 / 0.1);
+
+  --su-state-live-glow: oklch(0.82 0.2 145 / 0.35);
+  --su-state-done-glow: oklch(0.7 0.13 250 / 0.3);
+  --su-state-now-glow: oklch(0.78 0.12 230 / 0.3);
+  --su-state-alert-glow: oklch(0.72 0.16 25 / 0.3);
+
+  --su-accent: var(--su-state-live);
+  --su-accent-soft: var(--su-state-live-soft);
+}
+
+
+/* ==========================================================================
+   入场编排：分组与卡片单次错落上浮；仅 transform/opacity，布局属性不动。
+   prefers-reduced-motion 下整体关闭
+   ========================================================================== */
+@keyframes su-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.standup-list-page .cx-folder-container,
+.days-con > .standup-card,
+.daily-standup-dashboard-page .cx-dashboard-card,
+.weekly-standup-dashboard-page .cx-dashboard-card {
+  animation: su-rise var(--su-dur-slow) var(--su-ease) both;
+}
+
+.standup-list-page .cx-folder-container:nth-child(2),
+.days-con > .standup-card:nth-child(2),
+.cx-dashboard-card:nth-of-type(2) {
+  animation-delay: 60ms;
+}
+.standup-list-page .cx-folder-container:nth-child(3),
+.days-con > .standup-card:nth-child(3),
+.cx-dashboard-card:nth-of-type(3) {
+  animation-delay: 120ms;
+}
+.days-con > .standup-card:nth-child(4) { animation-delay: 180ms; }
+.days-con > .standup-card:nth-child(5) { animation-delay: 240ms; }
+.days-con > .standup-card:nth-child(6) { animation-delay: 300ms; }
+.days-con > .standup-card:nth-child(7) { animation-delay: 360ms; }
+
+/* 暗色下浅色空态插画压光，避免贴纸感 */
+.dark .cx-dashboard-card .empty-con .image,
+.dark .cx-todo-card .empty-con .image {
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .standup-list-page .cx-folder-container,
+  .days-con > .standup-card,
+  .daily-standup-dashboard-page .cx-dashboard-card,
+  .weekly-standup-dashboard-page .cx-dashboard-card {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   element-plus 暗色桥接：EP 外观经官方 CSS 变量定制（非工具类覆盖，
+   不触碰 cx-ep 层序契约）。light 值即 EP 默认，无需重复声明
+   ========================================================================== */
+.dark {
+  --el-bg-color: var(--su-bg-surface);
+  --el-bg-color-overlay: var(--su-bg-raised);
+  --el-bg-color-page: var(--su-bg-page);
+  --el-fill-color-blank: var(--su-bg-surface);
+  --el-fill-color-light: var(--su-bg-inset);
+  --el-text-color-primary: var(--su-ink);
+  --el-text-color-regular: var(--su-ink-2);
+  --el-text-color-secondary: var(--su-ink-3);
+  --el-border-color: var(--su-border-strong);
+  --el-border-color-light: var(--su-border);
+  --el-border-color-lighter: var(--su-divider);
+  --el-color-primary: var(--su-state-live);
+  --el-color-primary-light-3: color-mix(in oklab, var(--su-state-live) 70%, var(--su-bg-surface));
+  --el-color-primary-light-5: color-mix(in oklab, var(--su-state-live) 50%, var(--su-bg-surface));
+  --el-color-primary-light-7: color-mix(in oklab, var(--su-state-live) 30%, var(--su-bg-surface));
+  --el-color-primary-light-9: color-mix(in oklab, var(--su-state-live) 12%, var(--su-bg-surface));
+  --el-color-primary-dark-2: color-mix(in oklab, var(--su-state-live) 80%, black);
+}

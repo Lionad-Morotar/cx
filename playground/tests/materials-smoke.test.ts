@@ -16,10 +16,10 @@ const materialEntries = Object.entries(Materials).filter(
 ][]
 
 describe('站会物料 defineCxComponent 契约', () => {
-  it('32 个物料全部带 _cx_meta 且 key 唯一', () => {
-    expect(materialEntries.length).toBe(32)
+  it('33 个物料全部带 _cx_meta 且 key 唯一', () => {
+    expect(materialEntries.length).toBe(33)
     const keys = materialEntries.map(([, m]) => m._cx_meta.key)
-    expect(new Set(keys).size).toBe(32)
+    expect(new Set(keys).size).toBe(33)
     keys.forEach((k) => expect(k).toMatch(/^cx-[a-z0-9-]+$/))
   })
 

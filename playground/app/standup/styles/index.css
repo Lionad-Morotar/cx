@@ -7,19 +7,21 @@
   --el-font-size-base: 13px;
 }
 body {
-  color: #262626;
+  color: var(--su-ink);
+  background: var(--su-bg-page);
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
 }
 
 a {
-  color: #1890ff;
+  color: var(--su-state-now);
   &:hover {
-    color: #0080f6;
+    opacity: 0.85;
+    text-decoration: underline;
   }
   &:active {
-    opacity: 0.9;
+    opacity: 0.75;
   }
 }
 
@@ -33,7 +35,7 @@ body {
 
 #__nuxt {
   display: grid;
-  background: #f7f7f7;
+  background: var(--su-bg-page);
   overflow: hidden;
   box-sizing: border-box;
   width: 100%;
@@ -42,7 +44,7 @@ body {
 
 /* 站会页面容器：替代原微前端的 .layout-content-wrapper */
 .standup-layout-wrapper {
-  background: #f7f7f7;
+  background: var(--su-bg-page);
   box-sizing: border-box;
   padding: 12px;
   width: 100%;
@@ -55,7 +57,7 @@ body {
   position: absolute;
   inset: 0;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--su-bg-overlay);
   padding: 16px;
   overflow: hidden;
 }
@@ -74,9 +76,9 @@ body {
   align-items: center;
   width: 40px;
   height: 40px;
-  background: #df963f;
-  color: white;
-  border-radius: 4px;
+  background: var(--su-state-narrative);
+  color: var(--su-ink-invert);
+  border-radius: var(--su-radius-control);
   flex-shrink: 0;
 
   .page-icon {
@@ -86,7 +88,7 @@ body {
     height: 1em;
     vertical-align: -0.18em;
     font-size: 27px;
-    color: white;
+    color: inherit;
     fill: currentColor;
     overflow: hidden;
   }
@@ -94,7 +96,7 @@ body {
 
 /* atomic：聚焦描边（outline 不受 overflow:hidden 裁切） */
 .is-focus__useFocus {
-  outline: 2px solid #000;
+  outline: 2px solid var(--su-ring);
   outline-offset: -2px;
   transition: 0.15s;
 

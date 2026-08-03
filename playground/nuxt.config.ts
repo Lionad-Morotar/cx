@@ -16,7 +16,12 @@ export default defineNuxtConfig({
   ssr: false,
   // vtu 样式不在此手写：cx-nuxt 模块在启用 vtu bundle 时条件注入 @lionad/vtu-components/style.css
   // （其 @source "." 指令由宿主 Tailwind v4 处理，扫描 vtu dist 生成工具类）
-  css: ['~/assets/css/main.css', '@lionad/cx-comps/style.css', '~/standup/styles/index.css'],
+  css: [
+    '~/assets/css/main.css',
+    '@lionad/cx-comps/style.css',
+    '~/standup/styles/theme.css',
+    '~/standup/styles/index.css',
+  ],
   devServer: {
     port: 3209,
     host: '0.0.0.0',
