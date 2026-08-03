@@ -6,6 +6,26 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.1] - 2026-08-03
+
+### Added
+
+- `@lionad/cx-stream`：声明式流式触发器 DSL 新增 scalar 标量形态——短属性与标量主体物料可声明式流式揭示，含标量闭合事件扫描器 `scanStreamEvents`、帧节流与管线闭合事件回退
+- `@lionad/cx-stream`：流式管线终态兜底——`scanPath` 主路径完整 JSON 终态短路，标量回退输入终态直出完整帧，任意输入终止形态下组件树终态完整可查
+- `@lionad/cx-comps-vtu`：29 件物料全量流式声明——短属性与长主体 scalar、长主体 wrapper `StreamSkeleton` 骨架（含 article 正文骨架），流式注册全汇聚
+- `@lionad/cx-comps`：9 件基础物料标量主体流式声明与触发注册
+- `@lionad/cx-comps-nuxt-ui-v4`：alert / avatar / banner / empty / error / user 六件标量主体流式声明与触发注册
+- `@lionad/cx-comps-element-plus`：10 件物料流式判定声明，汇聚迁移新 sections DSL
+- `@lionad/cx-comps-naive-ui`：12 件物料三形态（array / scalar / region）流式声明与注册汇聚
+- [internal] playground：全物料包 variants 六分类深化展示与回放链路逐件验证（vtu / comps / nuxt-ui-v4 / element-plus / naive-ui）
+
+### Fixed
+
+- `@lionad/cx-comps-nuxt-ui-v4`：U* 离线 stub 作用域槽改为对象调用
+- `@lionad/cx-comps-nuxt-ui-v2`：table `useAttrs` 交叉类型收窄为可达声明
+- [internal] playground：uuid 升级 ^14 修复 vitest ESM 互操作崩溃，typecheck 切换 vue-tsgo；vite / vitest 别名经 `fileURLToPath` 可移植化
+- [internal] release：dry-run 逐包实测 tarball 完整性，拦截打包工具链丢产物
+
 ## [0.1.0-alpha.0] - 2026-07-31
 
 首次公开发布（alpha）：schema 驱动的 Vue 组件渲染系统全链路首发——从低代码组件定义（schema）到运行时渲染，含核心渲染链、流式渲染管线、Nuxt 模块与六套物料包。
