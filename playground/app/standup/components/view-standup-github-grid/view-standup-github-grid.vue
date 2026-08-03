@@ -283,7 +283,7 @@ const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
         top: 50%;
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
-        border-top: 4px solid #fe4d4f;
+        border-top: 4px solid var(--su-state-alert);
         transform: translate(-50%, -50%);
       }
     }
@@ -303,41 +303,41 @@ const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
     height: var(--item-size);
     border: solid 2px transparent;
     background: currentColor;
-    color: #ececef;
+    color: var(--su-bg-inset);
     cursor: pointer;
 
     &.is-selected,
     &:hover {
-      border-color: #666;
+      border-color: var(--su-ink-3);
     }
     &:active {
-      border-color: #333;
+      border-color: var(--su-ink);
     }
 
     &.is-today.is-today {
-      border-color: #fe4d4fff;
+      border-color: var(--su-state-alert);
 
       &:hover {
-        border-color: #fe5a5d;
+        border-color: color-mix(in oklab, var(--su-state-alert) 80%, white);
       }
       &:active {
-        border-color: #ff6c6e;
+        border-color: color-mix(in oklab, var(--su-state-alert) 65%, white);
       }
     }
 
     &.is-UNKNOWN {
-      color: #ececef;
+      color: var(--su-bg-inset);
       cursor: revert;
     }
     &.is-IN_PROGRESS {
-      color: #73d13d;
+      color: var(--su-state-live);
 
       &:hover {
-        border-color: #999;
+        border-color: var(--su-border-strong);
       }
     }
     &.is-ENDED {
-      color: #1678ff;
+      color: var(--su-state-done);
     }
   }
 
@@ -355,7 +355,7 @@ const isToday = (day: Dayjs) => dayjs().isSame(day, 'day')
 
     .label {
       font-size: 12px;
-      color: #666;
+      color: var(--su-ink-2);
     }
   }
 }

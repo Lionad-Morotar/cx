@@ -39,30 +39,45 @@ const groupByType = computed<'week' | 'month' | 'year'>(
 <style scoped>
 .group-header {
   display: grid;
-  grid-template: 24px / auto auto 1fr auto;
+  grid-template: 28px / auto auto 1fr auto;
   box-sizing: border-box;
-  padding: 8px 12px;
+  padding: 10px 16px;
   align-items: center;
   gap: 12px;
   width: 100%;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--su-dur) var(--su-ease);
+
+  &:hover {
+    background: var(--su-bg-raised);
+  }
 
   .icon {
-    font-size: 18px;
+    font-size: 16px;
+    color: var(--su-ink-3);
   }
   .group-con-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: #262626;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--su-ink);
   }
   .group-range {
     display: flex;
     align-items: center;
-    color: #999;
+    color: var(--su-ink-3);
+    font-variant-numeric: tabular-nums;
 
     .sep {
-      margin: 0 0.2em;
-      font-size: 18px;
+      margin: 0 0.3em;
+      font-size: 12px;
     }
+  }
+  .icon-open,
+  .icon-close {
+    color: var(--su-ink-3);
+    font-size: 12px;
   }
   .icon-collapse {
     font-size: 12px;

@@ -138,6 +138,8 @@ const displayMeetingOrder = (idx: number) => {
 </script>
 
 <style scoped>
+/* 状态色映射：进行中=LIVE / 已结束=DONE / 未进行=PENDING。
+   边框恒 1px 占位，悬浮只换颜色与辉光，几何尺寸不跳变 */
 .standup-card {
   position: relative;
 }
@@ -145,10 +147,13 @@ const displayMeetingOrder = (idx: number) => {
 .standup-card.is-card {
   display: grid;
   grid-template: 32px 118px / 100%;
-  background: white;
-  border-radius: 4px;
-  border: solid 1px transparent;
-  transition: 0.2s;
+  background: var(--su-bg-raised);
+  border-radius: var(--su-radius-card);
+  border: solid 1px var(--su-border);
+  transition:
+    border-color var(--su-dur) var(--su-ease),
+    box-shadow var(--su-dur) var(--su-ease),
+    translate var(--su-dur) var(--su-ease);
   overflow: hidden;
 
   &.is-week-meeting {
@@ -160,21 +165,32 @@ const displayMeetingOrder = (idx: number) => {
     cursor: pointer;
 
     &:hover {
-      border-color: #5c9ef6;
+      translate: 0 -2px;
+      box-shadow: var(--su-shadow-raised);
     }
     &:active {
-      border-color: #388af7;
+      translate: 0 0;
     }
   }
 
   &.is-IN_PROGRESS {
+    border-color: color-mix(in oklab, var(--su-state-live) 45%, transparent);
+
     .day-header {
-      background: #73d13d;
+      background: var(--su-state-live);
+    }
+    &:hover {
+      border-color: var(--su-state-live);
+      box-shadow: 0 8px 28px var(--su-state-live-glow);
     }
   }
   &.is-ENDED {
     .day-header {
-      background: #1678ff;
+      background: var(--su-state-done);
+    }
+    &:hover {
+      border-color: var(--su-state-done);
+      box-shadow: 0 8px 28px var(--su-state-done-glow);
     }
   }
 
@@ -183,17 +199,25 @@ const displayMeetingOrder = (idx: number) => {
     justify-content: space-between;
     align-items: center;
     padding: 0 10px;
-    background: #8c8c8c;
+    background: var(--su-state-pending);
 
     .time,
-    :deep(.time),
-    .progress-state {
-      color: white;
-      font-size: 14px;
-    }
-    .time,
     :deep(.time) {
-      font-weight: bold;
+      color: var(--su-ink-invert);
+      font-family: var(--su-font-display);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-state {
+      color: var(--su-ink-invert);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 0.15em 0.6em;
+      border-radius: var(--su-radius-pill);
+      background: color-mix(in oklab, var(--su-ink-invert) 22%, transparent);
     }
   }
 
@@ -209,12 +233,13 @@ const displayMeetingOrder = (idx: number) => {
     .label {
       display: grid;
       place-items: center;
-      color: #666;
+      color: var(--su-ink-3);
       font-size: 14px;
     }
     .value {
-      color: #222;
-      font-size: 14px;
+      color: var(--su-ink);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
     }
   }
 
@@ -227,22 +252,25 @@ const displayMeetingOrder = (idx: number) => {
     position: absolute;
     bottom: 8px;
     right: 8px;
+    font-family: var(--su-font-display);
     font-size: 28px;
-    font-weight: bold;
-    color: #f0f0f0;
-    fill: #f0f0f0;
+    font-weight: 800;
+    font-stretch: 110%;
+    color: color-mix(in oklab, var(--su-ink) 8%, transparent);
+    fill: color-mix(in oklab, var(--su-ink) 8%, transparent);
     line-height: 28px;
     letter-spacing: 1.5px;
+    pointer-events: none;
 
     .icon {
       width: 32px;
       height: 32px;
-      color: #f0f0f0;
-      fill: #f0f0f0;
+      color: inherit;
+      fill: inherit;
     }
     :deep(svg) {
-      color: #f0f0f0;
-      fill: #f0f0f0;
+      color: inherit;
+      fill: inherit;
     }
   }
 }
@@ -252,48 +280,70 @@ const displayMeetingOrder = (idx: number) => {
   gap: 2em;
   padding: 8px 12px;
   align-items: center;
-  background: white;
-  border-radius: 4px;
-  border: solid 1px transparent;
-  transition: 0.2s;
+  background: var(--su-bg-raised);
+  border-radius: var(--su-radius-control);
+  border: solid 1px var(--su-border);
+  transition:
+    border-color var(--su-dur) var(--su-ease),
+    box-shadow var(--su-dur) var(--su-ease);
 
   &.is-IN_PROGRESS,
   &.is-ENDED {
     cursor: pointer;
 
     &:hover {
-      border-color: #5c9ef6;
+      border-color: var(--su-border-strong);
+      box-shadow: var(--su-shadow-card);
     }
-    &:active {
-      border-color: #388af7;
-    }
+  }
+  &.is-IN_PROGRESS {
+    border-color: color-mix(in oklab, var(--su-state-live) 45%, transparent);
   }
 
   .icon-face {
     font-size: 14px;
   }
+  &.is-IN_PROGRESS .icon-face {
+    color: var(--su-state-live);
+  }
+  &.is-ENDED .icon-face {
+    color: var(--su-state-done);
+  }
   .time {
-    color: #333;
+    color: var(--su-ink);
+    font-variant-numeric: tabular-nums;
   }
   .time-range {
     display: flex;
     align-items: center;
     gap: 0.2em;
-    font-size: 14px;
-    color: #333;
+    font-size: 13px;
+    color: var(--su-ink-2);
+    font-variant-numeric: tabular-nums;
 
     .sep {
       display: inline-block;
       width: 0.2em;
     }
     .label {
-      color: #999;
+      color: var(--su-ink-3);
     }
   }
 
   :deep(.el-tag),
   :deep([class*='badge']) {
     font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .standup-card.is-card,
+  .standup-card.is-list-item {
+    transition: none;
+  }
+  .standup-card.is-card.is-IN_PROGRESS:hover,
+  .standup-card.is-card.is-ENDED:hover {
+    translate: none;
   }
 }
 </style>

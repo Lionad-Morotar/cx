@@ -98,8 +98,10 @@ const countClass = computed(() => {
   }
 
   .empty-tip {
-    padding-left: 25px;
-    color: #777;
+    grid-column: 1 / -1;
+    padding: 20px 25px;
+    color: var(--su-ink-3);
+    letter-spacing: 0.02em;
   }
 }
 </style>

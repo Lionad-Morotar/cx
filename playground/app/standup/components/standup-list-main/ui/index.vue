@@ -42,21 +42,39 @@ const groupByType = computed<'week' | 'month' | 'year'>(
 .left-scroll-area {
   grid-area: left;
   display: grid;
-  grid-template-rows: 78px auto 78px minmax(0, 1fr);
+  /* 标题行收窄为标签节奏，把垂直空间让给分组卡片 */
+  grid-template-rows: 36px auto 52px minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     'h1'
     'current-standup-group'
     'h2'
     'history-standups';
+
+  .list-section-title.is-second {
+    align-self: end;
+  }
 }
 
+/* 分区标题：小字号字距拉开的标签式层级，与卡片内容形成大小对比 */
 .list-section-title {
   display: flex;
   align-items: center;
-  font-size: 18px;
-  font-weight: bold;
-  color: #262626;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--su-ink-3);
+  user-select: none;
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 3px;
+    background: var(--su-accent);
+    flex-shrink: 0;
+  }
 
   &.is-first {
     grid-area: h1;

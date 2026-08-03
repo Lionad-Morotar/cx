@@ -221,9 +221,18 @@ defineExpose(compExpose)
 <style>
 .cx-folder-container {
   position: relative;
+  background: var(--su-bg-surface);
+  border: 1px solid var(--su-border);
+  border-radius: var(--su-radius-card);
+  overflow: hidden;
+  transition: border-color var(--su-dur) var(--su-ease);
+
+  &:hover {
+    border-color: var(--su-border-strong);
+  }
 
   /* 没有内容时隐藏缩放的 icon */
-  &:has(> .c-folder-container__content-wrapper:empty) {
+  &:has(> .cx-folder-container__content-wrapper:empty) {
     .cx-folder-container__header {
       .icon-preset {
         display: none;

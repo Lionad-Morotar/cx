@@ -48,24 +48,32 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 成员栏：右侧 sticky 存在感，视觉重量低于主区。
+   左缘 1px 分隔线为结构性分割（非彩色侧条），颜色走 token */
 .project-members-section {
   grid-area: project-members;
   position: relative;
-  margin-top: 78px;
+  padding-top: 6px;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
 
   &::after {
     content: '';
     position: absolute;
     top: 0;
-    left: 0px;
+    left: 0;
     height: 85%;
-    border-left: solid 1px #d9d9d9;
+    border-left: solid 1px var(--su-divider);
   }
 
   .member-section-title {
-    padding: 0 24px 0 32px;
-    color: #b4b4b4;
-    font-size: 14px;
+    padding: 0 24px 10px 32px;
+    color: var(--su-ink-3);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    user-select: none;
   }
 
   .project-members-con {
@@ -77,16 +85,20 @@ onMounted(() => {
     .member {
       display: flex;
       align-items: center;
-      padding: 12px;
+      padding: 10px 12px;
       position: relative;
       margin-left: -12px;
       gap: 12px;
-
-      &:first-child {
-        margin-top: 12px;
-      }
+      border-radius: var(--su-radius-control);
+      border: solid 1px transparent;
+      transition:
+        background var(--su-dur) var(--su-ease),
+        border-color var(--su-dur) var(--su-ease);
 
       &:hover {
+        background: var(--su-bg-surface);
+        border-color: var(--su-border);
+
         :deep(.drag-handler) {
           opacity: 1;
         }
@@ -96,10 +108,11 @@ onMounted(() => {
         position: absolute;
         left: -0.6em;
         opacity: 0;
-        transition: 0.2s;
+        transition: opacity var(--su-dur) var(--su-ease);
         padding: 3px;
         cursor: grab;
         user-select: none;
+        color: var(--su-ink-3);
       }
 
       .avatar {
@@ -110,9 +123,10 @@ onMounted(() => {
         border: solid 1.5px transparent;
         overflow: hidden;
         cursor: grab;
+        flex-shrink: 0;
 
         &:hover {
-          border: solid 1.5px bisque;
+          border-color: var(--su-state-narrative);
         }
 
         img {
@@ -124,23 +138,25 @@ onMounted(() => {
 
       .name-con {
         cursor: pointer;
+        min-width: 0;
 
         &:hover {
           text-decoration: underline;
           text-underline-offset: 5px;
           text-decoration-thickness: 1.5px;
-          text-decoration-color: bisque;
+          text-decoration-color: var(--su-state-narrative);
         }
 
         .name {
-          color: #333;
+          color: var(--su-ink);
+          font-weight: 500;
         }
         .username {
           margin-left: 4px;
         }
         .username,
         .id {
-          color: #999;
+          color: var(--su-ink-3);
         }
       }
     }

@@ -43,29 +43,29 @@ const meetingTypeName = computed(
 .list-con {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: clamp(10px, 1vw, 16px);
   box-sizing: border-box;
   padding: 0 2em 0 0 !important;
   min-height: 130px;
   width: 100%;
 
   .empty-group-tip {
-    font-size: 16px;
-    color: #666;
+    font-size: 14px;
+    color: var(--su-ink-3);
+    letter-spacing: 0.02em;
   }
 
   /* 折叠/展开态样式：is-fold/is-unfold 在 folder-container 根上，
-     其视觉（背景、卡片与图标显隐）经 :deep 跨物料作用到后代 */
+     其视觉（背景、卡片与图标显隐）经 :deep 跨物料作用到后代。
+     折叠态退为沉底行（inset），展开态浮为卡片表面（surface） */
   :deep(.cx-folder-container) {
     display: flex;
     flex-direction: column;
     min-width: 500px;
-    border-radius: 4px;
-    transition: 0.2s;
     cursor: pointer;
 
     &.is-fold {
-      background-color: #f5f5f5;
+      background-color: var(--su-bg-inset);
 
       .days-con {
         display: none;
@@ -75,7 +75,7 @@ const meetingTypeName = computed(
       }
     }
     &.is-unfold {
-      background-color: #eff2fb;
+      background-color: var(--su-bg-surface);
       cursor: revert;
 
       .group-header {
