@@ -6,6 +6,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- `@lionad/cx-render`：TS7 下 30 处类型错误清零（hooks payload 对齐注册表、slots 函数签名断言到 SlotContext 调用约定、watch 源数组 tuple 化等）；`@lionad/cx-vue` 的 `useMarkRaw` 签名与「空值直通」实现对齐（`x: T | undefined`）
+- [internal] build：根构建自指空转修复（`vp run build` 循环检测致产物长期为开发残留，改 `pnpm -r` 拓扑递归）；release 全链测试双跑修复（pnpm 与 vp 双生命周期叠加）
+
 ## [0.1.0-alpha.1] - 2026-08-03
 
 ### Added
@@ -23,8 +28,6 @@
 
 - `@lionad/cx-comps-nuxt-ui-v4`：U* 离线 stub 作用域槽改为对象调用
 - `@lionad/cx-comps-nuxt-ui-v2`：table `useAttrs` 交叉类型收窄为可达声明
-- `@lionad/cx-render`：TS7 下 30 处类型错误清零（hooks payload 对齐注册表、slots 函数签名断言到 SlotContext 调用约定、watch 源数组 tuple 化等）；`@lionad/cx-vue` 的 `useMarkRaw` 签名与「空值直通」实现对齐（`x: T | undefined`）
-- [internal] build：根构建自指空转修复（`vp run build` 循环检测致产物长期为开发残留，改 `pnpm -r` 拓扑递归）；release 全链测试双跑修复（pnpm 与 vp 双生命周期叠加）
 - [internal] playground：uuid 升级 ^14 修复 vitest ESM 互操作崩溃，typecheck 切换 vue-tsgo；vite / vitest 别名经 `fileURLToPath` 可移植化
 - [internal] release：dry-run 逐包实测 tarball 完整性，拦截打包工具链丢产物
 
