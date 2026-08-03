@@ -36,3 +36,12 @@ body {
   height: 100%;
   overflow: hidden;
 }
+
+/* vtu 的 shadcn token 以 unlayered :root 声明 --color-primary/--color-secondary，
+   unlayered 赢过 Nuxt UI 的 @layer theme 映射（层优先于 import 顺序），导致 UButton
+   bg-primary 落到 shadcn 静态色。此处同为 unlayered 且源序最后，反向映射回 Nuxt UI
+   语义 token；语义 token 随 .dark 自切换，双主题免维护 */
+:root {
+  --color-primary: var(--ui-color-primary-500);
+  --color-secondary: var(--ui-color-secondary-500);
+}
