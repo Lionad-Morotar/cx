@@ -213,7 +213,7 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
   padding-top: 26px;
   border-radius: 8px;
   border: solid 0 white;
-  background: white;
+  background: var(--su-bg-raised);
   cursor: revert;
 
   &.anim-blink {
@@ -224,21 +224,21 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
     filter: brightness(0.9);
   }
   &.is-due-date-today {
-    background: #fff2f1;
-    border: solid 2px #fe0000;
+    background: var(--su-state-alert-soft);
+    border: solid 2px var(--su-state-alert);
 
     &.is-closed {
-      background: white;
-      border: solid 2px #f3b5b4;
+      background: var(--su-bg-raised);
+      border: solid 2px color-mix(in oklab, var(--su-state-alert) 16%, var(--su-bg-surface));
 
       .handler {
-        background: #f3b5b4;
+        background: color-mix(in oklab, var(--su-state-alert) 16%, var(--su-bg-surface));
       }
     }
   }
   &.is-due-date-in-two-days {
-    background: #fef7e5;
-    border: solid 2px #fbae16;
+    background: var(--su-state-narrative-soft);
+    border: solid 2px var(--su-state-narrative);
   }
 
   .handler {
@@ -259,12 +259,12 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
   }
   &.is-due-date-today {
     .handler {
-      background: #fe0000;
+      background: var(--su-state-alert);
     }
   }
   &.is-due-date-in-two-days {
     .handler {
-      background: #fbae16;
+      background: var(--su-state-narrative);
     }
   }
 
@@ -279,17 +279,17 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
     height: 16px;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
-    background: white;
+    background: var(--su-bg-raised);
     overflow: hidden;
 
     .progress {
       position: relative;
       flex: 1;
-      background: var(--color, #e8e8e8);
+      background: var(--color, var(--su-border));
       clip-path: polygon(0% 0%, calc(100% - 5px) 0%, 100% 50%, calc(100% - 5px) 100%, 0% 100%);
 
       &.is-disabled {
-        background: #e8e8e8;
+        background: var(--su-border);
       }
       &.is-active {
         &::after {
@@ -305,7 +305,7 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
         }
 
         &.in-requirement {
-          --color: #fae08f;
+          --color: color-mix(in oklab, var(--su-state-narrative) 45%, var(--su-bg-raised));
         }
         &.in-design {
           --color: #f7cb50;
@@ -382,12 +382,12 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
     height: 20px;
     border: solid 2px white;
     border-radius: 50%;
-    background: #f2f2f2;
+    background: var(--su-bg-inset);
     margin-right: -5px;
   }
   .gitlab-project-url {
     font-size: 13px;
-    color: #b4b4b4;
+    color: var(--su-ink-3);
   }
   .labels {
     display: flex;
@@ -406,7 +406,7 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
         'Noto Color Emoji';
       color: white;
       --color: #888;
-      background: white;
+      background: var(--su-bg-raised);
       border: solid 1px var(--color);
       color: var(--color);
 
@@ -414,10 +414,10 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
         --color: #ed9121;
       }
       &[data-gitlab-label-type^='state'] {
-        --color: #808080;
+        --color: var(--su-ink-3);
       }
       &[data-gitlab-label-text^='state: waiting-for-pre-issues'] {
-        --color: #ff0000;
+        --color: var(--su-state-alert);
       }
       &[data-gitlab-label-type^='type'] {
         --color: #009966;
@@ -435,14 +435,14 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
         --color: #3cb371;
       }
       &[data-gitlab-label-text^='priority: high'] {
-        --color: #ff0000;
+        --color: var(--su-state-alert);
       }
       &[data-gitlab-label-text^='priority: medium'] {
         --color: #fc7878;
       }
       &[data-gitlab-label-text^='priority: low'] {
         --color: #fbc8c8;
-        color: #333;
+        color: var(--su-ink);
       }
       &[data-gitlab-label-type^='test-estimate'] {
         --color: #c39953;
@@ -460,19 +460,19 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
         --color: #d1518a;
       }
       &[data-gitlab-label-text^='in: meta'] {
-        --color: #009193;
+        --color: var(--su-state-teal);
       }
       &[data-gitlab-label-text^='in: requirement'] {
         --color: #00b140;
       }
       &[data-gitlab-label-text^='in: tenant'] {
-        --color: #009193;
+        --color: var(--su-state-teal);
       }
       &[data-gitlab-label-type^='comp'] {
         --color: #05b09d;
       }
       &[data-gitlab-label-text^='effort-'] {
-        --color: #808080;
+        --color: var(--su-ink-3);
       }
     }
   }
@@ -489,19 +489,19 @@ emitter.on('highlight-issue-by-gitlab-id', checkBlink as any)
 
 @keyframes blink {
   0% {
-    background: white;
+    background: var(--su-bg-raised);
     border-radius: 4px;
     z-index: 2;
   }
   20% {
-    background: #fae08f;
+    background: color-mix(in oklab, var(--su-state-narrative) 45%, var(--su-bg-raised));
   }
   99% {
-    background: white;
+    background: var(--su-bg-raised);
     border-radius: 4px;
   }
   100% {
-    background: white;
+    background: var(--su-bg-raised);
     border-radius: 0;
   }
 }

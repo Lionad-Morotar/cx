@@ -25,7 +25,7 @@ defineProps<{ name?: string }>()
 .cx-card {
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: var(--su-bg-raised);
   border-radius: 4px;
   overflow: hidden;
 }

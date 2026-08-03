@@ -12,7 +12,7 @@
       <template v-if="!displayIssues?.length">
         <div ref="emptyFirstRef" class="empty-con">
           <img class="image" :src="EmptyStrImage" />
-          <div class="title">{{ props.isLoading ? '载入中...' : '暂时没有内容哦~' }}</div>
+          <div class="title">{{ props.isLoading ? '载入中...' : '暂无内容' }}</div>
         </div>
       </template>
       <template v-else>
@@ -408,11 +408,11 @@ defineExpose({
   grid-template: minmax(min-content, max-content) minmax(0, 1fr) / minmax(0, 1fr);
   width: 100%;
   height: 100%;
-  background: white;
+  background: var(--su-bg-raised);
 
   .table-header {
     display: flex;
-    background: #faf9fe;
+    background: var(--su-bg-raised);
     border-radius: 8px;
     width: 100%;
   }
@@ -433,7 +433,7 @@ defineExpose({
     transition: 0.15s;
 
     &:hover {
-      background: #faf9febb;
+      background: color-mix(in oklab, var(--su-bg-raised) 80%, transparent);
       border-radius: 4px;
     }
 
@@ -452,7 +452,7 @@ defineExpose({
     }
 
     .column-item {
-      color: #8b8995;
+      color: var(--su-ink-3);
       white-space: nowrap;
     }
   }
@@ -466,11 +466,11 @@ defineExpose({
         line-height: 22px;
         border-radius: 4px;
         font-size: 13px;
-        color: #8b8995;
+        color: var(--su-ink-3);
         cursor: pointer;
 
         &:hover {
-          background: #eeeff4;
+          background: var(--su-bg-inset);
         }
       }
     }
@@ -495,7 +495,7 @@ defineExpose({
         transition: 0.1s;
 
         &:hover {
-          background: #eeeff4;
+          background: var(--su-bg-inset);
         }
       }
     }
@@ -504,7 +504,7 @@ defineExpose({
     }
     &.is-name {
       font-size: 13px;
-      color: #337cfb;
+      color: var(--su-state-now);
 
       a {
         text-decoration: none;
@@ -529,26 +529,26 @@ defineExpose({
         align-items: center;
         width: fit-content;
         height: 26px;
-        color: #363636;
+        color: var(--su-ink);
         border-radius: 13px;
         white-space: nowrap;
         padding: 4px 12px;
         box-sizing: border-box;
       }
       .is-pending {
-        background: #ffc7ce;
+        background: var(--su-state-alert-soft);
       }
       .is-due-date {
-        background: #fbcfce;
+        background: var(--su-state-alert-soft);
       }
       .is-plan {
-        background: #fcefd3;
+        background: var(--su-state-narrative-soft);
       }
       .is-undone {
-        background: #dff9e9;
+        background: var(--su-state-live-soft);
       }
       .is-done {
-        background: #e4def6;
+        background: var(--su-state-done-soft);
       }
     }
     &.is-participants {
@@ -562,7 +562,7 @@ defineExpose({
         height: 20px;
         border: solid 2px white;
         border-radius: 50%;
-        background: #f2f2f2;
+        background: var(--su-bg-inset);
 
         & + .participant {
           margin-left: -5px;
@@ -571,7 +571,7 @@ defineExpose({
     }
     &.is-time {
       font-size: 13px;
-      color: #333333;
+      color: var(--su-ink);
     }
   }
 }
@@ -602,25 +602,25 @@ defineExpose({
   }
   .title {
     font-size: 18px;
-    color: #373737;
+    color: var(--su-ink);
   }
 }
 
 @keyframes blink {
   0% {
-    background: white;
+    background: var(--su-bg-raised);
     border-radius: 4px;
     z-index: 2;
   }
   20% {
-    background: #fae08f;
+    background: color-mix(in oklab, var(--su-state-narrative) 45%, var(--su-bg-raised));
   }
   99% {
-    background: white;
+    background: var(--su-bg-raised);
     border-radius: 4px;
   }
   100% {
-    background: white;
+    background: var(--su-bg-raised);
     border-radius: 0;
   }
 }

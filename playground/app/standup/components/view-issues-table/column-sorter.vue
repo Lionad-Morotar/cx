@@ -55,10 +55,10 @@ const active = (sort: string) => {
     width: 0;
     height: 0;
     cursor: pointer;
-    --color: #999;
+    --color: var(--su-ink-3);
 
     &.is-active {
-      --color: #1890ff;
+      --color: var(--su-state-now);
     }
   }
 

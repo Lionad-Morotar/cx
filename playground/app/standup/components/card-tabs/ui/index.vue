@@ -91,12 +91,12 @@ const { isSelected, isDisabled, select } = useCardTabs(props, emits)
   flex-shrink: 0;
 
   &:hover {
-    background: #f9f9f9;
+    background: var(--su-bg-inset);
   }
 
   &.is-active {
-    background: #f0f2fb;
-    color: #337cfb;
+    background: var(--su-bg-inset);
+    color: var(--su-state-now);
   }
 
   .text {

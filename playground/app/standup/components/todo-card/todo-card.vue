@@ -28,7 +28,7 @@
     <template v-if="isEmptyContent">
       <div ref="emptyFirstRef" :class="ns.e('empty-con')">
         <img class="image" :src="EmptyStrImage" />
-        <div class="title">暂时没有内容哦~</div>
+        <div class="title">暂无内容</div>
       </div>
     </template>
     <template v-else>
@@ -608,7 +608,7 @@ defineExpose({
 
   position: relative;
   gap: 4px;
-  background: white;
+  background: var(--su-bg-raised);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -618,10 +618,10 @@ defineExpose({
   height: 100%;
   overflow: hidden;
   transition: 0.15s;
-  color: #262626;
+  color: var(--su-ink);
 
   &.is-disabled {
-    background: #eff2fb;
+    background: var(--su-bg-surface);
 
     .cx-todo-card__actions {
       display: none;
@@ -632,7 +632,7 @@ defineExpose({
     }
 
     &:hover {
-      background: #e4e7f1;
+      background: var(--su-bg-inset);
 
       .cx-todo-card__bg {
         background: none;
@@ -674,7 +674,7 @@ defineExpose({
     }
     .cx-todo-card__title {
       font-size: 18px;
-      color: #373737;
+      color: var(--su-ink);
     }
   }
 
@@ -688,8 +688,8 @@ defineExpose({
     background: repeating-linear-gradient(
       transparent,
       transparent var(--line-height),
-      #f1f1f1 var(--line-height),
-      #f1f1f1 calc(var(--line-height) + 1px)
+      var(--su-bg-inset) var(--line-height),
+      var(--su-bg-inset) calc(var(--line-height) + 1px)
     );
     transform: translateY(v-bind(scrollYPX));
   }
@@ -722,7 +722,7 @@ defineExpose({
     display: grid;
     place-items: center;
     padding: 0 0.5em;
-    color: #b4b4b4;
+    color: var(--su-ink-3);
     font-size: 14px;
     font-weight: bold;
     height: var(--line-height);
@@ -734,7 +734,7 @@ defineExpose({
     padding: 0;
     height: calc(var(--line-height) + 1px);
     line-height: var(--line-height);
-    border-bottom: solid 1px #f1f1f1;
+    border-bottom: solid 1px var(--su-bg-inset);
     border: none;
     box-shadow: none;
     outline: none;
@@ -773,7 +773,7 @@ defineExpose({
     .el-checkbox__inner {
       width: 18px;
       height: 18px;
-      outline-color: var(--color, #ff4c4f);
+      outline-color: var(--color, var(--su-state-alert));
 
       &::after {
         top: 1px;
@@ -782,13 +782,13 @@ defineExpose({
         height: 10px;
       }
       &:hover {
-        border-color: var(--color, #ff4c4f);
+        border-color: var(--color, var(--su-state-alert));
       }
     }
     .el-checkbox__input {
       &.is-checked .el-checkbox__inner {
-        background: var(--color, #ff4c4f);
-        border-color: var(--color, #ff4c4f);
+        background: var(--color, var(--su-state-alert));
+        border-color: var(--color, var(--su-state-alert));
       }
     }
 
@@ -806,7 +806,7 @@ defineExpose({
           }
         }
         .el-input__inner {
-          color: #262626;
+          color: var(--su-ink);
         }
       }
     }
@@ -846,7 +846,7 @@ defineExpose({
         width: 100%;
         height: fit-content;
         transition: background 0.2s;
-        border-bottom: solid 1px #eff2fb;
+        border-bottom: solid 1px var(--su-bg-surface);
 
         &:hover {
           .cx-todo-card__action {
@@ -866,7 +866,7 @@ defineExpose({
 
         &.is-checked {
           .cx-todo-card__line-content {
-            color: #b4b4b4;
+            color: var(--su-ink-3);
             text-decoration: line-through;
           }
         }
@@ -880,17 +880,17 @@ defineExpose({
         .el-icon {
           padding: 6px;
           cursor: pointer;
-          background: white;
+          background: var(--su-bg-raised);
           border-radius: 4px;
-          background: #fcfdff;
+          background: var(--su-bg-raised);
           opacity: 0;
           transition: 0.2s;
 
           &:hover {
-            background: #f4f5fd;
+            background: var(--su-bg-inset);
           }
           &:active {
-            background: #eff2fb;
+            background: var(--su-bg-surface);
           }
         }
       }
@@ -914,7 +914,7 @@ defineExpose({
   position: relative;
   top: -0.5px;
   font-size: 15px;
-  color: #999;
+  color: var(--su-ink-3);
 }
 
 .cx-todo-card__todo-content {
@@ -941,19 +941,19 @@ defineExpose({
 /* @keyframes 必须置于顶层：Lightning CSS minify 不接受嵌套在选择器内的 at-rule */
 @keyframes highlight {
   0% {
-    background: #ff4c4f00;
+    background: transparent;
     border-radius: 4px;
     z-index: 2;
   }
   20% {
-    background: #ff4c4f43;
+    background: color-mix(in oklab, var(--su-state-alert) 26%, transparent);
   }
   99% {
-    background: #ff4c4f00;
+    background: transparent;
     border-radius: 4px;
   }
   100% {
-    background: white;
+    background: var(--su-bg-raised);
     border-radius: 0;
   }
 }

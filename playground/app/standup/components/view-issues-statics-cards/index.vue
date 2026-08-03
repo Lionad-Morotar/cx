@@ -199,7 +199,7 @@ const userMetrics = computed(() => {
 
 <style>
 .issues-view-statics {
-  background: white;
+  background: var(--su-bg-raised);
 
   .card-content-section {
     display: grid;
@@ -295,68 +295,68 @@ const userMetrics = computed(() => {
     &.is-total-issue-count,
     &.is-total-issue-count {
       --color-1: #5496f7;
-      --color-2: #cee2fc;
+      --color-2: color-mix(in oklab, var(--su-state-now) 16%, var(--su-bg-surface));
     }
 
     &.is-done-count {
       --color-1: #826dc6;
-      --color-2: #e4def6;
+      --color-2: color-mix(in oklab, var(--su-state-done) 16%, var(--su-bg-surface));
     }
 
     &.is-effort-point {
       --color-1: #5fbcdf;
-      --color-2: #d0eefd;
+      --color-2: color-mix(in oklab, var(--su-state-now) 16%, var(--su-bg-surface));
     }
 
     &.is-new-issue-count {
       --color-1: #5dc9b0;
-      --color-2: #d8f7f7;
+      --color-2: color-mix(in oklab, var(--su-state-teal) 16%, var(--su-bg-surface));
     }
 
     &.is-in-design {
-      --color-1: #edb24b;
-      --color-2: #fcefd3;
+      --color-1: var(--su-state-narrative);
+      --color-2: color-mix(in oklab, var(--su-state-narrative) 18%, var(--su-bg-surface));
     }
 
     &.is-in-dev {
       --color-1: #6dca85;
-      --color-2: #dff9e9;
+      --color-2: color-mix(in oklab, var(--su-state-live) 16%, var(--su-bg-surface));
     }
 
     &.is-in-test,
     &.is-in-test {
-      --color-1: #f1ae5e;
-      --color-2: #fcefe0;
+      --color-1: var(--su-state-narrative);
+      --color-2: color-mix(in oklab, var(--su-state-narrative) 18%, var(--su-bg-surface));
     }
 
     &.is-in-due-date {
-      --color-1: #eb534b;
-      --color-2: #fae1e3;
+      --color-1: var(--su-state-alert);
+      --color-2: color-mix(in oklab, var(--su-state-alert) 16%, var(--su-bg-surface));
     }
 
     &.is-check-count {
       --color-1: #7c95ef;
-      --color-2: #e4e9f9;
+      --color-2: color-mix(in oklab, var(--su-state-now) 16%, var(--su-bg-surface));
     }
 
     &.is-np-count {
-      --color-1: #eb4f6a;
-      --color-2: #fbeaec;
+      --color-1: var(--su-state-alert);
+      --color-2: color-mix(in oklab, var(--su-state-alert) 16%, var(--su-bg-surface));
     }
 
     &.is-pending-count {
       --color-1: #9eadcc;
-      --color-2: #e6edf5;
+      --color-2: var(--su-bg-inset);
     }
 
     &.is-average-spend-time {
       --color-1: #cd6fe3;
-      --color-2: #f3dff6;
+      --color-2: color-mix(in oklab, var(--su-state-done) 16%, var(--su-bg-surface));
     }
 
     &.is-average-wait-time {
       --color-1: #abc670;
-      --color-2: #eaf4d4;
+      --color-2: color-mix(in oklab, var(--su-state-live) 16%, var(--su-bg-surface));
     }
   }
 
@@ -369,8 +369,8 @@ const userMetrics = computed(() => {
     padding: 12px 14px;
     width: auto;
     height: auto;
-    border: solid 1px #e4e7f4;
-    background: white;
+    border: solid 1px var(--su-bg-inset);
+    background: var(--su-bg-raised);
     border-radius: 8px;
 
     .icon-con {
@@ -403,7 +403,7 @@ const userMetrics = computed(() => {
 
       .title {
         font-size: 13px;
-        color: #838991;
+        color: var(--su-ink-3);
         font-weight: 500;
         white-space: nowrap;
       }
@@ -411,7 +411,7 @@ const userMetrics = computed(() => {
       .value {
         position: relative;
         font-size: 22px;
-        color: #333333;
+        color: var(--su-ink);
         font-weight: 600;
 
         .meter {
