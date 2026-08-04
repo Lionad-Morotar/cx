@@ -3,14 +3,13 @@
        布局语义：增量渲染是主角——页面物料全尺寸铺满舞台逐节点生长；
        播放控制与选项收进底部悬浮控制器；终态渲染不是并排面板，
        而是控制器上「增量 | 终态」的视图切换（success 才解锁）。 -->
-  <main class="page-dev-stream-pages">
+  <main class="page-stage">
     <!-- 主舞台：增量/终态双视图，v-show 切换保持两棵树各自 DOM 状态 -->
     <section class="stage">
       <div v-show="view === 'incremental'" class="stage-view" data-testid="panel-incremental">
-        <CxRender v-if="partialNode" :components="[partialNode]" />
+        <CxRender v-if="stageNode" :components="[stageNode]" />
         <div v-else class="stage-empty">
-          <p v-if="status === 'success'">增量阶段已结束，切换到终态查看完整页面</p>
-          <p v-else>播放后页面骨架将在此逐节点生长</p>
+          <p>播放后页面骨架将在此逐节点生长</p>
         </div>
       </div>
       <div v-show="view === 'final'" class="stage-view" data-testid="panel-final">
@@ -112,6 +111,7 @@ import {
 } from '@lionad/cx-stream'
 import { toRenderNode } from '~/dev/material-utils'
 import { createPageTriggerRegistry, PAGE_SCENARIOS } from '~/dev/stream-pages-scenario'
+import { useLastFrame } from '~/dev/use-last-frame'
 import { useStreamReplay } from '~/dev/use-stream-replay'
 
 defineOptions({ name: 'PageDevStreamPages' })
@@ -138,6 +138,8 @@ const { partialSpec, reset: resetExtractor } = useIncrementalTree(
   { registry: createPageTriggerRegistry(), matchTrigger: matchCxTrigger },
 )
 const partialNode = computed(() => toCxNode(partialSpec.value))
+// 增量视图停留最后一帧：success 后 extractor 出 null，不清空生长到最后的形态
+const { frame: stageNode, clear: clearLastFrame } = useLastFrame(partialNode)
 
 // --- 终态渲染：success 后渲染完整页面树 ---
 const finalNode = computed(() =>
@@ -157,148 +159,16 @@ function toCxNode(spec: CxStreamNode | CxStreamNode[] | null) {
 function reset() {
   resetReplay()
   resetExtractor()
+  clearLastFrame()
 }
 // 剧本切换（页面选择器）：引擎自动停表归零，extractor 缓存同步清除、视图归位增量——
 // 与引擎内部 watch 同源按注册序执行，归零在前、清缓存在后
 watch(scenarioChunks, () => {
   resetExtractor()
+  clearLastFrame()
   view.value = 'incremental'
 })
 </script>
 
-<!-- 按钮/徽标/调试抽屉内 pre 等基础样式与 /dev/stream/components 共享 -->
+<!-- 舞台/悬浮控制器/抽屉样式与 /dev/stream/components 共享，见 stream-lab.css -->
 <style scoped src="~/dev/stream-lab.css"></style>
-
-<style scoped>
-/* 舞台铺满视口：页面物料以真实尺寸生长，滚动交给物料自身高度 */
-.page-dev-stream-pages {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #f1f5f9;
-}
-.stage {
-  position: absolute;
-  inset: 0;
-}
-.stage-view {
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-}
-.stage-empty {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #94a3b8;
-  font-size: 14px;
-}
-
-/* 悬浮层：玻璃拟态浮于舞台之上，不占用布局空间 */
-.dock {
-  position: absolute;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(12px);
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-  padding: 10px 14px;
-}
-.dock--info {
-  top: 16px;
-  left: 16px;
-}
-.dock-title {
-  font-size: 13px;
-  font-weight: 600;
-}
-.dock--controls {
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 600px;
-  max-width: calc(100% - 32px);
-}
-.controls-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.controls-row .progress {
-  margin-left: auto;
-}
-
-/* 剧本 tab：透明边框占位，active 仅换色避免切换跳动 */
-.tab {
-  font-size: 12px;
-  padding: 4px 12px;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  background: transparent;
-  color: #6b7280;
-  cursor: pointer;
-}
-.tab:hover {
-  color: #374151;
-}
-.tab--active {
-  border-color: #2563eb;
-  color: #2563eb;
-  background: #eff6ff;
-}
-
-/* 视图切换 segmented：终态段 success 前禁用 */
-.view-switch {
-  display: flex;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  overflow: hidden;
-}
-.view-switch button {
-  font-size: 12px;
-  padding: 5px 14px;
-  background: #fff;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-}
-.view-switch button + button {
-  border-left: 1px solid #e5e7eb;
-}
-.view-switch--active {
-  background: #2563eb !important;
-  color: #fff !important;
-}
-.view-switch button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.btn--ghost {
-  border-color: transparent;
-  color: #6b7280;
-}
-.btn--ghost-on {
-  border-color: #2563eb;
-  color: #2563eb;
-  background: #eff6ff;
-}
-
-.debug-pane {
-  border-top: 1px solid #f1f5f9;
-  padding-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.debug-pane .raw {
-  max-height: 160px;
-}
-</style>
