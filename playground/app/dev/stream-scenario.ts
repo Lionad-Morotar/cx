@@ -1,6 +1,6 @@
 import { compositeChunks, compositeMeta } from './stream-mock.generated'
 
-// /dev/stream 验收页的确定性剧本。
+// /dev/stream/components 验收页的确定性剧本。
 // 抽成独立模块（而非内联进页面）有两个原因：
 // 1. 无头测试可直接驱动这些纯数据/纯函数，不必挂载 Nuxt 页面与定时器；
 // 2. 页面 setup 只保留回放引擎与面板渲染，控制在可读行数内。

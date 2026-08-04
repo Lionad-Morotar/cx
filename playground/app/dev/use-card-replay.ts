@@ -9,7 +9,7 @@ import {
 
 // /dev/components* 验收页卡片回放的引擎：把卡片自身的节点序列化成一根
 // 不断生长的 JSON，按 40 tokens/秒 喂给增量管线，复现真实 LLM 流式输出时
-// 「从 0 逐项长出来」的渲染过程。与 /dev/stream 的回放引擎同构但单组件、
+// 「从 0 逐项长出来」的渲染过程。与 /dev/stream/components 的回放引擎同构但单组件、
 // 无围栏——extractor 对纯 JSON 直送同样成立（不经 detector）。
 
 /** 回放速度（tokens/秒）。token 与字符的换算取粗近似，见 CHARS_PER_TOKEN */
@@ -18,7 +18,7 @@ export const REPLAY_TOKENS_PER_SEC = 40
 /**
  * 每 token 平均字符数（粗近似）：JSON 语法 ASCII 约 4 chars/token，
  * 中文数据约 1.5 chars/token，混合剧本加权取 3。回放节奏为演示体感，
- * 非精确计量——40 × 3 = 120 chars/秒 与 /dev/stream 默认速度同档。
+ * 非精确计量——40 × 3 = 120 chars/秒 与 /dev/stream/components 默认速度同档。
  */
 const CHARS_PER_TOKEN = 3
 

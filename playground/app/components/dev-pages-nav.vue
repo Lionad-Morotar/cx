@@ -25,7 +25,7 @@ const links = [
   { to: '/dev/components-vtu', label: 'vtu' },
   { to: '/dev/components-element-plus', label: 'element-plus' },
   { to: '/dev/components-naive-ui', label: 'naive-ui' },
-  { to: '/dev/stream', label: 'stream 流式' },
+  { to: '/dev/stream/components', label: 'stream 组件' },
 ] as const
 </script>
 

@@ -28,7 +28,7 @@ describe('R1.3 卡片阵列退役', () => {
 })
 
 describe('R1.5.4 导航与索引无损', () => {
-  it('dev-pages-nav 含 5 物料页 + stream 共 6 条互链', () => {
+  it('dev-pages-nav 含 5 物料页 + stream components 共 6 条互链', () => {
     const src = read('../app/components/dev-pages-nav.vue')
     for (const to of [
       '/dev/components',
@@ -36,13 +36,13 @@ describe('R1.5.4 导航与索引无损', () => {
       '/dev/components-nuxt-ui-v4',
       '/dev/components-vtu',
       '/dev/components-element-plus',
-      '/dev/stream',
+      '/dev/stream/components',
     ]) {
       expect(src, to).toContain(to)
     }
   })
 
-  it('/dev/index 入口卡含 5 物料页 + stream 共 6 条', () => {
+  it('/dev/index 入口卡含 5 物料页 + stream components 共 6 条', () => {
     const src = read('../app/pages/dev/index.vue')
     for (const to of [
       '/dev/components',
@@ -50,15 +50,15 @@ describe('R1.5.4 导航与索引无损', () => {
       '/dev/components-nuxt-ui-v4',
       '/dev/components-vtu',
       '/dev/components-element-plus',
-      '/dev/stream',
+      '/dev/stream/components',
     ]) {
       expect(src, to).toContain(`to: '${to}'`)
     }
   })
 
-  it('stream.vue 未被本改版触碰其展示逻辑（仅 dev-pages-nav 引入入口）', () => {
+  it('stream/components.vue 未被本改版触碰其展示逻辑（仅 dev-pages-nav 引入入口）', () => {
     // stream 页不在迁移集：其源码不应出现 showcase 装配（避免误改）
-    const src = read('../app/pages/dev/stream.vue')
+    const src = read('../app/pages/dev/stream/components.vue')
     expect(src).not.toContain('DevShowcase')
   })
 })

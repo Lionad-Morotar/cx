@@ -48,8 +48,8 @@ const links = [
     desc: 'Element Plus 物料，按包冻结六类（基础反馈 / 数据展示 / 导航版式 / 表单 / 表格 / 插槽容器）组织',
   },
   {
-    to: '/dev/stream',
-    name: 'cx stream · 流式结构化渲染',
+    to: '/dev/stream/components',
+    name: 'cx stream · 流式结构化渲染（组件级）',
     desc: '流式管线验收：模拟 LLM 输出不完整 JSON，演示三态检测、增量渲染、打字机预览与多策略切分',
   },
 ] as const

@@ -22,7 +22,7 @@ import {
   STREAM_SCRIPT,
 } from '../app/dev/stream-scenario'
 
-// /dev/stream 验收页的无头契约：以「一根不断生长的字符串」驱动管线，
+// /dev/stream/components 验收页的无头契约：以「一根不断生长的字符串」驱动管线，
 // 不依赖页面定时器，确定性断言三态转移与增量行为。
 //
 // 断言全部基于 detector/extractor 的语义输出（status、specs、pendingSources、
