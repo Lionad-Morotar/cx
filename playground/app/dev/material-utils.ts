@@ -109,8 +109,20 @@ export function toItem(comp: { _cx_meta: CxMeta }): DevItem {
  * 把流式管线的 CxStreamNode 规整为 CxRender 可消费的最小运行时节点。
  * CxRender 只需 id/key/data（props 由 data 展开绑定）；流式节点的 id 可缺省，
  * 此处回填稳定 id，使增量帧与终态帧落在同一组件实例上原地更新而非重建。
+ * 嵌套 components 递归转换：数组形式归入 default slot，Record 形式按 slot 名保留——
+ * 页面级 schema（/dev/stream/pages）的增量帧是逐节点生长的前缀树，丢子树会让
+ * 骨架永远停在首节点。
  */
 export function toRenderNode(spec: CxStreamNode): CxComponentRuntime {
+  const components: Record<string, CxComponentRuntime[]> = {}
+  const slots = spec.components
+  if (Array.isArray(slots)) {
+    components.default = slots.map(toRenderNode)
+  } else if (slots && typeof slots === 'object') {
+    for (const [slot, children] of Object.entries(slots)) {
+      components[slot] = children.map(toRenderNode)
+    }
+  }
   return {
     id: spec.id ?? 'stream-node',
     key: spec.key,
@@ -120,6 +132,6 @@ export function toRenderNode(spec: CxStreamNode): CxComponentRuntime {
     emits: {},
     exposes: {},
     parents: [],
-    components: {},
+    components,
   } as CxComponentRuntime
 }
