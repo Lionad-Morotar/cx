@@ -52,6 +52,11 @@ const links = [
     name: 'cx stream · 流式结构化渲染（组件级）',
     desc: '流式管线验收：模拟 LLM 输出不完整 JSON，演示三态检测、增量渲染、打字机预览与多策略切分',
   },
+  {
+    to: '/dev/stream/pages',
+    name: 'cx stream · 流式结构化渲染（页面级）',
+    desc: '页面级流式验收：站会列表/日会看板/周会看板复杂嵌套 schema，演示嵌套树按文档序逐节点生长的增量语义',
+  },
 ] as const
 </script>
 

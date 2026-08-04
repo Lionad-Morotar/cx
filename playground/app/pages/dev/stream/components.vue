@@ -131,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   createSpecDetector,
   cxHumanTextConfig,
@@ -145,67 +145,20 @@ import {
 import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-comps-vtu'
 import { toRenderNode } from '~/dev/material-utils'
 import { cropScenarioChunks, MAX_COMPONENTS } from '~/dev/stream-scenario'
+import { useStreamReplay } from '~/dev/use-stream-replay'
 
 defineOptions({ name: 'PageDevStream' })
 
-// --- 回放引擎：定时器按「字符/秒」推进，进度对齐到 chunk（SSE delta）边界 ---
-// 组件数量决定剧本裁剪：原始流只含前 N 个组件围栏，默认单组件
+// --- 剧本源：组件数量决定剧本裁剪，原始流只含前 N 个组件围栏，默认单组件 ---
 const componentCount = ref(1)
 const scenarioChunks = computed(() => cropScenarioChunks(componentCount.value))
 const scenarioScript = computed(() => scenarioChunks.value.join(''))
 
-// chunk 起始偏移前缀和：字符进度换算 chunk 进度的索引
-const chunkStarts = computed(() => {
-  const starts: number[] = []
-  let acc = 0
-  for (const c of scenarioChunks.value) {
-    starts.push(acc)
-    acc += c.length
-  }
-  return starts
-})
-
-const TICK_MS = 50
-const charOffset = ref(0)
-const playing = ref(false)
-const speed = ref(120) // 生成速度（字符/秒）
-let timer: ReturnType<typeof setInterval> | null = null
-
-// 进度以 chunk 为单位对齐：管线（检测/增量/打字机）只在 delta 边界处重算，
-// 避免按字符步进把每帧重算放大回字符数级
-const progress = computed(() => {
-  const starts = chunkStarts.value
-  let n = 0
-  while (n < starts.length && starts[n]! <= charOffset.value) n++
-  return n
-})
-
-const streamText = computed(() => scenarioChunks.value.slice(0, progress.value).join(''))
-
-function togglePlay() {
-  if (playing.value) {
-    pause()
-  } else {
-    playing.value = true
-    // 已到结尾再播放则从头开始
-    if (charOffset.value >= scenarioScript.value.length) charOffset.value = 0
-    timer = setInterval(() => {
-      charOffset.value += (speed.value * TICK_MS) / 1000
-      if (charOffset.value >= scenarioScript.value.length) {
-        charOffset.value = scenarioScript.value.length
-        pause()
-      }
-    }, TICK_MS)
-  }
-}
-function pause() {
-  playing.value = false
-  if (timer) {
-    clearInterval(timer)
-    timer = null
-  }
-}
-onUnmounted(pause)
+// --- 回放引擎（与 /dev/stream/pages 共用 composable）---
+// 引擎内部已 watch 剧本切换自动停表归零；extractor 的 lastValid 缓存属消费侧状态，
+// 由页面在剧本切换与 reset 时一并清除
+const { playing, speed, progress, streamText, togglePlay, reset: resetReplay } =
+  useStreamReplay(scenarioChunks)
 
 // --- 三态检测 ---
 const detector = createSpecDetector(cxSpecDetectorConfig)
@@ -258,175 +211,13 @@ const { chunks } = useStreamChunks(streamText, [{ marker: '\n\n', offset: 2 }], 
 })
 
 function reset() {
-  pause()
-  charOffset.value = 0
+  resetReplay()
   resetExtractor()
 }
-
-// 剧本随组件数量切换：播放中改动立即停表归零，避免旧进度落到新剧本的错误区间
-watch(componentCount, reset)
+// 剧本切换（组件数量调整）：引擎自动停表归零，extractor 缓存同步清除——
+// 与引擎内部 watch 同源按注册序执行，归零在前、清缓存在后，与原单体实现顺序一致
+watch(scenarioChunks, resetExtractor)
 </script>
 
-<style scoped>
-.page {
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  box-sizing: border-box;
-  padding: 32px 24px;
-}
-.page-header {
-  margin-bottom: 20px;
-}
-.title {
-  font-size: 20px;
-  font-weight: 600;
-}
-.subtitle {
-  font-size: 13px;
-  color: #888;
-  margin-top: 4px;
-}
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.btn {
-  font-size: 13px;
-  padding: 6px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-}
-.btn:hover {
-  border-color: #2563eb;
-  color: #2563eb;
-}
-.speed {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #666;
-}
-.speed-val {
-  min-width: 20px;
-  color: #2563eb;
-}
-.progress {
-  font-size: 12px;
-  color: #aaa;
-  margin-left: auto;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 12px;
-}
-.card {
-  padding: 12px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-}
-.card-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.card-name {
-  font-weight: 600;
-  font-size: 14px;
-}
-.badge {
-  font-size: 11px;
-  padding: 1px 8px;
-  border-radius: 4px;
-}
-.badge--none {
-  color: #6b7280;
-  background: #f3f4f6;
-}
-.badge--pending {
-  color: #c2410c;
-  background: #fff7ed;
-}
-.badge--success {
-  color: #15803d;
-  background: #f0fdf4;
-}
-.count {
-  font-size: 12px;
-  color: #aaa;
-}
-.raw {
-  font-size: 12px;
-  line-height: 1.5;
-  background: #0f172a;
-  color: #e2e8f0;
-  padding: 10px;
-  border-radius: 6px;
-  white-space: pre-wrap;
-  word-break: break-all;
-  max-height: 240px;
-  overflow: auto;
-  margin: 0;
-}
-.raw--small {
-  max-height: 120px;
-  font-size: 11px;
-}
-.cursor {
-  color: #38bdf8;
-}
-.kv {
-  font-size: 12px;
-  color: #666;
-  margin: 0 0 8px;
-  padding-left: 16px;
-}
-.typewriter {
-  font-size: 14px;
-  color: #334155;
-  min-height: 24px;
-}
-.preview {
-  border: 1px dashed #e5e7eb;
-  border-radius: 6px;
-  padding: 10px;
-  min-height: 64px;
-  max-height: 320px;
-  overflow: auto;
-}
-.muted {
-  font-size: 12px;
-  color: #bbb;
-}
-.chunks {
-  margin: 0;
-  padding-left: 18px;
-  font-size: 12px;
-}
-.chunk {
-  margin-bottom: 6px;
-}
-.chunk-flag {
-  display: inline-block;
-  font-size: 10px;
-  color: #15803d;
-  margin-right: 6px;
-}
-.chunk--open .chunk-flag {
-  color: #c2410c;
-}
-.chunk-body {
-  color: #6b7280;
-}
-</style>
+<!-- 面板样式与 /dev/stream/pages 共享，见 stream-lab.css -->
+<style scoped src="~/dev/stream-lab.css"></style>

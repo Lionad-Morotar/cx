@@ -26,6 +26,7 @@ const links = [
   { to: '/dev/components-element-plus', label: 'element-plus' },
   { to: '/dev/components-naive-ui', label: 'naive-ui' },
   { to: '/dev/stream/components', label: 'stream 组件' },
+  { to: '/dev/stream/pages', label: 'stream 页面' },
 ] as const
 </script>
 
