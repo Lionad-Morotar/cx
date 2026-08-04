@@ -1,132 +1,138 @@
 <template>
-  <!-- /dev/stream：@lionad/cx-stream 流式结构化渲染管线验收。
-       模拟 LLM 流式输出（一根不断生长的字符串），演示四组能力：
-       三态检测（none/pending/success）、增量渲染、打字机预览、多策略切分。 -->
-  <main class="page-dev-stream page">
-    <header class="page-header">
-      <h1 class="title">cx stream · 流式结构化渲染</h1>
-      <p class="subtitle">/dev/stream/components · 从不完整 LLM JSON 增量提取可渲染组件树的管线验收</p>
-      <DevPagesNav />
-    </header>
-
-    <!-- 控制条：播放/暂停 · 重置 · 速度 -->
-    <section class="controls" data-testid="stream-controls">
-      <button class="btn" data-testid="stream-play" @click="togglePlay">
-        {{ playing ? '暂停' : '播放' }}
-      </button>
-      <button class="btn" data-testid="stream-reset" @click="reset">重置</button>
-      <label class="speed">
-        速度
-        <input
-          v-model.number="speed"
-          type="range"
-          min="1"
-          max="600"
-          step="1"
-          data-testid="stream-speed"
-        />
-        <span class="speed-val">{{ speed }} 字/秒</span>
-      </label>
-      <label class="speed">
-        组件
-        <input
-          v-model.number="componentCount"
-          type="range"
-          min="1"
-          :max="MAX_COMPONENTS"
-          step="1"
-          data-testid="stream-component-count"
-        />
-        <span class="speed-val">{{ componentCount }}</span>
-      </label>
-      <span class="progress">{{ progress }} / {{ scenarioChunks.length }} chunks</span>
-    </section>
-
-    <div class="grid">
-      <!-- 面板 1：原始流（不断生长的字符串） -->
-      <article class="card" data-testid="panel-raw">
-        <header class="card-head"><span class="card-name">原始流</span></header>
-        <pre class="raw">{{ streamText }}<span class="cursor">▍</span></pre>
-      </article>
-
-      <!-- 面板 2：三态检测漏斗 -->
-      <article class="card" data-testid="panel-detector">
-        <header class="card-head">
-          <span class="card-name">三态检测</span>
-          <span class="badge" :class="`badge--${status}`" data-testid="detector-status">{{
-            status
-          }}</span>
-        </header>
-        <ul class="kv">
-          <li>specs：{{ detection.specs.length }}</li>
-          <li>pendingSources：{{ detection.pendingSources?.length ?? 0 }}</li>
-          <li>content（占位符预览）：</li>
-        </ul>
-        <pre class="raw raw--small">{{ detection.content ?? '—' }}</pre>
-      </article>
-
-      <!-- 面板 3：打字机预览（任一围栏 pending 阶段） -->
-      <article class="card" data-testid="panel-typewriter">
-        <header class="card-head"><span class="card-name">打字机预览</span></header>
-        <p v-if="pendingSource" class="typewriter" data-testid="typewriter-text">
-          {{ displayText }}<span class="cursor">▍</span>
-        </p>
-        <p v-else class="muted">仅 pending 阶段展示</p>
-      </article>
-
-      <!-- 面板 4：增量渲染（pending 阶段行逐步增长） -->
-      <article class="card" data-testid="panel-incremental">
-        <header class="card-head">
-          <span class="card-name">增量渲染</span>
-          <span v-if="partialNode" class="badge badge--pending">
-            {{ mainArrayOf(partialNode)?.length ?? 0 }} 项
-          </span>
-        </header>
-        <div class="preview">
-          <CxRender v-if="partialNode" :components="[partialNode]" />
-          <!-- success 后增量管线已让位给终态渲染，空态文案须与状态一致，避免误以为仍在等待 -->
-          <span v-else-if="status === 'success'" class="muted">增量阶段已结束，已交由终态渲染</span>
-          <span v-else class="muted">等待首个完整行…</span>
+  <!-- /dev/stream/components：@lionad/cx-stream 组件级流式管线验收。
+       布局语言与 /dev/stream/pages 一致：增量/终态升格为舞台双视图，
+       播放控制与选项收进悬浮控制器；组件级物料非整页，舞台内居中自然尺寸。
+       管线观测面板（原始流/打字机/切分/三态细节）折叠进调试抽屉。 -->
+  <main class="page-stage">
+    <!-- 主舞台：增量/终态双视图，v-show 切换保持各自 DOM 状态 -->
+    <section class="stage">
+      <div v-show="view === 'incremental'" class="stage-view" data-testid="panel-incremental">
+        <div class="stage-center">
+          <CxRender v-if="stageNode" :components="[stageNode]" />
+          <div v-else class="stage-empty">
+            <p>播放后组件骨架将在此逐行生长</p>
+          </div>
         </div>
-      </article>
-
-      <!-- 面板 5：终态渲染（success 后随围栏闭合逐个接管） -->
-      <article class="card" data-testid="panel-final">
-        <header class="card-head">
-          <span class="card-name">终态渲染</span>
-          <span v-if="finalNodes.length" class="badge badge--success">
-            {{ finalNodes.length }} / {{ totalSpecs }} specs
-          </span>
-        </header>
-        <div class="preview">
+      </div>
+      <div v-show="view === 'final'" class="stage-view" data-testid="panel-final">
+        <div class="stage-center stage-center--stack">
           <template v-if="finalNodes.length">
             <CxRender v-for="node in finalNodes" :key="node.id" :components="[node]" />
           </template>
-          <span v-else class="muted">Spec 闭合后渲染完整组件</span>
+          <div v-else class="stage-empty"><p>Spec 闭合后渲染完整组件</p></div>
         </div>
-      </article>
+      </div>
+    </section>
 
-      <!-- 面板 6：多策略切分（useStreamChunks） -->
-      <article class="card" data-testid="panel-chunks">
-        <header class="card-head">
-          <span class="card-name">流式切分</span>
-          <span class="count">{{ chunks.length }}</span>
-        </header>
-        <ol class="chunks">
-          <li
-            v-for="(c, i) in chunks"
-            :key="i"
-            class="chunk"
-            :class="{ 'chunk--open': !c.isComplete }"
+    <!-- 左上悬浮：页面标识与验收页导航 -->
+    <header class="dock dock--info">
+      <h1 class="dock-title">cx stream · 流式结构化渲染（组件级）</h1>
+      <DevPagesNav />
+    </header>
+
+    <!-- 底部悬浮控制器：组件数量 · 播放控制 · 视图切换 · 调试抽屉 -->
+    <section class="dock dock--controls" data-testid="stream-controls">
+      <div class="controls-row">
+        <span class="controls-label">组件</span>
+        <button
+          v-for="n in MAX_COMPONENTS"
+          :key="n"
+          class="tab"
+          :class="{ 'tab--active': n === componentCount }"
+          :data-testid="`count-tab-${n}`"
+          @click="componentCount = n"
+        >
+          {{ n }}
+        </button>
+        <span class="badge" :class="`badge--${status}`" data-testid="detector-status">{{
+          status
+        }}</span>
+        <span class="progress">{{ progress }} / {{ scenarioChunks.length }} chunks</span>
+      </div>
+      <div class="controls-row">
+        <button class="btn" data-testid="stream-play" @click="togglePlay">
+          {{ playing ? '暂停' : '播放' }}
+        </button>
+        <button class="btn" data-testid="stream-reset" @click="reset">重置</button>
+        <label class="speed">
+          速度
+          <input
+            v-model.number="speed"
+            type="range"
+            min="1"
+            max="600"
+            step="1"
+            data-testid="stream-speed"
+          />
+          <span class="speed-val">{{ speed }}</span>
+        </label>
+        <!-- 终态渲染作为控制器视图切换存在，有闭合 Spec 才解锁 -->
+        <div class="view-switch" data-testid="view-switch">
+          <button
+            :class="{ 'view-switch--active': view === 'incremental' }"
+            data-testid="view-incremental"
+            @click="view = 'incremental'"
           >
-            <span class="chunk-flag">{{ c.isComplete ? '完整' : '生长中' }}</span>
-            <code class="chunk-body"
-              >{{ c.content.slice(0, 60) }}{{ c.content.length > 60 ? '…' : '' }}</code
+            增量
+          </button>
+          <button
+            :class="{ 'view-switch--active': view === 'final' }"
+            :disabled="finalNodes.length === 0"
+            data-testid="view-final"
+            @click="view = 'final'"
+          >
+            终态
+          </button>
+        </div>
+        <button
+          class="btn btn--ghost"
+          :class="{ 'btn--ghost-on': debugOpen }"
+          data-testid="debug-toggle"
+          @click="debugOpen = !debugOpen"
+        >
+          调试
+        </button>
+      </div>
+      <!-- 调试抽屉：管线各阶段观测面板，默认收起不抢舞台 -->
+      <div v-if="debugOpen" class="debug-pane" data-testid="debug-pane">
+        <section class="debug-section">
+          <h4>三态检测</h4>
+          <ul class="kv">
+            <li>specs：{{ detection.specs.length }}（{{ finalNodes.length }} / {{ totalSpecs }} 已接管）</li>
+            <li>pendingSources：{{ detection.pendingSources?.length ?? 0 }}</li>
+            <li>增量帧：{{ mainArrayOf(stageNode)?.length ?? 0 }} 项</li>
+          </ul>
+          <pre class="raw raw--small">{{ detection.content ?? '—' }}</pre>
+        </section>
+        <section class="debug-section">
+          <h4>打字机预览（pending 阶段）</h4>
+          <p v-if="pendingSource" class="typewriter" data-testid="typewriter-text">
+            {{ displayText }}<span class="cursor">▍</span>
+          </p>
+          <p v-else class="muted">仅 pending 阶段展示</p>
+        </section>
+        <section class="debug-section">
+          <h4>原始流</h4>
+          <pre class="raw" data-testid="panel-raw">{{ streamText }}<span class="cursor">▍</span></pre>
+        </section>
+        <section class="debug-section">
+          <h4>流式切分（{{ chunks.length }}）</h4>
+          <ol class="chunks" data-testid="panel-chunks">
+            <li
+              v-for="(c, i) in chunks"
+              :key="i"
+              class="chunk"
+              :class="{ 'chunk--open': !c.isComplete }"
             >
-          </li>
-        </ol>
-      </article>
-    </div>
+              <span class="chunk-flag">{{ c.isComplete ? '完整' : '生长中' }}</span>
+              <code class="chunk-body"
+                >{{ c.content.slice(0, 60) }}{{ c.content.length > 60 ? '…' : '' }}</code
+              >
+            </li>
+          </ol>
+        </section>
+      </div>
+    </section>
   </main>
 </template>
 
@@ -145,6 +151,7 @@ import {
 import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-comps-vtu'
 import { toRenderNode } from '~/dev/material-utils'
 import { cropScenarioChunks, MAX_COMPONENTS } from '~/dev/stream-scenario'
+import { useLastFrame } from '~/dev/use-last-frame'
 import { useStreamReplay } from '~/dev/use-stream-replay'
 
 defineOptions({ name: 'PageDevStream' })
@@ -175,14 +182,17 @@ const { partialSpec, reset: resetExtractor } = useIncrementalTree(
   { registry: createVtuTriggerRegistry(), matchTrigger: matchCxTrigger },
 )
 const partialNode = computed(() => toCxNode(partialSpec.value))
+// 增量视图停留最后一帧：success 后 extractor 出 null，不清空生长到最后的形态
+const { frame: stageNode, clear: clearLastFrame } = useLastFrame(partialNode)
 
-// --- 终态渲染：success 后已闭合的 Spec 逐个接管（多围栏下随闭合递增） ---
+// --- 终态渲染：已闭合的 Spec 逐个接管（多围栏下随闭合递增） ---
+// gate 用 specs 而非 status：detector 的 success 只表示「当前流文本围栏全闭合」，
+// 多围栏剧本播放中围栏间隙会闪现 success、下一围栏开始又回落 pending——
+// 绑定 status 会让已接管的终态物料随间隙闪退；specs 只含已闭合围栏，天然递增
 const finalNodes = computed(() =>
-  status.value === 'success'
-    ? detection.value.specs
-        .map((spec) => toCxNode(spec))
-        .filter((node): node is NonNullable<typeof node> => node !== null)
-    : [],
+  detection.value.specs
+    .map((spec) => toCxNode(spec))
+    .filter((node): node is NonNullable<typeof node> => node !== null),
 )
 // 围栏总数来自当前裁剪剧本的静态检出，用于进度展示（不随回放变化）
 const totalSpecs = computed(() => detector.extractSpecs(scenarioScript.value).specs.length)
@@ -210,14 +220,50 @@ const { chunks } = useStreamChunks(streamText, [{ marker: '\n\n', offset: 2 }], 
   ended: streamEnded,
 })
 
+// --- 舞台视图：增量 | 终态；终态视图 success 才解锁 ---
+const view = ref<'incremental' | 'final'>('incremental')
+const debugOpen = ref(false)
+
 function reset() {
   resetReplay()
   resetExtractor()
+  clearLastFrame()
 }
-// 剧本切换（组件数量调整）：引擎自动停表归零，extractor 缓存同步清除——
+// 剧本切换（组件数量调整）：引擎自动停表归零，extractor 缓存同步清除、视图归位增量——
 // 与引擎内部 watch 同源按注册序执行，归零在前、清缓存在后，与原单体实现顺序一致
-watch(scenarioChunks, resetExtractor)
+watch(scenarioChunks, () => {
+  resetExtractor()
+  clearLastFrame()
+  view.value = 'incremental'
+})
 </script>
 
-<!-- 面板样式与 /dev/stream/pages 共享，见 stream-lab.css -->
+<!-- 舞台/悬浮控制器/抽屉样式与 /dev/stream/pages 共享，见 stream-lab.css -->
 <style scoped src="~/dev/stream-lab.css"></style>
+
+<style scoped>
+/* 组件物料非整页：舞台内居中、自然尺寸展示 */
+.stage-center {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 96px 32px 120px;
+  min-height: 100%;
+}
+.stage-center--stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.controls-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+.debug-section h4 {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+</style>

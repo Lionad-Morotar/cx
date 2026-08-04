@@ -163,3 +163,131 @@
 .chunk-body {
   color: #6b7280;
 }
+
+/*
+ * 舞台 + 悬浮控制器体系：/dev/stream/components 与 /dev/stream/pages 共用布局语言——
+ * 增量/终态渲染升格为全视口舞台，播放控制与选项收进悬浮层，调试信息折叠为抽屉。
+ */
+.page-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+.stage {
+  position: absolute;
+  inset: 0;
+}
+.stage-view {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+.stage-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 14px;
+}
+.dock {
+  position: absolute;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  padding: 10px 14px;
+}
+.dock--info {
+  top: 16px;
+  left: 16px;
+}
+.dock-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+.dock--controls {
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 600px;
+  max-width: calc(100% - 32px);
+}
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.controls-row .progress {
+  margin-left: auto;
+}
+/* 透明边框占位：active 仅换色，切换不跳动 */
+.tab {
+  font-size: 12px;
+  padding: 4px 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+}
+.tab:hover {
+  color: #374151;
+}
+.tab--active {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+}
+.view-switch {
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.view-switch button {
+  font-size: 12px;
+  padding: 5px 14px;
+  background: #fff;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+}
+.view-switch button + button {
+  border-left: 1px solid #e5e7eb;
+}
+.view-switch--active {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+.view-switch button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn--ghost {
+  border-color: transparent;
+  color: #6b7280;
+}
+.btn--ghost-on {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+}
+.debug-pane {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.debug-pane .raw {
+  max-height: 160px;
+}
