@@ -75,6 +75,32 @@ export const cxHumanTextConfig: HumanTextConfig = {
 }
 
 /**
+ * 递归修剪 key 未传完的部分节点。
+ * 「id 已闭合、key 未传输」的节点是 closingBrackets 合法补全产物（真实前缀的
+ * 一部分），但对增量渲染无意义——CxRender 按 key 匹配物料，key 缺失即不可渲染；
+ * 修剪使出帧保持「完整传输节点组成的前缀树」语义。
+ * 根节点必有 key（matchTrigger 已按 key 匹配），修剪只作用于后代。
+ */
+export function pruneIncompleteNode(node: CxStreamNode): CxStreamNode | null {
+  if (!node.key) return null
+  const slots = node.components
+  if (!slots) return node
+  const out = { ...node }
+  if (Array.isArray(slots)) {
+    out.components = slots.map(pruneIncompleteNode).filter((n): n is CxStreamNode => n !== null)
+  } else {
+    const components: Record<string, CxStreamNode[]> = {}
+    for (const [slot, children] of Object.entries(slots)) {
+      components[slot] = children
+        .map(pruneIncompleteNode)
+        .filter((n): n is CxStreamNode => n !== null)
+    }
+    out.components = components
+  }
+  return out
+}
+
+/**
  * cx 协议匹配器：按节点 key 在注册表中查找 trigger。
  * 数组根取首个命中的节点。供 createIncrementalExtractor 的 matchTrigger 使用。
  */

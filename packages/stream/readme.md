@@ -95,6 +95,28 @@ trigger 是「组件 key → 增量规则」的纯数据：
 
 新组件接入只需 `registry.register(key, trigger)`，管线零修改。
 
+## 树级 trigger（页面级嵌套树）
+
+`compileTrigger` 的 scanPaths 是静态相对路径，服务「单围栏单物料」场景
+（`/dev/stream/components` 式多围栏剧本，每围栏一只物料）；页面级剧本是
+「单围栏整棵嵌套树」，树内组件位置不固定、scanPaths 无法寻址，`matchCxTrigger`
+也只命中顶层节点。
+
+`compileTreeTrigger(configs, opts?)` 消费同一批 `StreamTriggerConfig` 声明，
+产出单个走闭合事件分支的 trigger（`scanPaths: []` + `usesClosureEvents`），
+注册到页面根物料 key 即可：`buildPartial` 深递归按节点 key 应用各物料的
+closure 适配语义——管线截断保证 parsed 值皆完整，数组逐行 / 区域揭示 /
+骨架标记全部由 parsed 内容自足推导，无需 scanPaths 计数。
+
+树级与组件级的语义差异（写断言前先内化）：
+
+- **剔除**：节点按 config 判定「无产出即剔除」（连同子树），与组件级
+  buildPartial 末尾整体守卫的 null 语义一致；sibling 不受影响
+- **region 空 slot**：key 存在（含空数组）即保留——空数组是合法终态；
+  组件级「计数 0 移除」不可照搬（closure 模式 key 存在 ⟺ 已开始传输）
+- **frameStride**：树级统一取 `opts.frameStride`（缺省 1），各物料声明不生效
+- **extraScanPaths**：树级忽略（closure 截断天然逐行）
+
 ## LLM 输出约定（cx 预设）
 
 - Spec 置于 ```json 代码块内（也支持裸 JSON 兜底）
