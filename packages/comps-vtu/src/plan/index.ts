@@ -29,7 +29,7 @@ export default define({
       type: 'json',
       initial: () => [
         { id: 't1', label: '搭建包骨架', status: 'completed' },
-        { id: 't2', label: '接入组件', status: 'in-progress' },
+        { id: 't2', label: '接入组件', status: 'in_progress' },
         { id: 't3', label: '验收', status: 'pending' },
       ],
     },

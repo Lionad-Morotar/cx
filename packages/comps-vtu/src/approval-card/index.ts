@@ -43,8 +43,8 @@ export default define({
       name: '元数据',
       type: 'json',
       initial: () => [
-        { label: '环境', value: 'production' },
-        { label: '版本', value: 'v1.2.0' },
+        { key: '环境', value: 'production' },
+        { key: '版本', value: 'v1.2.0' },
       ],
     },
   },

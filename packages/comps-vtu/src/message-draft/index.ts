@@ -34,5 +34,12 @@ export default define({
       type: 'json',
       initial: () => ['team@example.com'],
     },
+    // slack 分支必填（vtu 判别联合直访 target.type/name，缺席即 TypeError）；
+    // email 分支忽略此字段
+    target: {
+      name: 'Slack 目标',
+      type: 'json',
+      initial: () => ({ type: 'channel', name: 'general' }),
+    },
   },
 })

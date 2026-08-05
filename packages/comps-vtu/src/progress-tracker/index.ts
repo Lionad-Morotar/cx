@@ -12,7 +12,8 @@ export default define({
     elapsedTime: {
       name: '已耗时',
       type: 'short',
-      initial: '00:42',
+      // vtu SFC 按毫秒数格式化（formatElapsedTime），字符串会渲染 NaN
+      initial: 42000,
     },
     steps: {
       name: '步骤',

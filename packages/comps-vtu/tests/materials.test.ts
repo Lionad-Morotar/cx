@@ -157,3 +157,56 @@ describe('vtu 物料挂载 smoke', () => {
     expect(wrapper.exists()).toBe(true)
   })
 })
+
+/**
+ * meta initial 与 vtu SFC 消费契约对齐：initial 值必须经 SFC 渲染出完整结构。
+ * vtu 源码（tool-ui-vue schema/SFC）为唯一准绳；status 枚举等字段不可跨组件类推
+ *（plan 用 in_progress 下划线、progress-tracker 用 in-progress 连字符）。
+ */
+describe('meta initial 与 vtu 消费契约对齐', () => {
+  /** meta props 的 initial 统一求值（函数形态带空 ctx 调一次） */
+  const initialOf = (key: string, prop: string) => {
+    const meta = byKey(key)._cx_meta.props[prop]
+    return typeof meta.initial === 'function' ? meta.initial({}) : meta.initial
+  }
+
+  it('approval-card metadata 项以 key 渲染（SFC 消费 item.key）', () => {
+    const comp = byKey('cx-vtu-approval-card')
+    const wrapper = mountMaterial(comp, {
+      title: '确认部署？',
+      metadata: initialOf('cx-vtu-approval-card', 'metadata'),
+    })
+    expect(wrapper.text()).toContain('环境')
+    expect(wrapper.text()).toContain('production')
+  })
+
+  it('plan todos 的 in_progress 状态渲染进行态样式', () => {
+    const comp = byKey('cx-vtu-plan')
+    const wrapper = mountMaterial(comp, {
+      title: '计划',
+      todos: initialOf('cx-vtu-plan', 'todos'),
+    })
+    expect(wrapper.html()).toContain('shimmer')
+  })
+
+  it('progress-tracker elapsedTime 为毫秒数（渲染不出现 NaN）', () => {
+    const comp = byKey('cx-vtu-progress-tracker')
+    const wrapper = mountMaterial(comp, {
+      elapsedTime: initialOf('cx-vtu-progress-tracker', 'elapsedTime'),
+      steps: [{ id: 's1', label: '解析', status: 'completed' }],
+    })
+    expect(wrapper.text()).not.toContain('NaN')
+  })
+
+  it('message-draft 声明 target 且 slack 分支挂载不炸', () => {
+    const comp = byKey('cx-vtu-message-draft')
+    const target = initialOf('cx-vtu-message-draft', 'target')
+    expect(target).toBeTruthy()
+    const wrapper = mountMaterial(comp, {
+      channel: 'slack',
+      body: '本周迭代已完成',
+      target,
+    })
+    expect(wrapper.text()).toContain('general')
+  })
+})
