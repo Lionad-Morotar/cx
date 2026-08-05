@@ -28,7 +28,7 @@
     <section class="dock dock--controls" data-testid="stream-controls">
       <div class="controls-row" data-testid="page-selector">
         <button
-          v-for="s in PAGE_SCENARIOS"
+          v-for="s in ALL_SCENARIOS"
           :key="s.id"
           class="tab"
           :class="{ 'tab--active': s.id === selectedId }"
@@ -110,6 +110,7 @@ import {
   type CxStreamNode,
 } from '@lionad/cx-stream'
 import { toRenderNode } from '~/dev/material-utils'
+import { NESTED_SCENARIOS } from '~/dev/stream-nested-scenario'
 import { createPageTriggerRegistry, PAGE_SCENARIOS } from '~/dev/stream-pages-scenario'
 import { useLastFrame } from '~/dev/use-last-frame'
 import { useStreamReplay } from '~/dev/use-stream-replay'
@@ -117,14 +118,22 @@ import { useStreamReplay } from '~/dev/use-stream-replay'
 defineOptions({ name: 'PageDevStreamPages' })
 
 // --- 剧本源：页面选择器决定当前剧本，默认站会列表 ---
+// 嵌套演示剧本（组件级语义验收载体）与 standup 页面剧本共用同一树级注册表
+const ALL_SCENARIOS = [...PAGE_SCENARIOS, ...NESTED_SCENARIOS]
 const selectedId = ref(PAGE_SCENARIOS[0]!.id)
-const scenario = computed(() => PAGE_SCENARIOS.find((s) => s.id === selectedId.value)!)
+const scenario = computed(() => ALL_SCENARIOS.find((s) => s.id === selectedId.value)!)
 const scenarioChunks = computed(() => scenario.value.chunks)
 
 // --- 回放引擎（与 /dev/stream/components 共用 composable）---
 // 引擎内部已 watch 剧本切换自动停表归零；extractor 缓存属消费侧状态由页面同步清除
-const { playing, speed, progress, streamText, togglePlay, reset: resetReplay } =
-  useStreamReplay(scenarioChunks)
+const {
+  playing,
+  speed,
+  progress,
+  streamText,
+  togglePlay,
+  reset: resetReplay,
+} = useStreamReplay(scenarioChunks)
 
 // --- 三态检测 ---
 const detector = createSpecDetector(cxSpecDetectorConfig)
@@ -132,7 +141,7 @@ const detection = computed(() => detector.extractSpecs(streamText.value))
 const status = computed(() => detection.value.status)
 const pendingSource = computed(() => detection.value.pendingSources?.[0] ?? '')
 
-// --- 增量渲染：页面级嵌套树按文档序逐节点生长（scalar 闭合事件分支 + 修剪契约）---
+// --- 增量渲染：树级 trigger 按节点 key 应用组件级语义（array 逐行 / region 分区 / scalar 骨架），无声明节点退化为修剪 ---
 const { partialSpec, reset: resetExtractor } = useIncrementalTree(
   computed(() => pendingSource.value),
   { registry: createPageTriggerRegistry(), matchTrigger: matchCxTrigger },

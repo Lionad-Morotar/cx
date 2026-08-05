@@ -1,9 +1,11 @@
 import type { CxComponentRuntime } from '@lionad/cx-definition'
+import { NUXT_UI_V4_STREAM_TRIGGERS } from '@lionad/cx-comps-nuxt-ui-v4'
+import { VTU_STREAM_TRIGGERS } from '@lionad/cx-comps-vtu'
 import {
+  compileTreeTrigger,
   createTriggerRegistry,
   type CxSpec,
   type CxStreamNode,
-  type IncrementalTrigger,
   type TriggerRegistry,
 } from '@lionad/cx-stream'
 
@@ -92,57 +94,18 @@ export const PAGE_SCENARIOS: PageScenario[] = [
 ]
 
 /**
- * 递归修剪 key 未传完的部分节点。
- * 「id 已闭合、key 未传输」的节点是 closingBrackets 合法补全产物（真实前缀的
- * 一部分），但对增量渲染无意义——CxRender 按 key 匹配物料，key 缺失即不可渲染；
- * 修剪使出帧保持「完整传输节点组成的前缀树」语义。
- * 根节点必有 key（matchTrigger 已按 key 匹配），修剪只作用于后代。
+ * 页面级增量注册表：树级 trigger 消费 vtu + nuxt-ui-v4 全量物料声明，
+ * 注册到各页面剧本根 key。树内组件按自身 key 命中组件级语义
+ * （array 逐行 / region 分区揭示 / scalar 骨架）；standup 物料无 trigger
+ * 声明，对 standup 树退化为纯 prune——与纯修剪时代的页面级行为等价。
+ * 嵌套演示剧本（stream-nested-scenario）根 key 与站会列表同为
+ * cx-page-main，已被同一注册覆盖，消费侧无需分支。
  */
-function pruneIncompleteNode(node: CxStreamNode): CxStreamNode | null {
-  if (!node.key) return null
-  const slots = node.components
-  if (!slots) return node
-  const out = { ...node }
-  if (Array.isArray(slots)) {
-    out.components = slots
-      .map(pruneIncompleteNode)
-      .filter((n): n is CxStreamNode => n !== null)
-  } else {
-    const components: Record<string, CxStreamNode[]> = {}
-    for (const [slot, children] of Object.entries(slots)) {
-      components[slot] = children
-        .map(pruneIncompleteNode)
-        .filter((n): n is CxStreamNode => n !== null)
-    }
-    out.components = components
-  }
-  return out
-}
-
-/**
- * 页面级增量 trigger：页面 schema 无数组主字段，增量语义是嵌套树逐步生长，
- * 走提取器的 usesClosureEvents 标量分支——截断至最远闭合事件 + 补闭合括号
- * 产出的即合法前缀树（实测各传输比例出帧均为真实前缀、零伪造节点），
- * buildPartial 只需修剪 key 未传完的部分节点，不做形状变换。
- */
-const PAGE_TRIGGER: IncrementalTrigger<CxSpec> = {
-  scanPaths: [],
-  usesClosureEvents: true,
-  buildPartial: (spec) => {
-    const nodes = Array.isArray(spec) ? spec : [spec]
-    const pruned = nodes
-      .map(pruneIncompleteNode)
-      .filter((n): n is CxStreamNode => n !== null)
-    if (pruned.length === 0) return null
-    return (Array.isArray(spec) ? pruned : pruned[0]!) as CxSpec
-  },
-}
-
-/** 按三个页面根物料 key 注册同一标量 trigger 的注册表工厂 */
 export function createPageTriggerRegistry(): TriggerRegistry<CxSpec> {
+  const treeTrigger = compileTreeTrigger([...VTU_STREAM_TRIGGERS, ...NUXT_UI_V4_STREAM_TRIGGERS])
   const registry = createTriggerRegistry<CxSpec>()
   for (const s of PAGE_SCENARIOS) {
-    registry.register(s.rootKey, PAGE_TRIGGER)
+    registry.register(s.rootKey, treeTrigger)
   }
   return registry
 }
