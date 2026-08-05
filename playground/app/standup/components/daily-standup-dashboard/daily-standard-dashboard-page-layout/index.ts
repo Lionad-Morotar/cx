@@ -5,6 +5,7 @@ export default define({
   name: translate('站会详情页面布局'),
   description: translate('标准站会详情页面布局'),
   key: 'cx-daily-standard-dashboard-page-layout',
+  icon: 'i-tabler-layout-dashboard',
   component,
   slots: {
     'page-header': {

@@ -9,6 +9,7 @@ export default define({
   name: translate('站会顶栏'),
   description: translate('站会列表顶栏：时间计数与手动同步、开会/继续、设置参会人、全屏操作'),
   key: 'cx-standup-header-bar',
+  icon: 'i-tabler-layout-navbar',
   component,
   async: true,
 })

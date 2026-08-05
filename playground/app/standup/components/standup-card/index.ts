@@ -9,6 +9,7 @@ export default define({
   name: translate('站会卡片'),
   description: translate('展示单次站会的日期、时间与状态，数据由卡片上下文注入，点击跳转看板'),
   key: 'cx-standup-card',
+  icon: 'i-tabler-id',
   component,
   async: true,
   props: {

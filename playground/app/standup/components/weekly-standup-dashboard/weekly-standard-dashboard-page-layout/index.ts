@@ -5,6 +5,7 @@ export default define({
   name: translate('周会详情页面'),
   description: translate('标准周会详情页面布局'),
   key: 'cx-weekly-standup-dashboard-page-layout',
+  icon: 'i-tabler-calendar-week',
   component,
   slots: {
     'page-header-center': {

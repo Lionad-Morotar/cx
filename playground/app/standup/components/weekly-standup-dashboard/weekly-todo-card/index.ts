@@ -7,6 +7,7 @@ export default define({
     '周会代码卡片用于展示在给定周会的对应用户的代办列表，并且你可以快速切换到上次周会',
   ),
   key: 'cx-weekly-todo-card',
+  icon: 'i-tabler-checkbox',
   component,
   async: true,
 })

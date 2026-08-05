@@ -9,6 +9,7 @@ export default define({
   name: translate('站会分组头部'),
   description: translate('展示分组序号与日期范围，点击切换折叠，数据由分组上下文注入'),
   key: 'cx-standup-group-header',
+  icon: 'i-tabler-heading',
   component,
   async: true,
 })

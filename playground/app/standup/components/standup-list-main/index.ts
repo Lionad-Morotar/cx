@@ -9,6 +9,11 @@ export default define({
   name: translate('站会列表主区域'),
   description: translate('站会列表左侧滚动区域：当期分组列表插槽与历史站会'),
   key: 'cx-standup-list-main',
+  icon: 'i-tabler-layout-list',
   component,
   async: true,
+  // 分组列表（cx-standup-group-list）经默认插槽传入
+  slots: {
+    default: { key: 'default', name: translate('默认插槽') },
+  },
 })

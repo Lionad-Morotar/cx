@@ -10,6 +10,7 @@ export default define({
   name: translate('站会分组列表'),
   description: translate('按分组循环渲染 group-item 模板插槽，单项 group 数据经上下文注入'),
   key: 'cx-standup-group-list',
+  icon: 'i-tabler-stack-2',
   component,
   async: true,
   slots: {

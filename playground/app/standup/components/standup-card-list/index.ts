@@ -10,6 +10,7 @@ export default define({
   name: translate('站会卡片列表'),
   description: translate('按 group.standups 循环渲染 card-item 模板插槽，单项卡片数据经上下文注入'),
   key: 'cx-standup-card-list',
+  icon: 'i-tabler-cards',
   component,
   async: true,
   slots: {

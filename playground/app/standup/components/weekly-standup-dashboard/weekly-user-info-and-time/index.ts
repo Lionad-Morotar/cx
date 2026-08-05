@@ -5,6 +5,7 @@ export default define({
   name: translate('用户名称及会议时间'),
   description: translate('显示当前用户头像及名称，以及此次会议的时间'),
   key: 'cx-weekly-user-info-and-time',
+  icon: 'i-tabler-clock',
   component,
   async: true,
 })

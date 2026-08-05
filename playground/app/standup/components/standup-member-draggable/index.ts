@@ -8,6 +8,7 @@ export default define({
   name: translate('项目成员列表'),
   description: translate('站会列表右侧项目成员区，支持拖拽排序'),
   key: 'cx-standup-member-draggable',
+  icon: 'i-tabler-drag-drop',
   component,
   async: true,
 })

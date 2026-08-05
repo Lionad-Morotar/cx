@@ -9,6 +9,7 @@ export default define({
   name: translate('参会人选择弹窗'),
   description: translate('选择站会参会/缺席人员，由顶栏开会流程唤起，状态经共享单例编排'),
   key: 'cx-select-participants-dialog',
+  icon: 'i-tabler-users',
   component,
   async: true,
 })

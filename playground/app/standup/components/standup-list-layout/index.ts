@@ -9,6 +9,11 @@ export default define({
   name: translate('站会列表布局'),
   description: translate('站会列表页的三区域网格布局容器'),
   key: 'cx-standup-list-layout',
+  icon: 'i-tabler-layout-columns',
   component,
   async: true,
+  // 三区域 grid 的子节点统一经默认插槽传入（display:contents 包装层直挂 grid 项）
+  slots: {
+    default: { key: 'default', name: translate('默认插槽') },
+  },
 })
