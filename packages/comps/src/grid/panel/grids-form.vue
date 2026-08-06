@@ -290,29 +290,33 @@ const lastColComps = computed(() => {
 const addRow = () => (row.value += 1)
 const addCol = () => (col.value += 1)
 
-const removeLastRow = () => {
-  lastRowsSlots.value.map((slot) => {
-    ;(childs.value[slot] || []).map((comp) => {
-      props.cx.removeComponent({
+const removeLastRow = async () => {
+  // removeComponent 经 useHooks 包装后为 async：逐个等待删除完成再减行数，
+  // 避免行数先减而组件未删造成的瞬态错位；删除间有组件树位置依赖，保持顺序执行。
+  // 迭代前快照槽内组件：removeComponent 会同步 splice 同一数组，直接迭代活数组会隔位漏删
+  for (const slot of lastRowsSlots.value) {
+    for (const comp of [...(childs.value[slot] || [])]) {
+      await props.cx.removeComponent({
         from: props.comp,
         slotKey: slot,
         remove: comp,
       })
-    })
-  })
+    }
+  }
   row.value -= 1
 }
 
-const removeLastCol = () => {
-  lastColsSlots.value.map((slot) => {
-    ;(childs.value[slot] || []).map((comp) => {
-      props.cx.removeComponent({
+const removeLastCol = async () => {
+  // 同 removeLastRow：await 保证删除时序，迭代前快照避免 splice 导致的漏删
+  for (const slot of lastColsSlots.value) {
+    for (const comp of [...(childs.value[slot] || [])]) {
+      await props.cx.removeComponent({
         from: props.comp,
         slotKey: slot,
         remove: comp,
       })
-    })
-  })
+    }
+  }
   col.value -= 1
 }
 
