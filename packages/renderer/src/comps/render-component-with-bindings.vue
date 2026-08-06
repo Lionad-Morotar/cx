@@ -605,42 +605,45 @@ export default defineComponent({
     //   return toSet
     // }
 
-    return () =>
-      unref(isHeadless)
-        ? h(
-            componentType.value,
-            {
-              ...attrs,
-              // componentType 是 Component | string 动态联合类型，标准 VNode props
-              // 未声明 ref/comp 这两个自定义字段，运行时由 Vue 处理
-              ref: props.setRef,
-              comp: markRaw(comp.value),
-            },
-            slots,
-          )
-        : withDirectives(
-            h(
-              componentType.value,
-              {
-                ...attrs,
-                // 见上 headless 分支：动态组件自定义 props 同理
-                ref: props.setRef,
-                comp: markRaw(comp.value),
-                // 空样式不下传：styles 由 _cx_style（编辑器样式）驱动，默认空对象；
-                // 空的响应式 style 进入组件链会在 Reka Primitive 的 vnode 归一化阶段
-                // 触发只读代理写入异常（'set' on proxy），仅在有实际样式时传 style
-                ...(Object.keys(styleSnapshot.value.styles).length > 0
-                  ? { style: styleSnapshot.value.styles }
-                  : {}),
-                class: styleSnapshot.value.classes,
-                ['data-is-cx-comp']: true,
-                ['data-cx-comp-id']: comp.value?.id,
-                ['data-cx-comp-key']: comp.value?.key,
-              },
-              slots,
-            ),
-            unref(resolvedDirectives) as unknown as DirectiveArguments,
-          )
+    return () => {
+      if (unref(isHeadless)) {
+        return h(
+          componentType.value,
+          {
+            ...attrs,
+            // componentType 是 Component | string 动态联合类型，标准 VNode props
+            // 未声明 ref/comp 这两个自定义字段，运行时由 Vue 处理
+            ref: props.setRef,
+            comp: markRaw(comp.value),
+          },
+          slots,
+        )
+      }
+      const vnode = h(
+        componentType.value,
+        {
+          ...attrs,
+          // 见上 headless 分支：动态组件自定义 props 同理
+          ref: props.setRef,
+          comp: markRaw(comp.value),
+          // 空样式不下传：styles 由 _cx_style（编辑器样式）驱动，默认空对象；
+          // 空的响应式 style 进入组件链会在 Reka Primitive 的 vnode 归一化阶段
+          // 触发只读代理写入异常（'set' on proxy），仅在有实际样式时传 style
+          ...(Object.keys(styleSnapshot.value.styles).length > 0
+            ? { style: styleSnapshot.value.styles }
+            : {}),
+          class: styleSnapshot.value.classes,
+          ['data-is-cx-comp']: true,
+          ['data-cx-comp-id']: comp.value?.id,
+          ['data-cx-comp-key']: comp.value?.key,
+        },
+        slots,
+      )
+      const dirs = unref(resolvedDirectives) as unknown as DirectiveArguments
+      // 空指令数组不包 withDirectives：空数组写入 vnode.dirs 后仍满足渲染器的
+      // truthy 检查，Fragment/Comment 根的物料会被误报非元素根指令警告
+      return dirs.length ? withDirectives(vnode, dirs) : vnode
+    }
   },
 })
 </script>
