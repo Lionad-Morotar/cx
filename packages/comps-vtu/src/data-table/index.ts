@@ -43,4 +43,8 @@ export default define({
       initial: '暂无数据',
     },
   },
+  // emits 与 SFC defineEmits 同集合:声明后 cx 渲染器 getEmits 命中,经 _cx_events 接到 host
+  emits: {
+    'link-click': { name: '链接列点击', description: '点击 link 列单元格,宿主回写「查看第 <行> 行 <列名>」并阻止整页导航' },
+  },
 })

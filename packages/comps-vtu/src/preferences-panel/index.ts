@@ -29,4 +29,9 @@ export default define({
       ],
     },
   },
+  // emits 与 SFC defineEmits 同集合:声明后 cx 渲染器 getEmits 命中,经 _cx_events 接到 host
+  emits: {
+    change: { name: '偏好变更', description: '任一项开关/取值变化,宿主回写「偏好设置为 <变更摘要>」' },
+    action: { name: '动作触发', description: '点击面板动作(如保存),宿主回写「偏好动作 <actionId>」' },
+  },
 })

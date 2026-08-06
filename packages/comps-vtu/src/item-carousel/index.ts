@@ -33,4 +33,9 @@ export default define({
       ],
     },
   },
+  // emits 与 SFC defineEmits 同集合:声明后 cx 渲染器 getEmits 命中,经 _cx_events 接到 host
+  emits: {
+    'item-click': { name: '条目点击', description: '点击条目主体,宿主回写「查看条目 <itemId>」' },
+    'item-action': { name: '条目动作', description: '点击条目内动作,宿主回写「条目 <itemId> 执行 <actionId>」' },
+  },
 })

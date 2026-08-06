@@ -42,4 +42,10 @@ export default define({
       initial: () => ({ type: 'channel', name: 'general' }),
     },
   },
+  // emits 与 SFC defineEmits 同集合:声明后 cx 渲染器 getEmits 命中,经 _cx_events 接到 host
+  emits: {
+    send: { name: '发送草稿', description: '点击发送,宿主回写「发送草稿」' },
+    undo: { name: '撤销草稿', description: '点击撤销,宿主回写「撤销草稿」' },
+    cancel: { name: '取消草稿', description: '点击取消,宿主回写「取消草稿」' },
+  },
 })
