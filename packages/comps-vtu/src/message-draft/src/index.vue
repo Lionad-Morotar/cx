@@ -2,8 +2,10 @@
   <!-- 消息草稿卡片；body 未闭合期间（_cx_streaming 含 body）以骨架条组替换物料占位 -->
   <StreamSkeleton v-if="streamingBody" :class="ns.b()" />
   <!--
-    vtu MessageDraft 的 send/undo/cancel 是函数型 prop(非 Vue emit),
-    包装件 :on-* 绑定回调再 re-emit,统一上抛供 cx 渲染器经 _cx_events 接线(host 侧 hooks 拦截)。
+    vtu MessageDraft 对 send/undo/cancel 是双通道:先调函数 prop e.onSend?.() 再 emit('send')。
+    此处刻意保留 :on-* kebab v-bind——kebab 键只进 props.onSend 通道、进不了 emit 的
+    camel 键查找,回调只被调一次;若改用 @send,props.onSend 与 emit 监听会同时命中
+    同一回调导致 re-emit 两次(双发到聊天区)。
   -->
   <MessageDraft
     v-else

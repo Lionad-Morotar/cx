@@ -6,9 +6,15 @@ import { CxVtu } from '../src/index'
 
 /**
  * 物料 emits 契约:meta emits 声明与包装件 SFC defineEmits 同集合,
- * vtu 函数型 prop(on*)经包装件 re-emit 为 Vue emit 上抛——
+ * vtu 事件经包装件 re-emit 为 Vue emit 上抛——
  * cx 渲染器 getEmits 命中 meta 声明后经 _cx_events 接到 host 事件总线。
  * data-table 行级 link-click 为包装件 DOM 委托(物料边界内),携带行内容与列定义。
+ *
+ * 上抛用例一律经 inner.vm.$emit 驱动而非直调 props.on*——$emit 走与生产一致的
+ * vnode props handler 查找(emit 找 camel 键 onXxx),能锁死「:on-* kebab v-bind
+ * 永远等不到真 emit」这类绑定形态错误;直调 props 则两种绑定形态都通过,失去回归意义。
+ * message-draft 是例外:vtu 对 send/undo/cancel 双通道(先调函数 prop 再 emit),
+ * 包装件刻意保留 kebab v-bind 走 props 单通道防双发,故该用例仍直调 props.on* 并断言单发。
  */
 const fakeComp = (key: string) => ({ id: `test-${key}`, key, data: {}, components: {} })
 
@@ -38,6 +44,8 @@ function metaEmits(comp: any): string[] {
 
 describe('物料 emits · meta 与 SFC 同集合', () => {
   const CASES: Array<[string, string[]]> = [
+    ['cx-vtu-option-list', ['action', 'change', 'update:modelValue']],
+    ['cx-vtu-approval-card', ['confirm', 'cancel']],
     ['cx-vtu-preferences-panel', ['change', 'action']],
     ['cx-vtu-question-flow', ['select', 'back', 'step-change', 'complete']],
     ['cx-vtu-message-draft', ['send', 'undo', 'cancel']],
@@ -54,8 +62,35 @@ describe('物料 emits · meta 与 SFC 同集合', () => {
   }
 })
 
-describe('物料 emits · vtu 函数 prop re-emit', () => {
-  it('preferences-panel: onChange/onAction/onUpdate:value 上抛', async () => {
+describe('物料 emits · vtu 真 emit 上抛', () => {
+  it('option-list: change/action 上抛', async () => {
+    const comp = byKey('cx-vtu-option-list')
+    const wrapper = mountMaterial(comp, {
+      options: [
+        { id: 'opt-1', label: '选项一' },
+        { id: 'opt-2', label: '选项二' },
+      ],
+    })
+    const inner = wrapper.findComponent({ name: 'CmptOptionList' })
+    inner.vm.$emit('change', 'opt-1')
+    inner.vm.$emit('action', 'confirm', 'opt-1')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.emitted('change')?.[0]).toEqual(['opt-1'])
+    expect(wrapper.emitted('action')?.[0]).toEqual(['confirm', 'opt-1'])
+  })
+
+  it('approval-card: confirm/cancel 上抛', async () => {
+    const comp = byKey('cx-vtu-approval-card')
+    const wrapper = mountMaterial(comp, { title: '发布审批' })
+    const inner = wrapper.findComponent({ name: 'CmptApprovalCard' })
+    inner.vm.$emit('confirm')
+    inner.vm.$emit('cancel')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.emitted('confirm')).toBeTruthy()
+    expect(wrapper.emitted('cancel')).toBeTruthy()
+  })
+
+  it('preferences-panel: change/action 上抛', async () => {
     const comp = byKey('cx-vtu-preferences-panel')
     const wrapper = mountMaterial(comp, {
       sections: [
@@ -66,15 +101,14 @@ describe('物料 emits · vtu 函数 prop re-emit', () => {
       ],
     })
     const inner = wrapper.findComponent({ name: 'CmptPreferencesPanel' })
-    const props = inner.props() as Record<string, any>
-    props.onChange?.({ notif: false })
-    props.onAction?.('save', { notif: false })
+    inner.vm.$emit('change', { notif: false })
+    inner.vm.$emit('action', 'save', { notif: false })
     await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('change')).toBeTruthy()
+    expect(wrapper.emitted('change')?.[0]).toEqual([{ notif: false }])
     expect(wrapper.emitted('action')?.[0]).toEqual(['save', { notif: false }])
   })
 
-  it('question-flow: onSelect/onBack/onStepChange/onComplete 上抛', async () => {
+  it('question-flow: select/back/stepChange/complete 上抛', async () => {
     const comp = byKey('cx-vtu-question-flow')
     const wrapper = mountMaterial(comp, {
       steps: [
@@ -90,11 +124,11 @@ describe('物料 emits · vtu 函数 prop re-emit', () => {
       ],
     })
     const inner = wrapper.findComponent({ name: 'CmptQuestionFlow' })
-    const props = inner.props() as Record<string, any>
-    props.onSelect?.(['a'])
-    props.onBack?.()
-    props.onStepChange?.('q1')
-    props.onComplete?.({ q1: ['a'] })
+    inner.vm.$emit('select', ['a'])
+    inner.vm.$emit('back')
+    // vtu 原生事件名是 camelCase 的 stepChange;包装件 re-emit 回宿主侧为 kebab step-change
+    inner.vm.$emit('stepChange', 'q1')
+    inner.vm.$emit('complete', { q1: ['a'] })
     await wrapper.vm.$nextTick()
     expect(wrapper.emitted('select')?.[0]).toEqual([['a']])
     expect(wrapper.emitted('back')).toBeTruthy()
@@ -102,7 +136,7 @@ describe('物料 emits · vtu 函数 prop re-emit', () => {
     expect(wrapper.emitted('complete')?.[0]).toEqual([{ q1: ['a'] }])
   })
 
-  it('message-draft: onSend/onUndo/onCancel 上抛', async () => {
+  it('message-draft: send/undo/cancel 经函数 prop 单通道上抛(防双发)', async () => {
     const comp = byKey('cx-vtu-message-draft')
     const wrapper = mountMaterial(comp, {
       type: 'email',
@@ -111,40 +145,41 @@ describe('物料 emits · vtu 函数 prop re-emit', () => {
       to: ['team@example.com'],
     })
     const inner = wrapper.findComponent({ name: 'CmptMessageDraft' })
+    // vtu MessageDraft 双通道(先调 props.onSend 再 emit send):生产命中 props 通道,
+    // kebab 绑定使 emit 通道查不到 handler——断言每事件恰好上抛一次,锁死防双发形态
     const props = inner.props() as Record<string, any>
     props.onSend?.()
     props.onUndo?.()
     props.onCancel?.()
     await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('send')).toBeTruthy()
-    expect(wrapper.emitted('undo')).toBeTruthy()
-    expect(wrapper.emitted('cancel')).toBeTruthy()
+    expect(wrapper.emitted('send')!.length).toBe(1)
+    expect(wrapper.emitted('undo')!.length).toBe(1)
+    expect(wrapper.emitted('cancel')!.length).toBe(1)
   })
 
-  it('parameter-slider: onChange/onAction 上抛', async () => {
+  it('parameter-slider: change/action 上抛', async () => {
     const comp = byKey('cx-vtu-parameter-slider')
     const wrapper = mountMaterial(comp, {
       sliders: [{ id: 'temp', label: '温度', min: 0, max: 100, step: 1, value: 42, unit: '°C' }],
     })
     const inner = wrapper.findComponent({ name: 'CmptParameterSlider' })
-    const props = inner.props() as Record<string, any>
     const next = [{ id: 'temp', label: '温度', min: 0, max: 100, step: 1, value: 50, unit: '°C' }]
-    props.onChange?.(next)
-    props.onAction?.('apply', next)
+    inner.vm.$emit('change', next)
+    inner.vm.$emit('action', 'apply', next)
     await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('change')).toBeTruthy()
+    expect(wrapper.emitted('change')?.[0]).toEqual([next])
     expect(wrapper.emitted('action')?.[0]).toEqual(['apply', next])
   })
 
-  it('item-carousel: onItemClick/onItemAction 上抛', async () => {
+  it('item-carousel: itemClick/itemAction 上抛', async () => {
     const comp = byKey('cx-vtu-item-carousel')
     const wrapper = mountMaterial(comp, {
       items: [{ id: 'i1', name: '条目一', subtitle: '副标题', image: 'https://example.com/i1.png' }],
     })
     const inner = wrapper.findComponent(ItemCarousel)
-    const props = inner.props() as Record<string, any>
-    props.onItemClick?.('i1')
-    props.onItemAction?.('i1', 'open')
+    // vtu 原生事件名是 camelCase 的 itemClick/itemAction;re-emit 回宿主侧为 kebab
+    inner.vm.$emit('itemClick', 'i1')
+    inner.vm.$emit('itemAction', 'i1', 'open')
     await wrapper.vm.$nextTick()
     expect(wrapper.emitted('item-click')?.[0]).toEqual(['i1'])
     expect(wrapper.emitted('item-action')?.[0]).toEqual(['i1', 'open'])

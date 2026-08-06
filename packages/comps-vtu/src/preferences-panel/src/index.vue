@@ -1,14 +1,14 @@
 <template>
   <!--
-    vtu PreferencesPanel 的 change/action 是函数型 prop(非 Vue emit),
-    包装件 :on-* 绑定回调再 re-emit,统一上抛供 cx 渲染器经 _cx_events 接线(host 侧 hooks 拦截)。
-    vtu 声明的 update:value emit 无对应函数型 prop,不在 re-emit 集合内(整值变更由 change 承载)。
+    vtu PreferencesPanel 的 change/action 是真 emit(实现只走 emit,不调函数 prop),
+    必须用 @ 监听——:on-* kebab v-bind 进不了 emit 的 camel 键查找,事件会丢。
+    vtu 声明的 update:value 不在 re-emit 集合内(整值变更由 change 承载)。
   -->
   <PreferencesPanel
     v-bind="vtuProps"
     :class="ns.b()"
-    :on-change="(value: PreferencesValue) => emit('change', value)"
-    :on-action="(actionId: string, value: PreferencesValue) => emit('action', actionId, value)"
+    @change="(value: PreferencesValue) => emit('change', value)"
+    @action="(actionId: string, value: PreferencesValue) => emit('action', actionId, value)"
   />
 </template>
 

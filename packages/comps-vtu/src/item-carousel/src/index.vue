@@ -1,13 +1,14 @@
 <template>
   <!--
-    vtu ItemCarousel 的 itemClick/itemAction 是函数型 prop(非 Vue emit),
-    包装件 :on-* 绑定回调再 re-emit,统一上抛供 cx 渲染器经 _cx_events 接线(host 侧 hooks 拦截)。
+    vtu ItemCarousel 的 itemClick/itemAction 是真 emit(实现只走 emit,不调函数 prop),
+    必须用 @ 监听——:on-* kebab v-bind 进不了 emit 的 camel 键查找,事件会丢。
+    re-emit 回宿主侧统一用 kebab 的 item-click/item-action(与 meta emits/hydrate 同键)。
   -->
   <ItemCarousel
     v-bind="vtuProps"
     :class="ns.b()"
-    :on-item-click="(itemId: string) => emit('item-click', itemId)"
-    :on-item-action="(itemId: string, actionId: string) => emit('item-action', itemId, actionId)"
+    @item-click="(itemId: string) => emit('item-click', itemId)"
+    @item-action="(itemId: string, actionId: string) => emit('item-action', itemId, actionId)"
   />
 </template>
 

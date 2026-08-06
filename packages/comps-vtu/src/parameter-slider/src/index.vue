@@ -1,13 +1,13 @@
 <template>
   <!--
-    vtu ParameterSlider 的 change/action 是函数型 prop(非 Vue emit),
-    包装件 :on-* 绑定回调再 re-emit,统一上抛供 cx 渲染器经 _cx_events 接线(host 侧 hooks 拦截)。
+    vtu ParameterSlider 的 change/action 是真 emit(实现只走 emit,不调函数 prop),
+    必须用 @ 监听——:on-* kebab v-bind 进不了 emit 的 camel 键查找,事件会丢。
   -->
   <ParameterSlider
     v-bind="vtuProps"
     :class="ns.b()"
-    :on-change="(values: SliderValue[]) => emit('change', values)"
-    :on-action="(actionId: string, values: SliderValue[]) => emit('action', actionId, values)"
+    @change="(values: SliderValue[]) => emit('change', values)"
+    @action="(actionId: string, values: SliderValue[]) => emit('action', actionId, values)"
   />
 </template>
 

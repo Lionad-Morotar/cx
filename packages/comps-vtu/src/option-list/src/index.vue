@@ -1,15 +1,16 @@
 <template>
   <!--
-    vtu OptionList 的 action/change 是函数型 prop(非 Vue emit),仅 update:modelValue 是真 emit。
-    故 action/change 用 :on-* 绑定 prop 回调再 re-emit,modelValue 用 @update 监听,
-    统一上抛为包装组件的 emits,供 cx 渲染器经 _cx_events 接线(host 侧 hooks 拦截)。
+    vtu OptionList 的 action/change/update:modelValue 均为真 emit(0.3.8 起实现只走 emit,
+    不再调函数 prop),必须用 @ 监听——:on-* kebab v-bind 会被解析成 props.onAction/onChange,
+    而 emit 查找的是 camel 键 onAction/onChange,kebab 绑定永远等不到触发。
+    监听后 re-emit 为包装组件 emits,供 cx 渲染器经 _cx_events 接线(host 侧 hooks 拦截)。
   -->
   <OptionList
     v-bind="vtuProps"
     :class="ns.b()"
     :actions="normalizedActions"
-    :on-action="(id, value) => emit('action', id, value)"
-    :on-change="(value) => emit('change', value)"
+    @action="(id, value) => emit('action', id, value)"
+    @change="(value) => emit('change', value)"
     @update:model-value="(value) => emit('update:modelValue', value)"
   />
 </template>
