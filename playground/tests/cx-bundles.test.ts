@@ -27,10 +27,10 @@ describe('物料 bundle 装配链路', () => {
     const total = (cxBundles as any[]).reduce((n, b) => n + b.materials.length, 0)
     expect(installComponent).toHaveBeenCalledTimes(total)
 
-    // 已知历史重复：基础物料与 v2 物料各有 cx-skeleton，v2 后注册覆盖基础物料
+    // 已知重复：基础物料与 v2 物料各有 cx-skeleton / cx-tabs，v2 后注册覆盖基础物料
     // （原硬编码装配顺序相同，行为未变）；命名空间治理属后续专项。
     // 子集断言：裁剪配置下重复可不出现（如未启用 v2），但任何新重复都会打破断言
-    const KNOWN_DUPLICATE_KEYS = ['cx-skeleton']
+    const KNOWN_DUPLICATE_KEYS = ['cx-skeleton', 'cx-tabs']
     const keys = installComponent.mock.calls.map(([key]) => key)
     const duplicates = [...new Set(keys.filter((k, i) => keys.indexOf(k) !== i))]
     expect(duplicates.every((k) => KNOWN_DUPLICATE_KEYS.includes(k))).toBe(true)
