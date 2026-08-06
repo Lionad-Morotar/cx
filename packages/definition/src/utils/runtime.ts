@@ -42,10 +42,11 @@ type DataRecord = Record<string, unknown>
 
 /**
  * useHooks 包装函数的 cancel 回调参数结构（见 use-fn.ts 的 cancel 注册：
- * 回调接收 { result, args }，args 为原函数参数元组）
+ * 回调接收 { result, args }，args 为原函数参数元组；fn 抛错时管线未产出结果，
+ * result 恒为 undefined，故类型含 undefined 与实现语义对齐）
  */
 type CancelArgs<T extends AnyFn> = {
-  result: ReturnType<T>
+  result: Awaited<ReturnType<T>> | undefined
   args: Parameters<T>
 }
 

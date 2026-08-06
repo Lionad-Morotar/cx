@@ -52,37 +52,42 @@ const BUILTIN_BUNDLES: Record<CxBuiltinMaterialSet, CxBundleSpec> = {
  * 基线表派生自 cx-nuxt 自身依赖链（cx-definition + cx-vue），恒可解析；
  * 物料集增量按内置物料集条件注入——宿主未安装对应物料包时预构建会解析失败，
  * 故不能无条件注入；自定义 bundles 形态的依赖链本模块无从得知，不予管理。
+ *
+ * 条目一律用嵌套依赖语法（'<parent> > <dep>'）：pnpm 严格布局下裸包名
+ * 只在宿主根 node_modules 有直接软链时可解析，cx 运行时依赖经 link 或
+ * npm 安装都不提升，裸条目会 WARN unresolvable 并漏掉预构建（实证：
+ * cx 运行时 CJS 依赖未预打包时浏览器裸解析 ESM 白屏）。
  */
 const BASE_OPTIMIZE_DEPS = [
   // cx-definition 运行时依赖
-  'bignumber.js',
-  'kareem',
-  'mitt',
-  'nanoid',
-  'nativebird',
-  'uuid',
-  'zod',
+  '@lionad/cx-definition > @middy/core',
+  '@lionad/cx-definition > bignumber.js',
+  '@lionad/cx-definition > mitt',
+  '@lionad/cx-definition > nanoid',
+  '@lionad/cx-definition > nativebird',
+  '@lionad/cx-definition > uuid',
+  '@lionad/cx-definition > zod',
   // cx 源码内 lodash-es 深路径导入
-  'lodash-es',
-  'lodash-es/camelCase',
-  'lodash-es/cloneDeep',
-  'lodash-es/isFunction',
-  'lodash-es/kebabCase',
-  'lodash-es/upperFirst',
+  '@lionad/cx-definition > lodash-es',
+  '@lionad/cx-definition > lodash-es/camelCase',
+  '@lionad/cx-definition > lodash-es/cloneDeep',
+  '@lionad/cx-definition > lodash-es/isFunction',
+  '@lionad/cx-definition > lodash-es/kebabCase',
+  '@lionad/cx-definition > lodash-es/upperFirst',
   // cx-vue 运行时依赖
-  '@iconify/vue',
-  'anysort',
-  'use-semantic-version',
-  'vue-concurrency',
+  '@lionad/cx-vue > @iconify/vue',
+  '@lionad/cx-vue > anysort',
+  '@lionad/cx-vue > use-semantic-version',
+  '@lionad/cx-vue > vue-concurrency',
   // dayjs 及物料内引用的 plugin/locale（dayjs 由 cx-vue 声明，随任一物料安装）
-  'dayjs',
-  'dayjs/locale/zh-cn',
-  'dayjs/plugin/duration',
-  'dayjs/plugin/isSameOrAfter',
-  'dayjs/plugin/isSameOrBefore',
-  'dayjs/plugin/localeData',
-  'dayjs/plugin/relativeTime',
-  'dayjs/plugin/weekday',
+  '@lionad/cx-vue > dayjs',
+  '@lionad/cx-vue > dayjs/locale/zh-cn',
+  '@lionad/cx-vue > dayjs/plugin/duration',
+  '@lionad/cx-vue > dayjs/plugin/isSameOrAfter',
+  '@lionad/cx-vue > dayjs/plugin/isSameOrBefore',
+  '@lionad/cx-vue > dayjs/plugin/localeData',
+  '@lionad/cx-vue > dayjs/plugin/relativeTime',
+  '@lionad/cx-vue > dayjs/plugin/weekday',
 ]
 
 /** 各内置物料集需追加预构建的依赖；render/components 无超出基线的依赖，空表即核验结论 */
