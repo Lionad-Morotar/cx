@@ -72,6 +72,28 @@ describe('vtu 物料挂载 smoke', () => {
     expect(wrapper.exists()).toBe(true)
   })
 
+  it('cx-vtu-option-list 未配 actions 时不渲染默认 Clear/Confirm(负面 action 与宿主契约相悖)', () => {
+    const comp = byKey('cx-vtu-option-list')
+    const wrapper = mountMaterial(comp, {
+      options: [
+        { id: 'a', label: '甲' },
+        { id: 'b', label: '乙' },
+      ],
+    })
+    expect(wrapper.text()).not.toContain('Clear')
+    expect(wrapper.text()).not.toContain('Confirm')
+  })
+
+  it('cx-vtu-option-list 配了 actions 时渲染给定按钮', () => {
+    const comp = byKey('cx-vtu-option-list')
+    const wrapper = mountMaterial(comp, {
+      options: [{ id: 'a', label: '甲' }],
+      actions: [{ id: 'confirm', label: '确认选择' }],
+    })
+    expect(wrapper.text()).toContain('确认选择')
+    expect(wrapper.text()).not.toContain('Clear')
+  })
+
   it('cx-vtu-stats-display 可挂载（统计项）', () => {
     const comp = byKey('cx-vtu-stats-display')
     const wrapper = mountMaterial(comp, {
