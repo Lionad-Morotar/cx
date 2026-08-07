@@ -95,24 +95,24 @@ const BUNDLE_OPTIMIZE_DEPS: Record<CxBuiltinMaterialSet, string[]> = {
   render: [],
   components: [],
   'nuxt-ui-v2': [
-    '@headlessui/vue',
-    '@popperjs/core',
-    '@vueuse/integrations/useFuse',
-    'fuse.js',
-    'tailwind-merge',
-    'v-calendar',
-    'vue-demi',
+    '@lionad/cx-comps-nuxt-ui-v2 > @headlessui/vue',
+    '@lionad/cx-comps-nuxt-ui-v2 > @popperjs/core',
+    '@lionad/cx-comps-nuxt-ui-v2 > @vueuse/integrations/useFuse',
+    '@lionad/cx-comps-nuxt-ui-v2 > fuse.js',
+    '@lionad/cx-comps-nuxt-ui-v2 > tailwind-merge',
+    '@lionad/cx-comps-nuxt-ui-v2 > v-calendar',
+    '@lionad/cx-comps-nuxt-ui-v2 > vue-demi',
   ],
-  'nuxt-ui-v4': ['@internationalized/date'],
+  'nuxt-ui-v4': ['@lionad/cx-comps-nuxt-ui-v4 > @internationalized/date'],
   // vtu-components 的重组件依赖（shiki/leaflet/chart.js 等）不预声明：
   // 引用它们的组件按需加载，预声明只会拖慢冷启动；待运行期观测到再补
-  vtu: ['@lionad/vtu-components', '@vueuse/router'],
+  vtu: ['@lionad/cx-comps-vtu > @lionad/vtu-components', '@lionad/vtu-components > @vueuse/router'],
   // element-plus 经物料包装层全入口具名导入，首趟对扫描器不可见，预声明消除冷启动重载；
   // dayjs / lodash-es 等深路径已在基线表覆盖
-  'element-plus': ['element-plus'],
+  'element-plus': ['@lionad/cx-comps-element-plus > element-plus'],
   // naive-ui 同为包装层全入口具名导入；其依赖链（css-render / vueuc / date-fns 等）
   // 随 naive-ui 预构建同 chunk 解析，单条声明即可
-  'naive-ui': ['naive-ui'],
+  'naive-ui': ['@lionad/cx-comps-naive-ui > naive-ui'],
 }
 
 /** 内置物料包名 → 物料集名反查；自定义 bundles 的包名不会命中 */
