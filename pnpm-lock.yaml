@@ -181,9 +181,6 @@ importers:
       dayjs:
         specifier: ^1.11.21
         version: 1.11.21
-      echarts:
-        specifier: ^5.5.1
-        version: 5.6.0
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
@@ -197,6 +194,9 @@ importers:
       '@vueuse/core':
         specifier: ^14.3.0
         version: 14.3.0(vue@3.5.26(typescript@6.0.3))
+      echarts:
+        specifier: ^5.5.1
+        version: 5.6.0
       sass-embedded:
         specifier: ^1.100.0
         version: 1.100.0
@@ -221,13 +221,13 @@ importers:
       '@lionad/cx-vue':
         specifier: workspace:*
         version: link:../vue
-      element-plus:
-        specifier: ^2.14.3
-        version: 2.14.3(vue@3.5.26(typescript@6.0.3))
     devDependencies:
       '@vueuse/core':
         specifier: ^14.3.0
         version: 14.3.0(vue@3.5.26(typescript@6.0.3))
+      element-plus:
+        specifier: ^2.14.3
+        version: 2.14.3(vue@3.5.26(typescript@6.0.3))
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -252,13 +252,13 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.4.0
-      naive-ui:
-        specifier: ^2.44.1
-        version: 2.44.1(vue@3.5.26(typescript@6.0.3))
     devDependencies:
       '@vueuse/core':
         specifier: ^14.3.0
         version: 14.3.0(vue@3.5.26(typescript@6.0.3))
+      naive-ui:
+        specifier: ^2.44.1
+        version: 2.44.1(vue@3.5.26(typescript@6.0.3))
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -579,9 +579,6 @@ importers:
 
   packages/vue:
     dependencies:
-      '@iconify/vue':
-        specifier: ^5.0.1
-        version: 5.0.1(vue@3.5.26(typescript@6.0.3))
       '@lionad/cx-definition':
         specifier: workspace:*
         version: link:../definition
@@ -604,9 +601,12 @@ importers:
         specifier: ^14.0.1
         version: 14.0.1
       vue-concurrency:
-        specifier: 5.0.3
+        specifier: ^5.0.3
         version: 5.0.3(vue@3.5.26(typescript@6.0.3))
     devDependencies:
+      '@iconify/vue':
+        specifier: ^5.0.1
+        version: 5.0.1(vue@3.5.26(typescript@6.0.3))
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -669,7 +669,7 @@ importers:
         version: link:../packages/vue
       '@lionad/vtu-components':
         specifier: ^0.3.7
-        version: 0.3.8(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(85a8fa2460bd173b42ba3ce2b16cc3e3))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@7.0.2)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@4.6.4(vue@3.5.26(typescript@7.0.2)))(vue@3.5.26(typescript@7.0.2))
+        version: 0.3.9(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(85a8fa2460bd173b42ba3ce2b16cc3e3))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@7.0.2)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@4.6.4(vue@3.5.26(typescript@7.0.2)))(vue@3.5.26(typescript@7.0.2))
       '@nuxt/ui':
         specifier: ^4.10.0
         version: 4.10.0(24d17d80fad1f4326814a0491400a22a)
@@ -1630,15 +1630,6 @@ packages:
 
   '@kwsites/promise-deferred@1.1.1':
     resolution: {integrity: sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==}
-
-  '@lionad/vtu-components@0.3.8':
-    resolution: {integrity: sha512-2CkDv7uZ9RJyBmv4/rOR1ApH0T7iUCfbckrOUS7XIKRtvtYzLwuD9N9pSFzZfm1eCnW87V+wyzxNasTUmkpYCw==, tarball: https://registry.npmjs.org/@lionad/vtu-components/-/vtu-components-0.3.8.tgz}
-    peerDependencies:
-      dompurify: ^3.0.0
-      vue: 3.5.26
-    peerDependenciesMeta:
-      dompurify:
-        optional: true
 
   '@lionad/vtu-components@0.3.9':
     resolution: {integrity: sha512-pH6HIwdjiaf02cfZ0XNxevZMnOp3hMp3iyVKoDE526L4Xx2zv9YhuXYyzQyFEgpUw9eNIEAPq3Qw4GfYXCwF+Q==, tarball: https://registry.npmjs.org/@lionad/vtu-components/-/vtu-components-0.3.9.tgz}
@@ -8912,7 +8903,7 @@ snapshots:
 
   '@kwsites/promise-deferred@1.1.1': {}
 
-  '@lionad/vtu-components@0.3.8(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(85a8fa2460bd173b42ba3ce2b16cc3e3))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@7.0.2)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@4.6.4(vue@3.5.26(typescript@7.0.2)))(vue@3.5.26(typescript@7.0.2))':
+  '@lionad/vtu-components@0.3.9(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(85a8fa2460bd173b42ba3ce2b16cc3e3))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@7.0.2)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@4.6.4(vue@3.5.26(typescript@7.0.2)))(vue@3.5.26(typescript@7.0.2))':
     dependencies:
       '@vue-leaflet/vue-leaflet': 0.10.1(leaflet@1.9.4)(typescript@7.0.2)
       '@vueuse/components': 14.3.0(vue@3.5.26(typescript@7.0.2))

@@ -41,17 +41,18 @@
   "dependencies": {
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-stream": "workspace:*",
-    "@lionad/cx-vue": "workspace:*",
-    "element-plus": "^2.14.3"
+    "@lionad/cx-vue": "workspace:*"
   },
   "devDependencies": {
     "@vueuse/core": "^14.3.0",
+    "element-plus": "^2.14.3",
     "typescript": "^6.0.3",
     "vue": "^3.5.40",
     "vue-tsc": "^3.3.7"
   },
   "peerDependencies": {
     "@vueuse/core": "^13.0.0 || ^14.0.0",
+    "element-plus": "^2.14.0",
     "vue": "^3.5.0"
   }
 }

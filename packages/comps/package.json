@@ -45,13 +45,13 @@
     "@lionad/cx-stream": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
     "dayjs": "^1.11.21",
-    "echarts": "^5.5.1",
     "lodash-es": "^4.18.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
     "@vueuse/core": "^14.3.0",
+    "echarts": "^5.5.1",
     "sass-embedded": "^1.100.0",
     "typescript": "^6.0.3",
     "vue": "^3.5.40",
@@ -59,6 +59,7 @@
   },
   "peerDependencies": {
     "@vueuse/core": "^13.0.0 || ^14.0.0",
+    "echarts": "^5.0.0",
     "vue": "^3.5.0"
   }
 }
