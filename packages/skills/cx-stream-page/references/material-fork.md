@@ -45,6 +45,33 @@
 - 根元素是包装组件时，沿模板链逐跳 v-bind="$attrs"（物料 → 包装组件 → 包装组件根元素），一跳缺失全链落空
 - 保留 inheritAttrs: false 防杂散 attr 落 DOM 时，显式 v-bind="$attrs" 到根元素即可兼得
 
+## 根节点形态契约
+
+渲染器会给每个非 headless 物料注入运行时指令与标识 class，只有「渲染出单元素根」的物料能正确接收：
+
+- 模板根禁止 template v-if 包裹多分支（渲染为 Fragment）或 v-if 落空（渲染为 Comment 占位）——两者在 dev 下触发「directive used on non-element root node」警告，按节点实例 × 每帧刷屏
+- 正确形态：根级 v-if/v-else-if/v-else 三元链直接返回元素 vnode；截断占位用 hidden 元素（`<div v-else hidden>`），不用注释节点
+- 装多子并列布局时（如链区三列），以 cx-block 容器承载子物料——物料预设 flex 子项语义（定宽、flex-shrink:0、height:100%）只有在 flex 容器内才生效
+
+## DTO 混型归一化
+
+Server DTO 类型声明须以真实接口字节为准（先验证再声明），接口混型在生成器组装层归一化为物料 prop 契约，不直达渲染侧：
+
+- 实测先例：链节点 countByRegion 对无区域统计节点返回空串 `""` 而非 0；企业卡 investmentScore 返回字符串数字 `"930.21"`
+- 脏数据透传触发 Vue prop 类型校验警告，流式回放期按实例 × tick 放大刷屏（曾一次回放 2.8 万条）
+- DTO 声明对齐实况（number | ''、string | null），组装函数内 `Number(x) || 0` / 空串判 null 归一化；spec fixture 用接口混型形态、断言归一化后契约形态，两头都防回归
+
+## 图表物料（echarts）流式防御
+
+流式场景 options 逐帧到达，中间帧是增量解析的半成品。图表包装组件须具备以下防御（实证先例 components/cx/shared/CxEchart.vue），缺一不可：
+
+- undefined 深扫闸门：帧内出现 undefined 即跳过（字段未到位），否则 paint 阶段异步爆炸（渐变 colorStops 缺 color 等）
+- legend-series 一致性闸门：legend.data 引用 ∉ series 名字（含饼图 data item 名）的帧跳过，否则 merge 模式逐条 dev 警告「series not exists」
+- 0 尺寸不 init：v-show 隐藏面板内容器 0×0，echarts init 会告警且转可见后不自动重排；等 ResizeObserver 报告非 0 再建实例（已建则 resize）
+- rAF 合并调度：回放 20 次/秒的 watch 高频 setOption 会撞 echarts 主流程重入，一帧合并一次渲染
+- catch 后 dispose 重建（不是吞掉继续）：echarts setOption 内同步 paint（zr.flush）位于其主流程标志复位之前且不在 try 保护内，爆炸后标志永久卡死、后续 setOption 全被拒（`setOption should not be called during main process`），只能 dispose 置 null、下一帧走统一入口重建
+- 值级闸门拦不住流式截断的合法坏值（chunk 边界切在颜色串中间，`'#F7B05'` 是合法 JSON 值），catch-重建是兜底，不能省略
+
 ## 验收判据（切片完成标准）
 
 - 物料目录形态：index.ts（define 元数据）+ src/index.vue（实现），经宿主插件注册
