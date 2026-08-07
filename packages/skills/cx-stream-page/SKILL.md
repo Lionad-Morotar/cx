@@ -1,18 +1,20 @@
 ---
 name: cx-stream-page
-description: 把业务页面组件 cx 化并以 cx-stream 流式渲染演示页（S 页面）的全流程技能：抓数预录、物料 Fork 改造、剧本生成、增量 trigger 声明、舞台搭建、验收。当任务涉及「cx 化」「流式渲染页面」「S 页面」「cx-stream 演示」「剧本 chunks」时使用本技能；仅修改既有物料样式或修复单点 bug 时不适用。
+description: 把业务页面组件 cx 化并以 cx-stream 流式渲染演示页（Stream 页面）的全流程技能：抓数预录、物料 Fork 改造、剧本生成、增量 trigger 声明、舞台搭建、验收。当任务涉及「cx 化」「流式渲染页面」「Stream 页面」「cx-stream 演示」「剧本 chunks」时使用本技能；仅修改既有物料样式或修复单点 bug 时不适用。
 metadata:
   version: 0.1.0
 ---
 
 # cx-stream-page：业务页面的 cx 化与流式渲染演示
 
-## 前置硬事实（先接受再动手，逐条都有源码锚点）
+## 硬事实
 
-- CxRender 对顶层数组**只渲染首元素**：页面 schema 必须以单根容器（cx-block 或等价布局物料）包裹全部兄弟物料（packages/stream/src/cx.ts 的 CxSpec 注释）。
-- 物料 emits **不会自动广播**：渲染器 compEmitNames 只接线节点 `data._cx_events` 登记过的事件（meta emits ∩ _cx_events），条目须 CxEvent 三必填（id/key/subs），缺 subs 会让 cx-emitter 广播读 `undefined.forEach` 抛错。
-- 渲染器标识是 class 三件套 `is-cx-component` / `cx-<id>` / `is-<key>`，经 attr fallthrough 落地；`inheritAttrs: false` 的物料会整口吞掉，须沿模板链逐跳 `v-bind="$attrs"` 恢复。
-- 参照实现两份：本 repo `playground` 的 /dev/stream/pages（舞台交互与剧本语义源头）；shushi.86links.com 的 `dev/industry-chain-*.ts` + `pages/dev/cx/industry-chain.vue`（本技能首个实证先例，含真实数据全套）。
+- CxRender 顶层数组只渲染首元素——页面 schema 必须单根容器承载（packages/stream/src/cx.ts）
+- 物料 emits 不会自动广播——节点 data._cx_events 须登记且对齐 CxEvent 三必填（id/key/subs）
+- 渲染器标识 class 三件套经 attr fallthrough 落地——inheritAttrs: false 物料须沿模板链逐跳 v-bind="$attrs"
+- 参照实现：playground /dev/stream/pages（语义源头）；shushi.86links.com dev/industry-chain-*（实证先例）
+
+契约机制详解与症状排障统一查 [references/schema-contracts.md](./references/schema-contracts.md)。
 
 ## 流程六阶段
 
@@ -22,8 +24,8 @@ metadata:
 
 目标：把页面依赖的接口数据固化为本地可重放的剧本原料。
 
-- 选 1 个有代表性的业务节点做全套抓数（curl 落 zRefs/req-*/），其余层级数据取全量平铺接口
-- 敏感数据（JWT、企业数据）只落 zRefs 与被 git exclude 的路径，剧本产物不入库
+- 选 1 个有代表性的业务节点做全套抓数（curl 落 .tmp/reqs/*/），其余层级数据取全量平铺接口
+- 敏感数据（JWT、企业数据）只落 .tmp 与被 git exclude 的路径，剧本产物不入库
 - 产出：`scenario data` 纯数据对象（Server DTO 形态直消费，前端不重映射）
 
 ### 2. 物料 Fork 改造
@@ -45,15 +47,13 @@ metadata:
 
 ### 5. 舞台搭建
 
-目标：S 页面（layout: false 空白布局）复刻 playground 舞台交互——增量渲染铺满舞台、播放控制收底部悬浮控制器、调试折叠抽屉。
+目标：Stream 页面（layout: false 空白布局）复刻 playground 舞台交互——增量渲染铺满舞台、播放控制收底部悬浮控制器、调试折叠抽屉。
 
 - 管线：createSpecDetector + useIncrementalTree(pendingSource, {registry, matchTrigger})
 - 增量视图数据源必须回落终态树（finish 直跳压缩中间帧，lastFrame 从未更新而非被清空）
 - 伪联动经 `cx.hooks.on('comp:cx-event:emit')` 消费，覆盖层作用于渲染节点不污染管线缓存
 - 页面级样式覆盖物料 DOM 必须 `:deep()`（CxRender 渲染的物料无页面 data-v 属性）
 - 舞台 grid 钉视口高、内容列内滚动（物料预设「父容器有界」前提，行高无约束会被内容撑破）
-
-契约类排障（症状 → 成因 → 做法对照）统一查 [references/schema-contracts.md](./references/schema-contracts.md)。
 
 ### 6. 验收
 
