@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@lionad/cx-definition": "workspace:*",
+    "@lionad/cx-stream": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
     "lodash-es": "^4.18.1"
   },

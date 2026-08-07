@@ -4,6 +4,8 @@ import type { CxMaterialBundle } from '@lionad/cx-definition'
 import './styles/index.scss'
 
 export * from './event'
+export * from './utils/hydrate'
+export * from './utils/to-renderable'
 export { default as CxRender } from './comps/render.vue'
 export { default as CxRenderComps } from './comps/index'
 

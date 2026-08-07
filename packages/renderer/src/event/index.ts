@@ -9,3 +9,5 @@ export {
   createSubEvent,
   createCxEmitter,
 } from '@lionad/cx-definition'
+
+export * from './use-cx-event-router'
