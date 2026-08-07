@@ -598,9 +598,11 @@ describe('compileTrigger scalar 经真实管线端到端', () => {
     const d3 = extractor.next('{"key":"cx-vtu-article","data":{"type":"md","title":"周')
     expect(d3).toBe(shell)
 
-    // d4：窗口到期（4-1=3）→ 被节流的 type 帧补出
+    // d4：窗口到期（4-1=3）→ 被节流的 type 帧补出。
+    // 补出帧与空壳同值（fallback 已含 type:'md'，title 流式中未闭合不进帧）——
+    // 结构共享语义下同值帧复用引用，窗口推进对消费侧零 patch，引用保持即正确行为
     const d4 = asNode(extractor.next('{"key":"cx-vtu-article","data":{"type":"md","title":"周报'))
-    expect(d4).not.toBe(shell)
+    expect(d4).toBe(shell)
 
     // d5-d6：content 闭合但窗口未满（6-4=2 < 3）→ 节流，帧保持
     extractor.next('{"key":"cx-vtu-article","data":{"type":"md","content":"x"')
