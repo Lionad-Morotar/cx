@@ -6,6 +6,13 @@
 
 ## 技术债务
 
+### 子包 `node_modules/.bin` 残留 shim 劫持 PATH（pnpm 12 alpha 不清理）
+
+- 现状：`comps-vtu` / `nuxt` / `playground` 的 `node_modules/.bin` 曾残留 `vp` / `vpr` / `oxfmt` shim，内嵌 `vite-plus@0.2.7` 实例绝对路径；三个包均未声明 vite-plus 依赖，shim 是「曾经为依赖、后被移除」的历史残留，pnpm 不管理——`pnpm install --force` 全量重装 1542 包后既不重建也不清理
+- 触发条件：lockfile 已把 vite-plus 升至 0.2.8，但 `pnpm -r` 执行脚本时 `<pkg>/node_modules/.bin` 优先于根 `.bin`，残留 shim 劫持 PATH 把子包 build 导回 0.2.7 实例；该实例的 `darwin-arm64` 平台包链接缺失，rolldown 原生绑定加载失败（`Cannot find module './rolldown-binding.darwin-arm64.node'`），`pnpm -r build` 在 comps-vtu 中断
+- 影响：任何子包 build / 脚本都可能静默使用与 lockfile 脱节的旧工具链实例，且 pnpm 自报 "Already up to date" 给出假信号
+- 修复路径：本次（2026-08-07）已手动删除三包的 vp / vpr / oxfmt 残留 shim；后续再遇 `ERR_PACKAGE_PATH_NOT_EXPORTED` / `MODULE_NOT_FOUND`（`*.node`）类报错，先用 `rg -o '<pkg>@[0-9.]+' <pkg>/node_modules/.bin/<bin>` 核对 shim 内嵌实例版本与 lockfile 是否一致，不一致即删
+
 ### 根目录 `vite.config.ts` 内绝对路径硬编码（不可移植）
 
 - 现状：`vite.config.ts` 第 11-26 行的 `resolve.alias` 把 6 条 alias 全部写死为 `/Users/lionad/Github/Lionad-Morotar/cx/...` 绝对路径，包括关键的 vue 单例归一 alias
