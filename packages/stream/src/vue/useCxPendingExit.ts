@@ -11,8 +11,10 @@ import type { CxSpec } from '../cx'
  * 的闭合帧,把新 widget-slot 占位还原为 pending-slot,让 pending-node 有机会逐字
  * 删除退出;markExitDone(pending-node 删除动画完成回调)后才真正翻牌。
  *
- * 翻牌后再给卡片 settleMs 的独占可见窗口:冻结 widget-slot 之后的 afterText
- * 不进 markstream(卡片不被顶出视口);finished 信号(消息完成/停止)立即释放,
+ * 翻牌后再给卡片 settleMs 的独占可见窗口:冻结 widget-slot 之后的成片 afterText
+ * 不进 markstream(卡片不被顶出视口);后续围栏的 pending-slot(生成中信号)
+ * 不冻结——打字机与增量渲染在 settle 期间照常,否则快于 settle 的输入源会让
+ * 后续组件一次性补出、丢失流式观感。finished 信号(消息完成/停止)立即释放,
  * 定时器到期自然释放。
  *
  * 单 pending 事实:未闭合围栏只能是全文末块(文本线性生长),pendingSources 恒 ≤1,
@@ -93,7 +95,12 @@ export function useCxPendingExit(
 
   onScopeDispose(releaseSettle)
 
-  /** 冻结 widget-slot 之后的文本(闭合标签后的内容不渲染) */
+  /**
+   * 冻结 widget-slot 之后的成片文本(闭合标签后的段落不渲染);
+   * 但 pending-slot(后续围栏的生成中信号)保留——单 pending 事实下未闭合围栏
+   * 恒为全文末块,砍掉它会让 settle 期间开始传输的围栏失去打字机与增量渲染,
+   * 释放时一次性补出即「丢失流式效果」;生成中信号只是占位行,不违反卡片独占。
+   */
   function trimAfterWidgetSlots(text: string): string {
     let lastEnd = -1
     const re = /<\/widget-slot>/g
@@ -101,7 +108,13 @@ export function useCxPendingExit(
     while ((m = re.exec(text)) !== null) {
       lastEnd = m.index + m[0].length
     }
-    return lastEnd >= 0 ? text.slice(0, lastEnd) : text
+    if (lastEnd < 0) return text
+    const rest = text.slice(lastEnd)
+    const pendingAt = rest.indexOf('<pending-slot')
+    // 拼接处补段落分隔:两占位标签相邻无换行时 markdown 不把它们拆成独立块
+    return pendingAt >= 0
+      ? `${text.slice(0, lastEnd)}\n\n${rest.slice(pendingAt)}`
+      : text.slice(0, lastEnd)
   }
 
   const content = computed(() => {

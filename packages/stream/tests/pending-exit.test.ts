@@ -187,6 +187,38 @@ describe('useCxPendingExit', () => {
     }
   })
 
+  it('settle 冻结只砍成片文本,后续 pending-slot(生成中信号)保留', async () => {
+    vi.useFakeTimers()
+    try {
+      const widgetText =
+        '<widget-slot data-spec-index="INDEX_PLACEHOLDER" data-spec-array-index="0"></widget-slot>'
+      const pendingSlot =
+        '<pending-slot data-spec-index="INDEX_PLACEHOLDER" data-pending-index="0"></pending-slot>'
+      const source = ref(extraction(`前文\n${pendingSlot}`, [], ['{}']))
+      const { content, markExitDone } = useCxPendingExit(computed(() => source.value))
+
+      source.value = extraction(`前文\n${widgetText}\n中段文本`, [SPEC])
+      await Promise.resolve()
+      markExitDone()
+      expect(content.value).toBe(`前文\n${widgetText}`)
+
+      // settle 期间新围栏开始传输:未闭合围栏恒为全文末块(单 pending 事实),
+      // pending-slot 是生成中信号(打字机/增量渲染的占位),随翻牌卡片一起保留;
+      // 其前的成片中段文本仍被砍(卡片独占语义不变)
+      source.value = extraction(`前文\n${widgetText}\n中段文本\n${pendingSlot}`, [SPEC], ['{"key":'])
+      await Promise.resolve()
+      // 拼接处补段落分隔(markdown 块语义),pending-slot 前成片文本砍除
+      expect(content.value).toBe(`前文\n${widgetText}\n\n${pendingSlot}`)
+
+      // 到期释放后全量呈现
+      vi.advanceTimersByTime(CX_SETTLE_MS)
+      await Promise.resolve()
+      expect(content.value).toBe(`前文\n${widgetText}\n中段文本\n${pendingSlot}`)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('settleMs 覆盖默认冻结时长', async () => {
     vi.useFakeTimers()
     try {
