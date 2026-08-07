@@ -24,6 +24,12 @@ export default define({
       initial: '',
     },
   },
+  emits: {
+    change: {
+      name: '切换',
+      description: '用户点击 tab 头切换时触发，载荷 { key }',
+    },
+  },
   slots: ({ comp }) => {
     const tabs = Array.isArray(comp?.data?.tabs)
       ? (comp.data.tabs as { key?: unknown; label?: unknown }[])

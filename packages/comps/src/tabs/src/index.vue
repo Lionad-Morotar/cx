@@ -9,7 +9,7 @@
         role="tab"
         :aria-selected="current === t.key"
         :class="[ns.e('tab'), current === t.key && ns.is('active')]"
-        @click="current = t.key"
+        @click="select(t.key)"
       >
         {{ t.label }}
       </button>
@@ -54,6 +54,11 @@ const props = withDefaults(
 
 const ns = useCxBEM('tabs')
 
+const emit = defineEmits<{
+  // data-out 通道：用户点击切换时通知（fire-and-forget，父级不接也不影响自洽）
+  change: [{ key: string }]
+}>()
+
 // data 可能来自流式 JSON（未过 zod），宽容过滤非法项
 const normalizedTabs = computed(() =>
   (props.tabs ?? []).filter(
@@ -61,16 +66,33 @@ const normalizedTabs = computed(() =>
   ).map((t) => ({ key: t.key, label: t.label || t.key })),
 )
 
-// 内部激活态：props.activeKey 是 data-in 通道（伪联动/外部驱动），
-// 缺省或失效时回落首个 tab
-const current = ref('')
+// 内部激活态（半受控，对齐 el-tabs currentName 语义）：只存用户手动选择，
+// 激活 key 渲染期推导——手动选择仍合法则优先，否则解析 data-in 的 activeKey
+// （缺省/失效回落首 tab）。流式回放每帧重建 props 引用但值未变，推导结果
+// 是稳定字符串，用户点击不会被帧冲刷；activeKey 值变化（伪联动）清空手动
+// 选择重新落地——目标 tab 随 tabs 生长到位即激活，不丢中途的外部驱动
+const userKey = ref('')
+const current = computed(() => {
+  const tabs = normalizedTabs.value
+  if (userKey.value && tabs.some((t) => t.key === userKey.value)) {
+    return userKey.value
+  }
+  const key = props.activeKey ?? ''
+  return tabs.some((t) => t.key === key) ? key : (tabs[0]?.key ?? '')
+})
+
 watch(
-  [() => props.activeKey, normalizedTabs],
-  ([key, tabs]) => {
-    current.value = tabs.some((t) => t.key === key) ? key : (tabs[0]?.key ?? '')
+  () => props.activeKey,
+  () => {
+    userKey.value = ''
   },
-  { immediate: true },
 )
+
+const select = (key: string) => {
+  if (current.value === key) return
+  userKey.value = key
+  emit('change', { key })
+}
 </script>
 
 <style lang="scss">
