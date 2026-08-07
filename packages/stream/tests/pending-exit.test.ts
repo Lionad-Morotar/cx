@@ -31,6 +31,15 @@ describe('useCxPendingExit', () => {
     expect(exitingIndex.value).toBeNull()
   })
 
+  it('status none(无围栏纯文本)content 直通 undefined,不截胡消费方的 ?? 原文回退', () => {
+    // 真实 detector 对无围栏文本返回 { status:'none', specs:[] }(content 缺省);
+    // 归零空串会让消费方 `content ?? 原文` 回退失效,纯文本回复渲染空白
+    const source = ref<ExtractSpecsResult<CxSpec>>({ status: 'none', specs: [] })
+    const { content, exitingIndex } = useCxPendingExit(computed(() => source.value))
+    expect(content.value).toBeUndefined()
+    expect(exitingIndex.value).toBeNull()
+  })
+
   it('pending 生长期间 content 直通,不进入退出态', async () => {
     const source = ref(
       extraction(

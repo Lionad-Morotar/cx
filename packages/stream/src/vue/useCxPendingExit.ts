@@ -29,8 +29,8 @@ import type { CxSpec } from '../cx'
 export const CX_SETTLE_MS = 2000
 
 export interface CxPendingExit {
-  /** 退出/settle 期间加工后的占位文本;无接管态时直通 */
-  content: ComputedRef<string>
+  /** 退出/settle 期间加工后的占位文本;无接管态时直通 extraction.content(无围栏输入为 undefined,由消费方以 ?? 回退原文) */
+  content: ComputedRef<string | undefined>
   /**
    * 退出期间冻结为闭合帧的 pendingSources;无退出态时直通。
    * 闭合即清空会让 pending-node 的增量树帧源断供、组件树退化为骨架——
@@ -118,7 +118,10 @@ export function useCxPendingExit(
   }
 
   const content = computed(() => {
-    const raw = extraction.value.content ?? ''
+    // status none(无围栏)时必须直通 undefined 而非归零空串:空串非 nullish,
+    // 会截胡消费方的 ?? 原文回退,纯文本回复将渲染为空白
+    const raw = extraction.value.content
+    if (raw === undefined) return undefined
     let out = raw
     if (exitingIndex.value !== null && heldWidgetIndex.value !== null) {
       const re = new RegExp(
