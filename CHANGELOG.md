@@ -6,8 +6,36 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.2] - 2026-08-07
+
+### Added
+
+- `@lionad/cx-stream`：树级 trigger 编译器 `compileTreeTrigger`——组件级 trigger 语义进页面树，页面级流式编排从整页单 trigger 细化为组件各自声明
+- `@lionad/cx-stream`：增量管线帧间结构共享——未变子树复用引用，降低流式回放内存与 diff 开销
+- `@lionad/cx-stream`：`useCxPendingExit` 围栏闭合退出接管 composable——无围栏时 content 直通 undefined
+- `@lionad/cx-stream`：页面剧本组装与流式回放 composable 三件套
+- `@lionad/cx-definition`：`createEvent` 支持确定性 id 第二参数
+- `@lionad/cx-vue`：`useCxAppends` 表单暂存单例
+- `@lionad/cx-render`：卡片水合 / 增量管线 / 事件路由骨架三件套
+- `@lionad/cx-comps`：新增通用 `cx-tabs` 物料——半受控激活态按值同步并补 change emit
+- `@lionad/cx-comps`：`CxEchart` 共享组件上提（流式中帧防御）
+- `@lionad/cx-comps-vtu`：物料×事件语义层——六件交互物料 emits 声明与真 emit 监听 re-emit 接线（对齐 vtu 0.3.8 契约），事件默认表 + 覆盖点；option-list 未配 actions 时压制 vtu 默认 Clear/Confirm；物料 meta initial 与 vtu SFC 消费契约对齐
+- [internal] playground：流式验收体系成型——/dev/stream 拆分 components / pages 双验收页（全页舞台 + 悬浮控制器布局），页面级流式剧本与嵌套渲染适配，树级注册表与组件级语义嵌套验收，增量视图成功后停留末帧，验收页改消费 SDK 包机制
+- [internal] docs：新增 cx-stream-page 技能，沉淀半受控物料契约、帧间结构共享与流式舞台实证坑点；新增 packages 子包职责一览
+
+### Changed
+
+- `@lionad/cx-definition`：`useHooks` 钩子内核从 kareem 迁移至 @middy/core（ESM-only）——消除浏览器 ESM 裸解析失败
+- 物料包依赖治理：宿主 UI 库（element-plus、naive-ui、@iconify/vue、@lionad/vtu-components 等）统一转为 peerDependencies 与 cx 发版解耦；纯工具库 @vue/shared 统一为 dependencies 声明
+- [internal] playground：standup 演示站点双主题 token 系统与主题开关物料，站会 / 日会 / 周会看板展示级重写；反向映射 --color-primary 修复 vtu shadcn token 劫持
+
 ### Fixed
 
+- `@lionad/cx-comps`：grids-form 行列删除适配异步 removeComponent，快照修复隔位漏删
+- `@lionad/cx-stream`：settle 冻结保留 pending-slot 生成中信号
+- `@lionad/cx-render`：空指令数组不包 withDirectives
+- `@lionad/cx-comps-nuxt-ui-v2`：补 uuid 依赖声明
+- `@lionad/cx-nuxt`：optimizeDeps 物料集条目回归嵌套依赖语法
 - `@lionad/cx-render`：TS7 下 30 处类型错误清零（hooks payload 对齐注册表、slots 函数签名断言到 SlotContext 调用约定、watch 源数组 tuple 化等）；`@lionad/cx-vue` 的 `useMarkRaw` 签名与「空值直通」实现对齐（`x: T | undefined`）
 - [internal] build：根构建自指空转修复（`vp run build` 循环检测致产物长期为开发残留，改 `pnpm -r` 拓扑递归）；release 全链测试双跑修复（pnpm 与 vp 双生命周期叠加）
 

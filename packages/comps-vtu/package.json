@@ -1,6 +1,6 @@
 {
   "name": "@lionad/cx-comps-vtu",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "cx material components wrapping tool-ui-vue (vtu) tool-call widgets",
   "author": "Lionad-Morotar",
   "keywords": [
