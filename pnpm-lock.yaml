@@ -393,9 +393,6 @@ importers:
       '@lionad/cx-vue':
         specifier: workspace:*
         version: link:../vue
-      '@lionad/vtu-components':
-        specifier: ^0.3.7
-        version: 0.3.8(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(aaa78235009c12f99112962490685cad))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@5.2.0(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.26(typescript@6.0.3)))(vue@3.5.26(typescript@6.0.3))
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
@@ -403,6 +400,9 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
+      '@lionad/vtu-components':
+        specifier: ^0.3.9
+        version: 0.3.9(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(aaa78235009c12f99112962490685cad))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@5.2.0(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.26(typescript@6.0.3)))(vue@3.5.26(typescript@6.0.3))
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -1633,6 +1633,15 @@ packages:
 
   '@lionad/vtu-components@0.3.8':
     resolution: {integrity: sha512-2CkDv7uZ9RJyBmv4/rOR1ApH0T7iUCfbckrOUS7XIKRtvtYzLwuD9N9pSFzZfm1eCnW87V+wyzxNasTUmkpYCw==, tarball: https://registry.npmjs.org/@lionad/vtu-components/-/vtu-components-0.3.8.tgz}
+    peerDependencies:
+      dompurify: ^3.0.0
+      vue: 3.5.26
+    peerDependenciesMeta:
+      dompurify:
+        optional: true
+
+  '@lionad/vtu-components@0.3.9':
+    resolution: {integrity: sha512-pH6HIwdjiaf02cfZ0XNxevZMnOp3hMp3iyVKoDE526L4Xx2zv9YhuXYyzQyFEgpUw9eNIEAPq3Qw4GfYXCwF+Q==, tarball: https://registry.npmjs.org/@lionad/vtu-components/-/vtu-components-0.3.9.tgz}
     peerDependencies:
       dompurify: ^3.0.0
       vue: 3.5.26
@@ -8949,7 +8958,7 @@ snapshots:
       - unplugin
       - vue-router
 
-  '@lionad/vtu-components@0.3.8(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(aaa78235009c12f99112962490685cad))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@5.2.0(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.26(typescript@6.0.3)))(vue@3.5.26(typescript@6.0.3))':
+  '@lionad/vtu-components@0.3.9(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(aaa78235009c12f99112962490685cad))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@5.2.0(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.26(typescript@6.0.3)))(vue@3.5.26(typescript@6.0.3))':
     dependencies:
       '@vue-leaflet/vue-leaflet': 0.10.1(leaflet@1.9.4)(typescript@6.0.3)
       '@vueuse/components': 14.3.0(vue@3.5.26(typescript@6.0.3))

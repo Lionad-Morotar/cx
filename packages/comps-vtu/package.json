@@ -43,11 +43,11 @@
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-stream": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
-    "@lionad/vtu-components": "^0.3.7",
     "lodash-es": "^4.18.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@lionad/vtu-components": "^0.3.9",
     "@types/lodash-es": "^4.17.12",
     "@vueuse/core": "^14.3.0",
     "sass-embedded": "^1.100.0",
@@ -56,6 +56,7 @@
     "vue-tsc": "^3.3.7"
   },
   "peerDependencies": {
+    "@lionad/vtu-components": "^0.3.0",
     "@vueuse/core": "^13.0.0 || ^14.0.0",
     "vue": "^3.5.0"
   }
