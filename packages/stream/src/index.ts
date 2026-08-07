@@ -18,6 +18,7 @@ export * from './core/parse'
 export * from './core/fence'
 export * from './core/spec-detector'
 export * from './core/incremental'
+export * from './core/structural-sharing'
 export * from './core/human-text'
 
 // --- vue：composables 绑定层 ---
@@ -25,9 +26,12 @@ export * from './vue/useStreamChunks'
 export * from './vue/useIncrementalTree'
 export * from './vue/usePendingTypewriter'
 export * from './vue/useCxPendingExit'
+export * from './vue/useStreamReplay'
+export * from './vue/useLastFrame'
 
 // --- cx 协议预设 ---
 export * from './cx'
 export * from './cx-array-trigger'
 export * from './cx-trigger-config'
 export * from './cx-tree-trigger'
+export * from './cx-scenario'

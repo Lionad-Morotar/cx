@@ -19,6 +19,7 @@
 import { scanBalancedItems } from './bracket-scanner'
 import { fenceBlockPattern } from './fence'
 import { safeJsonParse } from './parse'
+import { shareStructure } from './structural-sharing'
 import { furthestEvent, scanStreamEvents } from './stream-events'
 
 import type { PathSegment, ScanMatch, ScanPath } from './types'
@@ -188,7 +189,8 @@ export function createIncrementalExtractor<TSpec = unknown>(
       lastEmitDelta = deltaCount
       pendingEmit = false
       pendingTrigger = null
-      lastValid = partial
+      // 帧间结构共享：未变子树复用上帧引用，消费侧按引用比较跳过无效 patch
+      lastValid = shareStructure(lastValid, partial)
     } else {
       // 被节流：内容不丢失，并入窗口到期后的下一帧
       pendingEmit = true
@@ -268,8 +270,9 @@ export function createIncrementalExtractor<TSpec = unknown>(
     if (matched) {
       const partial = matched[1].buildPartial(spec, matchesPerPath)
       if (partial) {
-        lastValid = partial
-        return partial
+        // 帧间结构共享：未变子树复用上帧引用（见 structural-sharing.ts）
+        lastValid = shareStructure(lastValid, partial)
+        return lastValid
       }
     }
 
