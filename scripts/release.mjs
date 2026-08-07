@@ -6,10 +6,11 @@
  * 生命周期门禁链在根 package.json 配置，本脚本不重复:
  *   pnpm release → prerelease → pnpm build → prebuild → pnpm test
  *
- * 2FA/OTP 边界: npm 账号开 auth-and-writes 2FA 时，非交互发布会报
- * ERR_PNPM_OTP_NON_INTERACTIVE——多包 = 多个独立 publish 进程，每个都要一枚
- * OTP（30s 窗口）。正式发布请用 `! pnpm release` 交互执行（OTP 逐包提示），
- * 或配 bypass-2FA 的 granular access token 写入 ~/.npmrc；dry-run 不受影响。
+ * 2FA/OTP 边界: npm 账号开 auth-and-writes 2FA 时，pnpm 12 会对每个 publish
+ * 进程启动 web 授权流（"Press ENTER to open the URL in your browser."——按 Enter
+ * 才启动轮询，仅在浏览器完成验证 CLI 无感知）。多包 = 最多 11 次授权，不可行。
+ * 正式发布请配 bypass-2FA 的 granular access token 写入 ~/.npmrc 后
+ * `! pnpm release`（全程无交互）；dry-run 不受影响。
  */
 
 import { execFileSync } from 'node:child_process'
