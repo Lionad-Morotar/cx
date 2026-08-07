@@ -101,3 +101,6 @@ export const CxVtuBundle: CxMaterialBundle = {
 
 // --- 流式增量渲染预设 ---
 export * from './stream-triggers'
+
+// --- 卡片事件语义层(物料×事件分流与回写文本,SDK 默认) ---
+export * from './event-semantics'
