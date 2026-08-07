@@ -45,6 +45,7 @@
     "@lionad/cx-stream": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
     "dayjs": "^1.11.21",
+    "echarts": "^5.5.1",
     "lodash-es": "^4.18.1",
     "zod": "^4.4.3"
   },

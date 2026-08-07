@@ -21,3 +21,6 @@ export const CxComponentsBundle: CxMaterialBundle = {
 
 // --- 流式增量渲染预设 ---
 export * from './stream-triggers'
+
+// --- 共享组件（非物料：物料组装侧直接消费的包装组件） ---
+export * from './shared'
