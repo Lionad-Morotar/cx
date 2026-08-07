@@ -107,13 +107,12 @@ import {
   cxSpecDetectorConfig,
   matchCxTrigger,
   useIncrementalTree,
-  type CxStreamNode,
+  useLastFrame,
+  useStreamReplay,
 } from '@lionad/cx-stream'
-import { toRenderNode } from '~/dev/material-utils'
+import { toRenderableComponents } from '@lionad/cx-render'
 import { NESTED_SCENARIOS } from '~/dev/stream-nested-scenario'
 import { createPageTriggerRegistry, PAGE_SCENARIOS } from '~/dev/stream-pages-scenario'
-import { useLastFrame } from '~/dev/use-last-frame'
-import { useStreamReplay } from '~/dev/use-stream-replay'
 
 defineOptions({ name: 'PageDevStreamPages' })
 
@@ -146,24 +145,24 @@ const { partialSpec, reset: resetExtractor } = useIncrementalTree(
   computed(() => pendingSource.value),
   { registry: createPageTriggerRegistry(), matchTrigger: matchCxTrigger },
 )
-const partialNode = computed(() => toCxNode(partialSpec.value))
+// 部分树 → 可渲染节点：官方桥 prune 不完整后代 + 赋确定性 id（同结构同 id 序列，
+// 增量帧与终态帧落同一组件实例原地更新）；修剪后无可渲染节点为 null，保持骨架
+const partialNode = computed(
+  () => toRenderableComponents(partialSpec.value, 'stream-pages')?.[0] ?? null,
+)
 // 增量视图停留最后一帧：success 后 extractor 出 null，不清空生长到最后的形态
 const { frame: stageNode, clear: clearLastFrame } = useLastFrame(partialNode)
 
-// --- 终态渲染：success 后渲染完整页面树 ---
+// --- 终态渲染：success 后渲染完整页面树（数组根取首个存活节点） ---
 const finalNode = computed(() =>
-  status.value === 'success' ? toCxNode(detection.value.specs[0] ?? null) : null,
+  status.value === 'success'
+    ? (toRenderableComponents(detection.value.specs[0] ?? null, 'stream-pages')?.[0] ?? null)
+    : null,
 )
 
 // --- 舞台视图：增量 | 终态；终态视图 success 才解锁 ---
 const view = ref<'incremental' | 'final'>('incremental')
 const debugOpen = ref(false)
-
-// CxSpec（单根或数组）→ CxRender 可消费节点；空/缺省一律 null（数组根取首元素）
-function toCxNode(spec: CxStreamNode | CxStreamNode[] | null) {
-  const node = Array.isArray(spec) ? spec[0] : spec
-  return node ? toRenderNode(node) : null
-}
 
 function reset() {
   resetReplay()

@@ -1,8 +1,9 @@
 import type { CxComponentRuntime } from '@lionad/cx-definition'
-import type { CxStreamNode } from '@lionad/cx-stream'
 
 // dev 物料验收页共享：从物料 _cx_meta 构造示例 data + CxRender node。
 // 提取自 /dev/components.vue，供 v2/v4 验收页复用。
+// 「部分树 → 可渲染树」管线不在此模块：消费方统一走
+// @lionad/cx-render 的 toRenderableComponents（prune + 确定性 id）。
 
 export interface CxMeta {
   key: string
@@ -103,35 +104,4 @@ export function buildSampleNode(meta: CxMeta, options: SampleNodeOptions = {}): 
 
 export function toItem(comp: { _cx_meta: CxMeta }): DevItem {
   return { meta: comp._cx_meta, node: buildSampleNode(comp._cx_meta) }
-}
-
-/**
- * 把流式管线的 CxStreamNode 规整为 CxRender 可消费的最小运行时节点。
- * CxRender 只需 id/key/data（props 由 data 展开绑定）；流式节点的 id 可缺省，
- * 此处回填稳定 id，使增量帧与终态帧落在同一组件实例上原地更新而非重建。
- * 嵌套 components 递归转换：数组形式归入 default slot，Record 形式按 slot 名保留——
- * 页面级 schema（/dev/stream/pages）的增量帧是逐节点生长的前缀树，丢子树会让
- * 骨架永远停在首节点。
- */
-export function toRenderNode(spec: CxStreamNode): CxComponentRuntime {
-  const components: Record<string, CxComponentRuntime[]> = {}
-  const slots = spec.components
-  if (Array.isArray(slots)) {
-    components.default = slots.map(toRenderNode)
-  } else if (slots && typeof slots === 'object') {
-    for (const [slot, children] of Object.entries(slots)) {
-      components[slot] = children.map(toRenderNode)
-    }
-  }
-  return {
-    id: spec.id ?? 'stream-node',
-    key: spec.key,
-    name: spec.name ?? spec.key,
-    data: spec.data ?? {},
-    props: {},
-    emits: {},
-    exposes: {},
-    parents: [],
-    components,
-  } as CxComponentRuntime
 }

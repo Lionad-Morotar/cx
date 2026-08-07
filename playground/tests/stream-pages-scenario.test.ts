@@ -7,10 +7,11 @@ import {
   createSpecDetector,
   cxSpecDetectorConfig,
   matchCxTrigger,
+  toStreamNode,
   type CxSpec,
 } from '@lionad/cx-stream'
 
-import { createPageTriggerRegistry, PAGE_SCENARIOS, toStreamNode } from '~/dev/stream-pages-scenario'
+import { createPageTriggerRegistry, PAGE_SCENARIOS } from '~/dev/stream-pages-scenario'
 import { dailyStandupDashboardSchema } from '~/standup/schemas/daily-standup-dashboard.schema'
 import { standupListSchema } from '~/standup/schemas/standup-list.schema'
 import { weeklyStandupDashboardSchema } from '~/standup/schemas/weekly-standup-dashboard.schema'
@@ -179,7 +180,7 @@ describe('R2.3 页面级增量 trigger', () => {
 
   it('出帧树不存在 key 未传完的部分节点（buildPartial 修剪契约）', () => {
     // 「id 已闭合、key 未传输」的截断帧合法存在（closingBrackets 补全产物），
-    // 但 buildPartial 必须将其修剪——否则穿透 toRenderNode 成 key=undefined 节点，
+    // 但 buildPartial 必须将其修剪——否则穿透到渲染层成 key=undefined 节点，
     // 增量语义从「完整前缀」退化为「前缀 + 半节点」。
     for (const s of PAGE_SCENARIOS) {
       for (const pct of [10, 25, 35, 40, 50, 65, 70, 85, 90, 95]) {

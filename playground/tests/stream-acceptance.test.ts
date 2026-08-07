@@ -14,7 +14,6 @@ import {
 import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-comps-vtu'
 
 import { compositeMeta } from '../app/dev/stream-mock.generated'
-import { toRenderNode } from '../app/dev/material-utils'
 import {
   cropScenarioChunks,
   MAX_COMPONENTS,
@@ -192,24 +191,6 @@ describe('stream 验收 · 增量渲染', () => {
       { key: 'online', label: 'online' },
       { key: 'offline', label: 'offline' },
     ])
-  })
-
-  it('toRenderNode 补稳定 id 并保留 key/data', () => {
-    const fixture: CxStreamNode = {
-      id: 'stream-demo-table',
-      key: 'cx-vtu-data-table',
-      data: { columns: [], data: [] },
-    }
-    const node = toRenderNode(fixture)
-    expect(node.id).toBe('stream-demo-table')
-    expect(node.key).toBe('cx-vtu-data-table')
-    expect(node.data).toMatchObject(fixture.data!)
-  })
-
-  it('toRenderNode 对缺省 id 的节点回填可用 id', () => {
-    const node = toRenderNode({ key: 'cx-text', data: { content: 'x' } })
-    expect(node.id).toBeTruthy()
-    expect(node.key).toBe('cx-text')
   })
 })
 

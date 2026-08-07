@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { toRenderNode } from '~/dev/material-utils'
+import { toRenderableComponents } from '@lionad/cx-render'
 import type { CardReplay } from '~/dev/use-card-replay'
 import type { CxComponentRuntime } from '@lionad/cx-definition'
 
@@ -26,11 +26,11 @@ const props = defineProps<{
   replay: CardReplay
 }>()
 
-// 增量帧 → CxRender 节点数组；null 收窄在 setup 内完成，模板按 length 分支
-const partialComponents = computed(() => {
-  const partial = props.replay.partial.value
-  return partial ? [toRenderNode(partial)] : []
-})
+// 增量帧 → CxRender 节点数组：官方桥 prune + 赋确定性 id；
+// 修剪后无可渲染节点为空数组，模板按 length 分支
+const partialComponents = computed(
+  () => toRenderableComponents(props.replay.partial.value, 'card-preview') ?? [],
+)
 </script>
 
 <style scoped>

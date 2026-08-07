@@ -144,15 +144,14 @@ import {
   cxSpecDetectorConfig,
   matchCxTrigger,
   useIncrementalTree,
+  useLastFrame,
   usePendingTypewriter,
   useStreamChunks,
-  type CxStreamNode,
+  useStreamReplay,
 } from '@lionad/cx-stream'
+import { toRenderableComponents } from '@lionad/cx-render'
 import { createVtuTriggerRegistry, mainArrayOf } from '@lionad/cx-comps-vtu'
-import { toRenderNode } from '~/dev/material-utils'
 import { cropScenarioChunks, MAX_COMPONENTS } from '~/dev/stream-scenario'
-import { useLastFrame } from '~/dev/use-last-frame'
-import { useStreamReplay } from '~/dev/use-stream-replay'
 
 defineOptions({ name: 'PageDevStream' })
 
@@ -181,7 +180,9 @@ const { partialSpec, reset: resetExtractor } = useIncrementalTree(
   computed(() => pendingSource.value),
   { registry: createVtuTriggerRegistry(), matchTrigger: matchCxTrigger },
 )
-const partialNode = computed(() => toCxNode(partialSpec.value))
+const partialNode = computed(
+  () => toRenderableComponents(partialSpec.value, 'stream-components')?.[0] ?? null,
+)
 // 增量视图停留最后一帧：success 后 extractor 出 null，不清空生长到最后的形态
 const { frame: stageNode, clear: clearLastFrame } = useLastFrame(partialNode)
 
@@ -191,17 +192,11 @@ const { frame: stageNode, clear: clearLastFrame } = useLastFrame(partialNode)
 // 绑定 status 会让已接管的终态物料随间隙闪退；specs 只含已闭合围栏，天然递增
 const finalNodes = computed(() =>
   detection.value.specs
-    .map((spec) => toCxNode(spec))
+    .map((spec) => toRenderableComponents(spec, 'stream-components')?.[0] ?? null)
     .filter((node): node is NonNullable<typeof node> => node !== null),
 )
 // 围栏总数来自当前裁剪剧本的静态检出，用于进度展示（不随回放变化）
 const totalSpecs = computed(() => detector.extractSpecs(scenarioScript.value).specs.length)
-
-// CxSpec（单根或数组）→ CxRender 可消费节点；空/缺省一律 null（数组根取首元素）
-function toCxNode(spec: CxStreamNode | CxStreamNode[] | null) {
-  const node = Array.isArray(spec) ? spec[0] : spec
-  return node ? toRenderNode(node) : null
-}
 
 // --- 打字机预览 ---
 const { displayText } = usePendingTypewriter(

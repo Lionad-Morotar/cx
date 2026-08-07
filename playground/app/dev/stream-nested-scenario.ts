@@ -1,6 +1,5 @@
 import { cxNode, type CxComponentRuntime } from '@lionad/cx-definition'
-
-import { buildPageScenario, type PageScenario } from '~/dev/stream-pages-scenario'
+import { buildPageScenario, type PageScenario } from '@lionad/cx-stream'
 
 // /dev/stream/pages 的嵌套演示剧本模块。standup 三个页面 schema 是静态骨架
 // （节点几乎无 data），树内组件的 array 逐行 / region 分区揭示 / scalar 骨架
