@@ -2,7 +2,7 @@
 name: cx-stream-page
 description: 把业务页面组件 cx 化并以 cx-stream 流式渲染演示页（Stream 页面）的全流程技能：抓数预录、物料 Fork 改造、剧本生成、增量 trigger 声明、舞台搭建、验收。当任务涉及「cx 化」「流式渲染页面」「Stream 页面」「cx-stream 演示」「剧本 chunks」时使用本技能；仅修改既有物料样式或修复单点 bug 时不适用。
 metadata:
-  version: 0.2.0
+  version: 0.3.0
 ---
 
 # cx-stream-page：业务页面的 cx 化与流式渲染演示
@@ -14,6 +14,7 @@ metadata:
 - 渲染器标识 class 三件套经 attr fallthrough 落地——inheritAttrs: false 物料须沿模板链逐跳 v-bind="$attrs"
 - 物料根必须是单元素 vnode——template v-if 包多分支（Fragment）或 v-if 落空（Comment）与渲染器注入的指令不兼容，dev 下按实例 × 帧刷警告
 - 流式中间帧是半成品——图表物料须经闸门跳过（undefined 深扫 / legend-series 一致 / 0 尺寸），且 setOption 同步爆炸后实例标志卡死、catch 后必须 dispose 重建
+- 增量管线输出帧经结构共享（structural sharing）——同值子树跨帧引用稳定，渲染器按引用跳过 patch；物料不得依赖此优化替代自身的按值同步契约
 - 参照实现：playground /dev/stream/pages（语义源头）；shushi.86links.com dev/industry-chain-*（实证先例）
 
 契约机制详解与症状排障统一查 [references/schema-contracts.md](./references/schema-contracts.md)。
@@ -62,7 +63,7 @@ metadata:
 
 目标：双视图渲染等价 + 伪联动闭环 + console 零错误。脚本形态与断言清单见 [references/acceptance.md](./references/acceptance.md)：BEM 锚点分件计数、增量=终态等量、link-hint 与激活面板断言、全量测试收尾。流式放大效应下 warning 同样纳入统计（总量个位数为界）；console 消息页面侧截断存储防 driver OOM。
 
-## 红线速览（最容易翻车的七条）
+## 红线速览（最容易翻车的八条）
 
 1. 多根兄弟 schema 直接喂 CxRender——只出首元素，其余静默消失；必须单根容器
 2. `_cx_events` 写 `{ key }` 简写——功能能用但 console 有 emitter TypeError；必须三必填
@@ -71,11 +72,12 @@ metadata:
 5. 剧本产物提交入库——含真实业务数据；只提交生成器，剧本由构建脚本重建
 6. 物料根用 template v-if 包分支或 v-if 落空占位——Fragment/Comment 根被渲染器指令注入刷非元素根警告；根级三元链 + hidden 元素占位
 7. echarts setOption 炸了就吞异常继续用——同步 paint 爆炸让实例主流程标志永久卡死，后续全拒；必须 dispose 重建
+8. 半受控物料 watch props 对象引用（含派生 computed）同步内部交互态——流式每帧新引用按帧冲刷用户操作；按值同步 + 渲染期推导回落
 
 ## references 路由
 
 #### 物料 Fork 改造纪律
-[material-fork.md](./references/material-fork.md)：剥离宿主依赖、视图模型隔离、emits/样式/序列化判据、根节点形态契约、DTO 混型归一化、echarts 流式防御五件套
+[material-fork.md](./references/material-fork.md)：剥离宿主依赖、视图模型隔离、emits/样式/序列化判据、根节点形态契约、DTO 混型归一化、半受控物料按值同步、echarts 流式防御五件套
 
 #### 增量 trigger 形态决策
 [trigger-declaration.md](./references/trigger-declaration.md)：四形态决策树、emptyPassthrough、叶子误剔规避、skeletonFields 判据

@@ -61,6 +61,16 @@ Server DTO 类型声明须以真实接口字节为准（先验证再声明），
 - 脏数据透传触发 Vue prop 类型校验警告，流式回放期按实例 × tick 放大刷屏（曾一次回放 2.8 万条）
 - DTO 声明对齐实况（number | ''、string | null），组装函数内 `Number(x) || 0` / 空串判 null 归一化；spec fixture 用接口混型形态、断言归一化后契约形态，两头都防回归
 
+## 半受控物料契约（内部交互态 + data-in 通道）
+
+物料内部持有交互态（tabs 激活项、展开态等）且 props 提供外部驱动通道时，内部态与 props 的同步方式决定流式存活率：
+
+- 内部态只存用户手动选择，呈现态渲染期推导：手动选择仍合法则优先，否则解析 data-in prop（缺省/失效回落缺省项）——无 watch 同步链，推导结果是稳定原始值，帧引用抖动天然免疫
+- data-in prop 按值同步（watch 原始值 getter）：值变化时清空手动选择重新落地；目标项随数据生长到位即激活，中途外部驱动（伪联动）不丢
+- 禁止 watch props 对象引用（含派生 computed）同步内部态：流式回放每帧产出新引用，watch 按帧触发把用户操作冲掉（实证：cx-tabs 点击 tab 一个 tick 内被拉回）
+- 点击处理幂等（同值早退不重复 emit）；交互经 emits 外抛 data-out 通道（fire-and-forget，父级不接也自洽），meta emits 同步声明
+- 先例：el-tabs currentName（内部态 + watch(() => modelValue) 按值同步 + update:modelValue 外抛）；渲染期推导回落与 React 官方「calculate during rendering」同款
+
 ## 图表物料（echarts）流式防御
 
 流式场景 options 逐帧到达，中间帧是增量解析的半成品。图表包装组件须具备以下防御（实证先例 components/cx/shared/CxEchart.vue），缺一不可：
