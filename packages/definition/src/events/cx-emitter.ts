@@ -12,10 +12,12 @@ export const isValidSubEvent = (evt: CxSubEvent) => {
   return evt.target && evt.trigger
 }
 
-// 创建组件触发的事件
-export const createEvent = (key?: string): CxEvent => {
+// 创建组件触发的事件。
+// id 缺省走 createCxID() 随机；剧本生成等确定性场景（chunks 逐位比对禁随机）
+// 经第二参数显式传入语义 id
+export const createEvent = (key?: string, id?: string): CxEvent => {
   return {
-    id: createCxID(),
+    id: id || createCxID(),
     key: key || '',
     subs: [],
   }
