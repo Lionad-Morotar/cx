@@ -24,6 +24,7 @@ export * from './core/human-text'
 export * from './vue/useStreamChunks'
 export * from './vue/useIncrementalTree'
 export * from './vue/usePendingTypewriter'
+export * from './vue/useCxPendingExit'
 
 // --- cx 协议预设 ---
 export * from './cx'
