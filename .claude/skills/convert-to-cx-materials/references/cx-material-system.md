@@ -9,7 +9,7 @@
 definition ──▶ vue ──▶ renderer ──▶ comps / comps-nuxt-ui-v2 / comps-nuxt-ui-v4 / comps-vtu ──▶ nuxt
 ```
 
-- `@lionad/cx-definition`：schema 层。`normalize()`、`CxLoader`、类型系统、事件总线。零 Vue 渲染依赖（vue 是 peer）。
+- `@lionad/cx-definition`：schema 层。`define()`、`CxLoader`、类型系统、事件总线。零 Vue 渲染依赖（vue 是 peer）。
 - `@lionad/cx-vue`：Vue 运行时 composables（`useCxBEM`、`useCx*`、scoped-css、style-* 等）+ 共享组件（`CxIcon`/`CxEmpty`）。
 - `@lionad/cx-render`：`<CxRender>` 递归渲染器 + bundle `CxRenderBundle`。入口副作用 `import './styles/index.scss'`。
 - `packages/comps*`：物料包。每个导出 `CxXxxBundle: CxMaterialBundle`。
@@ -19,12 +19,12 @@ definition ──▶ vue ──▶ renderer ──▶ comps / comps-nuxt-ui-v2 /
   comps 集中单文件 `stream-triggers.ts`（组织两态见 deepen-and-stream §4）；playground 验收页消费注册表提供回放。
   深化与流式改造全流程见 `deepen-and-stream.md`。
 
-## 2. 物料契约：`normalize()`
+## 2. 物料契约：`define()`
 
-`packages/definition/src/normalize/component.ts`。签名要点：
+`packages/definition/src/define/component.ts`（2026-07 前称 `normalize()`，更名 `defineCxComponent` 并 alias 短名 `define`；旧文档/旧会话里的 normalize 即此函数）。签名要点：
 
 ```ts
-normalize({
+define({
   name,            // 中文展示名（编辑器物料面板），非空串
   description,     // 描述
   key,             // 全局唯一 kebab-case，如 'cx-vtu-terminal'；编译期 IsKebabCase 守卫

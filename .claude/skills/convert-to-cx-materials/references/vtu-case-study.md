@@ -50,7 +50,7 @@ vtu 组件普遍必填 `id`，且 cx 灌入的 attrs 含 `comp`/`data-*`/无 `_`
 
 ## 外部正交审查结论（glm-5.2，light）
 
-- **无高严重度问题**；核心逻辑（useVtuProps 剥离/id 回退、normalize 契约、bundle 注册、分类双向完备性）正交视角无缺陷。
+- **无高严重度问题**；核心逻辑（useVtuProps 剥离/id 回退、define 契约、bundle 注册、分类双向完备性）正交视角无缺陷。
 - **1 中价值观察**：vtu 的 SSR 兼容性在 `ssr:false` playground 下未实证。glm 独立静态分析偏安全——`@vue-leaflet/vue-leaflet` ESM 顶层 0 处 window/document、leaflet 为 `import('leaflet')` 动态加载、vtu bundle 含 12 处 `typeof window` 守卫。
 - **处置**：采纳为已知限制，不改。理由：cx 本为客户端渲染系统（playground `ssr:false`、renderer setup 依赖 window），SSR 非本任务目标；失败场景需「宿主开 SSR + 未来 vtu 升级引入顶层 window」方成立。后续若需 SSR：跑 `ssr:true` 的 `nuxt build` 实证 + 给重依赖物料加 `<ClientOnly>`/client-only 标记防线。
 

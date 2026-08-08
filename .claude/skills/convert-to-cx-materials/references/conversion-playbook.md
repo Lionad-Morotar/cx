@@ -18,7 +18,7 @@ packages/comps-<lib>/
 │   ├── index.ts                 # 桶 + CxXxx 数组 + CxXxxBundle
 │   ├── shared/use-<lib>-props.ts  # 通用 attrs 提纯 composable（§4）
 │   └── <name>/
-│       ├── index.ts             # normalize 定义（§3）
+│       ├── index.ts             # define 定义（§3）
 │       └── src/index.vue        # 包装 SFC（§2）
 └── tests/materials.test.ts      # §7
 ```
@@ -116,13 +116,13 @@ const vtuProps = useVtuProps<LibComponentProps>(useAttrs(), 'cx-lib-name')
 - 块顺序遵循 cx 约定 `<template>` → `<script setup lang="ts">` → `<style>`；`defineOptions.name` 与 key 的 PascalCase 一致。
 - 不要 `defineProps` 声明业务 props（cx 把 data 当 attrs 灌入，用 `useAttrs` 接；且 Guard 恒真，见 system §2）。
 
-## §3 normalize 定义 + props 映射策略
+## §3 define 定义 + props 映射策略
 
 ```ts
-import { normalize } from '@lionad/cx-definition'
+import { define } from '@lionad/cx-definition'
 import component from './src/index.vue'
 
-export default normalize({
+export default define({
   name: '中文名',
   description: '一句话描述',
   key: 'cx-lib-name',
