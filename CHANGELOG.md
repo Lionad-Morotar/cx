@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.3] - 2026-08-08
+
+### Fixed
+
+- `@lionad/cx-vue`：BEM mixin 顶层预声明 `$B`/`$E`，消除 Dart Sass new-global 弃用警告
+- [internal] docs：release.mjs 2FA 注释更正为 pnpm 12 web 授权流实际行为；CONCERNS 登记子包 .bin 残留 shim 劫持 PATH 坑点
+
 ## [0.1.0-alpha.2] - 2026-08-07
 
 ### Added
