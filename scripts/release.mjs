@@ -83,6 +83,24 @@ function verifyTarball(pkgDir, pkg) {
 
 const root = process.cwd()
 
+/**
+ * 版本是否已在 registry。Why 需要: 单包变更的 monorepo 发版只 bump 了一个包，
+ * 其余包版本未动已在 registry 上,无跳过则首包即撞 EPUBLISHCONFLICT 中止整链;
+ * 中途失败重跑同理。npm view 对不存在的版本输出空但 exit 0,须比对版本号文本。
+ */
+function isPublished(pkg) {
+  try {
+    const out = execFileSync(
+      'npm',
+      ['view', `${pkg.name}@${pkg.version}`, 'version', `--registry=${REGISTRY}`],
+      { stdio: 'pipe' },
+    )
+    return out.toString().trim() === pkg.version
+  } catch {
+    return false
+  }
+}
+
 for (const dir of PACKAGES) {
   const pkgDir = join(root, dir)
   const pkg = JSON.parse(readFileSync(join(pkgDir, 'package.json'), 'utf8'))
@@ -103,6 +121,12 @@ for (const dir of PACKAGES) {
   console.log(`\n▸ ${pkg.name}@${pkg.version} (tag: ${channel ?? 'latest'})${dryRun ? ' [dry-run]' : ''}`)
 
   if (dryRun) verifyTarball(pkgDir, pkg)
+
+  // dry-run 不跳过: 要全链实测 tarball,不查 registry
+  if (!dryRun && isPublished(pkg)) {
+    console.log(`  ↷ registry 已存在该版本,跳过`)
+    continue
+  }
 
   try {
     // cwd 设为包目录后裸 `pnpm publish`: `pnpm publish <dir>` 后接 flag 有解析冲突。
