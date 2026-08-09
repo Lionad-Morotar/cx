@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.5] - 2026-08-10
+
+### Fixed
+
+- `@lionad/cx-stream`：增量提取器终态回落最后闭合块——闭合围栏大剧本终帧不再卡 lastValid
+- [internal] release：发布脚本幂等跳过 registry 已存在版本——单包变更的 monorepo 发版与中途失败重跑不再撞 EPUBLISHCONFLICT
+
+### Added
+
+- [internal] docs：新增 cx-agent-manual 技能——业务页面转 agent 操作手册
+- [internal] docs：convert-to-cx-materials 深化——页面迁移 playbook 与场景分流、物料 API 同步 define 更名、vtu 样式集成改宿主入口注入并沉淀具名失败模式与深色类碰撞
+
 ## [0.1.0-alpha.4] - 2026-08-09
 
 ### Fixed

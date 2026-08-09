@@ -1,6 +1,6 @@
 {
   "name": "@lionad/cx-render",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.5",
   "description": "cx renderer: schema-driven Vue renderer",
   "author": "Lionad-Morotar",
   "keywords": [
