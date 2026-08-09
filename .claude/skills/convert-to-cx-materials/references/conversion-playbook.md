@@ -242,8 +242,12 @@ it('groupByCategory 全覆盖不抛错', () => {
 被包装库样式分三类，处理不同：
 
 - **自带编译好的 css**（utility 已内含）：cx-nuxt 条件注入即可，浏览器直接看效果。
-- **Tailwind v4 `@source` 形态**（utility 由消费方扫描生成，如 vtu）：cx-nuxt 注入其 `style.css`，依赖宿主 Tailwind v4 处理 `@source` 扫描被包装库 dist 生成 utility。必须在浏览器实证——看不到样式 = utility 没生成，备选在宿主 `main.css` 显式 `@source "<被包装库 dist 路径>"`。
+- **Tailwind v4 `@source` 形态**（utility 由消费方扫描生成，如 vtu）：**宿主入口 css 注入**——在 `@import "tailwindcss"` 之后 `@import` 其 `style.css`（模块侧 push 因缺 `@theme` 上下文、颜色工具类不生成，已弃用），由宿主 Tailwind v4 处理 `@source` 扫描被包装库 dist 生成 utility。诊断先查编译产物搜类名，两个具名失败模式：
+  - **「有类无色」**：类搜得到、`var()` 颜色值不对 → `@theme` 没进入口（并行注入 / 只扫描不引入），颜色工具类回退 `currentColor` 发黑。
+  - **「有色无类」**：颜色正常、被包装库独有 utility（如 `text-primary-foreground`、`@container/*` 容器查询族）搜不到 → `@source` 丢了。宿主 `@import` 触发 `@source cannot be nested`（部分构建链 / lint 插件不容 import 图内 `@source`）改 vendoring 拆文件时**必丢**扫描注册，须在宿主入口显式补 `@source "<被包装库 dist 路径>"`，且全程无构建期报错、纯静默。
 - **依赖运行时 JS 注入样式**：按被包装库要求，必要时在物料包运行时注入（参考 v4 的 ui replacer 经验）。
+
+另查**宿主深色标记类碰撞**：被包装库主题切换选择器若非根作用域（如 `[data-theme='dark'], .dark` 双分支的 `.dark` 任意祖先命中），宿主或其依赖在内层容器挂 dark 标记类（markdown 渲染器、代码高亮深色壳常见）时，整棵子树的撞名 token 会被重基、压过宿主在 `:root` 的覆写（曾致 bg-primary 按钮白底、继承浅文字隐身）。验收时核对选择器命中范围；须收窄时在 vendored 副本上改（如仅留 `[data-theme='dark']`）并注释记录本地改动。
 
 > 验收页截图是唯一可信证据；curl 200 只证明壳，不证明样式。
 

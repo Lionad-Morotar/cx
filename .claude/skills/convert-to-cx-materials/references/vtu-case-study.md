@@ -15,7 +15,7 @@
 
 - **依赖**：npm 发布版 `@lionad/vtu-components@^0.3.6`（干净、可发布、与本地一致；未用跨仓 link）。
 - **key 前缀**：`cx-vtu-<name>`。
-- **样式**：vtu 是 Tailwind v4 `@source` 形态 → cx-nuxt 启用 vtu 时 `nuxt.options.css.push('@lionad/vtu-components/style.css')`，由 playground 的 Tailwind v4 扫描 vtu dist 生成 utility。浏览器实证生效（见下「验证证据」）。
+- **样式**：vtu 是 Tailwind v4 `@source` 形态。~~cx-nuxt 启用 vtu 时 `nuxt.options.css.push(...)`~~（改造期旧方案，**已弃用**：模块侧扫描缺 `@theme` 上下文，颜色工具类不生成、边框回退 currentColor 发黑）。现行委托形态：宿主入口 css 在 `@import "tailwindcss"` 之后 `@import "@lionad/vtu-components/style.css"`，由其内置 `@theme` 注册 token、`@source` 扫描 dist 生成 utility。宿主 `@import` 若触发 `@source cannot be nested`，逃生舱是 vendoring 拆 tokens.css + 组件 css 引入，**且必须在宿主入口显式补 `@source "<vtu dist 路径>"`**——拆文件必丢扫描注册，丢后「颜色正常、vtu 独有 utility 静默缺失」（playbook §8 两个具名失败模式）。
 - **事件桥接（v1 未做）**：29 物料均未在 wrapper 声明 `defineEmits`/桥接 vtu 交互事件。物料可渲染、可配置，但 OptionList/PreferencesPanel/ParameterSlider 的 change/action、post 的 onAction 等暂不接入 cx 事件系统——留待后续切片（需 wrapper 加 defineEmits 并验证 Guard 对 emits 的兼容性，见 system §2 末尾）。
 
 ## 包装 composable：`useVtuProps`
