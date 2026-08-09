@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.4] - 2026-08-09
+
+### Fixed
+
+- `@lionad/cx-stream`：`usePendingTypewriter` 新增 `finished` 选项——消息完成/停止（abort）时动画链立即定格（`flush: 'sync'` 断链），修复围栏永不闭合时主循环无限空转；一次性边沿语义，不封锁后续 `exit()` 删除动画
+- `@lionad/cx-stream`：`useCxPendingExit` 的 `finished` 边沿打断进行中的退出删除动画——跳过逐字删除直接翻牌，修复停止信号到达后删除动画仍在播放
+
 ## [0.1.0-alpha.3] - 2026-08-08
 
 ### Fixed
