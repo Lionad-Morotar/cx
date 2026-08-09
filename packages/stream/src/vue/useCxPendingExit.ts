@@ -89,7 +89,11 @@ export function useCxPendingExit(
   // finished(消息完成/停止)立即释放冻结:用户停止即交还全部内容
   if (options?.finished) {
     watch(options.finished, (done) => {
-      if (done) releaseSettle()
+      if (!done) return
+      releaseSettle()
+      // 退出删除动画进行中被停止信号打断:跳过逐字删除直接翻牌,
+      // 否则停止后动画仍在播(半删除帧随翻牌后组件卸载一帧让位)
+      if (exitingIndex.value !== null) markExitDone()
     })
   }
 

@@ -307,4 +307,31 @@ describe('useCxPendingExit', () => {
     markExitDone()
     expect(content.value).toBe(`前文\n${widgetText}\n后续段落`)
   })
+
+  it('finished 边沿打断进行中的退出删除动画:跳过逐字删除直接翻牌', async () => {
+    const widgetText =
+      '<widget-slot data-spec-index="INDEX_PLACEHOLDER" data-spec-array-index="0"></widget-slot>'
+    const source = ref(
+      extraction(
+        '前文\n<pending-slot data-spec-index="INDEX_PLACEHOLDER" data-pending-index="0"></pending-slot>',
+        [],
+        ['{}'],
+      ),
+    )
+    const finished = ref(false)
+    const { content, exitingIndex } = useCxPendingExit(computed(() => source.value), {
+      finished,
+    })
+
+    source.value = extraction(`前文\n${widgetText}`, [SPEC])
+    await Promise.resolve()
+    expect(exitingIndex.value).toBe(0) // 进入退出态(逐字删除窗口)
+    expect(content.value).toContain('pending-slot')
+
+    // 停止信号打断:立即翻牌,删除动画不再播放;finished 已达成故不启动 settle
+    finished.value = true
+    await Promise.resolve()
+    expect(exitingIndex.value).toBeNull()
+    expect(content.value).toBe(`前文\n${widgetText}`)
+  })
 })

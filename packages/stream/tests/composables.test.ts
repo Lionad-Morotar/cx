@@ -322,4 +322,56 @@ describe('usePendingTypewriter', () => {
     vi.advanceTimersByTime(10000)
     expect(api.displayText.value).toBe(mid)
   })
+
+  it('finished 置 true 动画链定格:源增长不再驱动删旧打新', () => {
+    const source = ref('{"key":"cx-text","data":{"text":"第一句"}}')
+    const finished = ref(false)
+    const { wrapper, api } = mountTypewriter(source, { finished })
+
+    vi.advanceTimersByTime(1000 + 200)
+    expect(api.displayText.value).toBe('第一句')
+
+    // 停止信号(abort 语义):围栏永不闭合时主循环无限空转的出口
+    finished.value = true
+    source.value = '{"key":"cx-text","data":{"text":"第二句更长的句子"}}'
+    vi.advanceTimersByTime(5000)
+    expect(api.displayText.value).toBe('第一句')
+
+    wrapper.unmount()
+  })
+
+  it('finished 于打字中途到达:定格当前帧不补完', () => {
+    const source = ref('{"key":"cx-text","data":{"text":"很长的句子十个字以上"}}')
+    const finished = ref(false)
+    const { wrapper, api } = mountTypewriter(source, { finished })
+
+    vi.advanceTimersByTime(1000 + 30) // 打出 3 字
+    const frame = api.displayText.value
+    expect(frame.length).toBeGreaterThan(0)
+    expect(frame.length).toBeLessThan('很长的句子十个字以上'.length)
+
+    finished.value = true
+    vi.advanceTimersByTime(5000)
+    expect(api.displayText.value).toBe(frame)
+
+    wrapper.unmount()
+  })
+
+  it('finished 一次性边沿:不封锁后续 exit() 删除动画(闭合退出可晚于完成信号)', () => {
+    const source = ref('{"key":"cx-text","data":{"text":"退出"}}')
+    const finished = ref(false)
+    const { wrapper, api } = mountTypewriter(source, { finished })
+
+    vi.advanceTimersByTime(1000 + 200)
+    expect(api.displayText.value).toBe('退出')
+
+    finished.value = true
+    const onDone = vi.fn()
+    api.exit(onDone)
+    vi.advanceTimersByTime(2 * 5 + 10) // 2 字 × deletingSpeed
+    expect(onDone).toHaveBeenCalledTimes(1)
+    expect(api.displayText.value).toBe('')
+
+    wrapper.unmount()
+  })
 })

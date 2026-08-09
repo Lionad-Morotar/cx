@@ -1,4 +1,4 @@
-import { computed, onMounted, onUnmounted, shallowReactive, toValue } from 'vue'
+import { computed, onMounted, onUnmounted, shallowReactive, toValue, watch } from 'vue'
 import type { ComputedRef, Ref } from 'vue'
 import { extractDisplayText, funifyText } from '../core/human-text'
 import type { HumanTextConfig } from '../core/human-text'
@@ -49,6 +49,11 @@ export interface PendingTypewriterOptions {
   humanText?: HumanTextConfig
   /** 文本趣味化装饰；不传用默认规则 */
   funify?: (text: string) => string
+  /**
+   * 消息完成/停止信号：置 true 动画链立即定格（清定时器断链，显示态保持当前帧）。
+   * 一次性边沿语义——不封锁后续 exit() 的删除动画（闭合退出可晚于完成信号到达）。
+   */
+  finished?: Ref<boolean>
 }
 
 const DEFAULT_HUMAN_TEXT: HumanTextConfig = { looksLikeStructured: () => true }
@@ -243,6 +248,24 @@ export function usePendingTypewriter(
     const s = state ?? acquireState()
     return s.sentence.slice(0, s.cursor)
   })
+
+  // finished 边沿定格：断掉本实例驱动链（loop/typeIn/deleteOut 的下一个 step 不再排出）。
+  // 流式中断(abort)时围栏永不闭合,无此出口主循环会无限空转;
+  // exit() 不经此路径封锁——闭合退出晚于完成信号时删除动画仍可播放。
+  // flush sync:停止须即时——pre 异步结算会让已排出的 timer 在 watch 回调前继续跑
+  if (options.finished) {
+    watch(
+      options.finished,
+      (done) => {
+        if (!done) return
+        if (myTimer) {
+          clearTimeout(myTimer)
+          myTimer = null
+        }
+      },
+      { flush: 'sync' },
+    )
+  }
 
   onMounted(() => {
     liveInstances.add(id)
