@@ -208,14 +208,19 @@ export function createIncrementalExtractor<TSpec = unknown>(
     }
 
     // --- Step 0: 从 markdown 代码块中定位目标 JSON ---
-    // 多代码块场景：取最后一个未闭合的块（当前正在流式的那个）。
-    // 无代码块时输入视为已隔离的纯 JSON（如 pendingSources 直送）。
+    // 多代码块场景：优先取最后一个未闭合的块（当前正在流式的那个）。
+    // 无未闭合块时回落最后一个闭合块的内容——终态文本（围栏已闭合）若直接
+    // 以含围栏的 raw 进解析，JSON.parse 恒失败，大剧本的修复路径也会溢出，
+    // 完整帧永远卡在 lastValid 中间态。无代码块时输入视为已隔离的纯 JSON
+    // （如 pendingSources 直送）。
     const jsonMatches = Array.from(raw.matchAll(fenceBlockPattern(fence)))
     let target: string | null = null
+    let lastClosed: string | null = null
     for (const m of jsonMatches) {
-      if (!(m[0] ?? '').endsWith('```')) target = m[1] ?? null
+      if ((m[0] ?? '').endsWith('```')) lastClosed = m[1] ?? null
+      else target = m[1] ?? null
     }
-    const text = target ?? raw
+    const text = target ?? lastClosed ?? raw
     if (!text.trim()) return lastValid
 
     // --- Step 1: 收集所有已注册 trigger 的扫描路径 ---

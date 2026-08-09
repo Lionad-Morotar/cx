@@ -132,6 +132,18 @@ describe('createIncrementalExtractor（cx 表格流式）', () => {
     expect((partial.data!.columns as unknown[]).length).toBe(1)
   })
 
+  it('闭合围栏终帧：完整块内容产出全量 Spec', () => {
+    const ex = createTableExtractor()
+    // 流式中期（未闭合）先产一帧，再喂闭合围栏的完整文本：
+    // 终帧必须推进到全量，而不是停在 lastValid 中间态
+    const base = `${tablePrefix}${col1},${col2}],"rows":[`
+    ex.next(`\`\`\`json\n${base}${row1}`)
+    const closed = `\`\`\`json\n${base}${row1},${row2}]}}\n\`\`\``
+    const partial = ex.next(closed) as CxStreamNode
+    expect(partial).not.toBeNull()
+    expect((partial.data!.rows as unknown[]).length).toBe(2)
+  })
+
   it('解析失败 delta → lastValid 缓存防闪没', () => {
     const ex = createTableExtractor()
     const base = `${tablePrefix}${col1}],"rows":[`
