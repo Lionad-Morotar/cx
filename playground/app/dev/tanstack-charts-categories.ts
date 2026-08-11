@@ -19,6 +19,7 @@ export const TSC_FROZEN_KEYS = [
   'bar',
   'area',
   'dot',
+  'pie',
 ] as const
 
 // cx 物料 key（cx-tanstack-charts-<名>）→ 分类。
