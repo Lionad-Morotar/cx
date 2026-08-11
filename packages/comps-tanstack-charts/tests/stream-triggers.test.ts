@@ -82,9 +82,7 @@ describe('stream-trigger 判定完备性', () => {
   it('array 触发器编译扫描路径为主数组元素边界（frameStride 10）', () => {
     for (const config of TANSTACK_CHARTS_STREAM_TRIGGERS) {
       expect(config.frameStride).toBe(10)
-      const array = config.sections.find(
-        (s): s is ArraySectionConfig => s.kind === 'array',
-      )
+      const array = config.sections.find((s): s is ArraySectionConfig => s.kind === 'array')
       if (array) expect(array.arrayKey).toBe('data')
     }
   })

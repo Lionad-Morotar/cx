@@ -6,7 +6,8 @@
     <header class="page-header">
       <h1 class="title">cx components · tanstack-charts</h1>
       <p class="subtitle">
-        /dev/components-tanstack-charts · TanStack Charts 物料 schema 驱动渲染验收（JSON definition 投影）
+        /dev/components-tanstack-charts · TanStack Charts 物料 schema 驱动渲染验收（JSON definition
+        投影）
       </p>
       <DevPagesNav />
     </header>

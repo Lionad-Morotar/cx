@@ -2,22 +2,22 @@
   "name": "@lionad/cx-comps-tanstack-charts",
   "version": "0.1.0-alpha.5",
   "description": "cx material components wrapping TanStack Charts (@tanstack/vue-charts)",
-  "author": "Lionad-Morotar",
   "keywords": [
+    "charts",
     "schema-driven",
     "tanstack-charts",
-    "charts",
     "vue"
   ],
+  "homepage": "https://github.com/Lionad-Morotar/cx#readme",
+  "bugs": {
+    "url": "https://github.com/Lionad-Morotar/cx/issues"
+  },
+  "author": "Lionad-Morotar",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Lionad-Morotar/cx.git",
     "directory": "packages/comps-tanstack-charts"
   },
-  "bugs": {
-    "url": "https://github.com/Lionad-Morotar/cx/issues"
-  },
-  "homepage": "https://github.com/Lionad-Morotar/cx#readme",
   "files": [
     "dist"
   ],

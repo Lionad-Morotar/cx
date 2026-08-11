@@ -75,6 +75,7 @@ export default defineConfig({
   lint: {
     ignorePatterns: [
       'dist/**',
+      'refs/**',
       'packages/comps-nuxt-ui-v2/vendor/**',
       'packages/comps/src/calendar/vendor/el-calendar/**',
       'playground/.output/**',
@@ -86,6 +87,7 @@ export default defineConfig({
     singleQuote: true,
     ignorePatterns: [
       'dist/**',
+      'refs/**',
       'packages/comps-nuxt-ui-v2/vendor/**',
       'packages/comps/src/calendar/vendor/el-calendar/**',
       'playground/.output/**',

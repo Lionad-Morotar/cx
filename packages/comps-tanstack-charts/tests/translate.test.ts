@@ -106,7 +106,9 @@ describe('translateChartSpec', () => {
     const asBool = (d: unknown) => (d as { tooltip?: unknown }).tooltip
     expect(asBool(translateChartSpec({ ...base, tooltip: true }))).toBeUndefined()
     expect(asBool(translateChartSpec({ ...base, tooltip: false }))).toBe(false)
-    expect(asBool(translateChartSpec({ ...base, tooltip: { placement: 'top', offset: 8 } }))).toEqual({
+    expect(
+      asBool(translateChartSpec({ ...base, tooltip: { placement: 'top', offset: 8 } })),
+    ).toEqual({
       placement: 'top',
       offset: 8,
     })

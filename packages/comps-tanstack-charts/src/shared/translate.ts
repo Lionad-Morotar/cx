@@ -219,24 +219,15 @@ export function translateScale(spec: CxChartScaleSpec): unknown {
     case 'ordinal':
       return spec.domain ? scaleOrdinal<string>().domain(spec.domain) : scaleOrdinal
     default:
-      throw new Error(`translateScale: 未知 scale kind "${String((spec as { kind: string }).kind)}"`)
+      throw new Error(
+        `translateScale: 未知 scale kind "${String((spec as { kind: string }).kind)}"`,
+      )
   }
 }
 
 // ---------- mark 翻译 ----------
 
-const CHANNEL_KEYS = [
-  'x',
-  'y',
-  'x1',
-  'x2',
-  'y1',
-  'y2',
-  'z',
-  'color',
-  'key',
-  'text',
-] as const
+const CHANNEL_KEYS = ['x', 'y', 'x1', 'x2', 'y1', 'y2', 'z', 'color', 'key', 'text'] as const
 
 const STYLE_KEYS = [
   'stroke',
@@ -303,10 +294,12 @@ export function translateMark(spec: CxChartMarkSpec): ChartMark<unknown, any, an
   if (spec.r !== undefined) options.r = spec.r
   if (spec.id !== undefined) options.id = spec.id
   if (spec.curve !== undefined) options.curve = translateCurve(spec.curve)
-  return (factory as (data: readonly unknown[], options: Record<string, unknown>) => ChartMark<unknown, any, any>)(
-    spec.data ?? [],
-    options,
-  )
+  return (
+    factory as (
+      data: readonly unknown[],
+      options: Record<string, unknown>,
+    ) => ChartMark<unknown, any, any>
+  )(spec.data ?? [], options)
 }
 
 // ---------- axis 翻译 ----------
@@ -375,7 +368,8 @@ export function translateChartSpec(spec: CxChartSpec): DomChartDefinition {
   if (spec.keyboard !== undefined) definition.keyboard = spec.keyboard
   if (spec.focusRing !== undefined) definition.focusRing = spec.focusRing
   if (spec.tooltip !== undefined) {
-    definition.tooltip = spec.tooltip === true ? undefined : spec.tooltip === false ? false : spec.tooltip
+    definition.tooltip =
+      spec.tooltip === true ? undefined : spec.tooltip === false ? false : spec.tooltip
   }
   return (defineChart as (definition: unknown) => DomChartDefinition)(definition)
 }
