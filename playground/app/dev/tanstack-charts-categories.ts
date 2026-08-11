@@ -14,6 +14,11 @@ export const TSC_CATEGORY_ORDER: readonly TscCategory[] = ['通用', '预设图�
 export const TSC_FROZEN_KEYS = [
   // 通用
   'chart',
+  // 预设图表
+  'line',
+  'bar',
+  'area',
+  'dot',
 ] as const
 
 // cx 物料 key（cx-tanstack-charts-<名>）→ 分类。
