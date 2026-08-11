@@ -1,0 +1,4 @@
+[submodule "tanstack-charts"]
+	path = refs/tanstack-charts
+	url = https://github.com/TanStack/charts.git
+	ignore = all
