@@ -32,6 +32,12 @@ import {
   mainArrayOf as mainArrayOfNaive,
   NAIVE_UI_STREAM_TRIGGERS,
 } from '@lionad/cx-comps-naive-ui'
+import {
+  createTanstackChartsTriggerRegistry,
+  CxTanstackCharts,
+  mainArrayOf as mainArrayOfTsc,
+  TANSTACK_CHARTS_STREAM_TRIGGERS,
+} from '@lionad/cx-comps-tanstack-charts'
 import { buildDefaultData, type CxMeta } from '../app/dev/material-utils'
 
 // 物料库 trigger 注册表的判定型验收（与页面/定时器解耦的无头契约）：
@@ -718,5 +724,62 @@ describe('element-plus trigger 判定 · 三形态 10 件', () => {
     for (const slot of Object.keys(finalComponents)) {
       expect(declared, `终帧槽 ${slot} 应在声明 slots 内`).toContain(slot)
     }
+  })
+})
+
+const tscMeta = metaIndex(CxTanstackCharts)
+const tscCount = (node: CxStreamNode) => mainArrayOfTsc(node)?.length ?? null
+
+describe('tanstack-charts trigger 判定 · 6 件全适用（5 array + 1 scalar）', () => {
+  it('注册表恰 6 件，物料差集为零（0 不适用）', () => {
+    const registry = createTanstackChartsTriggerRegistry()
+    expect(registry.size).toBe(TANSTACK_CHARTS_STREAM_TRIGGERS.length)
+    expect(TANSTACK_CHARTS_STREAM_TRIGGERS).toHaveLength(6)
+    for (const config of TANSTACK_CHARTS_STREAM_TRIGGERS) {
+      expect(registry.has(config.key), `${config.key} 应在注册表内`).toBe(true)
+    }
+    // 差集派生：物料 key 集 - trigger key 集应为空
+    const notApplicable = CxTanstackCharts.map((x) => x._cx_meta.key as string).filter(
+      (key) => !TANSTACK_CHARTS_STREAM_TRIGGERS.some((c) => c.key === key),
+    )
+    expect(notApplicable).toEqual([])
+  })
+
+  it.each(
+    TANSTACK_CHARTS_STREAM_TRIGGERS.flatMap((c) => {
+      const array = arraySectionOf(c)
+      return array ? [[c.key, c, array.arrayKey] as const] : []
+    }),
+  )('%s 真实样本前缀播放增量收敛', (_key, config, arrayKey) => {
+    const meta = tscMeta.get(config.key)
+    expect(meta, `${config.key} 物料定义应存在`).toBeTruthy()
+    expectConverges(
+      createTanstackChartsTriggerRegistry,
+      tscCount,
+      config.key,
+      realDataOf(meta!, arrayKey),
+    )
+  })
+
+  it('chart scalar：key 检出即空壳帧（fallback 空 marks），终态完整帧全字段', () => {
+    const shell = createIncrementalExtractor<CxSpec>({
+      registry: createTanstackChartsTriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    }).next('{"key":"cx-tanstack-charts-chart"') as CxStreamNode | null
+    expect(shell).toMatchObject({
+      key: 'cx-tanstack-charts-chart',
+      data: { definition: { marks: [] } },
+    })
+    expect((shell?.data ?? {})['_cx_streaming']).toBeUndefined()
+
+    const meta = tscMeta.get('cx-tanstack-charts-chart')!
+    const data = buildDefaultData(meta)
+    const final = createIncrementalExtractor<CxSpec>({
+      registry: createTanstackChartsTriggerRegistry(),
+      matchTrigger: matchCxTrigger,
+    }).next(
+      JSON.stringify({ id: 'tsc-chart', key: 'cx-tanstack-charts-chart', data }),
+    ) as CxStreamNode | null
+    expect(final?.data).toMatchObject(data as Record<string, unknown>)
   })
 })

@@ -1,7 +1,7 @@
 <template>
   <!-- /dev/components-tanstack-charts：@lionad/cx-comps-tanstack-charts 物料 schema 驱动渲染验收。
        TanStack Charts 零 CSS 分发（样式=definition theme + inline style），无宿主样式注入；
-       S1 地基期仅通用 chart 物料，variants/replay 随后续 Slice 补 -->
+       6 件物料全量流式 trigger（5 array + 1 scalar）经 replay 装配提供流式回放 -->
   <main class="page-dev-components-tanstack-charts page">
     <header class="page-header">
       <h1 class="title">cx components · tanstack-charts</h1>
@@ -12,13 +12,17 @@
     </header>
 
     <div class="showcase-wrap">
-      <DevShowcase :groups="groups" />
+      <DevShowcase :groups="groups" :replay="{ registry, countOf }" />
     </div>
   </main>
 </template>
 
 <script setup lang="ts">
-import { CxTanstackCharts } from '@lionad/cx-comps-tanstack-charts'
+import {
+  CxTanstackCharts,
+  createTanstackChartsTriggerRegistry,
+  mainArrayOf,
+} from '@lionad/cx-comps-tanstack-charts'
 import { toItem, type CxMeta, type ShowcaseGroup } from '~/dev/material-utils'
 import { groupByCategory } from '~/dev/tanstack-charts-categories'
 
@@ -28,6 +32,11 @@ defineOptions({ name: 'PageDevComponentsTanstackCharts' })
 // 注册到全局 $cx；groupByCategory 未映射 key 会抛错强制补全映射
 const materials = CxTanstackCharts as unknown as { _cx_meta: CxMeta }[]
 const groups: ShowcaseGroup[] = groupByCategory(materials.map(toItem))
+
+// 回放装配：注册表工厂创建、countOf 取主数组长度（徽标展示用）
+const registry = createTanstackChartsTriggerRegistry()
+const countOf = (node: { key: string; data?: Record<string, unknown> }) =>
+  mainArrayOf(node)?.length ?? null
 </script>
 
 <style scoped>
