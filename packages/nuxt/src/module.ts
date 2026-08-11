@@ -24,6 +24,7 @@ export type CxBuiltinMaterialSet =
   | 'vtu'
   | 'element-plus'
   | 'naive-ui'
+  | 'tanstack-charts'
 
 export interface CxNuxtModuleOptions {
   /** 物料 bundle 声明列表（插件化形态）；与 materials 同时提供时 bundles 优先 */
@@ -43,6 +44,10 @@ const BUILTIN_BUNDLES: Record<CxBuiltinMaterialSet, CxBundleSpec> = {
   vtu: { package: '@lionad/cx-comps-vtu', namedExport: 'CxVtuBundle' },
   'element-plus': { package: '@lionad/cx-comps-element-plus', namedExport: 'CxElementPlusBundle' },
   'naive-ui': { package: '@lionad/cx-comps-naive-ui', namedExport: 'CxNaiveUiBundle' },
+  'tanstack-charts': {
+    package: '@lionad/cx-comps-tanstack-charts',
+    namedExport: 'CxTanstackChartsBundle',
+  },
 }
 
 /**
@@ -113,6 +118,14 @@ const BUNDLE_OPTIMIZE_DEPS: Record<CxBuiltinMaterialSet, string[]> = {
   // naive-ui 同为包装层全入口具名导入；其依赖链（css-render / vueuc / date-fns 等）
   // 随 naive-ui 预构建同 chunk 解析，单条声明即可
   'naive-ui': ['@lionad/cx-comps-naive-ui > naive-ui'],
+  // tanstack-charts：包装层 import @tanstack/vue-charts，翻译层 import @tanstack/charts
+  // 主入口与 scales/d3 子路径；charts-core 的 d3 子包随预构建同 chunk 解析（naive-ui
+  // 单条范式）；d3-shape 是物料包直接依赖（curve 枚举桥接），单列一条
+  'tanstack-charts': [
+    '@lionad/cx-comps-tanstack-charts > @tanstack/vue-charts',
+    '@lionad/cx-comps-tanstack-charts > @tanstack/charts',
+    '@lionad/cx-comps-tanstack-charts > d3-shape',
+  ],
 }
 
 /** 内置物料包名 → 物料集名反查；自定义 bundles 的包名不会命中 */
