@@ -6,7 +6,7 @@
 
 ```text
 cx/
-├── packages/                       # 11 个子包，单向依赖链
+├── packages/                       # 12 个子包，单向依赖链
 │   ├── definition/                 # schema 与 loader 核心（底层）
 │   ├── vue/                        # Vue 运行时 composables 与共享组件
 │   ├── renderer/                   # 渲染器（递归 schema → Vue 树）
@@ -16,6 +16,7 @@ cx/
 │   ├── comps-nuxt-ui-v4/           # vendored Nuxt UI v2 物料库
 │   │   └── vendor/                 # vendored 第三方源码 + 离线 shim（不参与 lint/fmt）
 │   ├── comps-vtu/                  # tool-ui-vue（vtu）工具调用组件物料库
+│   ├── comps-tanstack-charts/      # TanStack Charts 图表物料库（chart 通用 + line/bar/area/dot/pie 预设）
 │   ├── comps-element-plus/         # Element Plus 组件物料库（schema 驱动包装）
 │   ├── comps-naive-ui/             # Naive UI 组件物料库（schema 驱动包装，CSS-in-JS 零 css 装配）
 │   ├── eslint/                     # 共享 lint 配置
@@ -84,6 +85,12 @@ cx/
 - **包含：** 每物料 `<comp>/index.ts` + `<comp>/src/index.vue`；`shared/use-naive-ui-props.ts`（attrs 桥接）+ `shared/use-naive-change-bridge.ts`（桥接族变更上行）；`data-table/stream-trigger.ts` + `stream-triggers.ts`（流式增量预设）；`tests/`（桥接单测 + 各类 smoke + 27 件契约冻结）。
 - **关键文件：** `src/index.ts`（`CxNaiveUi` 数组 + `CxNaiveUiBundle` + stream-triggers 具名导出）、`src/shared/use-naive-change-bridge.ts`、`README.md`（CSS-in-JS 零装配契约 + 组件清单 + 未收录清单）。
 
+### `packages/comps-tanstack-charts/`
+
+- **用途：** 包装 TanStack Charts 为 cx 物料（6 件冻结：chart 通用 + line/bar/area/dot/pie 预设）；双通道供给——chart 走声明式 JSON 翻译层（scale kind 枚举 / curve 枚举 / 字段名 channel），预设走扁平通道 props 组装单 mark spec。
+- **包含：** 每物料 `<comp>/index.ts` + `<comp>/src/index.vue`（共享 `chart/src/` 包装 SFC 骨架，wrapper div 承担 testid/BEM——库根元素 `inheritAttrs:false` 且多根）；`shared/translate.ts`（声明式 JSON→运行时定义翻译层）+ `shared/use-chart-props.ts`（attrs 白名单提纯 + spec 回退）+ `shared/use-preset-chart.ts` / `use-pie-chart.ts`（预设 composable）；`stream-triggers.ts`（6 件全量：5 array + 1 scalar）；`tests/`（翻译层契约 + 物料三元组 + 特征元素 smoke + stream-trigger 回放链路）。
+- **关键文件：** `src/index.ts`（`CxTanstackCharts` 数组 + `CxTanstackChartsBundle` + translate/stream-triggers 再导出）、`src/shared/translate.ts`、`README.md`（双通道供给契约 + 样式零装配说明——样式全部经 definition theme + inline style，无 css 分发）。
+
 ### `packages/nuxt/`
 
 - **用途：** Nuxt 模块入口，零配置集成。
@@ -123,6 +130,7 @@ cx/
 - `packages/comps-nuxt-ui-v4/src/index.ts`：nuxt-ui 物料库入口。
 - `packages/comps-element-plus/src/index.ts`：Element Plus 物料库入口（含 stream-triggers 再导出）。
 - `packages/comps-naive-ui/src/index.ts`：Naive UI 物料库入口（含 stream-triggers 具名导出）。
+- `packages/comps-tanstack-charts/src/index.ts`：TanStack Charts 物料库入口（含 translate / stream-triggers 再导出）。
 - `packages/stream/src/index.ts`：cx-stream 管线入口。
 - `packages/nuxt/src/module.ts`：Nuxt 模块入口。
 - `playground/nuxt.config.ts`：playground 应用入口。

@@ -13,6 +13,7 @@ Schema 驱动的 Vue 渲染系统：从低代码组件定义（schema）到运�
 | [`@lionad/cx-comps-nuxt-ui-v2`](packages/comps-nuxt-ui-v2) | Nuxt UI v2 物料组件库                                      |
 | [`@lionad/cx-comps-nuxt-ui-v4`](packages/comps-nuxt-ui-v4) | Nuxt UI v4 物料组件库                                      |
 | [`@lionad/cx-comps-vtu`](packages/comps-vtu)               | tool-ui-vue（vtu）工具调用组件物料库                       |
+| [`@lionad/cx-comps-tanstack-charts`](packages/comps-tanstack-charts) | TanStack Charts 图表物料库（chart 通用 + line/bar/area/dot/pie 预设） |
 | [`@lionad/cx-nuxt`](packages/nuxt)                                   | Nuxt module：零配置集成                                    |
 
 ## 开发
