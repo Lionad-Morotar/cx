@@ -13,6 +13,7 @@
     "@lionad/cx-comps": "workspace:*",
     "@lionad/cx-comps-element-plus": "workspace:*",
     "@lionad/cx-comps-naive-ui": "workspace:*",
+    "@lionad/cx-comps-tanstack-charts": "workspace:*",
     "@lionad/cx-comps-nuxt-ui-v2": "workspace:*",
     "@lionad/cx-comps-nuxt-ui-v4": "workspace:*",
     "@lionad/cx-comps-vtu": "workspace:*",
