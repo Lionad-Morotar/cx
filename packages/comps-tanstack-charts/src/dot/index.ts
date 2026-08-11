@@ -24,11 +24,7 @@ export default define({
   icon: 'i-tabler-chart-dots',
   component,
   props: {
-    data: {
-      name: '数据',
-      type: 'json',
-      initial: initialData,
-    },
+    // 声明序即回放剧本序列化序：x/y 前置使增量帧首行起即携带通道配置，data 殿后逐项生长
     x: {
       name: 'X 字段',
       type: 'short',
@@ -38,6 +34,11 @@ export default define({
       name: 'Y 字段',
       type: 'short',
       initial: 'weight',
+    },
+    data: {
+      name: '数据',
+      type: 'json',
+      initial: initialData,
     },
     height: {
       name: '高度',

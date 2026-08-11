@@ -14,6 +14,11 @@ export { default as CxTanstackChartsArea } from './area'
 export { default as CxTanstackChartsDot } from './dot'
 export { default as CxTanstackChartsPie } from './pie'
 export * from './shared/translate'
+export {
+  TANSTACK_CHARTS_STREAM_TRIGGERS,
+  createTanstackChartsTriggerRegistry,
+  mainArrayOf,
+} from './stream-triggers'
 
 /** TanStack Charts 物料数组：通用 chart + 笛卡尔预设（line/bar/area/dot）+ 饼图 */
 export const CxTanstackCharts = [

@@ -23,11 +23,8 @@ export default define({
   icon: 'i-tabler-chart-line',
   component,
   props: {
-    data: {
-      name: '数据',
-      type: 'json',
-      initial: initialData,
-    },
+    // 声明序即回放剧本序列化序：x/y/curve 前置使增量帧首行起即携带通道配置，
+    // data 殿后逐项生长（尾随标量不入增量帧，终帧兜底）
     x: {
       name: 'X 字段',
       type: 'short',
@@ -43,6 +40,11 @@ export default define({
       type: 'select',
       initial: 'monotoneX',
       options: CURVE_SELECT_OPTIONS,
+    },
+    data: {
+      name: '数据',
+      type: 'json',
+      initial: initialData,
     },
     height: {
       name: '高度',

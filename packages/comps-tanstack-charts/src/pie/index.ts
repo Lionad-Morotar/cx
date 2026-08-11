@@ -18,11 +18,8 @@ export default define({
   icon: 'i-tabler-chart-pie',
   component,
   props: {
-    data: {
-      name: '数据',
-      type: 'json',
-      initial: initialData,
-    },
+    // 声明序即回放剧本序列化序：name/value/innerRadiusRatio 前置使增量帧首扇区起即携带
+    // 通道配置，data 殿后逐扇区生长
     name: {
       name: '类目字段',
       type: 'short',
@@ -37,6 +34,11 @@ export default define({
       name: '空心比',
       type: 'number',
       initial: 0,
+    },
+    data: {
+      name: '数据',
+      type: 'json',
+      initial: initialData,
     },
     height: {
       name: '高度',
