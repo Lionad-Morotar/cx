@@ -122,4 +122,29 @@ describe('extractSpecs（cx 预设）', () => {
     const rPending = d2.extractSpecs('```json\n{"key":"cx-text","data":{')
     expect(rPending.content).toContain('<my-pending')
   })
+
+  it('fence 数组:jsonc 围栏闭合 Spec → success', () => {
+    const dual = createSpecDetector({ ...cxSpecDetectorConfig, fence: ['json', 'jsonc'] })
+    const r = dual.extractSpecs(`\`\`\`jsonc\n${tableSpec}\n\`\`\``)
+    expect(r.status).toBe('success')
+    expect((r.specs[0] as CxStreamNode).key).toBe('cx-demo-table')
+    expect(r.content).toContain('<widget-slot')
+  })
+
+  it('fence 数组:json 与 jsonc 混合多块 → 按文档序全部提取', () => {
+    const dual = createSpecDetector({ ...cxSpecDetectorConfig, fence: ['json', 'jsonc'] })
+    const text = `\`\`\`json\n${tableSpec}\n\`\`\`\n中间\n\`\`\`jsonc\n{"key":"cx-text","data":{"text":"你好"}}\n\`\`\``
+    const r = dual.extractSpecs(text)
+    expect(r.status).toBe('success')
+    expect(r.specs).toHaveLength(2)
+    expect((r.specs[0] as CxStreamNode).key).toBe('cx-demo-table')
+    expect((r.specs[1] as CxStreamNode).key).toBe('cx-text')
+  })
+
+  it('fence 数组:未列入标记的未闭合围栏不入 pending 隔离', () => {
+    // 未列入标记按非 Spec 代码块处理;已闭合内容的裸 JSON 兜底抓取是既有宽容行为,不在此断言
+    const dual = createSpecDetector({ ...cxSpecDetectorConfig, fence: ['json', 'jsonc'] })
+    const r = dual.extractSpecs('```json5\n{"key":"cx-text","data":{')
+    expect(r.status).toBe('none')
+  })
 })

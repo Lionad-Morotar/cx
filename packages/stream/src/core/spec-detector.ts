@@ -25,8 +25,8 @@ function escapeAttr(value: string): string {
 }
 
 export interface SpecDetectorConfig<TSpec = unknown> {
-  /** 代码围栏语言标记，默认 'json' */
-  fence?: string
+  /** 代码围栏语言标记，默认 'json'；传数组时任一标记命中（如 ['json','jsonc']） */
+  fence?: string | string[]
   /** 未闭合代码块内容是否像 Spec 开头（空内容一律视为 pending，防流式初期闪烁） */
   looksLikeSpecPrefix: (jsonText: string) => boolean
   /** 裸 JSON 兜底扫描的起始位置正则（需带 g 标志） */

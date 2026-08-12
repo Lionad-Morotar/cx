@@ -84,8 +84,8 @@ export interface IncrementalExtractorConfig<TSpec> {
     spec: TSpec,
     registry: TriggerRegistry<TSpec>,
   ) => [string, IncrementalTrigger<TSpec>] | null
-  /** 代码围栏语言标记（输入文本可能含围栏），默认 'json' */
-  fence?: string
+  /** 代码围栏语言标记（输入文本可能含围栏），默认 'json'；传数组时任一标记命中 */
+  fence?: string | string[]
   /** jsonrepair 内存保护长度上限 */
   maxRepairLength?: number
 }
