@@ -124,7 +124,7 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     expect(wrapper.emitted('action')?.[0]).toEqual(['save', { notif: false }])
   })
 
-  it('question-flow: select/back/stepChange/complete 上抛', async () => {
+  it('question-flow: select 对象载荷(选项 id + label + 步骤 id)上抛,back/stepChange/complete 同前', async () => {
     const comp = byKey('cx-vtu-question-flow')
     const wrapper = mountMaterial(comp, {
       steps: [
@@ -137,19 +137,35 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
             { id: 'b', label: '手写组件' },
           ],
         },
+        {
+          id: 'q2',
+          title: '你在意哪些指标？',
+          selectionMode: 'multi',
+          options: [
+            { id: 'c', label: '首屏耗时' },
+            { id: 'd', label: '交互延迟' },
+          ],
+        },
       ],
     })
     const inner = wrapper.findComponent({ name: 'CmptQuestionFlow' })
     inner.vm.$emit('select', ['a'])
     inner.vm.$emit('back')
-    // vtu 原生事件名是 camelCase 的 stepChange;包装件 re-emit 回宿主侧为 kebab step-change
-    inner.vm.$emit('stepChange', 'q1')
-    inner.vm.$emit('complete', { q1: ['a'] })
+    // vtu 原生事件名是 camelCase 的 stepChange;包装件 re-emit 回宿主侧为 kebab step-change,
+    // 并跟踪为当前步骤(select 载荷的 stepId 来源)
+    inner.vm.$emit('stepChange', 'q2')
+    inner.vm.$emit('select', ['c', 'd'])
+    inner.vm.$emit('complete', { q1: ['a'], q2: ['c', 'd'] })
     await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('select')?.[0]).toEqual([['a']])
+    expect(wrapper.emitted('select')?.[0]).toEqual([
+      { optionIds: ['a'], labels: ['Schema 驱动'], stepId: 'q1' },
+    ])
     expect(wrapper.emitted('back')).toBeTruthy()
-    expect(wrapper.emitted('step-change')?.[0]).toEqual(['q1'])
-    expect(wrapper.emitted('complete')?.[0]).toEqual([{ q1: ['a'] }])
+    expect(wrapper.emitted('step-change')?.[0]).toEqual(['q2'])
+    expect(wrapper.emitted('select')?.[1]).toEqual([
+      { optionIds: ['c', 'd'], labels: ['首屏耗时', '交互延迟'], stepId: 'q2' },
+    ])
+    expect(wrapper.emitted('complete')?.[0]).toEqual([{ q1: ['a'], q2: ['c', 'd'] }])
   })
 
   it('message-draft: send/undo/cancel 经函数 prop 单通道上抛(防双发)', async () => {

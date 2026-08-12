@@ -42,7 +42,7 @@ export const DEFAULT_CX_EVENT_DISPOSITIONS: Record<string, Record<string, CxEven
   'cx-vtu-data-table': { 'link-click': 'direct' },
   'cx-vtu-item-carousel': { 'item-click': 'direct', 'item-action': 'direct' },
   'cx-vtu-message-draft': { send: 'direct', undo: 'append' },
-  'cx-vtu-question-flow': { select: 'append', 'step-change': 'append', complete: 'confirm' },
+  'cx-vtu-question-flow': { select: 'append', complete: 'confirm' },
   'cx-vtu-preferences-panel': { change: 'append', action: 'confirm' },
   'cx-vtu-parameter-slider': { change: 'append', action: 'confirm' },
 }
@@ -87,10 +87,11 @@ function defaultAppendText(materialKey: string, event: string, args: unknown[]):
     case 'cx-vtu-option-list':
       // change 载荷已被物料包装件翻译为选项 label(单选 label / 多选 label 数组)
       return `已选:${cxSelectionToText(args[0])}`
-    case 'cx-vtu-question-flow':
-      return event === 'select'
-        ? `已选:${cxSelectionToText(args[0])}`
-        : `切换步骤:${String(args[0])}`
+    case 'cx-vtu-question-flow': {
+      // select 载荷为对象 { optionIds, labels, stepId }(包装件已翻译 label 并补步骤上下文)
+      const p = (args[0] ?? {}) as { labels?: unknown }
+      return `已选:${cxSelectionToText(p.labels)}`
+    }
     case 'cx-vtu-message-draft':
       return '撤销草稿'
     default:
@@ -130,8 +131,16 @@ function cxFieldId(materialKey: string, event: string, args: unknown[]): string 
       }
       return event
     }
-    case 'cx-vtu-question-flow':
-      return event === 'select' ? `select:${cxSelectionToText(args[0])}` : event
+    case 'cx-vtu-question-flow': {
+      // select 按步骤幂等(同一步重选只留最新);取不到 stepId 退化选项 id 串
+      const p = (args[0] ?? {}) as { stepId?: unknown; optionIds?: unknown }
+      if (event === 'select') {
+        return typeof p.stepId === 'string' && p.stepId
+          ? `select:${p.stepId}`
+          : `select:${cxSelectionToText(p.optionIds)}`
+      }
+      return event
+    }
     case 'cx-vtu-message-draft':
       return 'body'
     default:

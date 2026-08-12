@@ -62,7 +62,7 @@ describe('classifyCxEvent 四态分流', () => {
     ['cx-vtu-message-draft', 'undo', 'append'],
     ['cx-vtu-message-draft', 'cancel', 'ignore'],
     ['cx-vtu-question-flow', 'select', 'append'],
-    ['cx-vtu-question-flow', 'step-change', 'append'],
+    ['cx-vtu-question-flow', 'step-change', 'ignore'],
     ['cx-vtu-question-flow', 'complete', 'confirm'],
     ['cx-vtu-question-flow', 'back', 'ignore'],
     ['cx-vtu-preferences-panel', 'change', 'append'],
@@ -157,9 +157,12 @@ describe('cxAppendText 暂存回写文本', () => {
     )
   })
 
-  it('question-flow: select 「已选:X」/ step-change 「切换步骤:X」', () => {
-    expect(cxAppendText('cx-vtu-question-flow', 'select', [['a', 'b']])).toBe('已选:a, b')
-    expect(cxAppendText('cx-vtu-question-flow', 'step-change', ['s2'])).toBe('切换步骤:s2')
+  it('question-flow: select 对象载荷取 labels「已选:X」', () => {
+    expect(
+      cxAppendText('cx-vtu-question-flow', 'select', [
+        { optionIds: ['a', 'b'], labels: ['Schema 驱动', '手写组件'], stepId: 'q1' },
+      ])
+    ).toBe('已选:Schema 驱动, 手写组件')
   })
 
   it('message-draft: undo 固定「撤销草稿」', () => {
@@ -200,9 +203,16 @@ describe('cxEventToAppend 字段键推导与幂等 id', () => {
     expect(cxEventToAppend('cx-vtu-parameter-slider', 'change', [[]], 'w').fieldId).toBe('change')
   })
 
-  it('question-flow: select 为 select:<值>,其余事件退化事件名', () => {
-    expect(cxEventToAppend('cx-vtu-question-flow', 'select', [['a']], 'w').fieldId).toBe('select:a')
-    expect(cxEventToAppend('cx-vtu-question-flow', 'step-change', ['s2'], 'w').fieldId).toBe('step-change')
+  it('question-flow: select 按步骤幂等 select:<stepId>,取不到退化选项串', () => {
+    expect(
+      cxEventToAppend('cx-vtu-question-flow', 'select', [
+        { optionIds: ['a'], labels: ['A'], stepId: 'q1' },
+      ], 'w').fieldId
+    ).toBe('select:q1')
+    expect(
+      cxEventToAppend('cx-vtu-question-flow', 'select', [{ optionIds: ['a', 'b'] }], 'w').fieldId
+    ).toBe('select:a, b')
+    expect(cxEventToAppend('cx-vtu-question-flow', 'complete', [{}], 'w').fieldId).toBe('complete')
   })
 
   it('message-draft 固定 body;未登记物料退化事件名', () => {
@@ -224,9 +234,7 @@ describe('cxConfirmText 确认连发文本', () => {
     expect(cxConfirmText('cx-vtu-preferences-panel', ['参数:{"notif":true}'])).toBe(
       '参数:{"notif":true}，应用设置'
     )
-    expect(cxConfirmText('cx-vtu-question-flow', ['已选:a', '切换步骤:s2'])).toBe(
-      '已选:a；切换步骤:s2，完成问卷'
-    )
+    expect(cxConfirmText('cx-vtu-question-flow', ['已选:a', '已选:b'])).toBe('已选:a；已选:b，完成问卷')
     expect(cxConfirmText('cx-vtu-option-list', ['已选:选项一'])).toBe('已选:选项一，确认选择')
   })
 })
