@@ -9,12 +9,16 @@ import type { CxAppendItem } from '@lionad/cx-vue'
  * (聊天卡片等)只做副作用承接(emit 消息 / 写暂存),语义本身随物料同包发布——
  * 物料新增或改事件键时与本模块同步演进,同仓防漂移测试钉死对齐。
  *
+ * 语义表未注册事件的缺省兜底可配:默认 ignore(零副作用),unregistered:
+ * 'passthrough' 时全量透传给业务方自决(经 passthroughText 给文案)——消极动作
+ * (cancel/back 等)的业务语义由宿主掌握,cx 只提供通道不预置立场。
+ *
  * 数据驱动(默认表)而非 switch:表可遍历、可与 meta emits 做集合断言;宿主需
  * 定制时用 defineCxEventSemantics 按物料键级覆盖,文案函数返回 undefined 即
  * 落回默认,不必整表复制。
  */
 
-export type CxEventDispositionKind = 'direct' | 'append' | 'confirm' | 'ignore'
+export type CxEventDispositionKind = 'direct' | 'append' | 'confirm' | 'ignore' | 'passthrough'
 
 /** 物料 key → 该物料的卡片语义分类 */
 export type CxEventDisposition =
@@ -22,6 +26,7 @@ export type CxEventDisposition =
   | { kind: 'append' }
   | { kind: 'confirm' }
   | { kind: 'ignore' }
+  | { kind: 'passthrough' }
 
 /**
  * 默认二维分流表(仅列非 ignore 项,查表缺省即 ignore——与「未声明事件零副作用」
@@ -145,7 +150,7 @@ function defaultConfirmText(materialKey: string, appendsTexts: string[]): string
   return `${appendsTexts.join('；')}，${semantic}`
 }
 
-/** 事件语义接口(默认实例五法,覆盖后同构) */
+/** 事件语义接口(默认实例六法,覆盖后同构) */
 export interface CxEventSemantics {
   classify(materialKey: string, event: string): CxEventDisposition
   directText(materialKey: string, event: string, args: unknown[]): string
@@ -158,15 +163,30 @@ export interface CxEventSemantics {
     label?: string
   ): CxAppendItem
   confirmText(materialKey: string, appendsTexts: string[]): string
+  /**
+   * 透传事件的回写文本(passthrough 态):语义表未注册的事件到达宿主时,
+   * 业务方决定回写什么;返回 undefined 即该事件不回应(等效 ignore)。
+   * 默认实现恒 undefined——cx 不替业务方发言,消极动作文案属业务决策。
+   */
+  passthroughText(materialKey: string, event: string, args: unknown[]): string | undefined
 }
 
 export interface CxEventSemanticsOverrides {
   /** 按物料键级合并:{...默认行, ...覆盖行}(整行替换请写全该行) */
   dispositions?: Record<string, Record<string, CxEventDispositionKind>>
+  /**
+   * 语义表未注册事件的缺省处置,默认 'ignore'(零副作用兜底,防技术事件噪声)。
+   * 'passthrough' 时未注册事件全量透传给业务方处置——注意透传面包含物料
+   * emits 声明的技术事件(如 update:modelValue),业务方 passthroughText 需自行甄别;
+   * 接线侧(hydrate)本就按物料 emits 全集接线,透传只是让分流层不再吞掉它们。
+   */
+  unregistered?: 'ignore' | 'passthrough'
   /** 返回 undefined 即落默认文案 */
   directText?(materialKey: string, event: string, args: unknown[]): string | undefined
   appendText?(materialKey: string, event: string, args: unknown[]): string | undefined
   confirmText?(materialKey: string, appendsTexts: string[]): string | undefined
+  /** 透传事件回写文本;返回 undefined 即该事件不回应 */
+  passthroughText?(materialKey: string, event: string, args: unknown[]): string | undefined
 }
 
 export function defineCxEventSemantics(overrides: CxEventSemanticsOverrides = {}): CxEventSemantics {
@@ -184,10 +204,13 @@ export function defineCxEventSemantics(overrides: CxEventSemanticsOverrides = {}
   const confirmText: CxEventSemantics['confirmText'] = (key, texts) =>
     overrides.confirmText?.(key, texts) ?? defaultConfirmText(key, texts)
 
+  const passthroughText: CxEventSemantics['passthroughText'] = (key, event, args) =>
+    overrides.passthroughText?.(key, event, args)
+
   return {
     classify: (materialKey, event) => {
       const kind = table[materialKey]?.[event]
-      return { kind: kind ?? 'ignore' }
+      return { kind: kind ?? (overrides.unregistered ?? 'ignore') }
     },
     directText,
     appendText,
@@ -197,6 +220,7 @@ export function defineCxEventSemantics(overrides: CxEventSemanticsOverrides = {}
       return { id: `${widgetId}:${fieldId}`, label: label || text, text, widgetId, fieldId }
     },
     confirmText,
+    passthroughText,
   }
 }
 
@@ -208,3 +232,4 @@ export const cxDirectText = defaultSemantics.directText
 export const cxAppendText = defaultSemantics.appendText
 export const cxEventToAppend = defaultSemantics.eventToAppend
 export const cxConfirmText = defaultSemantics.confirmText
+export const cxPassthroughText = defaultSemantics.passthroughText

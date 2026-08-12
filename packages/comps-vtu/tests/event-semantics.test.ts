@@ -7,6 +7,7 @@ import {
   cxConfirmText,
   cxDirectText,
   cxEventToAppend,
+  cxPassthroughText,
   cxSelectionToText,
   DEFAULT_CX_EVENT_DISPOSITIONS,
   defineCxEventSemantics,
@@ -75,6 +76,39 @@ describe('classifyCxEvent 四态分流', () => {
   it('未知物料与未登记事件一律 ignore(零副作用兜底)', () => {
     expect(classifyCxEvent('cx-vtu-article', 'whatever')).toEqual({ kind: 'ignore' })
     expect(classifyCxEvent('cx-vtu-option-list', 'unregistered')).toEqual({ kind: 'ignore' })
+  })
+})
+
+describe('defineCxEventSemantics 透传(unregistered: passthrough)', () => {
+  it('缺省 unregistered 保持 ignore(向后兼容)', () => {
+    const sem = defineCxEventSemantics()
+    expect(sem.classify('cx-vtu-approval-card', 'cancel')).toEqual({ kind: 'ignore' })
+  })
+
+  it('未注册事件 → passthrough;已注册事件处置不受影响', () => {
+    const sem = defineCxEventSemantics({ unregistered: 'passthrough' })
+    expect(sem.classify('cx-vtu-approval-card', 'cancel')).toEqual({ kind: 'passthrough' })
+    expect(sem.classify('cx-vtu-option-list', 'update:modelValue')).toEqual({
+      kind: 'passthrough',
+    })
+    expect(sem.classify('cx-vtu-approval-card', 'confirm')).toEqual({ kind: 'confirm' })
+    expect(sem.classify('cx-vtu-option-list', 'action')).toEqual({ kind: 'direct' })
+  })
+
+  it('passthroughText 默认恒 undefined(cx 不预置消极动作文案)', () => {
+    const sem = defineCxEventSemantics({ unregistered: 'passthrough' })
+    expect(sem.passthroughText('cx-vtu-approval-card', 'cancel', [])).toBeUndefined()
+    expect(cxPassthroughText('cx-vtu-approval-card', 'cancel', [])).toBeUndefined()
+  })
+
+  it('业务方 passthroughText 钩子接管文案;未命中返回 undefined 即不回应', () => {
+    const sem = defineCxEventSemantics({
+      unregistered: 'passthrough',
+      passthroughText: (key, event) =>
+        key === 'cx-vtu-approval-card' && event === 'cancel' ? '取消执行' : undefined,
+    })
+    expect(sem.passthroughText('cx-vtu-approval-card', 'cancel', [])).toBe('取消执行')
+    expect(sem.passthroughText('cx-vtu-message-draft', 'cancel', [])).toBeUndefined()
   })
 })
 
