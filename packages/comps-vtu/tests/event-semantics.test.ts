@@ -50,8 +50,8 @@ describe('默认表与物料 meta emits 防漂移', () => {
 
 describe('classifyCxEvent 四态分流', () => {
   it.each([
-    ['cx-vtu-option-list', 'action', 'direct'],
-    ['cx-vtu-option-list', 'change', 'direct'],
+    ['cx-vtu-option-list', 'action', 'confirm'],
+    ['cx-vtu-option-list', 'change', 'append'],
     ['cx-vtu-option-list', 'update:modelValue', 'ignore'],
     ['cx-vtu-approval-card', 'confirm', 'confirm'],
     ['cx-vtu-approval-card', 'cancel', 'ignore'],
@@ -92,7 +92,7 @@ describe('defineCxEventSemantics 透传(unregistered: passthrough)', () => {
       kind: 'passthrough',
     })
     expect(sem.classify('cx-vtu-approval-card', 'confirm')).toEqual({ kind: 'confirm' })
-    expect(sem.classify('cx-vtu-option-list', 'action')).toEqual({ kind: 'direct' })
+    expect(sem.classify('cx-vtu-option-list', 'action')).toEqual({ kind: 'confirm' })
   })
 
   it('passthroughText 默认恒 undefined(cx 不预置消极动作文案)', () => {
@@ -113,11 +113,6 @@ describe('defineCxEventSemantics 透传(unregistered: passthrough)', () => {
 })
 
 describe('cxDirectText 直发回写文本', () => {
-  it('option-list: action 取 args[1](当前选择值),change 退化 args[0]', () => {
-    expect(cxDirectText('cx-vtu-option-list', 'action', ['ok', ['a', 'b']])).toBe('a, b')
-    expect(cxDirectText('cx-vtu-option-list', 'change', [['x']])).toBe('x')
-  })
-
   it('data-table: 行级文本(行号 1 起 + 行内容摘要)', () => {
     const text = cxDirectText('cx-vtu-data-table', 'link-click', [
       { rowIndex: 1, text: '查看', row: ['李四', '设计'], column: { title: '详情' } },
@@ -155,6 +150,13 @@ describe('cxDirectText 直发回写文本', () => {
 })
 
 describe('cxAppendText 暂存回写文本', () => {
+  it('option-list: change 「已选:X」(载荷已被包装件翻译为 label)', () => {
+    expect(cxAppendText('cx-vtu-option-list', 'change', ['选项一'])).toBe('已选:选项一')
+    expect(cxAppendText('cx-vtu-option-list', 'change', [['选项一', '选项二']])).toBe(
+      '已选:选项一, 选项二'
+    )
+  })
+
   it('question-flow: select 「已选:X」/ step-change 「切换步骤:X」', () => {
     expect(cxAppendText('cx-vtu-question-flow', 'select', [['a', 'b']])).toBe('已选:a, b')
     expect(cxAppendText('cx-vtu-question-flow', 'step-change', ['s2'])).toBe('切换步骤:s2')
@@ -210,8 +212,9 @@ describe('cxEventToAppend 字段键推导与幂等 id', () => {
 })
 
 describe('cxConfirmText 确认连发文本', () => {
-  it('三档语义词:完成问卷 / 应用设置 / 确认执行', () => {
+  it('四档语义词:完成问卷 / 确认选择 / 应用设置 / 确认执行', () => {
     expect(cxConfirmText('cx-vtu-question-flow', [])).toBe('完成问卷')
+    expect(cxConfirmText('cx-vtu-option-list', [])).toBe('确认选择')
     expect(cxConfirmText('cx-vtu-preferences-panel', [])).toBe('应用设置')
     expect(cxConfirmText('cx-vtu-parameter-slider', [])).toBe('应用设置')
     expect(cxConfirmText('cx-vtu-approval-card', [])).toBe('确认执行')
@@ -224,6 +227,7 @@ describe('cxConfirmText 确认连发文本', () => {
     expect(cxConfirmText('cx-vtu-question-flow', ['已选:a', '切换步骤:s2'])).toBe(
       '已选:a；切换步骤:s2，完成问卷'
     )
+    expect(cxConfirmText('cx-vtu-option-list', ['已选:选项一'])).toBe('已选:选项一，确认选择')
   })
 })
 
@@ -240,10 +244,10 @@ describe('cxSelectionToText 选择值文本', () => {
 describe('defineCxEventSemantics 覆盖点', () => {
   it('dispositions 键级合并:覆盖生效,同物料其余键保持默认', () => {
     const sem = defineCxEventSemantics({
-      dispositions: { 'cx-vtu-option-list': { change: 'append' } },
+      dispositions: { 'cx-vtu-option-list': { change: 'direct' } },
     })
-    expect(sem.classify('cx-vtu-option-list', 'change')).toEqual({ kind: 'append' })
-    expect(sem.classify('cx-vtu-option-list', 'action')).toEqual({ kind: 'direct' })
+    expect(sem.classify('cx-vtu-option-list', 'change')).toEqual({ kind: 'direct' })
+    expect(sem.classify('cx-vtu-option-list', 'action')).toEqual({ kind: 'confirm' })
     expect(sem.classify('cx-vtu-approval-card', 'confirm')).toEqual({ kind: 'confirm' })
   })
 
@@ -255,7 +259,7 @@ describe('defineCxEventSemantics 覆盖点', () => {
         key === 'cx-vtu-approval-card' ? `已确认(${texts.length})` : undefined,
     })
     expect(sem.directText('cx-vtu-message-draft', 'send', [])).toBe('自定义发送')
-    expect(sem.directText('cx-vtu-option-list', 'change', [['x']])).toBe('x')
+    expect(sem.directText('cx-vtu-item-carousel', 'item-click', ['i-9'])).toBe('查看条目 i-9')
     expect(sem.confirmText('cx-vtu-approval-card', ['a'])).toBe('已确认(1)')
     expect(sem.confirmText('cx-vtu-question-flow', ['a'])).toBe('a，完成问卷')
     expect(sem.appendText('cx-vtu-message-draft', 'undo', [])).toBe('撤销草稿')
@@ -273,8 +277,8 @@ describe('defineCxEventSemantics 覆盖点', () => {
   it('空覆盖等价默认实例', () => {
     const sem = defineCxEventSemantics()
     expect(sem.classify('cx-vtu-option-list', 'change')).toEqual(classifyCxEvent('cx-vtu-option-list', 'change'))
-    expect(sem.directText('cx-vtu-option-list', 'change', [['x']])).toBe(
-      cxDirectText('cx-vtu-option-list', 'change', [['x']])
+    expect(sem.directText('cx-vtu-item-carousel', 'item-click', ['i-1'])).toBe(
+      cxDirectText('cx-vtu-item-carousel', 'item-click', ['i-1'])
     )
   })
 })

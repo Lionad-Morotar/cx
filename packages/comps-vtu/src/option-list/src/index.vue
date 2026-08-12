@@ -10,7 +10,7 @@
     :class="ns.b()"
     :actions="normalizedActions"
     @action="(id, value) => emit('action', id, value)"
-    @change="(value) => emit('change', value)"
+    @change="(value) => emit('change', toLabels(value))"
     @update:model-value="(value) => emit('update:modelValue', value)"
   />
 </template>
@@ -40,4 +40,16 @@ const vtuProps = useVtuProps<OptionListProps>(useAttrs(), 'cx-vtu-option-list')
 // (用户不回应即取消),且默认 Confirm 会经 action 直发一条用户看不懂的回写;
 // 故未配置时压为空数组,配置了才透传
 const normalizedActions = computed(() => vtuProps.value.actions ?? [])
+
+/**
+ * change 载荷翻译为选项 label(id → label):change 是「通知宿主选了什么」的业务
+ * 事件,宿主回写对话要用户可读的 label 而非内部 id;受控数据同步的 id 契约由
+ * update:modelValue 原样承载(不翻译)。options 查不到(流式半成品等)退化 id 上抛。
+ */
+const toLabels = (value: OptionListSelection): OptionListSelection => {
+  const options = vtuProps.value.options ?? []
+  const labelOf = (id: string) => options.find((o) => o.id === id)?.label ?? id
+  if (Array.isArray(value)) return value.map(labelOf)
+  return typeof value === 'string' ? labelOf(value) : value
+}
 </script>

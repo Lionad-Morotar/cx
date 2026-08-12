@@ -45,7 +45,11 @@ export default define({
       name: '操作触发',
       description: '用户点击 actions 按钮,载荷为 (actionId, 当前选择值),宿主据此回写对话',
     },
-    change: { name: '选择变更', description: '受控选择值变化(单选 id / 多选 id 数组)' },
+    change: {
+      name: '选择变更',
+      description:
+        '受控选择值变化,载荷已翻译为选项 label(单选 label / 多选 label 数组);id 受控同步走 update:modelValue',
+    },
     'update:modelValue': { name: 'v-model 同步', description: '选择值双向同步' },
   },
 })

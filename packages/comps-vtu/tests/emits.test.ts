@@ -63,7 +63,7 @@ describe('物料 emits · meta 与 SFC 同集合', () => {
 })
 
 describe('物料 emits · vtu 真 emit 上抛', () => {
-  it('option-list: change/action 上抛', async () => {
+  it('option-list: change 载荷翻译为 label 上抛;action 载荷保持 (actionId, id)', async () => {
     const comp = byKey('cx-vtu-option-list')
     const wrapper = mountMaterial(comp, {
       options: [
@@ -75,8 +75,24 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     inner.vm.$emit('change', 'opt-1')
     inner.vm.$emit('action', 'confirm', 'opt-1')
     await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('change')?.[0]).toEqual(['opt-1'])
+    expect(wrapper.emitted('change')?.[0]).toEqual(['选项一'])
     expect(wrapper.emitted('action')?.[0]).toEqual(['confirm', 'opt-1'])
+  })
+
+  it('option-list: change 多选逐个翻译,未知 id 退化原样上抛', async () => {
+    const comp = byKey('cx-vtu-option-list')
+    const wrapper = mountMaterial(comp, {
+      options: [
+        { id: 'opt-1', label: '选项一' },
+        { id: 'opt-2', label: '选项二' },
+      ],
+    })
+    const inner = wrapper.findComponent({ name: 'CmptOptionList' })
+    inner.vm.$emit('change', ['opt-1', 'opt-2'])
+    inner.vm.$emit('change', ['opt-1', 'ghost'])
+    await wrapper.vm.$nextTick()
+    expect(wrapper.emitted('change')?.[0]).toEqual([['选项一', '选项二']])
+    expect(wrapper.emitted('change')?.[1]).toEqual([['选项一', 'ghost']])
   })
 
   it('approval-card: confirm/cancel 上抛', async () => {

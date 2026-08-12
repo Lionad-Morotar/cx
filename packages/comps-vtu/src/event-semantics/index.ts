@@ -3,11 +3,12 @@ import type { CxAppendItem } from '@lionad/cx-vue'
 /**
  * event-semantics — 物料×事件二维分流与回写文本构造(cx 卡片的 SDK 默认语义)
  *
- * cx 卡片交互事件的语义不在渲染层:同一事件(如 change)在选项列表上是「直发
- * 回写」、在表单面板上是「暂存待确认」。本模块把「物料 key × 事件名」映射为
- * 四态处置(direct/append/confirm/ignore)与对应用户口吻回写文本,宿主消费方
- * (聊天卡片等)只做副作用承接(emit 消息 / 写暂存),语义本身随物料同包发布——
- * 物料新增或改事件键时与本模块同步演进,同仓防漂移测试钉死对齐。
+ * cx 卡片交互事件的语义不在渲染层:同一事件在不同物料上语义不同——选项列表
+ * 的 change 是「暂存待确认」、数据表格的 link-click 是「直发回写」。本模块把
+ * 「物料 key × 事件名」映射为四态处置(direct/append/confirm/ignore)与对应
+ * 用户口吻回写文本,宿主消费方(聊天卡片等)只做副作用承接(emit 消息 / 写暂存),
+ * 语义本身随物料同包发布——物料新增或改事件键时与本模块同步演进,同仓防漂移
+ * 测试钉死对齐。
  *
  * 语义表未注册事件的缺省兜底可配:默认 ignore(零副作用),unregistered:
  * 'passthrough' 时全量透传给业务方自决(经 passthroughText 给文案)——消极动作
@@ -36,7 +37,7 @@ export type CxEventDisposition =
  * - confirm: 表单确认动作,暂存拼接 confirm 语义连发后清该卡片暂存
  */
 export const DEFAULT_CX_EVENT_DISPOSITIONS: Record<string, Record<string, CxEventDispositionKind>> = {
-  'cx-vtu-option-list': { action: 'direct', change: 'direct' },
+  'cx-vtu-option-list': { action: 'confirm', change: 'append' },
   'cx-vtu-approval-card': { confirm: 'confirm' },
   'cx-vtu-data-table': { 'link-click': 'direct' },
   'cx-vtu-item-carousel': { 'item-click': 'direct', 'item-action': 'direct' },
@@ -53,12 +54,9 @@ export function cxSelectionToText(value: unknown): string {
   return String(value)
 }
 
-/** 直发回写文本(动作类:选择值/行级点击/条目点击/草稿发送) */
+/** 直发回写文本(动作类:行级点击/条目点击/草稿发送) */
 function defaultDirectText(materialKey: string, event: string, args: unknown[]): string {
   switch (materialKey) {
-    case 'cx-vtu-option-list':
-      // action 载荷为 (actionId, 当前选择值),change 载荷即选择值
-      return cxSelectionToText(args[1] ?? args[0])
     case 'cx-vtu-data-table': {
       const p = (args[0] ?? {}) as {
         rowIndex?: number
@@ -86,6 +84,9 @@ function defaultDirectText(materialKey: string, event: string, args: unknown[]):
 /** 暂存回写文本(表单字段变更摘要,进暂存条目的 text 字段) */
 function defaultAppendText(materialKey: string, event: string, args: unknown[]): string {
   switch (materialKey) {
+    case 'cx-vtu-option-list':
+      // change 载荷已被物料包装件翻译为选项 label(单选 label / 多选 label 数组)
+      return `已选:${cxSelectionToText(args[0])}`
     case 'cx-vtu-question-flow':
       return event === 'select'
         ? `已选:${cxSelectionToText(args[0])}`
@@ -143,9 +144,11 @@ function defaultConfirmText(materialKey: string, appendsTexts: string[]): string
   const semantic =
     materialKey === 'cx-vtu-question-flow'
       ? '完成问卷'
-      : materialKey === 'cx-vtu-preferences-panel' || materialKey === 'cx-vtu-parameter-slider'
-        ? '应用设置'
-        : '确认执行'
+      : materialKey === 'cx-vtu-option-list'
+        ? '确认选择'
+        : materialKey === 'cx-vtu-preferences-panel' || materialKey === 'cx-vtu-parameter-slider'
+          ? '应用设置'
+          : '确认执行'
   if (!appendsTexts.length) return semantic
   return `${appendsTexts.join('；')}，${semantic}`
 }
