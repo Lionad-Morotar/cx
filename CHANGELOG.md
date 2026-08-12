@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.7] - 2026-08-12
+
+### Changed
+
+- `@lionad/cx-comps-vtu`：option-list 交互语义转「暂存待确认」——`change` 由直发转暂存、`action` 由直发转确认连发：点击选项写暂存（同字段幂等覆盖，单选重选自然替换），点 actions 按钮才拼接暂存作为用户消息发出并清该卡暂存；`change` 载荷经 options 查表翻译为 label 上抛（回写对话要用户可读文案，受控 id 契约由 `update:modelValue` 原样承载，查不到退化 id 兜底）；`appendText`/`confirmText` 新增 option-list 文案「已选:X」「确认选择」
+
 ## [0.1.0-alpha.6] - 2026-08-12
 
 ### Added
