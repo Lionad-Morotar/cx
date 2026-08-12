@@ -24,9 +24,11 @@ import type { CxSpec, StreamTriggerConfig, TriggerRegistry } from '@lionad/cx-st
  *   闭合即完整揭示（与 comps 文本物料 content 闭合前空壳同构，接受粒度取舍）。
  * - 不适用 0 件。计数校验：5 + 1 + 0 = 6（playground 判定测试差集派生兜底）。
  *
- * 骨架裁决：整包不设 skeletonFields、不做 wrapper 骨架——props 全带 initial/
- * composable 回退（无可骨架化必填字段，列入会终态常亮），且天然空态在场
- * （空 data 渲染空坐标系、空 marks 渲染空 svg），comps/naive 豁免判例同构。
+ * 骨架裁决：array 5 预设不设 skeletonFields——首行闭合即出帧逐行生长，天然有实时
+ * 反馈；chart scalar 设 skeletonFields=['definition']——空壳期 fallback 的空 marks
+ * 渲染的是不可见空 svg（无任何图形元素），「天然空态」对空 svg 不成立，须借
+ * 缺席性判据注入 _cx_streaming 标记，由包装层在 definition 未闭合期间渲染图表骨架
+ * 占位（definition 是必填主体字段，完整帧必在场，标记不终态常亮）。
  *
  * fallback 从简：渲染链路不过 zod，包装层无模板直访（useAttrs 平铺 +
  * composable 全回退，缺席不 TypeError）；chart 的 fallbackData
@@ -64,7 +66,13 @@ const ARRAY_PRESET_KEYS = [
 export const TANSTACK_CHARTS_STREAM_TRIGGERS: StreamTriggerConfig[] = [
   {
     key: keyOf('cx-tanstack-charts-chart'),
-    sections: [{ kind: 'scalar', fallbackData: { definition: { marks: [] } } }],
+    sections: [
+      {
+        kind: 'scalar',
+        fallbackData: { definition: { marks: [] } },
+        skeletonFields: ['definition'],
+      },
+    ],
     frameStride: 10,
   },
   ...ARRAY_PRESET_KEYS.map(

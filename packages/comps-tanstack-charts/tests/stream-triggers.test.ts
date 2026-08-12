@@ -86,16 +86,24 @@ describe('stream-trigger 判定完备性', () => {
       if (array) expect(array.arrayKey).toBe('data')
     }
   })
+
+  it('chart scalar 声明 skeletonFields=[definition]：缺席性判据驱动包装层骨架', () => {
+    const chart = TANSTACK_CHARTS_STREAM_TRIGGERS.find((c) => c.key === 'cx-tanstack-charts-chart')!
+    const scalar = chart.sections[0]!
+    expect(scalar.kind).toBe('scalar')
+    expect((scalar as { skeletonFields?: string[] }).skeletonFields).toEqual(['definition'])
+  })
 })
 
 describe('chart scalar 形态', () => {
-  it('key 检出即空壳帧：fallback 保契约（definition 空 marks）', () => {
+  it('key 检出即空壳帧：fallback 保契约（definition 空 marks）+ skeleton 标记注入', () => {
     const shell = extractorOf().next('{"key":"cx-tanstack-charts-chart"') as CxStreamNode | null
     expect(shell).toMatchObject({
       key: 'cx-tanstack-charts-chart',
       data: { definition: { marks: [] } },
     })
-    expect((shell?.data ?? {})['_cx_streaming']).toBeUndefined()
+    // definition 未闭合期间标记在场：包装层据此渲染骨架而非不可见的空 svg
+    expect((shell?.data ?? {})['_cx_streaming']).toEqual(['definition'])
   })
 
   it('空壳帧经翻译层组装渲染不抛错（fallback 与翻译层默认同值）', () => {
@@ -113,6 +121,8 @@ describe('chart scalar 形态', () => {
     const final = extractorOf().next(script) as CxStreamNode | null
     expect(final).not.toBeNull()
     expect(final?.data).toMatchObject(data)
+    // 终态 definition 必在场，标记消失不常亮（骨架随完整帧退场）
+    expect((final?.data ?? {})['_cx_streaming']).toBeUndefined()
   })
 })
 

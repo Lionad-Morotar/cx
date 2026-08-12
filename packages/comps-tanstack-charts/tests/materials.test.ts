@@ -79,3 +79,47 @@ describe('cx-tanstack-charts-chart 挂载 smoke', () => {
     expect(attrs['data-cx-comp-id']).toBeUndefined()
   })
 })
+
+describe('cx-tanstack-charts-chart 流式骨架', () => {
+  const lineSpec = {
+    marks: [{ type: 'lineY', data: [{ month: 'Jan', value: 40 }], x: 'month', y: 'value' }],
+    x: { scale: { kind: 'point' } },
+    y: { scale: { kind: 'linear' } },
+  }
+
+  it('definition 未闭合（_cx_streaming 含 definition）渲染骨架而非空 svg', () => {
+    const wrapper = mountMaterial(byKey('cx-tanstack-charts-chart'), {
+      definition: { marks: [] },
+      _cx_streaming: ['definition'],
+    })
+    const skeleton = wrapper.find('[data-testid=cx-tanstack-charts-chart-skeleton]')
+    expect(skeleton.exists()).toBe(true)
+    expect(skeleton.attributes('aria-hidden')).toBe('true')
+    // 骨架与物料互斥替换：空壳期不渲染 Chart（空 svg 无可见元素，等同无反馈）
+    expect(wrapper.find('svg').exists()).toBe(false)
+  })
+
+  it('骨架高度跟随 height prop（揭示瞬间无布局跳动），缺省回退 320', () => {
+    const explicit = mountMaterial(byKey('cx-tanstack-charts-chart'), {
+      definition: { marks: [] },
+      height: 240,
+      _cx_streaming: ['definition'],
+    })
+    expect(
+      explicit.find('[data-testid=cx-tanstack-charts-chart-skeleton]').attributes('style'),
+    ).toContain('240px')
+    const fallback = mountMaterial(byKey('cx-tanstack-charts-chart'), {
+      definition: { marks: [] },
+      _cx_streaming: ['definition'],
+    })
+    expect(
+      fallback.find('[data-testid=cx-tanstack-charts-chart-skeleton]').attributes('style'),
+    ).toContain('320px')
+  })
+
+  it('无流式标记时骨架不在场、图表直渲（标记消失即揭示）', () => {
+    const wrapper = mountMaterial(byKey('cx-tanstack-charts-chart'), { definition: lineSpec })
+    expect(wrapper.find('[data-testid=cx-tanstack-charts-chart-skeleton]').exists()).toBe(false)
+    expect(wrapper.find('svg').exists()).toBe(true)
+  })
+})

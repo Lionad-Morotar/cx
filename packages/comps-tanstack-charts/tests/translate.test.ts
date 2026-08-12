@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { createChartScene, renderChartSvg } from '@tanstack/charts'
 
-import { translateChartSpec, translateCurve, translateScale } from '../src/shared/translate'
+import {
+  translateAxis,
+  translateChartSpec,
+  translateCurve,
+  translateScale,
+} from '../src/shared/translate'
+
+import type { CxChartAxisSpec } from '../src/shared/translate'
 
 /**
  * 翻译层行为契约：声明式 JSON（物料 data）→ TanStack Charts 运行时产物。
@@ -113,5 +120,45 @@ describe('translateChartSpec', () => {
       offset: 8,
     })
     expect(asBool(translateChartSpec(base))).toBeUndefined()
+  })
+})
+
+describe('translateChartSpec 流式中间态容错', () => {
+  const rows = [
+    { month: 'Jan', value: 40 },
+    { month: 'Feb', value: 62 },
+  ]
+
+  it('x/y 缺席（definition 部分闭合）注入缺省 scale，端到端渲染不抛错', () => {
+    // 流式实证：definition 开容器后 marks 即逐元素生长，x/y 字段在其后传输——
+    // 缺席期间库对「mark 物化 channel 但无 scale 配置」抛错，翻译层须注入缺省
+    const definition = translateChartSpec({
+      marks: [{ type: 'lineY', data: rows, x: 'month', y: 'value' }],
+    })
+    const scene = createChartScene(definition, { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'partial' })
+    expect(svg).toContain('<svg')
+    expect(svg).toContain('M')
+  })
+
+  it('axis spec 在场但 scale 未闭合（{}）回退缺省工厂', () => {
+    const definition = translateChartSpec({
+      marks: [{ type: 'lineY', data: rows, x: 'month', y: 'value' }],
+      // 模拟容器开而未及 scale 字段的中间态
+      x: {} as CxChartAxisSpec,
+      y: { grid: true } as CxChartAxisSpec,
+    })
+    const scene = createChartScene(definition, { width: 640, height: 320 })
+    expect(renderChartSvg(scene, { ariaLabel: 'partial-axis' })).toContain('<svg')
+  })
+
+  it('x/y 显式 null（polar 语义）保留不注入缺省', () => {
+    const definition = translateChartSpec({
+      marks: [{ type: 'dot', data: rows, x: 'month', y: 'value' }],
+      x: null,
+      y: null,
+    }) as { x?: unknown; y?: unknown }
+    expect(definition.x).toBeNull()
+    expect(definition.y).toBeNull()
   })
 })

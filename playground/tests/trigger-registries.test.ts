@@ -761,7 +761,7 @@ describe('tanstack-charts trigger 判定 · 6 件全适用（5 array + 1 scalar�
     )
   })
 
-  it('chart scalar：key 检出即空壳帧（fallback 空 marks），终态完整帧全字段', () => {
+  it('chart scalar：key 检出即空壳帧（fallback 空 marks + 骨架标记），终态完整帧全字段', () => {
     const shell = createIncrementalExtractor<CxSpec>({
       registry: createTanstackChartsTriggerRegistry(),
       matchTrigger: matchCxTrigger,
@@ -770,7 +770,8 @@ describe('tanstack-charts trigger 判定 · 6 件全适用（5 array + 1 scalar�
       key: 'cx-tanstack-charts-chart',
       data: { definition: { marks: [] } },
     })
-    expect((shell?.data ?? {})['_cx_streaming']).toBeUndefined()
+    // definition 未闭合期间标记在场：包装层据此渲染骨架（空 marks 的空 svg 不可见，无骨架等同无反馈）
+    expect((shell?.data ?? {})['_cx_streaming']).toEqual(['definition'])
 
     const meta = tscMeta.get('cx-tanstack-charts-chart')!
     const data = buildDefaultData(meta)
@@ -781,5 +782,7 @@ describe('tanstack-charts trigger 判定 · 6 件全适用（5 array + 1 scalar�
       JSON.stringify({ id: 'tsc-chart', key: 'cx-tanstack-charts-chart', data }),
     ) as CxStreamNode | null
     expect(final?.data).toMatchObject(data as Record<string, unknown>)
+    // 终态 definition 在场，标记消失不常亮
+    expect((final?.data ?? {})['_cx_streaming']).toBeUndefined()
   })
 })
