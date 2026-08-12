@@ -6,6 +6,19 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.8] - 2026-08-12
+
+### Changed
+
+- `@lionad/cx-comps-vtu`：动作类回写语义吃按钮 label——`confirmText` 签名加 `args`，actions 类物料（option-list/preferences-panel/parameter-slider）取载荷末参按钮 label、approval-card 取 `confirmLabel`；无 label 落兜底表且兜底词全面对齐 vtu 按钮 i18n 默认值（完成/保存/确认/批准）——写死泛词（「确认执行」）在批准/删除场景必然语义偏差；message-draft send 回写对齐按钮「发送」
+- `@lionad/cx-comps-vtu`：question-flow 暂存语义修正——step-change 导航不再暂存（步骤切换是 UI 行为非作答内容）；select 上抛对象载荷 `{ optionIds, labels, stepId }`，label 经当前步骤 options 翻译，暂存幂等键改 `select:<stepId>`（同一步重选替换，修复按选项值当键残留多条）
+- `@lionad/cx-comps-vtu`：preferences-panel/parameter-slider 未配 actions 时压空 vtu 默认按钮（英文 [Cancel, Save Changes] 与 [reset, apply]，负面/默认按钮的回写用户看不懂，同 option-list 契约）
+
+### Fixed
+
+- `@lionad/cx-comps-vtu`：item-carousel 注入 `interactive` 恢复条目可点击——vtu 条目点击 emit 以该 prop 为门禁（默认 false 永不 emit 也不渲染点击覆盖层），cx 卡片的交互/只读门禁归 host 层 pointer-events-none
+- `@lionad/cx-comps-vtu`：link-preview `navigate` 事件接线直发——meta 补 emits 声明、包装层 re-emit 附标题，回写「打开链接:标题」（href 兜底）；此前点击卡片零反应（vtu 只 emit 不内建跳转）
+
 ## [0.1.0-alpha.7] - 2026-08-12
 
 ### Changed
