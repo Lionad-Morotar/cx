@@ -229,6 +229,18 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     expect(wrapper.emitted('item-click')?.[0]).toEqual(['i1'])
     expect(wrapper.emitted('item-action')?.[0]).toEqual(['i1', 'open'])
   })
+
+  it('item-carousel: 注入 interactive 后条目真点击可 emit(vtu 默认 false 永不 emit)', async () => {
+    const comp = byKey('cx-vtu-item-carousel')
+    const wrapper = mountMaterial(comp, {
+      items: [{ id: 'i1', name: '条目一', subtitle: '副标题', image: 'https://example.com/i1.png' }],
+    })
+    await wrapper.vm.$nextTick()
+    const hit = wrapper.find('button[aria-label="View item: 条目一"]')
+    expect(hit.exists()).toBe(true)
+    await hit.trigger('click')
+    expect(wrapper.emitted('item-click')?.[0]).toEqual(['i1'])
+  })
 })
 
 describe('物料 emits · data-table 行级 link-click(DOM 委托)', () => {
