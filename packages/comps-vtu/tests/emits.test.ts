@@ -51,6 +51,7 @@ describe('物料 emits · meta 与 SFC 同集合', () => {
     ['cx-vtu-message-draft', ['send', 'undo', 'cancel']],
     ['cx-vtu-parameter-slider', ['change', 'action']],
     ['cx-vtu-item-carousel', ['item-click', 'item-action']],
+    ['cx-vtu-link-preview', ['navigate']],
     ['cx-vtu-data-table', ['link-click']],
   ]
   for (const [key, expected] of CASES) {
@@ -228,6 +229,15 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     await wrapper.vm.$nextTick()
     expect(wrapper.emitted('item-click')?.[0]).toEqual(['i1'])
     expect(wrapper.emitted('item-action')?.[0]).toEqual(['i1', 'open'])
+  })
+
+  it('link-preview: navigate 上抛附标题', async () => {
+    const comp = byKey('cx-vtu-link-preview')
+    const wrapper = mountMaterial(comp, { href: 'https://example.com/page', title: '页面标题' })
+    const inner = wrapper.findComponent({ name: 'CmptLinkPreview' })
+    inner.vm.$emit('navigate', 'https://example.com/page')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.emitted('navigate')?.[0]).toEqual(['https://example.com/page', '页面标题'])
   })
 
   it('item-carousel: 注入 interactive 后条目真点击可 emit(vtu 默认 false 永不 emit)', async () => {

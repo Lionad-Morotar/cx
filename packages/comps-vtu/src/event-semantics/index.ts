@@ -41,6 +41,7 @@ export const DEFAULT_CX_EVENT_DISPOSITIONS: Record<string, Record<string, CxEven
   'cx-vtu-approval-card': { confirm: 'confirm' },
   'cx-vtu-data-table': { 'link-click': 'direct' },
   'cx-vtu-item-carousel': { 'item-click': 'direct', 'item-action': 'direct' },
+  'cx-vtu-link-preview': { navigate: 'direct' },
   'cx-vtu-message-draft': { send: 'direct', undo: 'append' },
   'cx-vtu-question-flow': { select: 'append', complete: 'confirm' },
   'cx-vtu-preferences-panel': { change: 'append', action: 'confirm' },
@@ -74,6 +75,11 @@ function defaultDirectText(materialKey: string, event: string, args: unknown[]):
       return event === 'item-action'
         ? `条目 ${String(args[0])} 执行 ${String(args[1])}`
         : `查看条目 ${String(args[0])}`
+    case 'cx-vtu-link-preview': {
+      // navigate 载荷为 (href, 标题):回写标题优先,href 兜底
+      const target = typeof args[1] === 'string' && args[1] ? args[1] : String(args[0] ?? '')
+      return `打开链接:${target}`
+    }
     case 'cx-vtu-message-draft':
       // 与按钮 i18n 文案「发送」对齐——回写即用户所点,写死「发送草稿」与按钮漂移
       return '发送'

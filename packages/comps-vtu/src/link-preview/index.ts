@@ -35,4 +35,11 @@ export default define({
       initial: 'example.com',
     },
   },
+  // emits 与 SFC defineEmits 同集合:声明后 cx 渲染器 getEmits 命中,经 _cx_events 接到 host
+  emits: {
+    navigate: {
+      name: '跳转触发',
+      description: '点击卡片,载荷为 (href, 标题),宿主据此回写对话',
+    },
+  },
 })

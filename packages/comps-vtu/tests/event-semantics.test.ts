@@ -27,6 +27,7 @@ const INTERACTIVE_KEYS = [
   'cx-vtu-approval-card',
   'cx-vtu-data-table',
   'cx-vtu-item-carousel',
+  'cx-vtu-link-preview',
   'cx-vtu-message-draft',
   'cx-vtu-question-flow',
   'cx-vtu-preferences-panel',
@@ -36,7 +37,7 @@ const INTERACTIVE_KEYS = [
 const byKey = (key: string) => CxVtu.find((x: any) => x._cx_meta.key === key)!
 
 describe('默认表与物料 meta emits 防漂移', () => {
-  it('默认表覆盖的物料恰为 8 件交互物料', () => {
+  it('默认表覆盖的物料恰为 9 件交互物料', () => {
     expect(Object.keys(DEFAULT_CX_EVENT_DISPOSITIONS).sort()).toEqual([...INTERACTIVE_KEYS].sort())
   })
 
@@ -58,6 +59,7 @@ describe('classifyCxEvent 四态分流', () => {
     ['cx-vtu-data-table', 'link-click', 'direct'],
     ['cx-vtu-item-carousel', 'item-click', 'direct'],
     ['cx-vtu-item-carousel', 'item-action', 'direct'],
+    ['cx-vtu-link-preview', 'navigate', 'direct'],
     ['cx-vtu-message-draft', 'send', 'direct'],
     ['cx-vtu-message-draft', 'undo', 'append'],
     ['cx-vtu-message-draft', 'cancel', 'ignore'],
@@ -138,6 +140,15 @@ describe('cxDirectText 直发回写文本', () => {
       '条目 it-1 执行 buy'
     )
     expect(cxDirectText('cx-vtu-item-carousel', 'item-click', ['it-2'])).toBe('查看条目 it-2')
+  })
+
+  it('link-preview: navigate 标题优先,href 兜底', () => {
+    expect(cxDirectText('cx-vtu-link-preview', 'navigate', ['https://x.com/p', '页面标题'])).toBe(
+      '打开链接:页面标题'
+    )
+    expect(cxDirectText('cx-vtu-link-preview', 'navigate', ['https://x.com/p', undefined])).toBe(
+      '打开链接:https://x.com/p'
+    )
   })
 
   it('message-draft: send 与按钮 i18n 对齐「发送」', () => {
