@@ -22,7 +22,7 @@ import { useCxBEM } from '@lionad/cx-vue'
 
 import { useVtuProps } from '../../shared/use-vtu-props'
 
-import type { QuestionFlowProps } from '@lionad/vtu-components'
+import type { QuestionFlowUpfrontProps } from '@lionad/vtu-components'
 
 /** select 上抛载荷:选项 id 全集 + 翻译后 label + 所在步骤 id(暂存按步骤幂等的锚) */
 export interface CxQuestionFlowSelectPayload {
@@ -42,7 +42,9 @@ const emit = defineEmits<{
 }>()
 
 const ns = useCxBEM('vtu-question-flow')
-const vtuProps = useVtuProps<QuestionFlowProps>(useAttrs(), 'cx-vtu-question-flow')
+// 泛型收窄 Upfront(steps 驱动):vtu props 是三形态联合,仅 Upfront 有 steps;
+// progressive(单步)/receipt(回执)形态不是本物料承载的契约
+const vtuProps = useVtuProps<QuestionFlowUpfrontProps>(useAttrs(), 'cx-vtu-question-flow')
 
 /**
  * 当前步骤跟踪:初始首步;vtu 前进与 back 回退都会 fire stepChange 且携带进入的
