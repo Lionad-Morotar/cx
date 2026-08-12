@@ -178,12 +178,28 @@ function confirmActionLabel(materialKey: string, args: unknown[]): string | unde
   return typeof raw === 'string' && raw ? raw : undefined
 }
 
+/**
+ * question-flow complete 载荷摘要提取:upfront 形态 vtu 的 toggleOption 不 fire
+ * select(暂存侧收不到选择),全量答案由物料包装件翻译进 complete 载荷 texts——
+ * 优先于暂存文本;载荷无 texts(旧形态)或全空时退化暂存拼接。
+ */
+function completePayloadTexts(args: unknown[]): string[] | undefined {
+  const p = (args[0] ?? {}) as { texts?: unknown }
+  if (!Array.isArray(p.texts)) return undefined
+  const texts = p.texts.filter((t): t is string => typeof t === 'string' && !!t)
+  return texts.length ? texts : undefined
+}
+
 /** confirm 连发文本:暂存拼接 + 按钮 label(无 label 落兜底表);无暂存退化为纯语义 */
 function defaultConfirmText(materialKey: string, appendsTexts: string[], args: unknown[] = []): string {
   const semantic =
     confirmActionLabel(materialKey, args) ?? CONFIRM_FALLBACK[materialKey] ?? '确认'
-  if (!appendsTexts.length) return semantic
-  return `${appendsTexts.join('；')}，${semantic}`
+  const texts =
+    materialKey === 'cx-vtu-question-flow'
+      ? (completePayloadTexts(args) ?? appendsTexts)
+      : appendsTexts
+  if (!texts.length) return semantic
+  return `${texts.join('；')}，${semantic}`
 }
 
 /** 事件语义接口(默认实例六法,覆盖后同构) */

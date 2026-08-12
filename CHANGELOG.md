@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.9] - 2026-08-12
+
+### Fixed
+
+- `@lionad/cx-comps-vtu`：question-flow 回写恢复携带答案——vtu upfront 形态 toggleOption 只写内部 answers、不 fire select（select 仅 progressive 分支），select 暂存设计在真实交互下恒空，回写退化为纯「完成」；complete 载荷对象化 `{ answers, texts }`，物料包装件把全量答案经 steps 查表翻译为每步「已选:label…」摘要，`confirmText` 优先取载荷摘要拼接（缺省/全空退化暂存链路）；emits 测试补真实 DOM 驱动序列锁死该 vtu 契约（手工 $emit 用例只覆盖 re-emit 形态，曾掩盖 upfront 不 fire 的事实）
+
 ## [0.1.0-alpha.8] - 2026-08-12
 
 ### Changed

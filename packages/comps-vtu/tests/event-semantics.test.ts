@@ -258,6 +258,23 @@ describe('cxConfirmText 确认连发文本', () => {
     expect(cxConfirmText('cx-vtu-question-flow', ['已选:a', '已选:b'], [])).toBe('已选:a；已选:b，完成')
     expect(cxConfirmText('cx-vtu-option-list', ['已选:选项一'], [])).toBe('已选:选项一，确认')
   })
+
+  it('question-flow: complete 载荷 texts 摘要优先于暂存(upfront vtu 不 fire select)', () => {
+    const payload = {
+      answers: { q1: ['a'], q2: ['c', 'd'] },
+      texts: ['已选:Schema 驱动', '已选:首屏耗时, 交互延迟'],
+    }
+    expect(cxConfirmText('cx-vtu-question-flow', ['已选:残留'], [payload])).toBe(
+      '已选:Schema 驱动；已选:首屏耗时, 交互延迟，完成'
+    )
+  })
+
+  it('question-flow: 载荷 texts 缺省或全空时退化暂存拼接', () => {
+    expect(cxConfirmText('cx-vtu-question-flow', ['已选:a'], [{ answers: {}, texts: [] }])).toBe(
+      '已选:a，完成'
+    )
+    expect(cxConfirmText('cx-vtu-question-flow', ['已选:a'], [{ q1: ['a'] }])).toBe('已选:a，完成')
+  })
 })
 
 describe('cxSelectionToText 选择值文本', () => {

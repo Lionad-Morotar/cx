@@ -11,7 +11,7 @@
     @select="(optionIds: string[]) => emit('select', toSelectPayload(optionIds))"
     @back="() => emit('back')"
     @step-change="onStepChange"
-    @complete="(answers: Record<string, string[]>) => emit('complete', answers)"
+    @complete="(answers: Record<string, string[]>) => emit('complete', toCompletePayload(answers))"
   />
 </template>
 
@@ -31,6 +31,17 @@ export interface CxQuestionFlowSelectPayload {
   stepId: string
 }
 
+/**
+ * complete 上抛载荷:全量答案 + 每步「已选:label…」摘要。
+ * vtu upfront 形态 toggleOption 只写内部 answers、不 fire select(select 仅 progressive
+ * 分支),暂存链路收不到选择——complete 载荷是回写唯一信息源,摘要在此翻译;
+ * 与 select 暂存 text 同格式,语义层可直接拼接。
+ */
+export interface CxQuestionFlowCompletePayload {
+  answers: Record<string, string[]>
+  texts: string[]
+}
+
 defineOptions({ name: 'CxVtuQuestionFlow', inheritAttrs: false })
 
 // 与 meta emits 同集合:declare 后这些 on* 从 $attrs 消费,避免 useVtuProps 二次透传造成重复绑定
@@ -38,7 +49,7 @@ const emit = defineEmits<{
   select: [payload: CxQuestionFlowSelectPayload]
   back: []
   'step-change': [stepId: string]
-  complete: [answers: Record<string, string[]>]
+  complete: [payload: CxQuestionFlowCompletePayload]
 }>()
 
 const ns = useCxBEM('vtu-question-flow')
@@ -67,5 +78,22 @@ function toSelectPayload(optionIds: string[]): CxQuestionFlowSelectPayload {
   const options = steps.find((s) => s.id === currentStepId.value)?.options ?? []
   const labels = optionIds.map((id) => options.find((o) => o.id === id)?.label ?? id)
   return { optionIds, labels, stepId: currentStepId.value }
+}
+
+/**
+ * complete 载荷装配:answers 的选项 id 经各步 options 查表翻译为 label,
+ * 每步一条「已选:…」摘要(空答案步骤跳过);查不到退化 id 兜底。
+ */
+function toCompletePayload(answers: Record<string, string[]>): CxQuestionFlowCompletePayload {
+  const steps = vtuProps.value.steps ?? []
+  const texts = steps
+    .map((s) => {
+      const ids = answers[s.id]
+      if (!ids?.length) return undefined
+      const labels = ids.map((id) => s.options.find((o) => o.id === id)?.label ?? id)
+      return `已选:${labels.join(', ')}`
+    })
+    .filter((t): t is string => typeof t === 'string')
+  return { answers, texts }
 }
 </script>

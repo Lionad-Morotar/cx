@@ -138,7 +138,7 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     expect(wrapper.emitted('action')?.[0]).toEqual(['save', { notif: false }, undefined])
   })
 
-  it('question-flow: select 对象载荷(选项 id + label + 步骤 id)上抛,back/stepChange/complete 同前', async () => {
+  it('question-flow: re-emit 形态契约(手工驱动)——select 对象载荷、step-change、complete 摘要', async () => {
     const comp = byKey('cx-vtu-question-flow')
     const wrapper = mountMaterial(comp, {
       steps: [
@@ -179,7 +179,57 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     expect(wrapper.emitted('select')?.[1]).toEqual([
       { optionIds: ['c', 'd'], labels: ['首屏耗时', '交互延迟'], stepId: 'q2' },
     ])
-    expect(wrapper.emitted('complete')?.[0]).toEqual([{ q1: ['a'], q2: ['c', 'd'] }])
+    expect(wrapper.emitted('complete')?.[0]).toEqual([
+      {
+        answers: { q1: ['a'], q2: ['c', 'd'] },
+        texts: ['已选:Schema 驱动', '已选:首屏耗时, 交互延迟'],
+      },
+    ])
+  })
+
+  it('question-flow: upfront 真实交互——点选项不 fire select(vtu 契约),完成上抛全量答案摘要', async () => {
+    const comp = byKey('cx-vtu-question-flow')
+    const wrapper = mountMaterial(comp, {
+      steps: [
+        {
+          id: 'q1',
+          title: '你偏好哪种渲染方式？',
+          selectionMode: 'single',
+          options: [
+            { id: 'a', label: 'Schema 驱动' },
+            { id: 'b', label: '手写组件' },
+          ],
+        },
+        {
+          id: 'q2',
+          title: '你在意哪些指标？',
+          selectionMode: 'multi',
+          options: [
+            { id: 'c', label: '首屏耗时' },
+            { id: 'd', label: '交互延迟' },
+          ],
+        },
+      ],
+    })
+    const byText = (t: string) => wrapper.findAll('button').find((b) => b.text().includes(t))!
+    // upfront 形态 toggleOption 只写内部 answers、不 fire select(select 仅 progressive
+    // 分支)——暂存链路在 upfront 收不到选择,回写信息源只能是 complete 载荷
+    await wrapper.find('button[data-id="a"]').trigger('click')
+    expect(wrapper.emitted('select')).toBeFalsy()
+    await byText('下一步').trigger('click')
+    // vtu 步骤过渡动画(EXIT/ENTER 约 250ms)期间选项 disabled,等动画落定再点
+    await new Promise((r) => setTimeout(r, 300))
+    expect(wrapper.emitted('step-change')?.[0]).toEqual(['q2'])
+    await wrapper.find('button[data-id="c"]').trigger('click')
+    await wrapper.find('button[data-id="d"]').trigger('click')
+    expect(wrapper.emitted('select')).toBeFalsy()
+    await byText('完成').trigger('click')
+    expect(wrapper.emitted('complete')?.[0]).toEqual([
+      {
+        answers: { q1: ['a'], q2: ['c', 'd'] },
+        texts: ['已选:Schema 驱动', '已选:首屏耗时, 交互延迟'],
+      },
+    ])
   })
 
   it('message-draft: send/undo/cancel 经函数 prop 单通道上抛(防双发)', async () => {
