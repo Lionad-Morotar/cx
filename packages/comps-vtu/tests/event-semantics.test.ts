@@ -140,8 +140,8 @@ describe('cxDirectText 直发回写文本', () => {
     expect(cxDirectText('cx-vtu-item-carousel', 'item-click', ['it-2'])).toBe('查看条目 it-2')
   })
 
-  it('message-draft: send 固定「发送草稿」', () => {
-    expect(cxDirectText('cx-vtu-message-draft', 'send', [])).toBe('发送草稿')
+  it('message-draft: send 与按钮 i18n 对齐「发送」', () => {
+    expect(cxDirectText('cx-vtu-message-draft', 'send', [])).toBe('发送')
   })
 
   it('未登记物料直发退化 selection 文本(args[0])', () => {
@@ -222,20 +222,30 @@ describe('cxEventToAppend 字段键推导与幂等 id', () => {
 })
 
 describe('cxConfirmText 确认连发文本', () => {
-  it('四档语义词:完成问卷 / 确认选择 / 应用设置 / 确认执行', () => {
-    expect(cxConfirmText('cx-vtu-question-flow', [])).toBe('完成问卷')
-    expect(cxConfirmText('cx-vtu-option-list', [])).toBe('确认选择')
-    expect(cxConfirmText('cx-vtu-preferences-panel', [])).toBe('应用设置')
-    expect(cxConfirmText('cx-vtu-parameter-slider', [])).toBe('应用设置')
-    expect(cxConfirmText('cx-vtu-approval-card', [])).toBe('确认执行')
+  it('无 label 载荷时落 i18n 对齐兜底表', () => {
+    expect(cxConfirmText('cx-vtu-question-flow', [], [])).toBe('完成')
+    expect(cxConfirmText('cx-vtu-option-list', [], [])).toBe('确认')
+    expect(cxConfirmText('cx-vtu-preferences-panel', [], [])).toBe('保存')
+    expect(cxConfirmText('cx-vtu-parameter-slider', [], [])).toBe('确认')
+    expect(cxConfirmText('cx-vtu-approval-card', [], [])).toBe('批准')
+    expect(cxConfirmText('cx-vtu-unknown', [], [])).toBe('确认')
+  })
+
+  it('按钮 label 载荷优先:actions 类取 args[2],approval-card 取 args[0]', () => {
+    expect(cxConfirmText('cx-vtu-option-list', ['已选:A'], ['confirm', 'a', '查看结果'])).toBe(
+      '已选:A，查看结果'
+    )
+    expect(cxConfirmText('cx-vtu-preferences-panel', [], ['save', {}, '应用全部'])).toBe('应用全部')
+    expect(cxConfirmText('cx-vtu-parameter-slider', [], ['apply', [], '调参完成'])).toBe('调参完成')
+    expect(cxConfirmText('cx-vtu-approval-card', [], ['允许删除'])).toBe('允许删除')
   })
 
   it('有暂存时拼接:暂存以；相连,再接，+语义', () => {
-    expect(cxConfirmText('cx-vtu-preferences-panel', ['参数:{"notif":true}'])).toBe(
-      '参数:{"notif":true}，应用设置'
+    expect(cxConfirmText('cx-vtu-preferences-panel', ['参数:{"notif":true}'], [])).toBe(
+      '参数:{"notif":true}，保存'
     )
-    expect(cxConfirmText('cx-vtu-question-flow', ['已选:a', '已选:b'])).toBe('已选:a；已选:b，完成问卷')
-    expect(cxConfirmText('cx-vtu-option-list', ['已选:选项一'])).toBe('已选:选项一，确认选择')
+    expect(cxConfirmText('cx-vtu-question-flow', ['已选:a', '已选:b'], [])).toBe('已选:a；已选:b，完成')
+    expect(cxConfirmText('cx-vtu-option-list', ['已选:选项一'], [])).toBe('已选:选项一，确认')
   })
 })
 
@@ -268,8 +278,8 @@ describe('defineCxEventSemantics 覆盖点', () => {
     })
     expect(sem.directText('cx-vtu-message-draft', 'send', [])).toBe('自定义发送')
     expect(sem.directText('cx-vtu-item-carousel', 'item-click', ['i-9'])).toBe('查看条目 i-9')
-    expect(sem.confirmText('cx-vtu-approval-card', ['a'])).toBe('已确认(1)')
-    expect(sem.confirmText('cx-vtu-question-flow', ['a'])).toBe('a，完成问卷')
+    expect(sem.confirmText('cx-vtu-approval-card', ['a'], [])).toBe('已确认(1)')
+    expect(sem.confirmText('cx-vtu-question-flow', ['a'], [])).toBe('a，完成')
     expect(sem.appendText('cx-vtu-message-draft', 'undo', [])).toBe('撤销草稿')
   })
 

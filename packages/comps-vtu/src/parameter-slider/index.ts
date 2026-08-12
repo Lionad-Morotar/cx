@@ -20,7 +20,10 @@ export default define({
   },
   // emits 与 SFC defineEmits 同集合:声明后 cx 渲染器 getEmits 命中,经 _cx_events 接到 host
   emits: {
-    change: { name: '滑块变更', description: '任一滑块值变化,宿主回写「参数调整为 <变更摘要>」' },
-    action: { name: '动作触发', description: '点击滑块组动作(如应用),宿主回写「参数动作 <actionId>」' },
+    change: { name: '滑块变更', description: '任一滑块值变化,暂存为待发送上下文' },
+    action: {
+      name: '动作触发',
+      description: '点击 actions 按钮,载荷为 (actionId, 当前值, 按钮 label),连同暂存一起回写',
+    },
   },
 })

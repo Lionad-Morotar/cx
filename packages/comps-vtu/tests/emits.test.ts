@@ -63,20 +63,32 @@ describe('物料 emits · meta 与 SFC 同集合', () => {
 })
 
 describe('物料 emits · vtu 真 emit 上抛', () => {
-  it('option-list: change 载荷翻译为 label 上抛;action 载荷保持 (actionId, id)', async () => {
+  it('option-list: change 载荷翻译为 label 上抛;action 载荷附按钮 label', async () => {
     const comp = byKey('cx-vtu-option-list')
     const wrapper = mountMaterial(comp, {
       options: [
         { id: 'opt-1', label: '选项一' },
         { id: 'opt-2', label: '选项二' },
       ],
+      actions: [{ id: 'confirm', label: '查看结果' }],
     })
     const inner = wrapper.findComponent({ name: 'CmptOptionList' })
     inner.vm.$emit('change', 'opt-1')
     inner.vm.$emit('action', 'confirm', 'opt-1')
     await wrapper.vm.$nextTick()
     expect(wrapper.emitted('change')?.[0]).toEqual(['选项一'])
-    expect(wrapper.emitted('action')?.[0]).toEqual(['confirm', 'opt-1'])
+    expect(wrapper.emitted('action')?.[0]).toEqual(['confirm', 'opt-1', '查看结果'])
+  })
+
+  it('option-list: action 的 actionId 查不到 label 时第三参 undefined(语义层落兜底)', async () => {
+    const comp = byKey('cx-vtu-option-list')
+    const wrapper = mountMaterial(comp, {
+      options: [{ id: 'opt-1', label: '选项一' }],
+    })
+    const inner = wrapper.findComponent({ name: 'CmptOptionList' })
+    inner.vm.$emit('action', 'confirm', 'opt-1')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.emitted('action')?.[0]).toEqual(['confirm', 'opt-1', undefined])
   })
 
   it('option-list: change 多选逐个翻译,未知 id 退化原样上抛', async () => {
@@ -95,14 +107,14 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     expect(wrapper.emitted('change')?.[1]).toEqual([['选项一', 'ghost']])
   })
 
-  it('approval-card: confirm/cancel 上抛', async () => {
+  it('approval-card: confirm 上抛附 confirmLabel,cancel 同前', async () => {
     const comp = byKey('cx-vtu-approval-card')
-    const wrapper = mountMaterial(comp, { title: '发布审批' })
+    const wrapper = mountMaterial(comp, { title: '发布审批', confirmLabel: '允许发布' })
     const inner = wrapper.findComponent({ name: 'CmptApprovalCard' })
     inner.vm.$emit('confirm')
     inner.vm.$emit('cancel')
     await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('confirm')).toBeTruthy()
+    expect(wrapper.emitted('confirm')?.[0]).toEqual(['允许发布'])
     expect(wrapper.emitted('cancel')).toBeTruthy()
   })
 
@@ -121,7 +133,8 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     inner.vm.$emit('action', 'save', { notif: false })
     await wrapper.vm.$nextTick()
     expect(wrapper.emitted('change')?.[0]).toEqual([{ notif: false }])
-    expect(wrapper.emitted('action')?.[0]).toEqual(['save', { notif: false }])
+    // 未配 actions:label 第三参 undefined(语义层落兜底「保存」)
+    expect(wrapper.emitted('action')?.[0]).toEqual(['save', { notif: false }, undefined])
   })
 
   it('question-flow: select 对象载荷(选项 id + label + 步骤 id)上抛,back/stepChange/complete 同前', async () => {
@@ -200,7 +213,7 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     inner.vm.$emit('action', 'apply', next)
     await wrapper.vm.$nextTick()
     expect(wrapper.emitted('change')?.[0]).toEqual([next])
-    expect(wrapper.emitted('action')?.[0]).toEqual(['apply', next])
+    expect(wrapper.emitted('action')?.[0]).toEqual(['apply', next, undefined])
   })
 
   it('item-carousel: itemClick/itemAction 上抛', async () => {

@@ -75,7 +75,8 @@ function defaultDirectText(materialKey: string, event: string, args: unknown[]):
         ? `条目 ${String(args[0])} 执行 ${String(args[1])}`
         : `查看条目 ${String(args[0])}`
     case 'cx-vtu-message-draft':
-      return '发送草稿'
+      // 与按钮 i18n 文案「发送」对齐——回写即用户所点,写死「发送草稿」与按钮漂移
+      return '发送'
     default:
       return cxSelectionToText(args[0])
   }
@@ -148,16 +149,33 @@ function cxFieldId(materialKey: string, event: string, args: unknown[]): string 
   }
 }
 
-/** confirm 连发文本:暂存拼接 + confirm 语义;无暂存退化为纯 confirm 文本 */
-function defaultConfirmText(materialKey: string, appendsTexts: string[]): string {
+/**
+ * confirm 语义词兜底表(物料未上抛按钮 label 时):全面对齐 vtu 按钮 i18n 默认值——
+ * 回写语义必须与用户所点按钮文案一致,写死的泛词(如「确认执行」)在批准/删除等
+ * 场景必然语义偏差。
+ */
+const CONFIRM_FALLBACK: Record<string, string> = {
+  'cx-vtu-question-flow': '完成',
+  'cx-vtu-option-list': '确认',
+  'cx-vtu-preferences-panel': '保存',
+  'cx-vtu-parameter-slider': '确认',
+  'cx-vtu-approval-card': '批准',
+}
+
+/**
+ * 从动作载荷提取按钮 label:actions 配置类物料(option-list/preferences/slider)
+ * 载荷为 (actionId, value, label) 取 args[2];approval-card confirm 载荷为 (label)
+ * 取 args[0];取不到返回 undefined 落兜底表。
+ */
+function confirmActionLabel(materialKey: string, args: unknown[]): string | undefined {
+  const raw = materialKey === 'cx-vtu-approval-card' ? args[0] : args[2]
+  return typeof raw === 'string' && raw ? raw : undefined
+}
+
+/** confirm 连发文本:暂存拼接 + 按钮 label(无 label 落兜底表);无暂存退化为纯语义 */
+function defaultConfirmText(materialKey: string, appendsTexts: string[], args: unknown[] = []): string {
   const semantic =
-    materialKey === 'cx-vtu-question-flow'
-      ? '完成问卷'
-      : materialKey === 'cx-vtu-option-list'
-        ? '确认选择'
-        : materialKey === 'cx-vtu-preferences-panel' || materialKey === 'cx-vtu-parameter-slider'
-          ? '应用设置'
-          : '确认执行'
+    confirmActionLabel(materialKey, args) ?? CONFIRM_FALLBACK[materialKey] ?? '确认'
   if (!appendsTexts.length) return semantic
   return `${appendsTexts.join('；')}，${semantic}`
 }
@@ -174,7 +192,7 @@ export interface CxEventSemantics {
     widgetId: string,
     label?: string
   ): CxAppendItem
-  confirmText(materialKey: string, appendsTexts: string[]): string
+  confirmText(materialKey: string, appendsTexts: string[], args: unknown[]): string
   /**
    * 透传事件的回写文本(passthrough 态):语义表未注册的事件到达宿主时,
    * 业务方决定回写什么;返回 undefined 即该事件不回应(等效 ignore)。
@@ -196,7 +214,7 @@ export interface CxEventSemanticsOverrides {
   /** 返回 undefined 即落默认文案 */
   directText?(materialKey: string, event: string, args: unknown[]): string | undefined
   appendText?(materialKey: string, event: string, args: unknown[]): string | undefined
-  confirmText?(materialKey: string, appendsTexts: string[]): string | undefined
+  confirmText?(materialKey: string, appendsTexts: string[], args: unknown[]): string | undefined
   /** 透传事件回写文本;返回 undefined 即该事件不回应 */
   passthroughText?(materialKey: string, event: string, args: unknown[]): string | undefined
 }
@@ -213,8 +231,8 @@ export function defineCxEventSemantics(overrides: CxEventSemanticsOverrides = {}
     overrides.directText?.(key, event, args) ?? defaultDirectText(key, event, args)
   const appendText: CxEventSemantics['appendText'] = (key, event, args) =>
     overrides.appendText?.(key, event, args) ?? defaultAppendText(key, event, args)
-  const confirmText: CxEventSemantics['confirmText'] = (key, texts) =>
-    overrides.confirmText?.(key, texts) ?? defaultConfirmText(key, texts)
+  const confirmText: CxEventSemantics['confirmText'] = (key, texts, args) =>
+    overrides.confirmText?.(key, texts, args) ?? defaultConfirmText(key, texts, args)
 
   const passthroughText: CxEventSemantics['passthroughText'] = (key, event, args) =>
     overrides.passthroughText?.(key, event, args)

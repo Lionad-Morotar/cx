@@ -43,7 +43,7 @@ export default define({
   emits: {
     action: {
       name: '操作触发',
-      description: '用户点击 actions 按钮,载荷为 (actionId, 当前选择值),宿主据此回写对话',
+      description: '用户点击 actions 按钮,载荷为 (actionId, 当前选择值, 按钮 label),宿主据此回写对话',
     },
     change: {
       name: '选择变更',

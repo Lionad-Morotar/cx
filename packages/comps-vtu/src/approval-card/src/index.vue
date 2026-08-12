@@ -1,13 +1,13 @@
 <template>
   <!--
-    vtu ApprovalCard 的 confirm/cancel 是运行时 emit(非函数 prop),须用 @ 监听再 re-emit;
-    与 OptionList 的 action/change(函数 prop,用 :on-*)不同,故此处用 @ 形式。
-    re-emit 后统一上抛为包装组件 emits,供 cx 渲染器经 _cx_events 接线。
+    vtu ApprovalCard 的 confirm/cancel 是真 emit(实现只走 emit,不调函数 prop),
+    必须用 @ 监听——:on-* kebab v-bind 进不了 emit 的 camel 键查找,事件会丢。
+    confirm 上抛附 confirmLabel(按钮文案即回写语义,未配时 undefined 由语义层落兜底)。
   -->
   <ApprovalCard
     v-bind="vtuProps"
     :class="ns.b()"
-    @confirm="emit('confirm')"
+    @confirm="emit('confirm', vtuProps.confirmLabel)"
     @cancel="emit('cancel')"
   />
 </template>
@@ -24,7 +24,7 @@ import type { ApprovalCardProps } from '@lionad/vtu-components'
 defineOptions({ name: 'CxVtuApprovalCard', inheritAttrs: false })
 
 const emit = defineEmits<{
-  confirm: []
+  confirm: [label: string | undefined]
   cancel: []
 }>()
 

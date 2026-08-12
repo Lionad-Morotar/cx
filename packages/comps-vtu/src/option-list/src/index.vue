@@ -9,7 +9,7 @@
     v-bind="vtuProps"
     :class="ns.b()"
     :actions="normalizedActions"
-    @action="(id, value) => emit('action', id, value)"
+    @action="(id, value) => emit('action', id, value, findActionLabel(vtuProps.actions, id))"
     @change="(value) => emit('change', toLabels(value))"
     @update:model-value="(value) => emit('update:modelValue', value)"
   />
@@ -21,6 +21,7 @@ import { OptionList } from '@lionad/vtu-components'
 import { useCxBEM } from '@lionad/cx-vue'
 
 import { useVtuProps } from '../../shared/use-vtu-props'
+import { findActionLabel } from '../../shared/action-label'
 
 import type { OptionListProps, OptionListSelection } from '@lionad/vtu-components'
 
@@ -28,7 +29,7 @@ defineOptions({ name: 'CxVtuOptionList', inheritAttrs: false })
 
 // 与 meta emits 同集合:declare 后这些 on* 从 $attrs 消费,避免 useVtuProps 二次透传造成重复绑定
 const emit = defineEmits<{
-  action: [actionId: string, value: OptionListSelection]
+  action: [actionId: string, value: OptionListSelection, label: string | undefined]
   change: [value: OptionListSelection]
   'update:modelValue': [value: OptionListSelection]
 }>()

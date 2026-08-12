@@ -94,6 +94,39 @@ describe('vtu 物料挂载 smoke', () => {
     expect(wrapper.text()).not.toContain('Clear')
   })
 
+  it('cx-vtu-preferences-panel 未配 actions 时不渲染英文默认 Cancel/Save Changes', () => {
+    const comp = byKey('cx-vtu-preferences-panel')
+    const wrapper = mountMaterial(comp, {
+      sections: [{ heading: '通用', items: [{ id: 'notif', label: '通知', type: 'switch' }] }],
+    })
+    expect(wrapper.text()).not.toContain('Cancel')
+    expect(wrapper.text()).not.toContain('Save Changes')
+  })
+
+  it('cx-vtu-preferences-panel 配了 actions 时渲染给定按钮', () => {
+    const comp = byKey('cx-vtu-preferences-panel')
+    const wrapper = mountMaterial(comp, {
+      sections: [{ heading: '通用', items: [{ id: 'notif', label: '通知', type: 'switch' }] }],
+      actions: [{ id: 'save', label: '保存偏好' }],
+    })
+    expect(wrapper.text()).toContain('保存偏好')
+    expect(wrapper.text()).not.toContain('Cancel')
+  })
+
+  it('cx-vtu-parameter-slider 未配 actions 时不渲染默认 reset/apply,配了渲染给定按钮', () => {
+    const comp = byKey('cx-vtu-parameter-slider')
+    const bare = mountMaterial(comp, {
+      sliders: [{ id: 'temp', label: '温度', min: 0, max: 100, step: 1, value: 42 }],
+    })
+    // vtu 默认 apply 按钮 label 为 i18n「确认」;压默认后 actions 区整体不渲染
+    expect(bare.text()).not.toContain('重置')
+    const withActions = mountMaterial(comp, {
+      sliders: [{ id: 'temp', label: '温度', min: 0, max: 100, step: 1, value: 42 }],
+      actions: [{ id: 'apply', label: '应用参数' }],
+    })
+    expect(withActions.text()).toContain('应用参数')
+  })
+
   it('cx-vtu-stats-display 可挂载（统计项）', () => {
     const comp = byKey('cx-vtu-stats-display')
     const wrapper = mountMaterial(comp, {
