@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.6] - 2026-08-12
+
+### Added
+
+- `@lionad/cx-stream`：`fence` 支持 `string | string[]` 多围栏标记——`fenceBlockPattern` 数组联合为单非捕获组正则按文档序归并，`spec-detector`/`incremental` 同步放宽；模型模仿组件文档的 jsonc 示例围栏输出时不再静默漏提
+- `@lionad/cx-comps-vtu`：`event-semantics` 新增未注册事件透传——`CxEventDisposition` 加 `passthrough` 态，`defineCxEventSemantics` 支持 `unregistered: 'passthrough'` 缺省处置与 `passthroughText` 钩子；消极动作（cancel/back）回写文案由业务方掌握，cx 提供通道不预置立场，默认 `ignore` 向后兼容
+
 ## [0.1.0-alpha.5] - 2026-08-10
 
 ### Fixed

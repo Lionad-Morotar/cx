@@ -1,6 +1,6 @@
 {
   "name": "@lionad/cx-vue",
-  "version": "0.1.0-alpha.5",
+  "version": "0.1.0-alpha.6",
   "description": "cx Vue runtime: composables and shared runtime components",
   "author": "Lionad-Morotar",
   "keywords": [
