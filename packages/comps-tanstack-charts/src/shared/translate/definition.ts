@@ -64,6 +64,49 @@ function translateTooltip(tooltip: NonNullable<CxChartSpec['tooltip']>): unknown
 }
 
 /**
+ * 时间轴 channel 纠偏：utc/time scale 要求 channel 值为 Date 实例，而 JSON spec 只能
+ * 携带 ISO 字符串——翻译层按轴 scale 声明收集绑定字段，把数据集行映射为 Date 副本
+ * （不改写调用方行对象）。null 原样保留（nullable channel 缺口语义）。
+ */
+function coerceTemporalChannels(spec: CxChartSpec, table: CxChartDatasets): CxChartDatasets {
+  const temporal = (axis: CxChartSpec['x']): boolean =>
+    axis != null && (axis.scale?.kind === 'utc' || axis.scale?.kind === 'time')
+  const xTemporal = temporal(spec.x)
+  const yTemporal = temporal(spec.y)
+  if (!xTemporal && !yTemporal) return table
+  const fieldsByDataset = new Map<string, Set<string>>()
+  const bind = (dataRef: unknown, field: unknown) => {
+    const name = typeof dataRef === 'string' ? dataRef : 'rows'
+    if (typeof field !== 'string') return
+    let set = fieldsByDataset.get(name)
+    if (!set) fieldsByDataset.set(name, (set = new Set()))
+    set.add(field)
+  }
+  for (const mark of spec.marks) {
+    if (xTemporal) for (const f of ['x', 'x1', 'x2'] as const) bind(mark.data, mark[f])
+    if (yTemporal) for (const f of ['y', 'y1', 'y2'] as const) bind(mark.data, mark[f])
+  }
+  let changed = false
+  const next: CxChartDatasets = { ...table }
+  for (const [name, fields] of fieldsByDataset) {
+    const rows = table[name]
+    if (!rows?.length) continue
+    changed = true
+    next[name] = rows.map((row) => {
+      if (row == null || typeof row !== 'object') return row
+      const source = row as Record<string, unknown>
+      const copy = { ...source }
+      for (const field of fields) {
+        const value = source[field]
+        if (typeof value === 'string') copy[field] = new Date(value)
+      }
+      return copy
+    })
+  }
+  return changed ? next : table
+}
+
+/**
  * 单 spec → definition 核心（facet 子 spec 复用）：返回原始 spec 对象而非
  * defineChart 产物——facet chart 回调要求返回 ChartSpec 字面量形态。
  * rowsOverride：facet 分组行注入（子 spec marks 未声明 data 时绑定分组行）。
@@ -75,7 +118,8 @@ function buildDefinition(
 ): Record<string, unknown> {
   const base: CxChartDatasets = { ...datasets }
   if (rowsOverride !== undefined) base.rows = rowsOverride
-  const table = spec.transforms?.length ? applyTransforms(spec.transforms, base) : base
+  const transformed = spec.transforms?.length ? applyTransforms(spec.transforms, base) : base
+  const table = coerceTemporalChannels(spec, transformed)
 
   const marks: unknown[] = []
   let derivedXDomain: [number, number] | undefined

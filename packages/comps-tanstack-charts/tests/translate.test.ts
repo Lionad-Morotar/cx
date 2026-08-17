@@ -829,4 +829,28 @@ describe('definition 顶层扩展（color.legend / tooltip / focus）', () => {
     }) as { focus?: unknown }
     expect(definition.focus).toBe('nearest-x')
   })
+
+  it('utc/time 轴 channel ISO 字符串纠偏为 Date（null 保留缺口语义）', () => {
+    const definition = translateChartSpec({
+      marks: [
+        {
+          type: 'lineY',
+          data: 'rows',
+          x: 'date',
+          y: 'close',
+        },
+      ],
+      x: { scale: { kind: 'utc' } },
+      y: { scale: { kind: 'linear' } },
+    }, {
+      rows: [
+        { date: '2026-01-05', close: null },
+        { date: '2026-04-06', close: 168.82 },
+        { date: '2026-04-13', close: 174.31 },
+      ],
+    })
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    // 库对 temporal scale 的非 Date channel 值抛错——纠偏后全链路可渲染
+    expect(renderChartSvg(scene, { ariaLabel: 'utc' })).toContain('<svg')
+  })
 })
