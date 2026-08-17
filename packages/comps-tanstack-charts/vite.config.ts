@@ -16,7 +16,7 @@ export default defineConfig({
         '@lionad/cx-vue',
         '@lionad/cx-stream',
         '@tanstack/charts',
-        '@tanstack/vue-charts',
+        // vue 适配器 0.14 起收进主包子路径（@tanstack/charts/vue），外置匹配主包即可覆盖
         'd3-shape',
       ],
     },

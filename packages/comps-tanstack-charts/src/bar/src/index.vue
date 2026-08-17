@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue'
-import { Chart } from '@tanstack/vue-charts'
+import { Chart } from '@tanstack/charts/vue'
 import { useCxBEM } from '@lionad/cx-vue'
 
 import { usePresetChart } from '../../shared/use-preset-chart'

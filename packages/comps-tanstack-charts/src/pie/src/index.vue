@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { useAttrs } from 'vue'
-import { Chart } from '@tanstack/vue-charts'
+import { Chart } from '@tanstack/charts/vue'
 import { useCxBEM } from '@lionad/cx-vue'
 
 import { usePieChart } from '../../shared/use-pie-chart'
