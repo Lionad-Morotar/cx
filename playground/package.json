@@ -43,6 +43,11 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
-    "subset-font": "^2.5.0"
+    "@vueuse/shared": "^14.4.0",
+    "h3": "1.15.11",
+    "ofetch": "1.5.1",
+    "scule": "1.3.0",
+    "subset-font": "^2.5.0",
+    "vue-router": "4.6.4"
   }
 }

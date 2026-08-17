@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@lionad/cx-eslint-config": "workspace:*",
+    "@types/node": "^26.2.0",
     "@voidzero-dev/vite-plus-core": "latest",
     "@vue/test-utils": "^2.4.11",
     "eslint": "^10.8.0",

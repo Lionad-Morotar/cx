@@ -1,0 +1,24 @@
+/*
+ * charts-theme — design tokens → TanStack Charts 主题桥。
+ *
+ * TanStack Charts 默认主题消费 --ts-chart-1..N 系列色变量,轴/网格经
+ * currentColor 继承宿主文字色——本桥只做系列色映射,把宿主(如
+ * @ai86/design-tokens)的 accent 色板接入,深浅主题切换随 CSS 变量解析
+ * 天然跟随,零 JS。作用域挂 .cx-charts 类(由图表容器声明),不污染 :root,
+ * 同页多套图表实例可各自定主题。
+ *
+ * 宿主消费方式:图表容器元素加 class="cx-charts",且宿主已定义
+ * --color-accent-* 变量(未定义时回落浏览器默认色,cx 不耦合任何 token 包)。
+ */
+.cx-charts {
+  --ts-chart-1: var(--color-accent-blue);
+  --ts-chart-2: var(--color-accent-purple);
+  --ts-chart-3: var(--color-accent-green);
+  --ts-chart-4: var(--color-accent-orange);
+  --ts-chart-5: var(--color-accent-cyan);
+  --ts-chart-6: var(--color-accent-pink);
+  --ts-chart-7: var(--color-accent-yellow);
+  --ts-chart-8: var(--color-accent-red);
+  /* 焦点/悬停强调填充:宿主 primary 的柔化形态 */
+  --ts-chart-focus-fill: var(--color-primary-soft);
+}

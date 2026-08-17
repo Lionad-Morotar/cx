@@ -24,3 +24,6 @@ export * from './stream-triggers'
 
 // --- 共享组件（非物料：物料组装侧直接消费的包装组件） ---
 export * from './shared'
+
+// --- 图表主题桥（design tokens → TanStack Charts 变量;随 barrel 聚合进 style.css） ---
+import './charts/charts-theme.css'
