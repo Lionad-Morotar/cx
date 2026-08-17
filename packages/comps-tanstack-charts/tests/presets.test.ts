@@ -35,7 +35,7 @@ const initialDataOf = (meta: any): Record<string, any> => {
 describe('预设物料契约', () => {
   it('通用 chart 与四个笛卡尔预设在包内（全包计数由 pie 测试锁定）', () => {
     const keys = (CxTanstackCharts as any[]).map((m) => m._cx_meta.key)
-    for (const key of ['cx-tanstack-charts-chart', ...PRESET_KEYS]) {
+    for (const key of ['cx-chart', ...PRESET_KEYS]) {
       expect(keys).toContain(key)
     }
   })

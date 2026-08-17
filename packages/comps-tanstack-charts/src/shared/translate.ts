@@ -110,8 +110,13 @@ export type CxChartMarkType =
 
 export interface CxChartMarkSpec {
   type: CxChartMarkType
-  /** 行数组或常量数组（rule 类），原样透传给 mark 工厂 */
-  data?: readonly unknown[]
+  /**
+   * 行数组（内嵌，常量数组亦可）或命名数据集字符串引用。
+   * 字符串引用由 translateChartSpec 的 datasets 表解析——GenUI 契约是数据顶层化
+   * （data.rows 与 definition 平级），marks 内以 "rows" 引用；未命中一律回退空数组
+   * （流式中间态与笔误运行时不可区分，渲染层容错优先，笔误显式化归生成期校验门）。
+   */
+  data?: readonly unknown[] | string
   id?: string
   x?: string
   y?: string
@@ -277,8 +282,29 @@ function assertChannels(spec: CxChartMarkSpec): void {
   }
 }
 
+/** 命名数据集表：物料 data 顶层除 definition 外的数组字段（GenUI 契约 rows/nodes/links） */
+export type CxChartDatasets = Record<string, readonly unknown[] | undefined>
+
+/**
+ * mark data 解析：字符串 → datasets 查表；数组原样透传。
+ * 未命中一律回退空数组——流式中间态（definition 先闭合、数据集在途；多数据集
+ * 部分到达）与 LLM 笔误在运行时不可区分，渲染层容错优先（与「渲染链路不过 zod，
+ * fallback 从简」契约一致）；笔误显式化归生成期校验（spec 渲染断言门）。
+ */
+function resolveMarkData(
+  data: readonly unknown[] | string | undefined,
+  datasets: CxChartDatasets | undefined,
+): readonly unknown[] {
+  if (data === undefined) return []
+  if (typeof data !== 'string') return data
+  return datasets?.[data] ?? []
+}
+
 /** 单 mark 声明式 → ChartMark；多余样式键对 mark 工厂无害（按名读取） */
-export function translateMark(spec: CxChartMarkSpec): ChartMark<unknown, any, any> {
+export function translateMark(
+  spec: CxChartMarkSpec,
+  datasets?: CxChartDatasets,
+): ChartMark<unknown, any, any> {
   const factory = MARK_FACTORIES[spec.type]
   if (!factory) {
     throw new Error(`translateMark: 未知 mark type "${String(spec.type)}"`)
@@ -299,7 +325,7 @@ export function translateMark(spec: CxChartMarkSpec): ChartMark<unknown, any, an
       data: readonly unknown[],
       options: Record<string, unknown>,
     ) => ChartMark<unknown, any, any>
-  )(spec.data ?? [], options)
+  )(resolveMarkData(spec.data, datasets), options)
 }
 
 // ---------- axis 翻译 ----------
@@ -351,9 +377,13 @@ export function translateAxis(
 /**
  * 声明式 spec → DomChartDefinition（可直接喂给 <Chart>）。
  * theme 与默认主题合并为完整 ChartTheme（palette 等字段缺省有库默认回退值）。
+ * datasets：命名数据集表（数据顶层化契约），marks 内字符串引用在此解析。
  */
-export function translateChartSpec(spec: CxChartSpec): DomChartDefinition {
-  const marks = spec.marks.map(translateMark)
+export function translateChartSpec(
+  spec: CxChartSpec,
+  datasets?: CxChartDatasets,
+): DomChartDefinition {
+  const marks = spec.marks.map((mark) => translateMark(mark, datasets))
   const theme: ChartTheme = { ...defaultChartTheme, ...spec.theme }
   const definition: Record<string, unknown> = {
     marks,
@@ -373,5 +403,5 @@ export function translateChartSpec(spec: CxChartSpec): DomChartDefinition {
     definition.tooltip =
       spec.tooltip === true ? undefined : spec.tooltip === false ? false : spec.tooltip
   }
-  return (defineChart as (definition: unknown) => DomChartDefinition)(definition)
+  return (defineChart as unknown as (definition: unknown) => DomChartDefinition)(definition)
 }

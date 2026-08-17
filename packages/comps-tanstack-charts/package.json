@@ -1,7 +1,7 @@
 {
   "name": "@lionad/cx-comps-tanstack-charts",
   "version": "0.1.0-alpha.5",
-  "description": "cx material components wrapping TanStack Charts (@tanstack/vue-charts)",
+  "description": "cx material components wrapping TanStack Charts (@tanstack/charts/vue)",
   "keywords": [
     "charts",
     "schema-driven",

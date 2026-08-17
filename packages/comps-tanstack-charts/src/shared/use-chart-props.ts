@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 
 import type { ComputedRef } from 'vue'
-import type { CxChartSpec } from './translate'
+import type { CxChartDatasets, CxChartSpec } from './translate'
 
 /** <Chart> 宿主标量 props 白名单（回调 function props v1 不暴露：JSON 不可表达） */
 const HOST_PROP_KEYS = [
@@ -14,6 +14,14 @@ const HOST_PROP_KEYS = [
   'className',
 ] as const
 
+/**
+ * 命名数据集白名单（GenUI 数据顶层化契约）：
+ * rows 恒为主数据集（流式 trigger arrayKey），nodes/links 承载关系型图双数据集；
+ * 物料 data 顶层与 definition 平级的这三个数组字段分馏进 datasets 表，
+ * 供 marks 内字符串引用解析。非数组值静默忽略（流式半值防御）。
+ */
+const DATASET_KEYS = ['rows', 'nodes', 'links'] as const
+
 export interface CxChartHostPartition {
   /** <Chart> 宿主 props（标量白名单 + class/style） */
   hostProps: ComputedRef<Record<string, unknown>>
@@ -24,6 +32,8 @@ export interface CxChartHostPartition {
 export interface CxChartPropsPartition extends CxChartHostPartition {
   /** 物料 JSON definition（声明式 spec，待翻译层组装） */
   spec: ComputedRef<CxChartSpec>
+  /** 命名数据集表（rows/nodes/links 白名单分馏；marks 字符串引用在此解析） */
+  datasets: ComputedRef<CxChartDatasets>
 }
 
 /**
@@ -61,5 +71,13 @@ export function useChartProps(attrs: Record<string, unknown>): CxChartPropsParti
   const spec = computed<CxChartSpec>(
     () => (attrs.definition as CxChartSpec | undefined) ?? { marks: [] },
   )
-  return { spec, hostProps, ariaLabel }
+  const datasets = computed<CxChartDatasets>(() => {
+    const table: CxChartDatasets = {}
+    for (const key of DATASET_KEYS) {
+      const value = attrs[key]
+      if (Array.isArray(value)) table[key] = value
+    }
+    return table
+  })
+  return { spec, datasets, hostProps, ariaLabel }
 }

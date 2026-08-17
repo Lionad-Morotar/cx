@@ -43,7 +43,7 @@ export function usePieChart(attrs: Record<string, unknown>): CxPieChartPartition
       typeof attrs.innerRadiusRatio === 'number' && Number.isFinite(attrs.innerRadiusRatio)
         ? Math.min(Math.max(attrs.innerRadiusRatio, 0), 0.95)
         : 0
-    return (defineChart as (definition: unknown) => DomChartDefinition)({
+    return (defineChart as unknown as (definition: unknown) => DomChartDefinition)({
       marks: [
         polar({
           inset: 8,

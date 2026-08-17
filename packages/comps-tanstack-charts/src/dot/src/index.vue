@@ -22,6 +22,6 @@ const { spec, hostProps, ariaLabel } = usePresetChart(useAttrs(), {
   xScale: 'linear',
 })
 
-// JSON spec → 运行时 DomChartDefinition
+// JSON spec → 运行时 StaticChartDefinition
 const definition = computed(() => translateChartSpec(spec.value))
 </script>

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { createChartScene, renderChartSvg } from '@tanstack/charts'
 
+import type { DomChartDefinition, StaticChartDefinition } from '@tanstack/charts'
+
 import {
-  translateAxis,
   translateChartSpec,
   translateCurve,
   translateScale,
@@ -12,9 +13,16 @@ import type { CxChartAxisSpec } from '../src/shared/translate'
 
 /**
  * 翻译层行为契约：声明式 JSON（物料 data）→ TanStack Charts 运行时产物。
- * 端到端以 createChartScene + renderChartSvg 的字符串管线断言（vue-charts SSR 同款路径，
+ * 端到端以 createChartScene + renderChartSvg 的字符串管线断言（/charts/vue SSR 同款路径，
  * 不依赖浏览器布局）；逐函数断言 scale/curve/mark 翻译的边界行为（缺省推断、显式配置、未知抛错）。
  */
+
+/**
+ * 断言桥：翻译层产物以 DomChartDefinition（宿主联合）标注，scene 管线要 Static 分支——
+ * 联合含 Responsive 分支属 0.14 类型层不协变（官方 README 同款用法亦过不了严格 tsc），
+ * 运行时同构；与 usage 页 ChartProps 断言桥同一性质。
+ */
+const toStatic = (definition: DomChartDefinition) => definition as StaticChartDefinition
 
 describe('translateCurve', () => {
   it('枚举映射为 ChartCurve 函数对（line/area 可调）', () => {
@@ -84,7 +92,7 @@ describe('translateChartSpec', () => {
       x: { scale: { kind: 'point' } },
       y: { scale: { kind: 'linear' }, grid: true },
     })
-    const scene = createChartScene(definition, { width: 640, height: 320 })
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
     const svg = renderChartSvg(scene, { ariaLabel: 'test chart' })
     expect(svg).toContain('<svg')
     expect(svg).toContain('M')
@@ -135,7 +143,7 @@ describe('translateChartSpec 流式中间态容错', () => {
     const definition = translateChartSpec({
       marks: [{ type: 'lineY', data: rows, x: 'month', y: 'value' }],
     })
-    const scene = createChartScene(definition, { width: 640, height: 320 })
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
     const svg = renderChartSvg(scene, { ariaLabel: 'partial' })
     expect(svg).toContain('<svg')
     expect(svg).toContain('M')
@@ -148,7 +156,7 @@ describe('translateChartSpec 流式中间态容错', () => {
       x: {} as CxChartAxisSpec,
       y: { grid: true } as CxChartAxisSpec,
     })
-    const scene = createChartScene(definition, { width: 640, height: 320 })
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
     expect(renderChartSvg(scene, { ariaLabel: 'partial-axis' })).toContain('<svg')
   })
 
@@ -160,5 +168,51 @@ describe('translateChartSpec 流式中间态容错', () => {
     }) as { x?: unknown; y?: unknown }
     expect(definition.x).toBeNull()
     expect(definition.y).toBeNull()
+  })
+})
+
+describe('translateChartSpec 数据集引用（数据顶层化）', () => {
+  const rows = [
+    { month: 'Jan', value: 40 },
+    { month: 'Feb', value: 62 },
+    { month: 'Mar', value: 55 },
+  ]
+
+  it('mark.data 字符串引用经 datasets 表解析为行数组（端到端可渲染）', () => {
+    const definition = translateChartSpec(
+      {
+        marks: [{ type: 'lineY', data: 'rows', x: 'month', y: 'value' }],
+        x: { scale: { kind: 'point' } },
+        y: { scale: { kind: 'linear' }, grid: true },
+      },
+      { rows },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'dataset-ref' })
+    expect(svg).toContain('<svg')
+    expect(svg).toContain('M')
+  })
+
+  it('引用未注册数据集回退空数组（流式中间态与笔误运行时不可区分，渲染层容错优先）', () => {
+    expect(() =>
+      translateChartSpec(
+        { marks: [{ type: 'lineY', data: 'rows2', x: 'month', y: 'value' }] },
+        { rows },
+      ),
+    ).not.toThrow()
+  })
+
+  it('datasets 缺席时字符串引用回退空数组（流式中间态：definition 先于 rows 闭合）', () => {
+    expect(() =>
+      translateChartSpec({ marks: [{ type: 'lineY', data: 'rows', x: 'month', y: 'value' }] }),
+    ).not.toThrow()
+  })
+
+  it('内嵌数组形态保持兼容（存量内嵌 spec 语义不变）', () => {
+    const definition = translateChartSpec({
+      marks: [{ type: 'lineY', data: rows, x: 'month', y: 'value' }],
+    })
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    expect(renderChartSvg(scene, { ariaLabel: 'inline' })).toContain('<svg')
   })
 })

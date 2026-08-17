@@ -22,12 +22,13 @@ defineOptions({ name: 'CxTanstackChartsChart', inheritAttrs: false })
 
 const ns = useCxBEM('tanstack-charts-chart')
 const attrs = useAttrs()
-const { spec, hostProps, ariaLabel } = useChartProps(attrs)
+const { spec, datasets, hostProps, ariaLabel } = useChartProps(attrs)
 
-// JSON spec → 运行时 DomChartDefinition；spec 缺席回退空 marks（由 useChartProps 兜底）
-const definition = computed(() => translateChartSpec(spec.value))
+// JSON spec + 命名数据集表 → 运行时 DomChartDefinition；spec 缺席回退空 marks（由 useChartProps 兜底）
+const definition = computed(() => translateChartSpec(spec.value, datasets.value))
 
-// scalar trigger 以 skeletonFields=['definition'] 注入缺席性标记：未闭合期渲染骨架
+// _cx_streaming 标记只可能来自上游注入（本包 trigger 已改 array 形态不再注入）：
+// 兼容消费侧手工标注 definition 在途的场景，标记在场渲染骨架
 const isStreaming = computed(() => streamingFields(attrs).includes('definition'))
 // 骨架与揭示态等高（height 在 hostProps 白名单内，缺席回退物料 initial 同值）
 const skeletonHeight = computed(() => {

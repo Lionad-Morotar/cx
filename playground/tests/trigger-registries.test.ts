@@ -730,7 +730,7 @@ describe('element-plus trigger 判定 · 三形态 10 件', () => {
 const tscMeta = metaIndex(CxTanstackCharts)
 const tscCount = (node: CxStreamNode) => mainArrayOfTsc(node)?.length ?? null
 
-describe('tanstack-charts trigger 判定 · 6 件全适用（5 array + 1 scalar）', () => {
+describe('tanstack-charts trigger 判定 · 6 件全适用（6 array）', () => {
   it('注册表恰 6 件，物料差集为零（0 不适用）', () => {
     const registry = createTanstackChartsTriggerRegistry()
     expect(registry.size).toBe(TANSTACK_CHARTS_STREAM_TRIGGERS.length)
@@ -761,28 +761,22 @@ describe('tanstack-charts trigger 判定 · 6 件全适用（5 array + 1 scalar�
     )
   })
 
-  it('chart scalar：key 检出即空壳帧（fallback 空 marks + 骨架标记），终态完整帧全字段', () => {
-    const shell = createIncrementalExtractor<CxSpec>({
+  it('chart array：key 检出无帧（主数组缺席不产出），终态完整帧全字段（rows 驱动）', () => {
+    // array 形态无 scalar 的空壳帧机制：pending 期由渲染管线承担（与预设物料同语义）
+    const early = createIncrementalExtractor<CxSpec>({
       registry: createTanstackChartsTriggerRegistry(),
       matchTrigger: matchCxTrigger,
-    }).next('{"key":"cx-tanstack-charts-chart"') as CxStreamNode | null
-    expect(shell).toMatchObject({
-      key: 'cx-tanstack-charts-chart',
-      data: { definition: { marks: [] } },
-    })
-    // definition 未闭合期间标记在场：包装层据此渲染骨架（空 marks 的空 svg 不可见，无骨架等同无反馈）
-    expect((shell?.data ?? {})['_cx_streaming']).toEqual(['definition'])
+    }).next('{"key":"cx-chart"') as CxStreamNode | null
+    expect(early).toBeNull()
 
-    const meta = tscMeta.get('cx-tanstack-charts-chart')!
+    const meta = tscMeta.get('cx-chart')!
     const data = buildDefaultData(meta)
     const final = createIncrementalExtractor<CxSpec>({
       registry: createTanstackChartsTriggerRegistry(),
       matchTrigger: matchCxTrigger,
     }).next(
-      JSON.stringify({ id: 'tsc-chart', key: 'cx-tanstack-charts-chart', data }),
+      JSON.stringify({ id: 'tsc-chart', key: 'cx-chart', data }),
     ) as CxStreamNode | null
     expect(final?.data).toMatchObject(data as Record<string, unknown>)
-    // 终态 definition 在场，标记消失不常亮
-    expect((final?.data ?? {})['_cx_streaming']).toBeUndefined()
   })
 })

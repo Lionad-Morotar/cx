@@ -12,8 +12,11 @@ import type { ArraySectionConfig, CxSpec, CxStreamNode } from '@lionad/cx-stream
 
 /**
  * stream-trigger 判定与回放链路契约：
- * - 注册完备与计数校验（6 = 5 array + 1 scalar + 0 不适用，差集派生兜底）；
- * - chart scalar 空壳帧 fallback 与终态全字段（definition 检出即空壳、闭合即完整揭示）；
+ * - 注册完备与计数校验（6 array 全适用：预设 5 件主数组 data + chart 主数组 rows，
+ *   0 scalar 0 不适用，差集派生兜底）；
+ * - chart array 数据顶层化语义：key 检出无帧（主数组缺席不产出，pending 由渲染
+ *   管线承担）、rows 首行闭合出帧且 definition 必完整（序列化序前置）、行数单调
+ *   递增、空 rows 终态经 emptyPassthrough 透传（组件空态接管）；
  * - 5 预设真实样本前缀播放增量收敛（行数单调递增、终态满行）；
  * - 增量帧喂包装层全链路实证：中间帧 data 挂载不抛错、svg 存在——序列化序
  *   使通道字段先于行闭合，且 composable 对通道缺席有回退（LLM 乱序场景双保险）。
@@ -57,7 +60,7 @@ const ARRAY_KEYS = [
 ] as const
 
 describe('stream-trigger 判定完备性', () => {
-  it('注册表恰 6 件：5 array + 1 scalar，物料差集为零（无不适用）', () => {
+  it('注册表恰 6 件：6 array + 0 scalar，物料差集为零（无不适用）', () => {
     const registry = createTanstackChartsTriggerRegistry()
     expect(registry.size).toBe(TANSTACK_CHARTS_STREAM_TRIGGERS.length)
     expect(TANSTACK_CHARTS_STREAM_TRIGGERS).toHaveLength(6)
@@ -67,8 +70,8 @@ describe('stream-trigger 判定完备性', () => {
     const scalarCount = TANSTACK_CHARTS_STREAM_TRIGGERS.filter((c) =>
       c.sections.some((s) => s.kind === 'scalar'),
     ).length
-    expect(arrayCount).toBe(5)
-    expect(scalarCount).toBe(1)
+    expect(arrayCount).toBe(6)
+    expect(scalarCount).toBe(0)
     // 差集派生：物料 key 集 - trigger key 集应为空（6 全适用、0 不适用）
     const notApplicable = (CxTanstackCharts as any[])
       .map((m) => m._cx_meta.key as string)
@@ -79,50 +82,103 @@ describe('stream-trigger 判定完备性', () => {
     }
   })
 
-  it('array 触发器编译扫描路径为主数组元素边界（frameStride 10）', () => {
+  it('array 触发器扫描路径：预设主数组 data、chart 主数组 rows + nodes/links 次路径（frameStride 10）', () => {
     for (const config of TANSTACK_CHARTS_STREAM_TRIGGERS) {
       expect(config.frameStride).toBe(10)
       const array = config.sections.find((s): s is ArraySectionConfig => s.kind === 'array')
-      if (array) expect(array.arrayKey).toBe('data')
+      expect(array, `${config.key} 应为 array 形态`).toBeTruthy()
     }
-  })
-
-  it('chart scalar 声明 skeletonFields=[definition]：缺席性判据驱动包装层骨架', () => {
-    const chart = TANSTACK_CHARTS_STREAM_TRIGGERS.find((c) => c.key === 'cx-tanstack-charts-chart')!
-    const scalar = chart.sections[0]!
-    expect(scalar.kind).toBe('scalar')
-    expect((scalar as { skeletonFields?: string[] }).skeletonFields).toEqual(['definition'])
+    for (const key of ARRAY_KEYS) {
+      const config = TANSTACK_CHARTS_STREAM_TRIGGERS.find((c) => c.key === key)!
+      expect((config.sections[0] as ArraySectionConfig).arrayKey).toBe('data')
+    }
+    const chart = TANSTACK_CHARTS_STREAM_TRIGGERS.find((c) => c.key === 'cx-chart')!
+    const chartArray = chart.sections[0] as ArraySectionConfig
+    expect(chartArray.arrayKey).toBe('rows')
+    expect(chartArray.extraScanPaths).toEqual([
+      ['data', 'nodes', '*'],
+      ['data', 'links', '*'],
+    ])
+    // 空 rows 终态透传（组件空态接管）；无 rows 字段的 spec 不产帧——
+    // GenUI 契约锁死 rows 恒为主数据集在场，契约外形态由生成期校验门拦截
+    expect(chart.stateBranch?.emptyPassthrough).toBe(true)
   })
 })
 
-describe('chart scalar 形态', () => {
-  it('key 检出即空壳帧：fallback 保契约（definition 空 marks）+ skeleton 标记注入', () => {
-    const shell = extractorOf().next('{"key":"cx-tanstack-charts-chart"') as CxStreamNode | null
-    expect(shell).toMatchObject({
-      key: 'cx-tanstack-charts-chart',
-      data: { definition: { marks: [] } },
+describe('chart array 形态 · 数据顶层化回放', () => {
+  /** chart 真实样本剧本：initial 全字段 + 主数组 rows 循环扩充到 REAL_ROWS */
+  function realChartScriptOf(): string {
+    const data = initialDataOf(byKey('cx-chart')._cx_meta)
+    const rows = data.rows as unknown[]
+    data.rows = Array.from({ length: REAL_ROWS }, (_, i) => rows[i % rows.length])
+    const node: CxStreamNode = { id: 'test-cx-chart', key: 'cx-chart', data }
+    return JSON.stringify(node)
+  }
+
+  it('key 检出无帧：array 形态主数组缺席不产出（pending 由渲染管线承担）', () => {
+    expect(extractorOf().next('{"key":"cx-chart"')).toBeNull()
+  })
+
+  it('rows 首行闭合即出帧且 definition 完整在场（序列化序 definition 先于 rows）', () => {
+    const script = realChartScriptOf()
+    const extractor = extractorOf()
+    // 步进前缀找首个 1 行帧（语义定位，不与剧本序列化格式耦合）
+    let firstRow: CxStreamNode | null = null
+    const step = Math.max(1, Math.floor(script.length / 120))
+    for (let i = step; i < script.length && !firstRow; i += step) {
+      const partial = extractor.next(script.slice(0, i)) as CxStreamNode | null
+      if (partial && (partial.data?.rows as unknown[])?.length === 1) firstRow = partial
+    }
+    expect(firstRow, 'rows 首行闭合即出帧').not.toBeNull()
+    const definition = firstRow!.data?.definition as { marks?: unknown[] } | undefined
+    expect(
+      definition?.marks?.length,
+      'definition 序列化在 rows 前，首行帧必携完整 marks',
+    ).toBeGreaterThan(0)
+  })
+
+  it('rows 行数单调递增收敛到满行，终态全字段一致', () => {
+    const script = realChartScriptOf()
+    const extractor = extractorOf()
+    const counts: number[] = []
+    const step = Math.max(1, Math.floor(script.length / 40))
+    for (let i = step; i < script.length; i += step) {
+      const partial = extractor.next(script.slice(0, i)) as CxStreamNode | null
+      if (partial) counts.push(((partial.data?.rows as unknown[]) ?? []).length)
+    }
+    const final = extractor.next(script) as CxStreamNode | null
+    expect(final?.key).toBe('cx-chart')
+    expect((final?.data?.rows as unknown[]).length).toBe(REAL_ROWS)
+    expect(counts.length, '应有可观察的增量窗口').toBeGreaterThan(0)
+    expect(counts[0], '首帧应少于完整行数').toBeLessThan(REAL_ROWS)
+    for (let i = 1; i < counts.length; i++) {
+      expect(counts[i]).toBeGreaterThanOrEqual(counts[i - 1]!)
+    }
+  })
+
+  it('首行帧喂包装层全链路挂载不抛错、svg 在场（marks 字符串引用解析到部分 rows）', () => {
+    const script = realChartScriptOf()
+    const extractor = extractorOf()
+    let firstRow: CxStreamNode | null = null
+    const step = Math.max(1, Math.floor(script.length / 120))
+    for (let i = step; i < script.length && !firstRow; i += step) {
+      const partial = extractor.next(script.slice(0, i)) as CxStreamNode | null
+      if (partial && (partial.data?.rows as unknown[])?.length === 1) firstRow = partial
+    }
+    expect(firstRow).not.toBeNull()
+    const wrapper = mount(byKey('cx-chart'), {
+      props: { comp: fakeComp('cx-chart'), ...(firstRow!.data as Record<string, unknown>) },
     })
-    // definition 未闭合期间标记在场：包装层据此渲染骨架而非不可见的空 svg
-    expect((shell?.data ?? {})['_cx_streaming']).toEqual(['definition'])
+    expect(wrapper.find('.ts-chart-host').exists()).toBe(true)
+    expect(wrapper.find('svg').exists()).toBe(true)
   })
 
-  it('空壳帧经翻译层组装渲染不抛错（fallback 与翻译层默认同值）', () => {
-    const shell = extractorOf().next('{"key":"cx-tanstack-charts-chart"') as CxStreamNode
-    expect(() =>
-      mount(byKey('cx-tanstack-charts-chart'), {
-        props: { comp: fakeComp('shell'), ...(shell.data as Record<string, unknown>) },
-      }),
-    ).not.toThrow()
-  })
-
-  it('完整 JSON 终态帧全字段一致（definition 整字段闭合即完整揭示）', () => {
-    const data = initialDataOf(byKey('cx-tanstack-charts-chart')._cx_meta)
-    const script = JSON.stringify({ id: 'c1', key: 'cx-tanstack-charts-chart', data })
+  it('空 rows 终态经 emptyPassthrough 透传（容器闭合 0 元素 → 组件空态接管）', () => {
+    const data = { ...initialDataOf(byKey('cx-chart')._cx_meta), rows: [] }
+    const script = JSON.stringify({ id: 'c-empty', key: 'cx-chart', data })
     const final = extractorOf().next(script) as CxStreamNode | null
-    expect(final).not.toBeNull()
-    expect(final?.data).toMatchObject(data)
-    // 终态 definition 必在场，标记消失不常亮（骨架随完整帧退场）
-    expect((final?.data ?? {})['_cx_streaming']).toBeUndefined()
+    expect(final, '空 rows 终态应透传而非永驻 pending').not.toBeNull()
+    expect(final?.data?.rows).toEqual([])
   })
 })
 
