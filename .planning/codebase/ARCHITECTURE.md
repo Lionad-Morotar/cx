@@ -6,7 +6,7 @@
 
 ## 系统概览
 
-cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：消费方以 `CxComponentRuntime` 树描述界面结构，`CxRender` 把它递归渲染成真实的 Vue 组件树。整个仓库为 monorepo，由 8 个子包构成一条严格分层的依赖链，外加一个用于验收的 `playground` 沙箱。
+cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：消费方以 `CxComponentRuntime` 树描述界面结构，`CxRender` 把它递归渲染成真实的 Vue 组件树。整个仓库为 monorepo，由 9 个物料/集成子包构成一条严格分层的依赖链，外加一个用于验收的 `playground` 沙箱。
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -57,7 +57,7 @@ cx 是一个 **Schema 驱动（schema-driven）的 Vue 组件渲染系统**：�
 依赖链（单向，从下往上读）：
 
 ```text
-definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt-ui-v2 / comps-nuxt-ui-v4 / comps-vtu / comps-element-plus / comps-naive-ui ──▶ nuxt
+definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt-ui-v2 / comps-nuxt-ui-v4 / comps-vtu / comps-element-plus / comps-naive-ui / comps-tanstack-charts ──▶ nuxt
                                        ▲
                                        └── cx-stream（流式增量预设，物料包侧依赖）
 ```
@@ -70,6 +70,7 @@ definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt
 - `@lionad/cx-comps-vtu`：包装 [tool-ui-vue（vtu）](https://github.com/Lionad-Morotar/tool-ui-vue) 的 29 个 AI 工具调用组件为 cx 物料；vtu 为纯 npm Vue 库，无需 vendor/shim，样式经 cx-nuxt 条件注入 `@lionad/vtu-components/style.css`（其 `@source` 由宿主 Tailwind v4 处理）。
 - `@lionad/cx-comps-element-plus`：包装 Element Plus 的 27 件组件为 cx 物料（六类冻结）；同为纯 npm 库包装范式，桥接层 `useEpProps` 剥离 cx 内部键、保留 class/监听器；变更上行不声明 emits meta、走 `nativeEvents ∩ _cx_events` 原生通道。**EP 样式不在 cx-nuxt 模块侧注入**（其 unlayered 全局元素 reset 会胜宿主 `@layer utilities`），须由宿主以 `@import 'element-plus/dist/index.css' layer(cx-ep)` 压入层序最前的 `cx-ep` 层（详见包 README）。
 - `@lionad/cx-comps-naive-ui`：包装 Naive UI 的 27 件组件为 cx 物料（六类冻结，与 EP 同分类骨架）；桥接层 `useNaiveUiProps` 同形剥离 cx 内部键。naive-ui 双向约定为 `value` + `update:value`（非 `modelValue`），配置键直接取 naive prop 名；变更上行分三族——**透传族**（NInput/NInputNumber/NSelect 声明 onChange 函数型 prop，v-bind 直达）、**桥接族**（NSwitch/NRate/NSlider/NRadioGroup/NCheckboxGroup 经 `useNaiveChangeBridge` 剥离 on* 后 `@update:value → attrs.onChange`）、**formatted-value 桥接族**（NDatePicker 载荷为格式化字符串）。**naive-ui 为 CSS-in-JS**（css-render 渲染期注入、引用计数随组件卸载移除），无 dist css 文件，模块侧与宿主侧均无需注入、不参与 `@layer` 层序安排。
+- `@lionad/cx-comps-tanstack-charts`：包装 [TanStack Charts](https://tanstack.com/charts) 为 cx 物料（6 件冻结：chart 通用 + line/bar/area/dot/pie 预设）。双通道供给——chart 物料走**声明式 JSON 翻译层**（`translate.ts`：scale kind 枚举 / curve 枚举桥 d3-shape / channel 仅字段名字符串，把不可 JSON 化的函数值编译为运行时实例），预设物料走扁平通道 props 经 composable 组装单 mark spec（pie 例外：accessor 函数桥接 `pie()` 变换，不经翻译层）。**零 css 分发**——样式全部经 definition theme + inline style，模块侧与宿主侧均无样式装配。包装 SFC 的 wrapper div 承担 testid/BEM（库根元素 `inheritAttrs:false` 且 render 返回多根数组，attrs 无处 fallthrough）。流式改造 6 件全量：5 array（arrayKey=data）+ 1 scalar（chart，fallbackData 空 marks 壳）。
 - `@lionad/cx-nuxt`：Nuxt 模块入口，把上述所有能力零配置注入宿主。
 
 ## 组件职责
@@ -88,6 +89,8 @@ definition ──▶ vue ──▶ renderer ──▶ comps ──▶ comps-nuxt
 | `CxElementPlusBundle`                      | Element Plus 27 件物料自描述 bundle（`name: 'element-plus'`），供 cx-nuxt 按 bundle 装配                           | `packages/comps-element-plus/src/index.ts`                                                                                        |
 | `useNaiveUiProps` / `useNaiveChangeBridge` | naive-ui attrs 提纯桥 + 自定义控件族变更上行桥（剥离 onChange/onInput，`update:value → attrs.onChange`）           | `packages/comps-naive-ui/src/shared/`                                                                                             |
 | `CxNaiveUiBundle`                          | Naive UI 27 件物料自描述 bundle（`name: 'naive-ui'`），供 cx-nuxt 按 bundle 装配                                   | `packages/comps-naive-ui/src/index.ts`                                                                                            |
+| `translateChartSpec` / `useChartProps`     | 声明式 JSON→TanStack Charts 运行时定义翻译层 + attrs 白名单提纯桥（ariaLabel 独立绑定——v-bind Record 无法证明 required 键在场） | `packages/comps-tanstack-charts/src/shared/`                                                                             |
+| `CxTanstackChartsBundle`                   | TanStack Charts 6 件物料自描述 bundle（`name: 'tanstack-charts'`），供 cx-nuxt 按 bundle 装配                      | `packages/comps-tanstack-charts/src/index.ts`                                                                                     |
 | Nuxt module                                | `defineNuxtModule` 入口；注册 `CxRender`、注入 server/client plugin                                                | `packages/nuxt/src/module.ts`                                                                                                     |
 | `installCxBundles`                         | 按选项 `materials: ['render','components','nuxt-ui']` 安装物料集                                                   | `packages/nuxt/src/runtime/install.ts`                                                                                            |
 | Vendored shim                              | 离线化 Nuxt 虚拟模块（`#imports` / `#app` / `useState` / `useId`）                                                 | `packages/comps-nuxt-ui-v4/vendor/shims/imports.ts`                                                                               |

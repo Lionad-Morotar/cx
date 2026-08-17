@@ -48,6 +48,16 @@ const links = [
     desc: 'Element Plus 物料，按包冻结六类（基础反馈 / 数据展示 / 导航版式 / 表单 / 表格 / 插槽容器）组织',
   },
   {
+    to: '/dev/components-naive-ui',
+    name: 'cx components · naive-ui',
+    desc: 'Naive UI 物料，按官方分类（通用 / 数据录入 / 数据展示 / 导航 / 反馈 / 布局）组织',
+  },
+  {
+    to: '/dev/components-tanstack-charts',
+    name: 'cx components · tanstack-charts',
+    desc: 'TanStack Charts 图表物料：纯 JSON definition 投影（marks/x/y/theme），scale/curve 枚举化经翻译层组装',
+  },
+  {
     to: '/dev/stream/components',
     name: 'cx stream · 流式结构化渲染（组件级）',
     desc: '流式管线验收：模拟 LLM 输出不完整 JSON，演示三态检测、增量渲染、打字机预览与多策略切分',

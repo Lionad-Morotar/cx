@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     [
       '@lionad/cx-nuxt',
-      { materials: ['render', 'components', 'nuxt-ui-v2', 'nuxt-ui-v4', 'vtu', 'element-plus', 'naive-ui'] },
+      { materials: ['render', 'components', 'nuxt-ui-v2', 'nuxt-ui-v4', 'vtu', 'element-plus', 'naive-ui', 'tanstack-charts'] },
     ],
   ],
   // cx 是客户端渲染系统；站会组件 setup 顶层访问 window/localStorage
