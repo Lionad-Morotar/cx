@@ -1,6 +1,6 @@
 {
   "name": "@lionad/cx-stream",
-  "version": "0.1.0-alpha.9",
+  "version": "0.1.0-alpha.10",
   "description": "Streaming structured-render pipeline: incrementally parse incomplete LLM JSON into renderable cx component trees",
   "author": "Lionad-Morotar",
   "keywords": [

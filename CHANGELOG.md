@@ -6,6 +6,17 @@
 
 ## [Unreleased]
 
+## [0.1.0-alpha.10] - 2026-08-17
+
+### Added
+
+- `@lionad/cx-comps`：图表主题桥 charts-theme——TanStack Charts 系列色变量（`--ts-chart-1..8` 与焦点填充）映射宿主 design token（`--color-accent-*`/`--color-primary-soft`），挂 `.cx-charts` 作用域类不污染 `:root`；轴/网格经 currentColor 继承宿主文字色，深浅主题随 CSS 变量解析天然跟随，零 JS；随 barrel 聚合进 dist/style.css
+
+### Fixed
+
+- [internal] 根补 `@types/node` 修复 vue-tsc TS2688；playground 与 comps-nuxt-ui-v2 显式声明 h3/ofetch/scule/vue-router/@vueuse/shared 传递依赖——pnpm 12 严格解析下未声明传递依赖不可提升，全仓测试恢复全绿
+
+
 ## [0.1.0-alpha.9] - 2026-08-12
 
 ### Fixed
