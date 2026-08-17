@@ -120,11 +120,13 @@ const BUNDLE_OPTIMIZE_DEPS: Record<CxBuiltinMaterialSet, string[]> = {
   'naive-ui': ['@lionad/cx-comps-naive-ui > naive-ui'],
   // tanstack-charts：包装层与翻译层统一 import @tanstack/charts（vue 适配器 0.14 起
   // 为主包 ./vue 子路径）；主入口与 scales/d3 子路径经同一条预声明覆盖，charts-core
-  // 的 d3 子包随预构建同 chunk 解析（naive-ui 单条范式）；d3-shape 是物料包直接依赖
-  // （curve 枚举桥接），单列一条
+  // 的 d3 子包随预构建同 chunk 解析（naive-ui 单条范式）；d3-shape/d3-scale/d3-geo
+  // 是物料包直接依赖（curve 枚举桥接 / scale 扩充 / geoShape 投影枚举），逐条单列
   'tanstack-charts': [
     '@lionad/cx-comps-tanstack-charts > @tanstack/charts',
     '@lionad/cx-comps-tanstack-charts > d3-shape',
+    '@lionad/cx-comps-tanstack-charts > d3-scale',
+    '@lionad/cx-comps-tanstack-charts > d3-geo',
   ],
 }
 

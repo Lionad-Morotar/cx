@@ -1,0 +1,531 @@
+import type { ChartTheme } from '@tanstack/charts'
+
+/**
+ * 声明式 JSON 类型：物料 data 的投影形态。
+ *
+ * Why 存在：defineChart 的 definition 含三类不可 JSON 化值——scale（函数工厂/实例）、
+ * curve（ChartCurve 函数对）、回调（format/accessor/tooltip content）。cx 物料 data 必须
+ * 纯 JSON，本模块把声明式描述（kind 枚举、curve 枚举、字段名 channel、标量子集）约束为
+ * 可 JSON 化形态，由翻译层编译为运行时实例。channel 仅支持字段名字符串：低代码与
+ * LLM 生成场景不要求 accessor 函数（accessor 逻辑经数据预置烘焙降级）。
+ */
+
+export type CxChartCurveName =
+  | 'linear'
+  | 'monotoneX'
+  | 'step'
+  | 'stepAfter'
+  | 'stepBefore'
+  | 'basis'
+  | 'natural'
+
+/**
+ * scale 声明式枚举。时间系（utc/time）domain 用 ISO 8601 字符串表达
+ * （Date 实例 JSON 不可表达，翻译层负责 new Date 转换）。
+ */
+export type CxChartScaleSpec =
+  | { kind: 'linear'; domain?: [number, number] }
+  | { kind: 'utc' | 'time'; domain?: [string, string] }
+  | { kind: 'log' | 'sqrt' | 'symlog'; domain?: [number, number] }
+  | { kind: 'pow'; exponent?: number; domain?: [number, number] }
+  | { kind: 'point'; domain?: string[]; padding?: number }
+  | { kind: 'band'; domain?: string[]; padding?: number }
+  | { kind: 'ordinal'; domain?: string[] }
+
+export interface CxChartAxisSpec {
+  scale?: CxChartScaleSpec
+  nice?: boolean | number
+  reverse?: boolean
+  grid?: boolean
+  axis?:
+    | false
+    | {
+        label?: string
+        ticks?: { count?: number; size?: number; padding?: number; values?: (number | string)[] }
+        tickLabels?:
+          | false
+          | {
+              rotate?: number
+              fontSize?: number
+              dx?: number
+              dy?: number
+              anchor?: 'start' | 'middle' | 'end'
+            }
+      }
+}
+
+/**
+ * mark layout 声明式（stack/group/dodge 挂 mark.layout 字段；
+ * group 的 scale 函数形态不可 JSON，仅暴露 padding）。
+ */
+export type CxChartLayoutSpec =
+  | {
+      kind: 'stack'
+      order?: 'input' | 'ascending' | 'descending' | 'inside-out' | string[]
+      offset?: 'diverging' | 'normalize' | 'center' | 'wiggle'
+      reverse?: boolean
+      anchor?: { series: string; fraction?: number }
+    }
+  | { kind: 'group'; padding?: number }
+  | { kind: 'dodgeX'; anchor?: 'left' | 'middle' | 'right'; padding?: number }
+  | { kind: 'dodgeY'; anchor?: 'bottom' | 'middle' | 'top'; padding?: number }
+
+export type CxChartMarkType =
+  | 'lineY'
+  | 'lineX'
+  | 'areaY'
+  | 'areaX'
+  | 'barY'
+  | 'barX'
+  | 'ruleY'
+  | 'ruleX'
+  | 'dot'
+  | 'text'
+  | 'tickX'
+  | 'tickY'
+  | 'bandY'
+  | 'bandX'
+  | 'rect'
+  | 'cell'
+  | 'link'
+  | 'arrow'
+  | 'vector'
+  | 'hexagon'
+  | 'frame'
+  | 'boxY'
+  | 'boxX'
+  | 'violinY'
+  | 'violinX'
+  | 'ridgelineY'
+  | 'ridgelineX'
+  | 'waffleY'
+  | 'waffleX'
+  | 'differenceY'
+  | 'differenceX'
+  | 'linearRegressionY'
+  | 'linearRegressionX'
+  // spatial 系（mark.ts 经 @tanstack/charts/spatial/* 子路径直译）
+  | 'voronoi'
+  | 'hexbin'
+  | 'contour'
+  | 'delaunayLink'
+  // 以下由 polar.ts / composite.ts 分支处理（非 MARK_FACTORIES 直译）
+  | 'polar'
+  | 'pie'
+  | 'radialArc'
+  | 'radialBarRadius'
+  | 'radialBarAngle'
+  | 'radialLine'
+  | 'radialArea'
+  | 'radialDot'
+  | 'radialText'
+  | 'radialRule'
+  | 'sankey'
+  | 'sunburst'
+  | 'treemap'
+  | 'tree'
+  | 'forceGraph'
+  | 'geoShape'
+  | 'facet'
+
+/**
+ * 单 mark 声明式。平铺契约（LLM 友好）：专有标量字段全部可选、按名透传，
+ * 不适用的字段被对应工厂忽略；channel 只接受字段名字符串（弹性 channel
+ * angle/radius/width/height/length/rotate/r 另接受数值常量）。
+ */
+export interface CxChartMarkSpec {
+  type: CxChartMarkType
+  /**
+   * 行数组（内嵌，常量数组亦可）或命名数据集字符串引用。
+   * 字符串引用由 translateChartSpec 的 datasets 表解析——GenUI 契约是数据顶层化
+   * （data.rows 与 definition 平级），marks 内以 "rows" 引用；未命中一律回退空数组
+   * （流式中间态与笔误运行时不可区分，渲染层容错优先，笔误显式化归生成期校验门）。
+   */
+  data?: readonly unknown[] | string
+  id?: string
+  // --- 字段名 channel ---
+  x?: string
+  y?: string
+  x1?: string
+  y1?: string
+  x2?: string
+  y2?: string
+  z?: string
+  color?: string
+  key?: string
+  text?: string
+  // --- 弹性 channel（字段名或数值常量） ---
+  r?: string | number
+  angle?: string | number
+  radius?: string | number
+  width?: string | number
+  height?: string | number
+  length?: string | number
+  rotate?: string | number
+  // --- 通用样式 ---
+  stroke?: string
+  strokeWidth?: number
+  strokeOpacity?: number
+  strokeDasharray?: string
+  fill?: string
+  fillOpacity?: number
+  fontSize?: number
+  fontWeight?: number
+  dx?: number
+  dy?: number
+  points?: boolean
+  opacity?: number
+  curve?: CxChartCurveName
+  layout?: CxChartLayoutSpec
+  // --- mark 专有标量（按名透传，不适用者被工厂忽略） ---
+  span?: number
+  overlap?: number
+  unit?: number
+  round?: boolean
+  gap?: number
+  columns?: number
+  headLength?: number
+  headAngle?: number
+  lineCap?: 'butt' | 'round' | 'square'
+  anchor?: 'start' | 'middle' | 'end'
+  ci?: number
+  samples?: number
+  positiveFill?: string
+  negativeFill?: string
+  positiveFillOpacity?: number
+  negativeFillOpacity?: number
+  comparisonStroke?: string
+  cornerRadius?: number
+  padAngle?: number
+  radiusOffset?: number
+  baseline?: 'auto' | 'middle' | 'hanging'
+  inset?: number
+  // --- spatial mark 专有（hexbin/contour；voronoi/delaunayLink 复用通用 channel） ---
+  /** hexbin 相邻 bin 中心水平像素距 */
+  binWidth?: number
+  /** hexbin 聚合输出（reduce 枚举同 transforms） */
+  outputs?: CxChartTransformOutputs
+  /** contour 等值线层数或精确层级（标量网格字段复用通用 value channel） */
+  thresholds?: number | number[]
+  /** contour 线性插值平滑（缺省 true） */
+  smooth?: boolean
+  // --- polar 容器与命名复合（polar.ts / composite.ts 消费） ---
+  marks?: CxChartMarkSpec[]
+  radiusRatio?: number
+  startAngle?: number
+  endAngle?: number
+  angleAxis?: CxChartAxisSpec
+  radiusAxis?: CxChartAxisSpec
+  polarGuides?: CxChartPolarGuideSpec[]
+  innerRadiusRatio?: number
+  outerRadiusRatio?: number
+  // --- 层级数据源（sunburst/treemap/tree）：path 模式或 nodeId+parentId 平铺模式 ---
+  value?: string
+  path?: string
+  delimiter?: string
+  nodeId?: string
+  parentId?: string
+  nodes?: string
+  links?: string
+  nodeKey?: string
+  source?: string
+  target?: string
+  /** sankey 稳定连线标识字段 */
+  linkKey?: string
+  /** forceGraph 仿真参数与力集（缺省固化常规四力：link/manyBody/center/collide） */
+  domainPadding?: number
+  forces?: CxChartForceSpec[]
+  align?: 'left' | 'right' | 'center' | 'justify'
+  nodeWidth?: number
+  nodePadding?: number
+  iterations?: number
+  method?: 'squarify' | 'binary' | 'dice' | 'slice' | 'slice-dice'
+  ratio?: number
+  paddingInner?: number
+  paddingOuter?: number
+  /** treemap 叶子标签字段名（string）；facet 分组标签开关（boolean）——按 mark type 分别消费 */
+  label?: string | boolean
+  labelPadding?: number
+  labelFontSize?: number
+  labelFontWeight?: number
+  orientation?: 'left' | 'right' | 'top' | 'bottom'
+  nodeSize?: [number, number]
+  projection?: 'mercator' | 'orthographic' | 'naturalEarth1' | 'albersUsa' | 'equalEarth' | 'identity'
+  fit?: 'data' | 'sphere'
+  by?: string
+  axes?: 'outer' | 'cell'
+  minWidth?: number
+  chart?: CxChartSpec
+  visibleDepth?: number
+  ringPadding?: number
+}
+
+/** polar guides（radialGrid/angleGrid）声明式 */
+export interface CxChartPolarGuideSpec {
+  kind: 'radialGrid' | 'angleGrid'
+  values?: (number | string)[]
+  ticks?: number
+  shape?: 'circle' | 'polygon'
+  labels?: boolean
+  labelAngle?: number
+  labelOffset?: number
+}
+
+/**
+ * forceGraph 力集声明式：库 ForceDescriptor 的 JSON 子集。
+ * 数值参数接受字段名字符串（库 ForceNumericValue 支持 TransformValue）；
+ * custom 工厂形态不可 JSON，不收录。
+ */
+export type CxChartForceSpec =
+  | { type: 'link'; distance?: number | string; strength?: number | string }
+  | { type: 'manyBody'; strength?: number | string }
+  | { type: 'center'; x?: number; y?: number }
+  | { type: 'collide'; radius?: number | string; strength?: number }
+  | { type: 'x'; x?: number | string; strength?: number | string }
+  | { type: 'y'; y?: number | string; strength?: number | string }
+
+/**
+ * reduce 枚举（outputs 归约器）：字符串枚举全可 JSON；
+ * quantile 带参数用对象形态 { quantile: 0.25 }。
+ */
+export type CxChartReduce =
+  | 'count'
+  | 'sum'
+  | 'mean'
+  | 'min'
+  | 'max'
+  | 'median'
+  | 'first'
+  | 'last'
+  | 'variance'
+  | 'deviation'
+  | 'delta'
+  | 'ratio'
+  | { quantile: number }
+
+export interface CxChartTransformOutputs {
+  [name: string]: { value?: string; reduce: CxChartReduce }
+}
+
+/**
+ * 数据预处理管道：spec 顶层 transforms 数组，按序执行，
+ * 每步产物以 name 注册进数据集表（marks/transforms 后续步骤可字符串引用）。
+ * data 缺省引用 'rows'。binTime 系不收录（interval 对象 JSON 不可表达——时间分箱由
+ * 数据预置聚合降级）。
+ */
+export type CxChartTransformSpec =
+  | {
+      name: string
+      kind: 'groupBy'
+      data?: string
+      by: string | Record<string, string>
+      outputs: CxChartTransformOutputs
+    }
+  | {
+      name: string
+      kind: 'binX' | 'binY'
+      data?: string
+      value: string
+      by?: string | Record<string, string>
+      thresholds?: number | number[]
+      domain?: [number, number]
+      outputs?: CxChartTransformOutputs
+    }
+  | {
+      name: string
+      kind: 'binXY'
+      data?: string
+      x: string
+      y: string
+      by?: string | Record<string, string>
+      xThresholds?: number | number[]
+      yThresholds?: number | number[]
+      xDomain?: [number, number]
+      yDomain?: [number, number]
+      outputs?: CxChartTransformOutputs
+    }
+  | {
+      name: string
+      kind: 'rollingWindow'
+      data?: string
+      size: number
+      by?: string | Record<string, string>
+      anchor?: 'start' | 'middle' | 'end'
+      partial?: boolean
+      outputs: CxChartTransformOutputs
+      orderBy?: string
+      order?: 'ascending' | 'descending'
+    }
+  | {
+      name: string
+      kind: 'normalize'
+      data?: string
+      value: string
+      by?: string | Record<string, string>
+      as?: string
+      basis?: 'sum' | 'max' | 'extent' | 'first' | 'last'
+    }
+  | {
+      name: string
+      kind: 'cumulative'
+      data?: string
+      by?: string | Record<string, string>
+      outputs: CxChartTransformOutputs
+      orderBy?: string
+      order?: 'ascending' | 'descending'
+    }
+  | {
+      name: string
+      kind: 'fold'
+      data?: string
+      fields: string[]
+      as?: { key: string; value: string }
+    }
+  | {
+      name: string
+      kind: 'rank'
+      data?: string
+      value: string
+      by?: string | Record<string, string>
+      order?: 'ascending' | 'descending'
+      ties?: 'competition' | 'dense' | 'ordinal'
+      as?: string
+    }
+  | {
+      name: string
+      kind: 'select'
+      data?: string
+      by?: string | Record<string, string>
+      value?: string
+      select: 'first' | 'last' | 'min' | 'max'
+    }
+  | {
+      name: string
+      kind: 'stackRowsY' | 'stackRowsX'
+      data?: string
+      x: string
+      y: string
+      z?: string
+      order?: 'input' | 'ascending' | 'descending' | 'inside-out' | string[]
+      offset?: 'diverging' | 'normalize' | 'center' | 'wiggle'
+      reverse?: boolean
+      anchor?: { series: string; fraction?: number }
+    }
+  | {
+      name: string
+      kind: 'waterfall'
+      data?: string
+      value: string
+      by?: string | Record<string, string>
+      total?: boolean
+      orderBy?: string
+      order?: 'ascending' | 'descending'
+    }
+  | {
+      name: string
+      kind: 'mosaicY' | 'mosaicX'
+      data?: string
+      x: string
+      y: string
+      value: string
+      xOrder?: (string | number)[]
+      yOrder?: (string | number)[]
+    }
+  | {
+      name: string
+      kind: 'linearRegressionRowsY' | 'linearRegressionRowsX'
+      data?: string
+      x: string
+      y: string
+      z?: string
+      ci?: number
+      samples?: number
+    }
+  | { name: string; kind: 'boxRows'; data?: string; category: string; value: string }
+  | {
+      name: string
+      kind: 'pie'
+      data?: string
+      value: string
+      /** CX 统一 padAngle 命名（transform 侧字段为 gapAngle，翻译层映射） */
+      padAngle?: number
+      startAngle?: number
+      endAngle?: number
+    }
+
+/** 命名数据集表：物料 data 顶层除 definition 外的数组字段（GenUI 契约 rows/nodes/links） */
+export type CxChartDatasets = Record<string, readonly unknown[] | undefined>
+
+export interface CxChartSpec {
+  marks: CxChartMarkSpec[]
+  x?: CxChartAxisSpec | null
+  y?: CxChartAxisSpec | null
+  theme?: Partial<ChartTheme>
+  margin?: number | { top?: number; right?: number; bottom?: number; left?: number }
+  guides?: boolean
+  clip?: boolean
+  /** 数据预处理管道（顶层声明，marks 之前执行；产物注册进 datasets 表） */
+  transforms?: CxChartTransformSpec[]
+  /** color scale 声明式（domain/range 直可 JSON；legend 为图例声明） */
+  color?: {
+    domain?: (string | number)[]
+    range?: string[]
+    legend?:
+      | true
+      | {
+          kind?: 'color' | 'gradient'
+          label?: string
+          placement?: 'top' | 'bottom'
+          itemWidth?: number
+          steps?: number
+          width?: number
+        }
+  }
+  tooltip?:
+    | boolean
+    | {
+        placement?:
+          | 'auto'
+          | 'top'
+          | 'top-right'
+          | 'right'
+          | 'bottom-right'
+          | 'bottom'
+          | 'bottom-left'
+          | 'left'
+          | 'top-left'
+          | (
+              | 'top'
+              | 'top-right'
+              | 'right'
+              | 'bottom-right'
+              | 'bottom'
+              | 'bottom-left'
+              | 'left'
+              | 'top-left'
+            )[]
+        offset?: number
+        sticky?: boolean
+        visibility?: 'focus' | 'pinned'
+        anchor?:
+          | 'point'
+          | 'pointer'
+          | 'group-center'
+          | {
+              x?: 'point' | 'pointer' | 'value' | 'group-center' | 'plot-left' | 'plot-center' | 'plot-right'
+              y?: 'point' | 'pointer' | 'value' | 'group-center' | 'plot-top' | 'plot-center' | 'plot-bottom'
+            }
+        sort?: 'visual' | 'color-domain' | 'focus'
+        items?: (
+          | 'x'
+          | 'y'
+          | 'group'
+          | { channel: 'x' | 'y' | 'group'; label?: string }
+          | { field: string; label?: string }
+        )[]
+      }
+  pointer?: boolean
+  keyboard?: boolean
+  focusRing?: boolean
+  focus?: 'nearest' | 'nearest-x' | 'nearest-y' | 'group-x' | 'group-y'
+}

@@ -42,10 +42,14 @@
     "@lionad/cx-definition": "workspace:*",
     "@lionad/cx-stream": "workspace:*",
     "@lionad/cx-vue": "workspace:*",
+    "d3-geo": "^3.1.1",
+    "d3-scale": "^4.0.2",
     "d3-shape": "^3.2.0"
   },
   "devDependencies": {
     "@tanstack/charts": "^0.14.0",
+    "@types/d3-geo": "^3.1.1",
+    "@types/d3-scale": "^4.0.9",
     "@types/d3-shape": "^3.1.8",
     "@vueuse/core": "^14.3.0",
     "typescript": "^6.0.3",
