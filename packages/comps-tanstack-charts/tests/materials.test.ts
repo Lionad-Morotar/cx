@@ -59,6 +59,13 @@ describe('cx-chart 挂载 smoke', () => {
     expect(wrapper.find('svg').exists()).toBe(true)
   })
 
+  it('根元素自动挂 cx-charts 主题桥类——--ts-chart-N/--chart-N 色板作用域随组件声明，宿主无需手动', () => {
+    // 模板顶层注释 + div 双根，VTU wrapper.element 落在注释节点，断言须经 testid 定位实际根 div
+    const wrapper = mountMaterial(byKey('cx-chart'), { definition: lineSpec })
+    const root = wrapper.find('[data-testid=cx-tanstack-charts-chart]')
+    expect(root.classes()).toContain('cx-charts')
+  })
+
   it('ariaLabel 缺省回退物料中文名，显式配置优先（落在 svg 元素上）', () => {
     const fallback = mountMaterial(byKey('cx-chart'), { definition: lineSpec })
     expect(fallback.find('svg').attributes('aria-label')).toBe('图表')

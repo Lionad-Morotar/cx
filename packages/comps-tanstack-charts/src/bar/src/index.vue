@@ -1,7 +1,8 @@
 <!-- CxTanstackChartsBar: 柱状图预设物料，通道 props 经 usePresetChart 组装单 mark spec -->
 <template>
-  <!-- 库根元素 inheritAttrs:false 且多根，testid/BEM 类由本层 wrapper 承担 -->
-  <div :class="ns.b()" data-testid="cx-tanstack-charts-bar">
+  <!-- 库根元素 inheritAttrs:false 且多根，testid/BEM 类由本层 wrapper 承担。
+       cx-charts 为主题桥作用域类：宿主无需手动加类（charts-theme 映射 design token 到 --ts-chart-N/--chart-N） -->
+  <div :class="[ns.b(), 'cx-charts']" data-testid="cx-tanstack-charts-bar">
     <Chart v-bind="hostProps" :definition="definition" :aria-label="ariaLabel" />
   </div>
 </template>

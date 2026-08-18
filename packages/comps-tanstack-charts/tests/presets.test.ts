@@ -66,6 +66,14 @@ describe('预设物料契约', () => {
     expect(wrapper.find(`svg ${signature}`).exists()).toBe(true)
   })
 
+  it.each(PRESET_KEYS)('%s 根元素自动挂 cx-charts 主题桥类（宿主无需手动加类）', (key) => {
+    const meta = byKey(key)._cx_meta
+    const wrapper = mount(byKey(key), {
+      props: { comp: fakeComp(key), ...initialDataOf(meta) },
+    })
+    expect(wrapper.find(`[data-testid="${key}"]`).classes()).toContain('cx-charts')
+  })
+
   it.each(['cx-tanstack-charts-line', 'cx-tanstack-charts-area'])(
     '%s 的 curve select 值集与翻译层曲线枚举一致',
     (key) => {

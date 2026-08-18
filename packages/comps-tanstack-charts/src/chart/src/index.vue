@@ -1,7 +1,9 @@
 <!-- CxTanstackChartsChart: 通用图表物料，JSON definition 经翻译层组装为 <Chart> 运行时定义 -->
 <template>
-  <!-- 库根元素 inheritAttrs:false 且多根（host + tooltip Teleport），testid/BEM 类须由本层 wrapper 承担 -->
-  <div :class="ns.b()" data-testid="cx-tanstack-charts-chart">
+  <!-- 库根元素 inheritAttrs:false 且多根（host + tooltip Teleport），testid/BEM 类须由本层 wrapper 承担。
+       cx-charts 为主题桥作用域类（cx-comps charts-theme 映射 design token 到 --ts-chart-N/--chart-N）：
+       随组件自动声明，宿主无需手动加类——shadcn 系 spec 的 var(--chart-N, ...) 引用在此获得色板 -->
+  <div :class="[ns.b(), 'cx-charts']" data-testid="cx-tanstack-charts-chart">
     <!-- definition 未闭合期间骨架占位：空壳帧的空 marks 只渲染不可见空 svg，无反馈等同未渲染 -->
     <ChartSkeleton v-if="isStreaming" :height="skeletonHeight" />
     <Chart v-else v-bind="hostProps" :definition="definition" :aria-label="ariaLabel" />
