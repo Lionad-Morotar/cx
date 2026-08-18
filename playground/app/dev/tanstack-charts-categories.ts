@@ -13,7 +13,7 @@ export const TSC_CATEGORY_ORDER: readonly TscCategory[] = ['通用', '预设图�
 // 与包内物料 key 集双向相等（分类测试锁定），Slice 新增物料时同步扩充
 export const TSC_FROZEN_KEYS = [
   // 通用
-  'chart',
+  'cx-chart',
   // 预设图表
   'line',
   'bar',
@@ -26,7 +26,7 @@ export const TSC_FROZEN_KEYS = [
 // 先于物料实现建全映射：groupByCategory 只遍历已实现物料，未实现的映射不被命中，
 // 故本表可一次性建全而不破坏增量验收；新增物料忘记映射时 groupByCategory 抛错暴露。
 const CATEGORY_BY_KEY: Record<string, TscCategory> = {
-  chart: '通用',
+  'cx-chart': '通用',
   line: '预设图表',
   bar: '预设图表',
   area: '预设图表',
@@ -34,11 +34,17 @@ const CATEGORY_BY_KEY: Record<string, TscCategory> = {
   pie: '预设图表',
 }
 
+/** shortKey 推导:主物料短 key 即 'cx-chart' 整体(无前缀可去),预设物料去
+    cx-tanstack-charts- 前缀——key 形态双轨是短 key 决策的直接产物 */
+export function tscShortKey(key: string): string {
+  return key === 'cx-chart' ? key : key.replace(/^cx-tanstack-charts-/, '')
+}
+
 /** 按分类分组装配 sidebar；物料 key 未映射时抛错强制补全 */
 export function groupByCategory(items: DevItem[]): { name: TscCategory; items: DevItem[] }[] {
   const byCategory = new Map<TscCategory, DevItem[]>()
   for (const item of items) {
-    const shortKey = item.meta.key.replace(/^cx-tanstack-charts-/, '')
+    const shortKey = tscShortKey(item.meta.key)
     const category = CATEGORY_BY_KEY[shortKey]
     if (!category) {
       throw new Error(`tanstack-charts 物料未分类: ${item.meta.key}，请补 CATEGORY_BY_KEY 映射`)

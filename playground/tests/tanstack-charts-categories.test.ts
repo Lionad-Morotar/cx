@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CxTanstackCharts } from '@lionad/cx-comps-tanstack-charts'
 import { toItem, type CxMeta } from '../app/dev/material-utils'
-import { TSC_FROZEN_KEYS, groupByCategory } from '../app/dev/tanstack-charts-categories'
+import { TSC_FROZEN_KEYS, groupByCategory, tscShortKey } from '../app/dev/tanstack-charts-categories'
 
 /**
  * tanstack-charts 分类完备性契约：本包无外部权威官方分类可对齐（TanStack Charts 是
@@ -12,9 +12,7 @@ import { TSC_FROZEN_KEYS, groupByCategory } from '../app/dev/tanstack-charts-cat
 describe('tanstack-charts 分类完备性', () => {
   it('分类清单与物料 key 集双向相等', () => {
     const materialKeys = new Set(
-      (CxTanstackCharts as unknown as { _cx_meta: CxMeta }[]).map((m) =>
-        m._cx_meta.key.replace(/^cx-tanstack-charts-/, ''),
-      ),
+      (CxTanstackCharts as unknown as { _cx_meta: CxMeta }[]).map((m) => tscShortKey(m._cx_meta.key)),
     )
     const frozenKeys = new Set<string>(TSC_FROZEN_KEYS)
     expect([...materialKeys].filter((k) => !frozenKeys.has(k))).toEqual([])
