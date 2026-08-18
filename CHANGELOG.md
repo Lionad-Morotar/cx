@@ -6,7 +6,15 @@
 
 ## [Unreleased]
 
-## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.6] - 2026-08-18
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.7] - 2026-08-18
+
+### Fixed
+
+- 补包级 `.npmignore` 切断 pnpm 12 alpha pack 的 .gitignore 回退过滤——alpha.6 tarball 类型声明与子目录产物被清空（仅存 main 入口），消费端类型解析全崩
+
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.6] - 2026-08-18 [YANKED]
+
+> 本版本 tarball 缺全部 `.d.ts`（pnpm 12 alpha pack 缺陷），请勿使用，直接用 0.1.0-alpha.7。
 
 ### Added
 

@@ -52,10 +52,11 @@ const dryRun = args.includes('--dry-run')
 // ─── 发布 ────────────────────────────────────────────────────
 
 /**
- * tarball 完整性实测（仅 dry-run）：`pnpm publish --dry-run` 的 SKIP 输出不展示
+ * tarball 完整性实测：`pnpm publish --dry-run` 的 SKIP 输出不展示
  * 文件清单，打包工具链 silent 丢文件无从发现——pnpm 12 alpha 实测会把 files
  * 白名单内产物清空（仅剩 main + README + package.json 的坍缩态）。实测 tarball
- * 两处：文件数 > 3（坍缩拦截）、tarball 内 package.json 无 workspace:* 残留。
+ * 三处：文件数 > 3（坍缩拦截）、types 声明文件在包内（.gitignore 回退过滤的
+ * 精确形态）、tarball 内 package.json 无 workspace:* 残留。
  */
 function verifyTarball(pkgDir, pkg) {
   const tmp = mkdtempSync(join(tmpdir(), 'release-pack-'))
@@ -71,12 +72,21 @@ function verifyTarball(pkgDir, pkg) {
       console.error(`✗ ${pkg.name} tarball 仅 ${listing.length} 个文件，疑似打包丢产物: ${listing.join(', ')}`)
       process.exit(1)
     }
+    // types/typings 声明的入口文件必须在 tarball(缺 d.ts 的包流出即消费端类型全崩)
+    const typesEntry = pkg.types ?? pkg.typings
+    if (typesEntry) {
+      const normalized = `package/${typesEntry.replace(/^\.\//, '')}`
+      if (!listing.includes(normalized)) {
+        console.error(`✗ ${pkg.name} tarball 缺 types 入口 ${typesEntry}（疑似 files 目录被 ignore 规则过滤）`)
+        process.exit(1)
+      }
+    }
     const pkgJson = execFileSync('tar', ['-xzf', join(tmp, tgz), '-O', 'package/package.json'], { encoding: 'utf8' })
     if (/"workspace:/.test(pkgJson)) {
       console.error(`✗ ${pkg.name} tarball 内 dependencies 仍含 workspace:* 残留（应经 pnpm publish 转换）`)
       process.exit(1)
     }
-    console.log(`  tarball 实测 ${listing.length} 个文件，无 workspace:* 残留`)
+    console.log(`  tarball 实测 ${listing.length} 个文件，types 在包，无 workspace:* 残留`)
   } finally {
     rmSync(tmp, { recursive: true, force: true })
   }
@@ -121,7 +131,9 @@ for (const dir of PACKAGES) {
   ]
   console.log(`\n▸ ${pkg.name}@${pkg.version} (tag: ${channel ?? 'latest'})${dryRun ? ' [dry-run]' : ''}`)
 
-  if (dryRun) verifyTarball(pkgDir, pkg)
+  // 正式发布同样实测 tarball:pnpm 12 alpha 的 .gitignore 回退坍缩(仅存 main
+  // 入口)曾随 alpha.6 流出过 registry——缺 d.ts 的包发出去即不可回收,必须拦截
+  verifyTarball(pkgDir, pkg)
 
   // dry-run 不跳过: 要全链实测 tarball,不查 registry
   if (!dryRun && isPublished(pkg)) {
