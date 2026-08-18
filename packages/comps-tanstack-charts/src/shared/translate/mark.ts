@@ -42,10 +42,11 @@ import type { ChartMark } from '@tanstack/charts'
 
 import { contour } from '@tanstack/charts/spatial/contour'
 import { delaunayLink } from '@tanstack/charts/spatial/delaunay'
+import { densityContour } from '@tanstack/charts/spatial/density'
 import { hexbin } from '@tanstack/charts/spatial/hexbin'
 import { voronoi } from '@tanstack/charts/spatial/voronoi'
 
-import { translateCurve } from './curve'
+import { translateAreaXCurve, translateCurve } from './curve'
 import { translateOutputs } from './transforms'
 
 import type { CxChartDatasets, CxChartLayoutSpec, CxChartMarkSpec } from './types'
@@ -146,13 +147,15 @@ const MARK_FACTORIES = {
 
 /**
  * spatial 系 mark 工厂（子路径导入，签名与主入口 mark 同构：(source, options)）。
- * contour 是网格数据等值线（无 x/y channel，width/height 为网格行列数）。
+ * contour 是网格数据等值线（无 x/y channel，width/height 为网格行列数）；
+ * densityContour 是散点 KDE 等值线（x/y channel + bandwidth/cellSize/thresholds）。
  */
 const SPATIAL_FACTORIES = {
   voronoi,
   hexbin,
   contour,
   delaunayLink,
+  density: densityContour,
 } as const
 
 /** frame 无数据形态（纯装饰 mark）：签名无 source 参数，特判不走数据解析 */
@@ -166,9 +169,14 @@ function translateFrame(spec: CxChartMarkSpec): ChartMark<unknown, any, any> {
 
 /** channel 运行时校验：只接受字段名字符串（accessor 函数 JSON 不可表达） */
 function assertChannels(spec: CxChartMarkSpec): void {
+  // ruleX/ruleY 的主 channel 允许数值常量：ruleX({x:0})/ruleY({y:0}) 是官方
+  // 固定位置参考线的标准用法（库签名 Channel 收常量值），常量形态 JSON 可表达。
+  const constantKeys =
+    spec.type === 'ruleX' ? new Set(['x']) : spec.type === 'ruleY' ? new Set(['y']) : undefined
   for (const key of CHANNEL_KEYS) {
     const value = spec[key]
     if (value !== undefined && typeof value !== 'string') {
+      if (constantKeys?.has(key) && typeof value === 'number') continue
       throw new Error(
         `translateMark: channel "${key}" 只支持字段名字符串，收到 ${typeof value}（mark type=${spec.type}）`,
       )
@@ -254,6 +262,8 @@ function translateSpatialMark(
   if (spec.binWidth !== undefined) options.binWidth = spec.binWidth
   if (spec.thresholds !== undefined) options.thresholds = spec.thresholds
   if (spec.smooth !== undefined) options.smooth = spec.smooth
+  if (spec.bandwidth !== undefined) options.bandwidth = spec.bandwidth
+  if (spec.cellSize !== undefined) options.cellSize = spec.cellSize
   if (spec.outputs !== undefined) options.outputs = translateOutputs(spec.outputs)
   return (
     factory as (
@@ -292,7 +302,12 @@ export function translateMark(
     if (spec[key] !== undefined) options[key] = spec[key]
   }
   if (spec.id !== undefined) options.id = spec.id
-  if (spec.curve !== undefined) options.curve = translateCurve(spec.curve)
+  // violinY 的 curve 是 AreaXCurve（水平展开面积生成器），须 d3AreaXCurve 包装；
+  // 其余 mark（含 violinX/ridgeline，消费 ChartCurve 的 area/line 成员）走通用包装。
+  if (spec.curve !== undefined) {
+    options.curve =
+      spec.type === 'violinY' ? translateAreaXCurve(spec.curve) : translateCurve(spec.curve)
+  }
   if (spec.layout !== undefined) options.layout = translateLayout(spec.layout)
   return (
     factory as (

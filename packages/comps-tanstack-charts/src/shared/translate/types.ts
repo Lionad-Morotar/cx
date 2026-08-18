@@ -12,12 +12,14 @@ import type { ChartTheme } from '@tanstack/charts'
 
 export type CxChartCurveName =
   | 'linear'
+  | 'linearClosed'
   | 'monotoneX'
   | 'step'
   | 'stepAfter'
   | 'stepBefore'
   | 'basis'
   | 'natural'
+  | 'catmullRom'
 
 /**
  * scale 声明式枚举。时间系（utc/time）domain 用 ISO 8601 字符串表达
@@ -109,6 +111,7 @@ export type CxChartMarkType =
   | 'hexbin'
   | 'contour'
   | 'delaunayLink'
+  | 'density'
   // 以下由 polar.ts / composite.ts 分支处理（非 MARK_FACTORIES 直译）
   | 'polar'
   | 'pie'
@@ -198,6 +201,12 @@ export interface CxChartMarkSpec {
   cornerRadius?: number
   padAngle?: number
   radiusOffset?: number
+  /** radial 系径向起止（radialRule 引导线/指针、radialBarRadius/radialArea 内径端）：字段名或数值常量 */
+  radius1?: string | number
+  radius2?: string | number
+  /** radialBarAngle 弧段角度起止（显式堆叠弧段）：字段名或数值常量 */
+  angle1?: string | number
+  angle2?: string | number
   baseline?: 'auto' | 'middle' | 'hanging'
   inset?: number
   // --- spatial mark 专有（hexbin/contour；voronoi/delaunayLink 复用通用 channel） ---
@@ -205,10 +214,14 @@ export interface CxChartMarkSpec {
   binWidth?: number
   /** hexbin 聚合输出（reduce 枚举同 transforms） */
   outputs?: CxChartTransformOutputs
-  /** contour 等值线层数或精确层级（标量网格字段复用通用 value channel） */
+  /** contour 等值线层数或精确层级（标量网格字段复用通用 value channel）；density 同字段表达密度层级 */
   thresholds?: number | number[]
   /** contour 线性插值平滑（缺省 true） */
   smooth?: boolean
+  /** density 高斯核带宽（CSS 像素，库缺省 20） */
+  bandwidth?: number
+  /** density 密度网格单元尺寸（CSS 像素，库缺省 4） */
+  cellSize?: number
   // --- polar 容器与命名复合（polar.ts / composite.ts 消费） ---
   marks?: CxChartMarkSpec[]
   radiusRatio?: number

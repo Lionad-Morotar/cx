@@ -18,7 +18,7 @@ import { scalePoint } from '@tanstack/charts/scales/point'
 
 import type { ChartMark } from '@tanstack/charts'
 
-import { translateCurve } from './curve'
+import { translateRadialCurve } from './curve'
 import { resolveMarkData } from './mark'
 import { translateScale } from './scale'
 
@@ -63,7 +63,11 @@ function translateRadialMark(
   const options: Record<string, unknown> = {}
   for (const key of [
     'angle',
+    'angle1',
+    'angle2',
     'radius',
+    'radius1',
+    'radius2',
     'key',
     'z',
     'color',
@@ -97,7 +101,8 @@ function translateRadialMark(
     if (spec[key] !== undefined) options[key] = spec[key]
   }
   if (spec.id !== undefined) options.id = spec.id
-  if (spec.curve !== undefined) options.curve = translateCurve(spec.curve)
+  // radial 系 curve 参数消费原生 d3 CurveFactory（非 ChartCurve 包装，库签名实证）
+  if (spec.curve !== undefined) options.curve = translateRadialCurve(spec.curve)
   if (spec.innerRadiusRatio !== undefined) options.innerRadius = ratioToLength(spec.innerRadiusRatio)
   if (spec.outerRadiusRatio !== undefined) options.outerRadius = ratioToLength(spec.outerRadiusRatio)
   return (factory as (data: readonly unknown[], options: Record<string, unknown>) => unknown)(
@@ -147,14 +152,14 @@ export function translatePolar(
   if (spec.id !== undefined) options.id = spec.id
   const angle = translatePolarAxis(spec.angleAxis)
   const radius = translatePolarAxis(spec.radiusAxis)
-  // 未声明时注入缺省 scale：radialBar 系要求 band（需 bandwidth），其余 point 即可；
-  // 按子 mark 构成选择——缺省注入同时兜底流式中间态（angleAxis 字段尚未传到）。
+  // 未声明时注入缺省 scale：radialBar 系要求 band（需 bandwidth）——radialBarRadius
+  // 的 angle 为类别、radialBarAngle 的 radius 为类别；按子 mark 构成分别注入。
+  // 缺省注入同时兜底流式中间态（angleAxis/radiusAxis 字段尚未传到）。
   // radialArc/sunburst 走原始弧度不消费 scale，注入对其无害（官方 donut 示例实证）。
-  const hasRadialBar = (spec.marks ?? []).some(
-    (m) => m.type === 'radialBarRadius' || m.type === 'radialBarAngle',
-  )
-  options.angle = angle ?? { scale: () => (hasRadialBar ? scaleBand() : scalePoint()) }
-  options.radius = radius ?? { scale: scaleLinear }
+  const hasRadialBarRadius = (spec.marks ?? []).some((m) => m.type === 'radialBarRadius')
+  const hasRadialBarAngle = (spec.marks ?? []).some((m) => m.type === 'radialBarAngle')
+  options.angle = angle ?? { scale: () => (hasRadialBarRadius ? scaleBand() : scalePoint()) }
+  options.radius = radius ?? { scale: hasRadialBarAngle ? () => scaleBand() : scaleLinear }
   if (spec.polarGuides?.length) options.guides = spec.polarGuides.map(translatePolarGuide)
   return polar(options as never) as ChartMark<unknown, any, any>
 }

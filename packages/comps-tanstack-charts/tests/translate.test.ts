@@ -417,6 +417,52 @@ describe('mark layout 与长尾 mark', () => {
     const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
     expect(renderChartSvg(scene, { ariaLabel: 'frame' })).toContain('<svg')
   })
+
+  it('ruleX/ruleY 主 channel 接受数值常量（固定位置参考线）', () => {
+    const definition = translateChartSpec({
+      marks: [
+        { type: 'barY', data: rows, x: 'month', y: 'value' },
+        { type: 'ruleY', data: 'rows', y: 0 },
+      ],
+      x: { scale: { kind: 'point' } },
+      y: { scale: { kind: 'linear' } },
+    })
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    expect(renderChartSvg(scene, { ariaLabel: 'rule' })).toContain('<svg')
+    // 非 rule mark 的 x/y 仍拒绝数值（防止 LLM 把字段名笔误成数字静默通过）
+    expect(() =>
+      translateChartSpec({
+        marks: [{ type: 'barY', data: rows, x: 0, y: 'value' }],
+      }),
+    ).toThrow(/channel "x"/)
+  })
+
+  it('violinY curve 经 AreaXCurve 包装（basis 端到端可渲染）', () => {
+    const profiles = [
+      { species: 'a', y: 10, width: 0.4 },
+      { species: 'a', y: 20, width: 1 },
+      { species: 'a', y: 30, width: 0.5 },
+      { species: 'b', y: 15, width: 0.7 },
+      { species: 'b', y: 25, width: 0.9 },
+      { species: 'b', y: 35, width: 0.3 },
+    ]
+    const definition = translateChartSpec({
+      marks: [
+        {
+          type: 'violinY',
+          data: 'rows',
+          x: 'species',
+          y: 'y',
+          width: 'width',
+          curve: 'basis',
+        },
+      ],
+      x: { scale: { kind: 'point', domain: ['a', 'b'] } },
+      y: { scale: { kind: 'linear' } },
+    })
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    expect(renderChartSvg(scene, { ariaLabel: 'violin' })).toContain('<svg')
+  })
 })
 
 describe('polar 族（polar 容器 / pie 复合）', () => {
@@ -511,9 +557,91 @@ describe('polar 族（polar 容器 / pie 复合）', () => {
     const last = rows.at(-1)
     expect(last?.endAngle).toBeCloseTo(4)
   })
+
+  it('radialArea curve 原生 d3 工厂（linearClosed 雷达闭合端到端可渲染）', () => {
+    const definition = translateChartSpec({
+      marks: [
+        {
+          type: 'polar',
+          marks: [
+            {
+              type: 'radialArea',
+              data: [
+                { event: 'a', score: 80 },
+                { event: 'b', score: 100 },
+                { event: 'c', score: 55 },
+                { event: 'd', score: 66 },
+              ],
+              angle: 'event',
+              radius: 'score',
+              curve: 'linearClosed',
+              fillOpacity: 0.6,
+            },
+          ],
+        },
+      ],
+    })
+    const scene = createChartScene(toStatic(definition), { width: 480, height: 480 })
+    expect(renderChartSvg(scene, { ariaLabel: 'radar' })).toContain('<svg')
+  })
+
+  it('radialRule/radialBarRadius 径向起止 radius1/radius2 透传（仪表引导线端到端可渲染）', () => {
+    const definition = translateChartSpec({
+      marks: [
+        {
+          type: 'polar',
+          marks: [
+            {
+              type: 'radialBarRadius',
+              data: [{ cat: 'a', value: 72 }],
+              angle: 'cat',
+              radius1: 0,
+              radius2: 'value',
+            },
+            {
+              type: 'radialRule',
+              data: [{ cat: 'a', value: 72 }],
+              angle: 'cat',
+              radius1: 0.2,
+              radius2: 0.9,
+            },
+          ],
+        },
+      ],
+    })
+    const scene = createChartScene(toStatic(definition), { width: 480, height: 480 })
+    expect(renderChartSvg(scene, { ariaLabel: 'gauge' })).toContain('<svg')
+  })
+
+  it('radialBarAngle 弧段起止 angle1/angle2 透传（显式堆叠弧段端到端可渲染）', () => {
+    const definition = translateChartSpec({
+      marks: [
+        {
+          type: 'polar',
+          radiusRatio: 0.9,
+          marks: [
+            {
+              type: 'radialBarAngle',
+              data: [
+                { cat: 'a', from: 0, to: 1.2 },
+                { cat: 'a', from: 1.2, to: 2.6 },
+                { cat: 'a', from: 2.6, to: Math.PI },
+              ],
+              angle1: 'from',
+              angle2: 'to',
+              radius: 'cat',
+              color: 'cat',
+            },
+          ],
+        },
+      ],
+    })
+    const scene = createChartScene(toStatic(definition), { width: 480, height: 480 })
+    expect(renderChartSvg(scene, { ariaLabel: 'radial-stacked' })).toContain('<svg')
+  })
 })
 
-describe('spatial mark（voronoi/hexbin/contour/delaunayLink）', () => {
+describe('spatial mark（voronoi/hexbin/contour/delaunayLink/density）', () => {
   const points = Array.from({ length: 30 }, (_, i) => ({
     x: (i * 13) % 100,
     y: (i * 29) % 80,
@@ -572,6 +700,29 @@ describe('spatial mark（voronoi/hexbin/contour/delaunayLink）', () => {
     })
     const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
     expect(renderChartSvg(scene, { ariaLabel: 'contour' })).toContain('<svg')
+  })
+
+  it('density 散点 KDE 等值线（x/y channel + bandwidth/thresholds）端到端可渲染', () => {
+    const definition = translateChartSpec(
+      {
+        marks: [
+          {
+            type: 'density',
+            data: 'rows',
+            x: 'x',
+            y: 'y',
+            bandwidth: 18,
+            thresholds: [0.0004, 0.001, 0.002],
+            fillOpacity: 0.16,
+          },
+        ],
+        x: { scale: { kind: 'linear' } },
+        y: { scale: { kind: 'linear' } },
+      },
+      { rows: points },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    expect(renderChartSvg(scene, { ariaLabel: 'density' })).toContain('<svg')
   })
 })
 
