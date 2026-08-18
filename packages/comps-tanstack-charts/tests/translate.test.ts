@@ -463,6 +463,30 @@ describe('mark layout 与长尾 mark', () => {
     ).toThrow(/channel "x"/)
   })
 
+  it('rect 基线 channel 接受数值常量（y1:0 零基线直方图，对应官方 y1:()=>0）', () => {
+    // 库 rect 对 y1 缺席回退 y channel 而非零基线——bin 对象行 y 缺省为 undefined，
+    // 直方图形态必须显式给基线；y1:0 常量是官方 y1:()=>0 的 JSON 可表达等价物。
+    const bins = [
+      { x1: 0, x2: 10, count: 3 },
+      { x1: 10, x2: 20, count: 7 },
+      { x1: 20, x2: 30, count: 4 },
+    ]
+    const definition = translateChartSpec({
+      marks: [{ type: 'rect', data: bins, x1: 'x1', x2: 'x2', y1: 0, y2: 'count' }],
+      x: { scale: { kind: 'linear', domain: [0, 30] } },
+      y: { scale: { kind: 'linear' } },
+    })
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'hist' })
+    expect(svg).toMatch(/<(rect|path)[\s>]/)
+    // 白名单边界：非 rect mark 的 y1 仍拒绝数值常量
+    expect(() =>
+      translateChartSpec({
+        marks: [{ type: 'areaY', data: rows, x: 'month', y1: 0, y2: 'value' }],
+      }),
+    ).toThrow(/channel "y1"/)
+  })
+
   it('violinY curve 经 AreaXCurve 包装（basis 端到端可渲染）', () => {
     const profiles = [
       { species: 'a', y: 10, width: 0.4 },
@@ -950,6 +974,45 @@ describe('复合 mark（sankey/sunburst/treemap/tree/forceGraph/geoShape/facet�
     )
     const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
     expect(renderChartSvg(scene, { ariaLabel: 'facet' })).toContain('<svg')
+  })
+
+  it('facet 子图显式命名引用命中顶层数据集表（分组行仅覆盖缺省 data）', () => {
+    // 官方 facet 子图引用外部数据合法（如投影画廊子图的 sphere/land 轮廓）——
+    // 递归翻译若丢顶层表，子图命名引用静默回退空数组、渲染空组。
+    const definition = translateChartSpec(
+      {
+        marks: [
+          {
+            type: 'facet',
+            data: 'rows',
+            by: 'series',
+            columns: 2,
+            chart: {
+              marks: [
+                { type: 'dot', x: 'x', y: 'y', r: 3 },
+                { type: 'ruleY', data: 'baseline', y: 'level', stroke: 'red' },
+              ],
+              x: { scale: { kind: 'linear', domain: [0, 3] } },
+              y: { scale: { kind: 'linear', domain: [0, 6] } },
+            },
+          },
+        ],
+      },
+      {
+        rows: [
+          { series: 's1', x: 1, y: 2 },
+          { series: 's2', x: 1, y: 3 },
+        ],
+        baseline: [{ level: 2.5 }],
+      },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'facet-ext' })
+    // 两个 facet 分组各画一条 ruleY 参考线（命中顶层 baseline 数据集）；
+    // 组级 key 为锚——未命中时组在但内部无 line 几何
+    const ruleGroups = svg.match(/data-ts-key="[^"]*:rule-y-\d+"[^>]*>(.*?)(?=<g data-ts-key|$)/gs)
+    expect(ruleGroups?.length).toBe(2)
+    for (const group of ruleGroups ?? []) expect(group).toContain('<line')
   })
 
   it('未知复合 mark type 显式抛错', () => {

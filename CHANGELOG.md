@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.11] - 2026-08-18
+
+### Fixed
+
+- rect 基线 channel 开放数值常量：`x1`/`y1` 接受 `string | number`，常量经 translate 层物化为 accessor 函数——对应官方直方图零基线写法 `y1: () => 0`（库 `channelValues` 对非函数 channel 按字段名查表，`y1` 缺席回退 y channel 而非零基线，bin 对象行上直方图恒空）；白名单边界保留，其余 mark 的 `x1`/`y1` 传常量仍在运行时抛错
+- facet 子图显式命名数据集引用继承顶层数据集表：递归翻译由丢表（`datasets=undefined`）改为传本层表（含 transforms 产物），facet 分组行仅经 rowsOverride 覆盖 `rows` 键——官方投影画廊形态（facet 子图 geoShape 引用 sphere/land 外部轮廓数据）此前静默回退空数组、渲染空组
+
 ## [@lionad/cx-comps 0.1.0-alpha.11] - 2026-08-18
 
 ### Added

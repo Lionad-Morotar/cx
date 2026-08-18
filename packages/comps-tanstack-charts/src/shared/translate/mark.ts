@@ -169,10 +169,18 @@ function translateFrame(spec: CxChartMarkSpec): ChartMark<unknown, any, any> {
 
 /** channel 运行时校验：只接受字段名字符串（accessor 函数 JSON 不可表达） */
 function assertChannels(spec: CxChartMarkSpec): void {
-  // ruleX/ruleY 的主 channel 允许数值常量：ruleX({x:0})/ruleY({y:0}) 是官方
-  // 固定位置参考线的标准用法（库签名 Channel 收常量值），常量形态 JSON 可表达。
+  // 常量白名单（库签名 Channel 收常量值，常量形态 JSON 可表达）：
+  // - ruleX/ruleY 主 channel：ruleX({x:0})/ruleY({y:0}) 是官方固定位置参考线标准用法
+  // - rect 的 x1/y1 基线 channel：rect({y1:0}) 对应官方直方图零基线写法 y1:()=>0
+  //   （库 rect 对 y1 缺席回退 y channel 而非零基线，直方图/区间图必须显式给基线）
   const constantKeys =
-    spec.type === 'ruleX' ? new Set(['x']) : spec.type === 'ruleY' ? new Set(['y']) : undefined
+    spec.type === 'ruleX'
+      ? new Set(['x'])
+      : spec.type === 'ruleY'
+        ? new Set(['y'])
+        : spec.type === 'rect'
+          ? new Set(['x1', 'y1'])
+          : undefined
   for (const key of CHANNEL_KEYS) {
     const value = spec[key]
     if (value !== undefined && typeof value !== 'string') {
@@ -290,7 +298,11 @@ export function translateMark(
   assertChannels(spec)
   const options: Record<string, unknown> = {}
   for (const key of CHANNEL_KEYS) {
-    if (spec[key] !== undefined) options[key] = spec[key]
+    const value = spec[key]
+    if (value === undefined) continue
+    // 库 channelValues 对非函数 channel 按字段名查表（datum[channel]）——白名单
+    // 放行的数值常量（assertChannels 已拦截非白名单）须物化为 accessor 函数
+    options[key] = typeof value === 'number' ? () => value : value
   }
   for (const key of CHANNEL_FLEX_KEYS) {
     if (spec[key] !== undefined) options[key] = spec[key]

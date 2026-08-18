@@ -134,7 +134,8 @@ export type CxChartMarkType =
 /**
  * 单 mark 声明式。平铺契约（LLM 友好）：专有标量字段全部可选、按名透传，
  * 不适用的字段被对应工厂忽略；channel 只接受字段名字符串（弹性 channel
- * angle/radius/width/height/length/rotate/r 另接受数值常量）。
+ * angle/radius/width/height/length/rotate/r 另接受数值常量；x1/y1 仅在
+ * rect 基线场景接受数值常量——对应官方直方图零基线写法 y1:()=>0）。
  */
 export interface CxChartMarkSpec {
   type: CxChartMarkType
@@ -154,10 +155,12 @@ export interface CxChartMarkSpec {
    */
   decorative?: boolean
   // --- 字段名 channel ---
+  // x1/y1 另接受数值常量（运行时白名单仅放行 rect 基线场景，对应官方 y1:()=>0
+  // 零基线写法；其余 mark 传常量仍在运行时抛错，类型放宽是 JSON spec 无类型门的如实表达）
   x?: string
   y?: string
-  x1?: string
-  y1?: string
+  x1?: string | number
+  y1?: string | number
   x2?: string
   y2?: string
   z?: string

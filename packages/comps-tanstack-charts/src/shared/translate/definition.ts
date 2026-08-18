@@ -151,8 +151,11 @@ function buildDefinition(
     } else if (bound.type === 'pie') {
       pushMark(bound, translatePie(bound, table))
     } else if (COMPOSITE_TYPES.has(bound.type)) {
+      // 子 spec 继承本层数据集表（table 已含 transforms 产物）：facet 分组行仅经
+      // rowsOverride 覆盖 rows 键，子图显式命名引用（如 geoShape 的 sphere/land
+      // 外部轮廓数据）仍可命中顶层表——官方 facet 子图引用外部数据是合法形态。
       const result = translateCompositeMark(bound, table, (child, rows) =>
-        buildDefinition(child, undefined, rows),
+        buildDefinition(child, table, rows),
       )
       for (const expanded of result.marks) pushMark(bound, expanded)
       if (result.xDomain) derivedXDomain = result.xDomain
