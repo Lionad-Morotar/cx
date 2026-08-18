@@ -1,5 +1,6 @@
 import { colorGradientLegend, colorLegend, defaultChartTheme, defineChart } from '@tanstack/charts'
 import { scaleLinear } from '@tanstack/charts/scales/linear'
+import { tooltip as domChartTooltip } from '@tanstack/charts/tooltip'
 
 import type { ChartTheme, DomChartDefinition } from '@tanstack/charts'
 
@@ -44,10 +45,15 @@ function translateLegend(
   return colorLegend(items)
 }
 
-/** tooltip 声明：true→缺省开启（undefined），false→关闭，对象→标量子集原样透传 */
+/**
+ * tooltip 声明：false→关闭；true→默认 DOM extension；对象→extension + 标量子集。
+ * 库层没有「缺省开启」——resolveTooltipInput 对 undefined 返回 null 即关闭，
+ * 开启必须显式挂 extension（裸 extension 或 { use, ...options } 两形态）；
+ * 裸 options 对象会在 mount 时抛 TypeError（input.use 为 undefined）。
+ */
 function translateTooltip(tooltip: NonNullable<CxChartSpec['tooltip']>): unknown {
-  if (tooltip === true) return undefined
   if (tooltip === false) return false
+  if (tooltip === true) return domChartTooltip
   const options: Record<string, unknown> = {}
   for (const key of [
     'placement',
@@ -60,7 +66,7 @@ function translateTooltip(tooltip: NonNullable<CxChartSpec['tooltip']>): unknown
   ] as const) {
     if (tooltip[key] !== undefined) options[key] = tooltip[key]
   }
-  return options
+  return { use: domChartTooltip, ...options }
 }
 
 /**
@@ -183,10 +189,11 @@ function buildDefinition(
   if (spec.keyboard !== undefined) definition.keyboard = spec.keyboard
   if (spec.focusRing !== undefined) definition.focusRing = spec.focusRing
   if (spec.focus !== undefined) definition.focus = spec.focus
-  if (spec.tooltip !== undefined) {
-    const tooltip = translateTooltip(spec.tooltip)
-    if (tooltip !== undefined) definition.tooltip = tooltip
-  }
+  // tooltip 缺省开启对齐官方 catalog 形态（官网图表恒有 tooltip，而 LLM 产
+  // spec 极少显式配置；库层 undefined=关闭，故缺省显式挂默认 extension，
+  // 显式 false 保留关闭逃生）
+  const tooltip = spec.tooltip === undefined ? domChartTooltip : translateTooltip(spec.tooltip)
+  if (tooltip !== undefined) definition.tooltip = tooltip
   return definition
 }
 

@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.8] - 2026-08-18
+
+### Fixed
+
+- tooltip 翻译三态修正：库层 `resolveTooltipInput` 对 undefined 返回 null（关闭），此前 `true→undefined` 的「缺省开启」认知与库契约相反——修正为 `true`/标量对象显式挂 `@tanstack/charts/tooltip` 默认 DOM extension（对象形态 `{ use, ...标量 }`）；对象形态此前透传裸 options 会在 mount 时抛 TypeError（`input.use` 为 undefined），188 例中 interactive-charts 族 10 例命中
+- tooltip 缺省开启：spec.tooltip 缺席时注入默认 extension（对齐官方 catalog 图表恒有 tooltip 的形态；LLM 产 spec 极少显式配置），显式 `false` 保留关闭逃生
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.7] - 2026-08-18
 
 ### Fixed

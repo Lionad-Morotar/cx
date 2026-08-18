@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createChartScene, renderChartSvg } from '@tanstack/charts'
+import { tooltip as domChartTooltip } from '@tanstack/charts/tooltip'
 
 import type { DomChartDefinition, StaticChartDefinition } from '@tanstack/charts'
 
@@ -136,18 +137,21 @@ describe('translateChartSpec', () => {
     expect(Array.isArray(definition.theme?.palette)).toBe(true)
   })
 
-  it('tooltip 三态：true 回落库默认、false 关闭、标量对象原样透传', () => {
+  it('tooltip 三态：true 挂默认 extension、false 关闭、对象 extension+标量透传', () => {
     const base = { marks: [{ type: 'dot' as const, data: rows, x: 'month', y: 'value' }] }
-    const asBool = (d: unknown) => (d as { tooltip?: unknown }).tooltip
-    expect(asBool(translateChartSpec({ ...base, tooltip: true }))).toBeUndefined()
-    expect(asBool(translateChartSpec({ ...base, tooltip: false }))).toBe(false)
+    const tipOf = (d: unknown) => (d as { tooltip?: unknown }).tooltip
+    expect(tipOf(translateChartSpec({ ...base, tooltip: true }))).toBe(domChartTooltip)
+    expect(tipOf(translateChartSpec({ ...base, tooltip: false }))).toBe(false)
     expect(
-      asBool(translateChartSpec({ ...base, tooltip: { placement: 'top', offset: 8 } })),
+      tipOf(translateChartSpec({ ...base, tooltip: { placement: 'top', offset: 8 } })),
     ).toEqual({
+      use: domChartTooltip,
       placement: 'top',
       offset: 8,
     })
-    expect(asBool(translateChartSpec(base))).toBeUndefined()
+    // 缺席缺省开启：库层 undefined 等于关闭（resolveTooltipInput 返回 null），
+    // 而官方 catalog 图表恒有 tooltip——缺省显式挂默认 extension 对齐官网形态
+    expect(tipOf(translateChartSpec(base))).toBe(domChartTooltip)
   })
 })
 
@@ -959,7 +963,7 @@ describe('definition 顶层扩展（color.legend / tooltip / focus）', () => {
     expect(definition.color?.range).toEqual(['#111111', '#eeeeee'])
   })
 
-  it('tooltip anchor/sort/items 标量子集原样透传', () => {
+  it('tooltip anchor/sort/items 标量子集透传（挂默认 extension）', () => {
     const definition = translateChartSpec({
       marks: [{ type: 'dot', data: rows, x: 'month', y: 'value' }],
       tooltip: {
@@ -968,6 +972,7 @@ describe('definition 顶层扩展（color.legend / tooltip / focus）', () => {
         items: ['x', { field: 'value', label: '数值' }],
       },
     }) as { tooltip?: Record<string, unknown> }
+    expect(definition.tooltip?.use).toBe(domChartTooltip)
     expect(definition.tooltip?.sort).toBe('visual')
     expect(definition.tooltip?.anchor).toEqual({ x: 'plot-center', y: 'point' })
     expect(definition.tooltip?.items).toEqual(['x', { field: 'value', label: '数值' }])
