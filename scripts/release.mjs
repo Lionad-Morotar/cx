@@ -25,6 +25,7 @@ const PACKAGES = [
   'packages/definition',
   'packages/stream',
   'packages/vue',
+  'packages/comps-tanstack-charts',
   'packages/renderer',
   'packages/comps',
   'packages/comps-element-plus',

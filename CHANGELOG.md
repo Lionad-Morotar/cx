@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.6] - 2026-08-18
+
+### Added
+
+- 首发：TanStack Charts 0.14 物料包——`cx-chart` 单物料承载全图型声明式渲染，spec 经平铺 grammar（`CxChartSpec`）描述 definition（marks/scales/coords/transforms/legend/axis）+ 顶层数据集（`rows` 及多数据集平级挂载），translate 层把纯 JSON 翻译为 @tanstack/charts scene（vue 适配器消费主包 `./vue` 子路径）；流式渲染三段式生长（骨架 → definition 空坐标挂载 → rows 逐行进帧），trigger 声明数组化按位编排
+
+## [@lionad/cx-nuxt 0.1.0-alpha.11] - 2026-08-18
+
+### Added
+
+- 内建物料集新增 `tanstack-charts`：`materials: ['tanstack-charts']` 一行接入图表物料 bundle（`CxTanstackChartsBundle`），optimizeDeps 预声明覆盖主入口与 scales/d3 子路径，charts-core 的 d3 子包随预构建同 chunk 解析
+
 ## [0.1.0-alpha.10] - 2026-08-17
 
 ### Added
