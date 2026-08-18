@@ -4,11 +4,17 @@
  * TanStack Charts 默认主题消费 --ts-chart-1..N 系列色变量,轴/网格经
  * currentColor 继承宿主文字色——本桥只做系列色映射,把宿主(如
  * @ai86/design-tokens)的 accent 色板接入,深浅主题切换随 CSS 变量解析
- * 天然跟随,零 JS。作用域挂 .cx-charts 类(由图表容器声明),不污染 :root,
- * 同页多套图表实例可各自定主题。
+ * 天然跟随,零 JS。作用域挂 .cx-charts 类,不污染 :root,同页多套图表
+ * 实例可各自定主题。
  *
- * 宿主消费方式:图表容器元素加 class="cx-charts",且宿主已定义
- * --color-accent-* 变量(未定义时回落浏览器默认色,cx 不耦合任何 token 包)。
+ * --chart-N 别名是 shadcn 图表生态的变量名(shadcn 系 spec/LLM 生成
+ * 代码的 fill/stroke/color.range 直接引用 var(--chart-N, ...)):别名指向
+ * 本桥色板,使该类 spec 无需宿主预定义 --chart-N 即获色板——两级 fallback
+ * var(--chart-N, var(--ts-chart-N)) 缺任一环都会让 fill 失效(黑色/透明)。
+ *
+ * 宿主消费方式:图表组件(CxTanstackChartsChart)根元素自动声明 cx-charts,
+ * 宿主无需手动加类;宿主须定义 --color-accent-* 变量(未定义时回落浏览器
+ * 默认色,cx 不耦合任何 token 包)。
  */
 .cx-charts {
   --ts-chart-1: var(--color-accent-blue);
@@ -21,4 +27,13 @@
   --ts-chart-8: var(--color-accent-red);
   /* 焦点/悬停强调填充:宿主 primary 的柔化形态 */
   --ts-chart-focus-fill: var(--color-primary-soft);
+  /* shadcn 兼容别名:shadcn 系 spec 变量名 → 本桥色板 */
+  --chart-1: var(--ts-chart-1);
+  --chart-2: var(--ts-chart-2);
+  --chart-3: var(--ts-chart-3);
+  --chart-4: var(--ts-chart-4);
+  --chart-5: var(--ts-chart-5);
+  --chart-6: var(--ts-chart-6);
+  --chart-7: var(--ts-chart-7);
+  --chart-8: var(--ts-chart-8);
 }
