@@ -146,6 +146,13 @@ export interface CxChartMarkSpec {
    */
   data?: readonly unknown[] | string
   id?: string
+  /**
+   * 装饰层开关：true 时经库 decorative() 包装——保留比例尺与绘制几何、剥离交互
+   * 所有权（tooltip 命中/焦点/条件高亮均跳过该 mark）。典型：辅助折线/参考线/标注
+   * 不抢数据点的 tooltip 命中。库层约束是带 focus/states 行为的 mark 不可包装
+   * （initialize 抛 TypeError），本 grammar 不暴露条件态声明，故恒安全。
+   */
+  decorative?: boolean
   // --- 字段名 channel ---
   x?: string
   y?: string

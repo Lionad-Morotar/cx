@@ -153,6 +153,28 @@ describe('translateChartSpec', () => {
     // 而官方 catalog 图表恒有 tooltip——缺省显式挂默认 extension 对齐官网形态
     expect(tipOf(translateChartSpec(base))).toBe(domChartTooltip)
   })
+
+  it('decorative:true 经库 decorative() 包装——几何保留（SSR 输出与未装饰版逐字节一致）', () => {
+    const base = { type: 'lineY' as const, data: rows, x: 'month', y: 'value', strokeWidth: 2 }
+    const axes = { x: { scale: { kind: 'point' as const } }, y: { scale: { kind: 'linear' as const } } }
+    const plain = translateChartSpec({ marks: [base], ...axes })
+    const decorated = translateChartSpec({ marks: [{ ...base, decorative: true }], ...axes })
+    const markOf = (d: unknown) => (d as { marks: unknown[] }).marks[0]
+    // 包装产物是代理新引用（initialize 内剥 focus/states，本 grammar 不暴露条件态恒安全）
+    expect(markOf(decorated)).not.toBe(markOf(plain))
+    const svgOf = (d: DomChartDefinition) =>
+      renderChartSvg(createChartScene(toStatic(d), { width: 640, height: 320 }), {
+        ariaLabel: 'decorative',
+      })
+    // decorative 语义即「保比例尺与绘制几何、剥交互所有权」：
+    // 数据几何 path 与未装饰版逐字节一致，焦点层（focus circles）被剥离
+    const plainSvg = svgOf(plain)
+    const decoratedSvg = svgOf(decorated)
+    const geometryOf = (svg: string) => svg.match(/<path[^>]*\bd="[^"]*"/g)
+    expect(geometryOf(decoratedSvg)).toEqual(geometryOf(plainSvg))
+    expect(plainSvg).toContain('ts-chart__focus-layer')
+    expect(decoratedSvg).not.toContain('ts-chart__focus-layer')
+  })
 })
 
 describe('translateChartSpec 流式中间态容错', () => {

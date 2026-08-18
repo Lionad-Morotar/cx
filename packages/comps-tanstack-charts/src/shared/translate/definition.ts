@@ -1,4 +1,5 @@
 import { colorGradientLegend, colorLegend, defaultChartTheme, defineChart } from '@tanstack/charts'
+import { decorative } from '@tanstack/charts/mark/decorative'
 import { scaleLinear } from '@tanstack/charts/scales/linear'
 import { tooltip as domChartTooltip } from '@tanstack/charts/tooltip'
 
@@ -10,7 +11,7 @@ import { translateMark } from './mark'
 import { POLAR_FAMILY_TYPES, translatePie, translatePolar } from './polar'
 import { applyTransforms } from './transforms'
 
-import type { CxChartDatasets, CxChartSpec } from './types'
+import type { CxChartDatasets, CxChartMarkSpec, CxChartSpec } from './types'
 
 /**
  * definition 组装：声明式 spec → DomChartDefinition（可直接喂给 <Chart>）。
@@ -131,24 +132,33 @@ function buildDefinition(
   let derivedXDomain: [number, number] | undefined
   let derivedYDomain: [number, number] | undefined
   let polarOnly = spec.marks.length > 0
+  // decorative 声明在统一出口包装：复合 mark 展开多 mark 时父级声明传染全部子 mark
+  // （官方用法即整组辅助层装饰化）；facet 子 spec 走递归 buildDefinition 独立判定。
+  const pushMark = (specMark: CxChartMarkSpec, runtimeMark: unknown) => {
+    marks.push(
+      specMark.decorative === true
+        ? decorative(runtimeMark as Parameters<typeof decorative>[0])
+        : runtimeMark,
+    )
+  }
   for (const mark of spec.marks) {
     // facet 子 spec：mark 未声明 data 时绑定分组行（顶层 spec 无 rowsOverride，恒 false）
     const bound =
       rowsOverride !== undefined && mark.data === undefined ? { ...mark, data: 'rows' } : mark
     if (!POLAR_FAMILY_TYPES.has(bound.type)) polarOnly = false
     if (bound.type === 'polar') {
-      marks.push(translatePolar(bound, table))
+      pushMark(bound, translatePolar(bound, table))
     } else if (bound.type === 'pie') {
-      marks.push(translatePie(bound, table))
+      pushMark(bound, translatePie(bound, table))
     } else if (COMPOSITE_TYPES.has(bound.type)) {
       const result = translateCompositeMark(bound, table, (child, rows) =>
         buildDefinition(child, undefined, rows),
       )
-      marks.push(...result.marks)
+      for (const expanded of result.marks) pushMark(bound, expanded)
       if (result.xDomain) derivedXDomain = result.xDomain
       if (result.yDomain) derivedYDomain = result.yDomain
     } else {
-      marks.push(translateMark(bound, table))
+      pushMark(bound, translateMark(bound, table))
     }
   }
 

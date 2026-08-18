@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.9] - 2026-08-18
+
+### Added
+
+- mark 级 `decorative` 声明：`true` 时经库 `decorative()` 包装——保留比例尺与绘制几何、剥离交互所有权（tooltip 命中/焦点/条件高亮跳过该 mark），对齐官方 catalog 12 例辅助层用法（折线装饰化让 tooltip 只对数据点生效）；组装统一出口包装，复合 mark 父级声明传染全部展开子 mark，facet 子 spec 递归独立判定
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.8] - 2026-08-18
 
 ### Fixed
