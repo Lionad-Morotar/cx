@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps 0.1.0-alpha.11] - 2026-08-18
+
+### Added
+
+- charts-theme 桥新增 `--chart-N`（1..8）shadcn 兼容别名：shadcn 系 spec/LLM 生成代码的 fill/stroke/color.range 直接引用 `var(--chart-N, ...)`，别名指向本桥 `--ts-chart-N` 色板——两级 fallback 缺任一环 fill 即失效（黑色/透明），别名使该类 spec 无需宿主预定义变量即获色板
+
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.10] - 2026-08-18
+
+### Fixed
+
+- 图表组件（通用 chart 与 line/bar/area/dot/pie 五个预设）根元素自动挂 `cx-charts` 主题桥类：`--ts-chart-N`/`--chart-N` 色板作用域随组件声明，宿主无需手动加类——genui 渲染链路缺失该作用域导致 shadcn 系 spec 系列颜色失效（黑色/透明）
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.9] - 2026-08-18
 
 ### Added
