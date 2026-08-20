@@ -10,6 +10,7 @@ import { COMPOSITE_TYPES, translateCompositeMark } from './composite'
 import { translateMark } from './mark'
 import { POLAR_FAMILY_TYPES, translatePie, translatePolar } from './polar'
 import { applyTransforms } from './transforms'
+import { translateViewGrid } from './view'
 
 import type { CxChartDatasets, CxChartMarkSpec, CxChartSpec } from './types'
 
@@ -22,6 +23,11 @@ import type { CxChartDatasets, CxChartMarkSpec, CxChartSpec } from './types'
  *   置 null 显式无轴（库对 polar mark 的 scale 类型为 never，缺省 axis 注入会抛错）
  * - tree/forceGraph 展开为多 mark；forceGraph 回传的轴域在 x/y 未显式声明时注入
  *   linear scale 实例（仿真坐标以 0 为中心，缺省推断 domain 不包含负半轴余量）
+ * - spec.views 存在时分流 viewGrid 多视图组合（views 与 marks 互斥），各子视图以
+ *   child 模式递归构建——host 权属字段（tooltip/pointer/keyboard/focus/focusRing）
+ *   归外层组合定义持有（官方 assertChildDefinition 拒绝子 view 携带），child 模式
+ *   下显式声明即抛错；theme 仅携带 spec 差异（defaultChartTheme.background 会触发
+ *   库拒绝，外层 mergeTheme 负责补齐缺省）
  */
 
 /** color.legend 声明 → 图例实例；true 等价 { kind:'color' } 缺省配置 */
@@ -89,7 +95,7 @@ function coerceTemporalChannels(spec: CxChartSpec, table: CxChartDatasets): CxCh
     if (!set) fieldsByDataset.set(name, (set = new Set()))
     set.add(field)
   }
-  for (const mark of spec.marks) {
+  for (const mark of spec.marks ?? []) {
     if (xTemporal) for (const f of ['x', 'x1', 'x2'] as const) bind(mark.data, mark[f])
     if (yTemporal) for (const f of ['y', 'y1', 'y2'] as const) bind(mark.data, mark[f])
   }
@@ -114,24 +120,27 @@ function coerceTemporalChannels(spec: CxChartSpec, table: CxChartDatasets): CxCh
 }
 
 /**
- * 单 spec → definition 核心（facet 子 spec 复用）：返回原始 spec 对象而非
- * defineChart 产物——facet chart 回调要求返回 ChartSpec 字面量形态。
+ * 单 spec → definition 核心（facet 子 spec、viewGrid 子视图复用）：返回原始 spec
+ * 对象而非 defineChart 产物——facet chart 回调要求返回 ChartSpec 字面量形态。
  * rowsOverride：facet 分组行注入（子 spec marks 未声明 data 时绑定分组行）。
+ * mode 'child'：viewGrid 子视图构建——剥除 host 权属字段（见文件头约定）。
  */
 function buildDefinition(
   spec: CxChartSpec,
   datasets: CxChartDatasets | undefined,
   rowsOverride?: readonly unknown[],
+  mode: 'host' | 'child' = 'host',
 ): Record<string, unknown> {
   const base: CxChartDatasets = { ...datasets }
   if (rowsOverride !== undefined) base.rows = rowsOverride
   const transformed = spec.transforms?.length ? applyTransforms(spec.transforms, base) : base
   const table = coerceTemporalChannels(spec, transformed)
 
+  const markSpecs = spec.marks ?? []
   const marks: unknown[] = []
   let derivedXDomain: [number, number] | undefined
   let derivedYDomain: [number, number] | undefined
-  let polarOnly = spec.marks.length > 0
+  let polarOnly = markSpecs.length > 0
   // decorative 声明在统一出口包装：复合 mark 展开多 mark 时父级声明传染全部子 mark
   // （官方用法即整组辅助层装饰化）；facet 子 spec 走递归 buildDefinition 独立判定。
   const pushMark = (specMark: CxChartMarkSpec, runtimeMark: unknown) => {
@@ -141,7 +150,7 @@ function buildDefinition(
         : runtimeMark,
     )
   }
-  for (const mark of spec.marks) {
+  for (const mark of spec.marks ?? []) {
     // facet 子 spec：mark 未声明 data 时绑定分组行（顶层 spec 无 rowsOverride，恒 false）
     const bound =
       rowsOverride !== undefined && mark.data === undefined ? { ...mark, data: 'rows' } : mark
@@ -165,8 +174,18 @@ function buildDefinition(
     }
   }
 
-  const theme: ChartTheme = { ...defaultChartTheme, ...spec.theme }
-  const definition: Record<string, unknown> = { marks, theme }
+  if (mode === 'child' && spec.theme?.background !== undefined) {
+    throw new Error('translateViewGrid 子视图不得声明 theme.background（库拒绝子图持有场景背景；背景用子图内普通 mark 表达）')
+  }
+  // child 模式 theme 仅携带 spec 差异：defaultChartTheme.background 会触发库对子视图的
+  // 拒绝，palette/foreground 等缺省由外层组合 mergeTheme 补齐
+  const theme: Partial<ChartTheme> | undefined =
+    mode === 'child'
+      ? spec.theme === undefined
+        ? undefined
+        : { ...spec.theme }
+      : { ...defaultChartTheme, ...spec.theme }
+  const definition: Record<string, unknown> = theme === undefined ? { marks } : { marks, theme }
 
   // polar 族无轴约定：全 polar 容器且未显式声明时显式置 null（显式声明优先，如混合场景）
   const xSpec = spec.x === undefined && polarOnly ? null : spec.x
@@ -198,6 +217,15 @@ function buildDefinition(
     if (spec.color.legend !== undefined) color.legend = translateLegend(spec.color.legend)
     definition.color = color
   }
+  if (mode === 'child') {
+    // host 权属字段归外层组合定义持有（官方 assertChildDefinition 契约），子视图显式声明即抛错
+    for (const key of ['tooltip', 'pointer', 'keyboard', 'focusRing', 'focus'] as const) {
+      if (spec[key] !== undefined) {
+        throw new Error(`translateViewGrid 子视图不得声明 "${key}"（host 权属字段，配置在外层 spec）`)
+      }
+    }
+    return definition
+  }
   if (spec.pointer !== undefined) definition.pointer = spec.pointer
   if (spec.keyboard !== undefined) definition.keyboard = spec.keyboard
   if (spec.focusRing !== undefined) definition.focusRing = spec.focusRing
@@ -218,6 +246,29 @@ export function translateChartSpec(
   spec: CxChartSpec,
   datasets?: CxChartDatasets,
 ): DomChartDefinition {
+  if (spec.views !== undefined) {
+    if (spec.marks?.length) {
+      throw new Error('translateChartSpec: views 与 marks 互斥——viewGrid 顶层不直接绘制 marks，图元属于各子视图')
+    }
+    return (defineChart as unknown as (definition: unknown) => DomChartDefinition)(
+      translateViewGrid(spec, datasets, {
+        buildChild: (child, table) =>
+          (defineChart as unknown as (definition: unknown) => unknown)(
+            buildDefinition(child, table, undefined, 'child'),
+          ),
+        applyHost: (composed, outer) => {
+          // 组合产物固定 guides:false/margin:0/x:null/y:null；外层 theme 与 tooltip 照常施加
+          const hosted: Record<string, unknown> = {
+            ...composed,
+            theme: { ...defaultChartTheme, ...outer.theme },
+          }
+          const tooltip = outer.tooltip === undefined ? domChartTooltip : translateTooltip(outer.tooltip)
+          if (tooltip !== undefined) hosted.tooltip = tooltip
+          return hosted
+        },
+      }),
+    )
+  }
   return (defineChart as unknown as (definition: unknown) => DomChartDefinition)(
     buildDefinition(spec, datasets),
   )

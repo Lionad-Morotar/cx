@@ -4,7 +4,7 @@ import type { ComputedRef } from 'vue'
 import { useChartHostProps } from './use-chart-props'
 import type { CxChartHostPartition } from './use-chart-props'
 import { CX_CHART_CURVE_NAMES } from './translate'
-import type { CxChartCurveName, CxChartMarkType, CxChartScaleSpec, CxChartSpec } from './translate'
+import type { CxChartCurveName, CxChartMarkSpec, CxChartMarkType, CxChartScaleSpec, CxChartSpec } from './translate'
 
 export interface CxPresetChartOptions {
   /** 预设 mark 类型（lineY/barY/areaY/dot 等笛卡尔单通道 mark） */
@@ -35,7 +35,7 @@ export function usePresetChart(
 ): CxPresetChartPartition {
   const { hostProps, ariaLabel } = useChartHostProps(attrs)
   const spec = computed<CxChartSpec>(() => {
-    const mark: CxChartSpec['marks'][number] = {
+    const mark: CxChartMarkSpec = {
       type: options.markType,
       data: Array.isArray(attrs.data) ? attrs.data : [],
       x: typeof attrs.x === 'string' && attrs.x ? attrs.x : 'x',

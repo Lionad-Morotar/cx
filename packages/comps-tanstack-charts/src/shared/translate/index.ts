@@ -2,7 +2,7 @@
  * 声明式 JSON → TanStack Charts 运行时定义的翻译层（桶文件）。
  * 模块分工：types（声明式契约）/ curve / scale / axis / mark（基础+spatial）/
  * transforms（数据预处理管道）/ polar（极坐标族）/ composite（七类命名复合）/
- * definition（translateChartSpec 组装入口）。
+ * view（viewGrid 多视图组合）/ definition（translateChartSpec 组装入口）。
  */
 
 export type {
@@ -19,6 +19,10 @@ export type {
   CxChartSpec,
   CxChartTransformOutputs,
   CxChartTransformSpec,
+  CxChartViewGridSpec,
+  CxChartViewItem,
+  CxChartViewLink,
+  CxChartViewTrack,
 } from './types'
 
 export { CX_CHART_CURVE_NAMES, translateCurve } from './curve'

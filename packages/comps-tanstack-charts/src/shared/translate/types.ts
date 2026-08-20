@@ -485,8 +485,45 @@ export type CxChartTransformSpec =
 /** 命名数据集表：物料 data 顶层除 definition 外的数组字段（GenUI 契约 rows/nodes/links） */
 export type CxChartDatasets = Record<string, readonly unknown[] | undefined>
 
+/** viewGrid 网格轨道：size 固定像素 / grow 按比例分配剩余空间（min/max 钳制） */
+export type CxChartViewTrack = { id: string; size: number } | { id: string; grow: number; min?: number; max?: number }
+
+/** viewGrid 轴链接目标：share 共享 scale（domain/序/方向/bandwidth 须一致，不一致显式失败）；align 仅对齐 plot 端点、domain 各自独立 */
+export interface CxChartViewLink {
+  x?: string
+  y?: string
+}
+
+export interface CxChartViewItem {
+  id: string
+  /** 轨道引用：row/column 分别指向 views.rows/views.columns 的轨道 id */
+  row: string
+  column: string
+  share?: CxChartViewLink
+  align?: CxChartViewLink
+  /**
+   * 子视图 spec（marks/x/y/color/margin/guides/transforms 等归属子图）；
+   * host 权属字段（tooltip/pointer/keyboard/focus/focusRing）归外层组合定义，
+   * 子视图声明即拒绝（官方 assertChildDefinition 契约）；不支持嵌套 views。
+   */
+  chart: CxChartSpec
+}
+
+/** viewGrid 多视图组合（非重叠网格；叠层/内嵌等组合形态官方 composeViews 支持、契约暂不暴露） */
+export interface CxChartViewGridSpec {
+  rows: CxChartViewTrack[]
+  columns: CxChartViewTrack[]
+  gap?: number
+  rowGap?: number
+  columnGap?: number
+  items: CxChartViewItem[]
+}
+
 export interface CxChartSpec {
-  marks: CxChartMarkSpec[]
+  /** viewGrid 顶层省略（views 与 marks 互斥）；其余场景必填 */
+  marks?: CxChartMarkSpec[]
+  /** 多视图组合：存在时 marks 须为空，各子视图在网格单元内独立成图、共享外层 host */
+  views?: CxChartViewGridSpec
   x?: CxChartAxisSpec | null
   y?: CxChartAxisSpec | null
   theme?: Partial<ChartTheme>

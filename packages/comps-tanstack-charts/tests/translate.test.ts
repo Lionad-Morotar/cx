@@ -1143,3 +1143,197 @@ describe('definition 顶层扩展（color.legend / tooltip / focus）', () => {
     expect(renderChartSvg(scene, { ariaLabel: 'utc' })).toContain('<svg')
   })
 })
+
+describe('viewGrid 多视图组合', () => {
+  it('主散点 + 上/右边缘直方图（57 形态：shareX/shareY 三视图）', () => {
+    const definition = translateChartSpec(
+      {
+        views: {
+          rows: [
+            { id: 'top', size: 72 },
+            { id: 'main', grow: 1 },
+          ],
+          columns: [
+            { id: 'main', grow: 1 },
+            { id: 'right', size: 72 },
+          ],
+          gap: 8,
+          items: [
+            {
+              id: 'main',
+              row: 'main',
+              column: 'main',
+              chart: {
+                marks: [{ type: 'dot', data: 'rows', x: 'x', y: 'y' }],
+                x: { scale: { kind: 'linear', domain: [0, 10] } },
+                y: { scale: { kind: 'linear', domain: [0, 10] } },
+              },
+            },
+            {
+              id: 'top',
+              row: 'top',
+              column: 'main',
+              share: { x: 'main' },
+              chart: {
+                marks: [
+                  {
+                    type: 'rect',
+                    data: [
+                      { x1: 0, x2: 5, count: 2 },
+                      { x1: 5, x2: 10, count: 3 },
+                    ],
+                    x1: 'x1',
+                    x2: 'x2',
+                    y1: 0,
+                    y2: 'count',
+                  },
+                ],
+                x: { scale: { kind: 'linear', domain: [0, 10] } },
+                y: { scale: { kind: 'linear' } },
+              },
+            },
+            {
+              id: 'right',
+              row: 'main',
+              column: 'right',
+              share: { y: 'main' },
+              chart: {
+                marks: [
+                  {
+                    type: 'rect',
+                    data: [
+                      { y1: 0, y2: 5, count: 3 },
+                      { y1: 5, y2: 10, count: 2 },
+                    ],
+                    y1: 'y1',
+                    y2: 'y2',
+                    x1: 0,
+                    x2: 'count',
+                  },
+                ],
+                y: { scale: { kind: 'linear', domain: [0, 10] } },
+                x: { scale: { kind: 'linear' } },
+              },
+            },
+          ],
+        },
+      },
+      {
+        rows: [
+          { x: 1, y: 2 },
+          { x: 3, y: 4 },
+          { x: 6, y: 7 },
+          { x: 8, y: 6 },
+          { x: 9, y: 9 },
+        ],
+      },
+    )
+    const svg = renderChartSvg(createChartScene(toStatic(definition), { width: 640, height: 480 }), {
+      ariaLabel: 'marginal',
+    })
+    expect(svg).toContain('<svg')
+    // 主散点（circle）与两缘直方图（rect）共存于同一场景
+    expect(svg).toContain('<circle')
+    expect(svg).toContain('<rect')
+  })
+
+  it('focus + context 双面板（83 形态：同列 shareX）', () => {
+    const definition = translateChartSpec(
+      {
+        views: {
+          rows: [
+            { id: 'focus', grow: 1 },
+            { id: 'context', size: 64 },
+          ],
+          columns: [{ id: 'main', grow: 1 }],
+          gap: 8,
+          items: [
+            {
+              id: 'focus',
+              row: 'focus',
+              column: 'main',
+              share: { x: 'context' },
+              chart: {
+                marks: [{ type: 'lineY', data: 'rows', x: 't', y: 'v' }],
+                x: { scale: { kind: 'linear', domain: [0, 10] } },
+                y: { scale: { kind: 'linear' } },
+              },
+            },
+            {
+              id: 'context',
+              row: 'context',
+              column: 'main',
+              chart: {
+                marks: [{ type: 'areaY', data: 'rows', x: 't', y: 'v' }],
+                x: { scale: { kind: 'linear', domain: [0, 10] } },
+                y: { scale: { kind: 'linear' } },
+              },
+            },
+          ],
+        },
+      },
+      {
+        rows: [
+          { t: 0, v: 3 },
+          { t: 5, v: 7 },
+          { t: 10, v: 4 },
+        ],
+      },
+    )
+    const svg = renderChartSvg(createChartScene(toStatic(definition), { width: 640, height: 400 }), {
+      ariaLabel: 'focus-context',
+    })
+    expect(svg).toContain('<svg')
+    expect(svg).toContain('<path')
+  })
+
+  it('权属护栏：子视图声明 host 字段 / views 与 marks 混用 / 嵌套 views 均拒绝', () => {
+    const grid = {
+      rows: [{ id: 'main', grow: 1 as const }],
+      columns: [{ id: 'main', grow: 1 as const }],
+      items: [
+        {
+          id: 'main',
+          row: 'main',
+          column: 'main',
+          chart: { marks: [{ type: 'dot' as const, data: [{ x: 1, y: 2 }], x: 'x', y: 'y' }] },
+        },
+      ],
+    }
+    // 子视图 tooltip 归外层 host
+    expect(() =>
+      translateChartSpec({
+        views: {
+          ...grid,
+          items: [
+            {
+              ...grid.items[0]!,
+              chart: { ...grid.items[0]!.chart, tooltip: true },
+            },
+          ],
+        },
+      }),
+    ).toThrow(/不得声明 "tooltip"/)
+    // views 与 marks 互斥
+    expect(() =>
+      translateChartSpec({
+        marks: [{ type: 'dot', data: [{ x: 1, y: 2 }], x: 'x', y: 'y' }],
+        views: grid,
+      }),
+    ).toThrow(/互斥/)
+    // 嵌套 views 拒绝
+    expect(() =>
+      translateChartSpec({
+        views: {
+          ...grid,
+          items: [
+            {
+              ...grid.items[0]!,
+              chart: { views: grid } as never,
+            },
+          ],
+        },
+      }),
+    ).toThrow(/嵌套/)
+  })
+})
