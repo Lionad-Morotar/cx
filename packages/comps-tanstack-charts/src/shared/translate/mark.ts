@@ -304,6 +304,13 @@ export function translateMark(
     // 放行的数值常量（assertChannels 已拦截非白名单）须物化为 accessor 函数
     options[key] = typeof value === 'number' ? () => value : value
   }
+  // 无显式 key 时注入行索引 key：TanStack 只在数据行含唯一 id 字段时能推断
+  // key，否则 fallback 行位置并 console.warn——dot/line 等逐行 mark 在流式
+  // 追加场景（cx ln 逐行进帧）每条 spec 都触发一次噪音警告。显式行索引与该
+  // fallback 语义一致（追加场景索引稳定），但走正常路径不警告。
+  if (options.key === undefined) {
+    options.key = (_datum: unknown, { index }: { index: number }) => index
+  }
   for (const key of CHANNEL_FLEX_KEYS) {
     if (spec[key] !== undefined) options[key] = spec[key]
   }

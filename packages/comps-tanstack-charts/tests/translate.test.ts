@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createChartScene, renderChartSvg } from '@tanstack/charts'
 import { tooltip as domChartTooltip } from '@tanstack/charts/tooltip'
 
@@ -126,6 +126,38 @@ describe('translateChartSpec', () => {
         marks: [{ type: 'lineY', data: rows, x: 42, y: 'value' }],
       }),
     ).toThrow(/channel/)
+  })
+
+  it('mark 无显式 key 时注入行索引 key——渲染不触发 TanStack key 推断警告', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      const definition = translateChartSpec({
+        marks: [{ type: 'lineY', data: rows, x: 'month', y: 'value' }],
+        x: { scale: { kind: 'point' } },
+        y: { scale: { kind: 'linear' } },
+      })
+      const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+      renderChartSvg(scene, { ariaLabel: 'test chart' })
+      expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining('could not infer a unique key'))
+    } finally {
+      warnSpy.mockRestore()
+    }
+  })
+
+  it('mark 显式 key 字段名时同样无警告（注入不覆盖显式 key）', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      const definition = translateChartSpec({
+        marks: [{ type: 'lineY', data: rows, x: 'month', y: 'value', key: 'month' }],
+        x: { scale: { kind: 'point' } },
+        y: { scale: { kind: 'linear' } },
+      })
+      const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+      renderChartSvg(scene, { ariaLabel: 'test chart' })
+      expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining('could not infer a unique key'))
+    } finally {
+      warnSpy.mockRestore()
+    }
   })
 
   it('theme 部分字段与默认主题合并', () => {

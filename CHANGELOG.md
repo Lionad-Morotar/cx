@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.13] - 2026-08-20
+
+### Fixed
+
+- mark 无显式 key 时注入行索引 key：TanStack 对无 key mark 仅在数据含唯一 id 字段时能推断，否则 fallback 行位置并 console.warn——dot/line 等逐行 mark 在流式追加场景每条 spec 触发一次噪音警告；显式行索引与 fallback 语义一致（追加场景索引稳定），走正常路径不警告
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.12] - 2026-08-20
 
 ### Added
