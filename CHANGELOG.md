@@ -6,6 +6,14 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.14] - 2026-08-20
+
+### Fixed
+
+- r 字段名 channel 缺省注入 sqrt 半径缩放：库 0.14 起 `rScale` 缺省恒等映射（原始值直接当像素半径），dot/hexagon 与 geoShape 点符号、tree/forceGraph 固化节点的字段名 `r` 会把大数据值渲染为巨泡——缺省注入 sqrt 面积映射（半径∝√值 ⇒ 面积∝值，range [2.5, 14]，domain 由库 includeZero 推断），数值常量 `r` 保持显式像素意图不注入；新增声明式 `rScale.range` 覆盖缺省像素上下界
+- 数据集分馏泛化：`rows`/`nodes`/`links` 白名单会丢弃全部自定义命名数据集（geo 的 sphere/land、分层图 innerRows/outerRows、仪表 bandRows 等静默回退空数组），改为物料 data 顶层与 definition 平级的数组字段全量进 datasets 表；宿主 props（class/style 可为数组）与 cx 内部键（comp/data-*/_ 前缀）显式排除防串味
+- 纯 geoShape spec 缺省 x/y 置 null：geo mark 不物化直角 scale channel，缺省注入的 point/linear 轴只剩 0-1 无意义刻度；混合直角 channel mark 或显式声明轴时保留既有行为
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.13] - 2026-08-20
 
 ### Fixed
