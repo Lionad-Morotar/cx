@@ -175,6 +175,13 @@ export interface CxChartMarkSpec {
   text?: string
   // --- 弹性 channel（字段名或数值常量） ---
   r?: string | number
+  /**
+   * 半径缩放声明式（仅 r 为字段名时消费；数值常量 r 是显式像素意图，不缩放）。
+   * 库缺省 rScale 为恒等映射（原始值直接当像素半径），翻译层对字段名 r 缺省注入
+   * sqrt 面积映射（半径∝√值 ⇒ 面积∝值，气泡图感知编码约定），本字段覆盖其
+   * range 像素上下界；kind 不收（sqrt 是气泡半径的正确默认，线性半径会平方夸大差异）。
+   */
+  rScale?: { range?: [number, number] }
   angle?: string | number
   radius?: string | number
   width?: string | number

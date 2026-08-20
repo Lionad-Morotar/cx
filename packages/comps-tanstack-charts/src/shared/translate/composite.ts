@@ -17,7 +17,7 @@ import {
 
 import type { ChartMark } from '@tanstack/charts'
 
-import { resolveMarkData } from './mark'
+import { resolveMarkData, resolveRScaleOption } from './mark'
 import { translatePolar } from './polar'
 
 import type {
@@ -208,6 +208,8 @@ function translateTree(
     links: readonly Record<string, unknown>[]
   })(rows, options)
   // 布局节点标识锁定 canonical id 字段（treeLayout 产物恒有 id；nodeKey 是层级源声明而非行字段）
+  // 字段名 r（节点大小编码字段）同 dot 主路径契约：缺省 sqrt 缩放防恒等巨泡
+  const nodeRScale = resolveRScaleOption(spec)
   return [
     looseLink(layout.links, {
       x1: 'x1',
@@ -226,6 +228,7 @@ function translateTree(
       r: spec.r ?? 4.5,
       color: spec.color ?? undefined,
       strokeWidth: 1.5,
+      ...(nodeRScale !== undefined ? { rScale: nodeRScale } : {}),
     }),
   ]
 }
@@ -275,6 +278,7 @@ function translateForceGraph(
     xDomain: readonly [number, number]
     yDomain: readonly [number, number]
   })(nodes, links, options)
+  const nodeRScale = resolveRScaleOption(spec)
   return {
     marks: [
       looseLink(graph.links, {
@@ -293,6 +297,7 @@ function translateForceGraph(
         color: spec.color ?? undefined,
         r: spec.r ?? 5,
         strokeWidth: 1.5,
+        ...(nodeRScale !== undefined ? { rScale: nodeRScale } : {}),
       }),
     ],
     xDomain: [graph.xDomain[0], graph.xDomain[1]],
@@ -332,6 +337,9 @@ function translateGeoShape(
   if (spec.key !== undefined) options.key = spec.key
   if (spec.color !== undefined) options.color = spec.color
   if (spec.r !== undefined) options.r = spec.r
+  // 点符号 geoShape（bubble map）的 r 字段名 channel 同 dot 契约：缺省注入 sqrt 缩放
+  const rScale = resolveRScaleOption(spec)
+  if (rScale !== undefined) options.rScale = rScale
   for (const key of [
     'fill',
     'fillOpacity',

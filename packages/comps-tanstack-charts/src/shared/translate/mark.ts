@@ -45,6 +45,7 @@ import { delaunayLink } from '@tanstack/charts/spatial/delaunay'
 import { densityContour } from '@tanstack/charts/spatial/density'
 import { hexbin } from '@tanstack/charts/spatial/hexbin'
 import { voronoi } from '@tanstack/charts/spatial/voronoi'
+import { scaleSqrt } from 'd3-scale'
 
 import { translateAreaXCurve, translateCurve } from './curve'
 import { translateOutputs } from './transforms'
@@ -213,6 +214,23 @@ export function resolveMarkData(
   return datasets?.[data] ?? []
 }
 
+/** 缺省半径像素上下界（sqrt 面积映射）：小值保可见、大值防巨泡覆盖全图 */
+const DEFAULT_R_RANGE: readonly [number, number] = [2.5, 14]
+
+/**
+ * rScale 注入：库缺省 rScale 是恒等映射（字段原始值直接当像素半径，大数据值
+ * 渲染为巨泡）——r 为字段名时缺省注入 sqrt 映射（半径∝√值 ⇒ 面积∝值，气泡图
+ * 感知编码约定），domain 由库从数据推断（includeZero）。数值常量 r 是显式像素
+ * 意图不缩放；spec.rScale.range 覆盖缺省上下界。
+ * 工厂形态（无 copy 的函数）让库推断 domain；实例形态库不推断（scale-input 契约）。
+ * 返回 undefined 表示不注入（消费方判空挂 options）。
+ */
+export function resolveRScaleOption(spec: CxChartMarkSpec): unknown {
+  if (typeof spec.r !== 'string') return undefined
+  const range = spec.rScale?.range ?? DEFAULT_R_RANGE
+  return { scale: () => scaleSqrt().range([range[0], range[1]]) }
+}
+
 /** layout 声明式 → mark layout 工厂（stack/group/dodge 挂 mark.layout 字段） */
 function translateLayout(spec: CxChartLayoutSpec): unknown {
   switch (spec.kind) {
@@ -314,6 +332,9 @@ export function translateMark(
   for (const key of CHANNEL_FLEX_KEYS) {
     if (spec[key] !== undefined) options[key] = spec[key]
   }
+  // r 字段名 channel 缺省半径缩放注入（dot/hexagon；常量 r 不注入——见 resolveRScaleOption）
+  const rScale = resolveRScaleOption(spec)
+  if (rScale !== undefined) options.rScale = rScale
   for (const key of STYLE_KEYS) {
     if (spec[key] !== undefined) options[key] = spec[key]
   }

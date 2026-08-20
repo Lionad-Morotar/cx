@@ -5,6 +5,7 @@ import { tooltip as domChartTooltip } from '@tanstack/charts/tooltip'
 import type { DomChartDefinition, StaticChartDefinition } from '@tanstack/charts'
 
 import {
+  resolveRScaleOption,
   translateChartSpec,
   translateCurve,
   translateScale,
@@ -295,6 +296,88 @@ describe('translateChartSpec 数据集引用（数据顶层化）', () => {
   })
 })
 
+describe('rScale 半径缩放注入', () => {
+  const bubbleRows = [
+    { x: 'a', v: 100 },
+    { x: 'b', v: 400 },
+    { x: 'c', v: 10000 },
+  ]
+  const axes = {
+    x: { scale: { kind: 'point' as const } },
+    y: { scale: { kind: 'linear' as const } },
+  }
+  const circleRadii = (svg: string) =>
+    [...svg.matchAll(/<circle[^>]*\br="([\d.]+)"/g)].map((m) => Number(m[1]))
+  const renderDots = (marks: CxChartMarkSpec[]) =>
+    renderChartSvg(createChartScene(toStatic(translateChartSpec({ marks, ...axes })), {
+      width: 640,
+      height: 320,
+    }), { ariaLabel: 'bubble' })
+
+  it('dot 字段名 r 缺省注入 sqrt 面积映射——原始值不当像素半径（库缺省恒等）', () => {
+    const radii = circleRadii(renderDots([{ type: 'dot', data: bubbleRows, x: 'x', y: 'v', r: 'v' }]))
+    expect(radii.length).toBeGreaterThan(0)
+    // 恒等映射会把 v=10000 直接当像素半径；注入后顶到缺省 range 上限 14
+    expect(Math.max(...radii)).toBeCloseTo(14, 5)
+  })
+
+  it('rScale.range 声明式覆盖缺省上下界', () => {
+    const radii = circleRadii(
+      renderDots([
+        { type: 'dot', data: bubbleRows, x: 'x', y: 'v', r: 'v', rScale: { range: [1, 6] } },
+      ]),
+    )
+    expect(Math.max(...radii)).toBeCloseTo(6, 5)
+  })
+
+  it('数值常量 r 是显式像素意图，不注入缩放', () => {
+    const radii = circleRadii(renderDots([{ type: 'dot', data: bubbleRows, x: 'x', y: 'v', r: 7 }]))
+    expect(radii).toContain(7)
+    expect(Math.max(...radii)).toBeLessThanOrEqual(7)
+  })
+
+  it('geoShape 点符号字段名 r 走同一注入助手（bubble map 场景，浏览器回归覆盖渲染）', () => {
+    // SSR 字符串管线 geo 组恒空（prerender 无真实 chart 盒，geoPath 拟合不发生），
+    // geoShape 分支的注入接线由 resolveRScaleOption 单元契约 + /dev/cx/genui-charts
+    // 浏览器回归（103-bubble-map）共同覆盖
+    const spec: CxChartMarkSpec = { type: 'geoShape', data: [], r: 'properties.gdp' }
+    expect(resolveRScaleOption(spec)).not.toBeUndefined()
+  })
+})
+
+describe('resolveRScaleOption（rScale 注入助手）', () => {
+  /** 注入产物的最小结构类型（d3 连续比例尺子集，免 any） */
+  interface InjectedScale {
+    (value: number): number
+    range: () => number[]
+    domain: (domain: [number, number]) => unknown
+  }
+
+  it('字段名 r 注入 sqrt 工厂（无 copy——库据工厂形态推断 domain），缺省 range [2.5,14]', () => {
+    const opt = resolveRScaleOption({ type: 'dot', r: 'v' }) as { scale: () => InjectedScale }
+    expect(typeof opt.scale).toBe('function')
+    expect('copy' in opt.scale).toBe(false)
+    const scale = opt.scale()
+    expect(scale.range()).toEqual([2.5, 14])
+    // 模拟库 includeZero 推断后的 domain：sqrt 面积编码（半径∝√值 ⇒ 面积∝值）
+    scale.domain([0, 10000])
+    expect(scale(10000)).toBeCloseTo(14, 5)
+    expect(scale(100)).toBeCloseTo(2.5 + Math.sqrt(100 / 10000) * 11.5, 5)
+  })
+
+  it('rScale.range 声明式覆盖缺省上下界', () => {
+    const opt = resolveRScaleOption({ type: 'dot', r: 'v', rScale: { range: [1, 6] } }) as {
+      scale: () => InjectedScale
+    }
+    expect(opt.scale().range()).toEqual([1, 6])
+  })
+
+  it('数值常量 r（显式像素意图）与 r 缺席均不注入', () => {
+    expect(resolveRScaleOption({ type: 'dot', r: 7 })).toBeUndefined()
+    expect(resolveRScaleOption({ type: 'dot' })).toBeUndefined()
+  })
+})
+
 describe('transforms 数据预处理管道', () => {
   const rows = [
     { month: 'Jan', kind: 'a', value: 40 },
@@ -528,20 +611,23 @@ describe('mark layout 与长尾 mark', () => {
       { species: 'b', y: 25, width: 0.9 },
       { species: 'b', y: 35, width: 0.3 },
     ]
-    const definition = translateChartSpec({
-      marks: [
-        {
-          type: 'violinY',
-          data: 'rows',
-          x: 'species',
-          y: 'y',
-          width: 'width',
-          curve: 'basis',
-        },
-      ],
-      x: { scale: { kind: 'point', domain: ['a', 'b'] } },
-      y: { scale: { kind: 'linear' } },
-    })
+    const definition = translateChartSpec(
+      {
+        marks: [
+          {
+            type: 'violinY',
+            data: 'rows',
+            x: 'species',
+            y: 'y',
+            width: 'width',
+            curve: 'basis',
+          },
+        ],
+        x: { scale: { kind: 'point', domain: ['a', 'b'] } },
+        y: { scale: { kind: 'linear' } },
+      },
+      { rows: profiles },
+    )
     const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
     expect(renderChartSvg(scene, { ariaLabel: 'violin' })).toContain('<svg')
   })
@@ -1024,6 +1110,45 @@ describe('复合 mark（sankey/sunburst/treemap/tree/forceGraph/geoShape/facet�
     )
     const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
     expect(renderChartSvg(scene, { ariaLabel: 'geo' })).toContain('<svg')
+  })
+
+  it('纯 geoShape spec 缺省 x/y 置 null——geo mark 不物化直角 channel，缺省轴只剩 0-1 噪音', () => {
+    const definition = translateChartSpec({
+      marks: [
+        {
+          type: 'geoShape',
+          data: [
+            {
+              type: 'Feature',
+              properties: { name: 'box' },
+              geometry: { type: 'Polygon', coordinates: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]] },
+            },
+          ],
+        },
+      ],
+    }) as { x?: unknown; y?: unknown }
+    expect(definition.x).toBeNull()
+    expect(definition.y).toBeNull()
+  })
+
+  it('geoShape 混合直角 channel mark 时保留缺省轴（显式声明优先同理）', () => {
+    const definition = translateChartSpec({
+      marks: [
+        {
+          type: 'geoShape',
+          data: [
+            {
+              type: 'Feature',
+              properties: { name: 'box' },
+              geometry: { type: 'Polygon', coordinates: [[[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]] },
+            },
+          ],
+        },
+        { type: 'dot', data: [{ x: 1, y: 2 }], x: 'x', y: 'y' },
+      ],
+    }) as { x?: unknown; y?: unknown }
+    expect(definition.x).not.toBeNull()
+    expect(definition.y).not.toBeNull()
   })
 
   it('facet：chart 子 spec 模板递归（分组行注入缺省 data）端到端可渲染', () => {

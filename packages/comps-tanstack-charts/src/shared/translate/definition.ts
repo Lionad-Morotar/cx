@@ -21,6 +21,8 @@ import type { CxChartDatasets, CxChartMarkSpec, CxChartSpec } from './types'
  * - transforms 管道先于 marks 执行，产物注册进数据集表副本（marks 字符串引用在此解析）
  * - polar 族（polar/pie/sunburst 全为 polar 容器且无直角 channel）未显式声明 x/y 时
  *   置 null 显式无轴（库对 polar mark 的 scale 类型为 never，缺省 axis 注入会抛错）
+ * - 纯 geoShape 场景同理置 null（geo mark 不物化直角 scale channel，缺省轴只剩
+ *   0-1 无意义刻度；混合直角 channel mark 时保留缺省轴）
  * - tree/forceGraph 展开为多 mark；forceGraph 回传的轴域在 x/y 未显式声明时注入
  *   linear scale 实例（仿真坐标以 0 为中心，缺省推断 domain 不包含负半轴余量）
  * - spec.views 存在时分流 viewGrid 多视图组合（views 与 marks 互斥），各子视图以
@@ -141,6 +143,8 @@ function buildDefinition(
   let derivedXDomain: [number, number] | undefined
   let derivedYDomain: [number, number] | undefined
   let polarOnly = markSpecs.length > 0
+  // geoShape 同 polar 族「无直角 channel」语义：纯 geo 场景缺省轴只剩 0-1 噪音
+  let geoOnly = markSpecs.length > 0
   // decorative 声明在统一出口包装：复合 mark 展开多 mark 时父级声明传染全部子 mark
   // （官方用法即整组辅助层装饰化）；facet 子 spec 走递归 buildDefinition 独立判定。
   const pushMark = (specMark: CxChartMarkSpec, runtimeMark: unknown) => {
@@ -155,6 +159,7 @@ function buildDefinition(
     const bound =
       rowsOverride !== undefined && mark.data === undefined ? { ...mark, data: 'rows' } : mark
     if (!POLAR_FAMILY_TYPES.has(bound.type)) polarOnly = false
+    if (bound.type !== 'geoShape') geoOnly = false
     if (bound.type === 'polar') {
       pushMark(bound, translatePolar(bound, table))
     } else if (bound.type === 'pie') {
@@ -187,9 +192,10 @@ function buildDefinition(
       : { ...defaultChartTheme, ...spec.theme }
   const definition: Record<string, unknown> = theme === undefined ? { marks } : { marks, theme }
 
-  // polar 族无轴约定：全 polar 容器且未显式声明时显式置 null（显式声明优先，如混合场景）
-  const xSpec = spec.x === undefined && polarOnly ? null : spec.x
-  const ySpec = spec.y === undefined && polarOnly ? null : spec.y
+  // polar 族 / 纯 geoShape 无轴约定：未显式声明时显式置 null（显式声明优先，如混合场景）
+  const axisless = polarOnly || geoOnly
+  const xSpec = spec.x === undefined && axisless ? null : spec.x
+  const ySpec = spec.y === undefined && axisless ? null : spec.y
   const x = translateAxis(xSpec ?? undefined, 'point')
   const y = translateAxis(ySpec ?? undefined, 'linear')
   if (xSpec !== null && x) definition.x = x

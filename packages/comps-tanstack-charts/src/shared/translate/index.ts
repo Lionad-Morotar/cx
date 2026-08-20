@@ -28,7 +28,7 @@ export type {
 export { CX_CHART_CURVE_NAMES, translateCurve } from './curve'
 export { translateScale } from './scale'
 export { translateAxis } from './axis'
-export { resolveMarkData, translateMark } from './mark'
+export { resolveMarkData, resolveRScaleOption, translateMark } from './mark'
 export { applyTransforms, translateOutputs, translateReduce, translateTransform } from './transforms'
 export { POLAR_FAMILY_TYPES, translatePie, translatePolar } from './polar'
 export { COMPOSITE_TYPES, translateCompositeMark } from './composite'
