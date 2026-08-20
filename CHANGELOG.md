@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.12] - 2026-08-20
+
+### Added
+
+- polar `radiusAxis.range` 比例对：`[0.3, 1]` 比例对物化为官方 `PolarLength` 回调数组，resize 随最终半径重解析——rose/径向条的「语义零映射到内径偏移」形态（官方 rose 基线抬升写法）此前无法表达，`radius1: 0` 只能映射到物理圆心；非法比例对（递减/负值/非有限）翻译期快速失败
+- viewGrid 多视图组合：`spec.views` 声明 rows/columns 轨道（size 固定像素 / grow 弹性）与 items 子视图（`share`/`align` 轴链接），翻译为官方 `viewGrid`——散点边缘直方图、focus+context 双面板等官方分面形态可达；权属护栏对齐官方 assertChildDefinition：子视图声明 host 字段（tooltip/pointer/keyboard/focus/focusRing）即抛错，theme 仅携差异（defaultChartTheme.background 会触发库拒绝，外层 mergeTheme 补齐缺省），views 与 marks 互斥、嵌套 views 拒绝；顶层 theme/tooltip 缺省注入施加于组合产物
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.11] - 2026-08-18
 
 ### Fixed
