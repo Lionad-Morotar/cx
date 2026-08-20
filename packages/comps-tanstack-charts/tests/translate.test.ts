@@ -1230,6 +1230,92 @@ describe('复合 mark（sankey/sunburst/treemap/tree/forceGraph/geoShape/facet�
   })
 })
 
+describe('层级 mark 字段名通道（布局节点 data 取值）', () => {
+  // 库 channelValues 在布局节点上平查 datum[field]，而 flatHierarchyNodeContext 把源行
+  // 收进 data 下不展开——translate 层把字段名物化为 node.data 取值 accessor；缺此桥时
+  // 字段恒 null，treemap/sunburst 单色、tree 节点半径塌成常量。
+  const paletteFills = (svg: string) =>
+    new Set([...svg.matchAll(/fill="(var\(--ts-chart-\d+[^"]*?)"/g)].map((m) => m[1]))
+
+  it('treemap：color 字段名按源行取色（两分支两色）', () => {
+    const rows = [
+      { id: 'root', parent: null, value: 0, branch: 'x' },
+      { id: 'a', parent: 'root', value: 30, branch: 'alpha' },
+      { id: 'b', parent: 'root', value: 70, branch: 'beta' },
+    ]
+    const definition = translateChartSpec(
+      {
+        marks: [
+          {
+            type: 'treemap',
+            data: 'rows',
+            nodeId: 'id',
+            parentId: 'parent',
+            value: 'value',
+            color: 'branch',
+          },
+        ],
+      },
+      { rows },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'treemap-color' })
+    expect(paletteFills(svg).size).toBeGreaterThanOrEqual(2)
+  })
+
+  it('sunburst：color 字段名按源行取色（两扇区两色）', () => {
+    const rows = [
+      { path: 'root/a', value: 30, branch: 'alpha' },
+      { path: 'root/b', value: 70, branch: 'beta' },
+    ]
+    const definition = translateChartSpec(
+      {
+        marks: [{ type: 'sunburst', data: 'rows', path: 'path', value: 'value', color: 'branch' }],
+      },
+      { rows },
+    )
+    const scene = createChartScene(toStatic(definition as DomChartDefinition), {
+      width: 480,
+      height: 480,
+    })
+    const svg = renderChartSvg(scene, { ariaLabel: 'sunburst-color' })
+    expect(paletteFills(svg).size).toBeGreaterThanOrEqual(2)
+  })
+
+  it('tree：节点 color/r 字段名按源行取值（分色且半径随字段缩放）', () => {
+    const rows = [
+      { name: 'root', parent: null, size: 10, kind: 'alpha' },
+      { name: 'a', parent: 'root', size: 5, kind: 'alpha' },
+      { name: 'b', parent: 'root', size: 15, kind: 'beta' },
+    ]
+    const definition = translateChartSpec(
+      {
+        marks: [
+          {
+            type: 'tree',
+            data: 'rows',
+            nodeId: 'name',
+            parentId: 'parent',
+            color: 'kind',
+            r: 'size',
+          },
+        ],
+        x: { scale: { kind: 'linear' } },
+        y: { scale: { kind: 'linear' } },
+      },
+      { rows },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 480 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'tree-color' })
+    expect(paletteFills(svg).size).toBeGreaterThanOrEqual(2)
+    // r 字段经缺省 sqrt 缩放：两档字段值渲染出两档 circle 半径
+    const radii = new Set(
+      [...svg.matchAll(/<circle[^>]*\sr="([\d.]+)"/g)].map((m) => Number(m[1])),
+    )
+    expect(radii.size).toBeGreaterThanOrEqual(2)
+  })
+})
+
 describe('definition 顶层扩展（color.legend / tooltip / focus）', () => {
   const rows = [
     { month: 'Jan', value: 40, kind: 'a' },

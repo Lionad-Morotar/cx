@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.15] - 2026-08-21
+
+### Fixed
+
+- 层级 mark 字段名通道按源行取值：库 channelValues 在布局节点上平查 `datum[field]`，而 flatHierarchyNodeContext 把源行收纳在 `data` 下不展开，treemap/sunburst 的 `color`（及 sunburst `z`）、tree 节点的 `color`/`r` 字段名恒 null——treemap/sunburst 渲染成单色、tree 节点半径塌成常量；translate 层把字段名物化为 `node.data` 取值 accessor，保持「字段名引用源数据」的声明式契约（sankey marks 回调按设计锁定布局行 canonical 字段，不在此列）
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.14] - 2026-08-20
 
 ### Fixed

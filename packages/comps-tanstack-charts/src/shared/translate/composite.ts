@@ -67,6 +67,17 @@ function hierarchyOptions(
   )
 }
 
+/**
+ * 层级布局节点的字段名通道（treemap/sunburst 的 color/z、tree 节点 dot 的 color/r）：
+ * 库的 channelValues 在布局节点上平查 datum[field]，而 flatHierarchyNodeContext 把源行
+ * 收纳在 data 下不展开——字段名物化为 data 取值 accessor，保持「字段名引用源数据」契约。
+ * sankey 不在此列：其 marks 回调 channel 按设计锁定布局行字段（key/width 等 canonical）。
+ */
+function hierarchyFieldChannel(field: string): (node: unknown) => unknown {
+  return (node) =>
+    (node as { data?: Record<string, unknown> } | null)?.data?.[field]
+}
+
 /** sankey：固化 marks 回调 = link(布局连线) + rect(布局节点)，样式取自声明 */
 function translateSankey(
   spec: CxChartMarkSpec,
@@ -130,8 +141,8 @@ function translateSunburst(
     value: spec.value,
   }
   if (spec.id !== undefined) options.id = spec.id
-  if (spec.color !== undefined) options.color = spec.color
-  if (spec.z !== undefined) options.z = spec.z
+  if (spec.color !== undefined) options.color = hierarchyFieldChannel(spec.color)
+  if (spec.z !== undefined) options.z = hierarchyFieldChannel(spec.z)
   if (spec.visibleDepth !== undefined) options.visibleDepth = spec.visibleDepth
   if (spec.ringPadding !== undefined) options.ringPadding = spec.ringPadding
   for (const key of [
@@ -174,7 +185,7 @@ function translateTreemap(
     value: spec.value,
   }
   if (spec.id !== undefined) options.id = spec.id
-  if (spec.color !== undefined) options.color = spec.color
+  if (spec.color !== undefined) options.color = hierarchyFieldChannel(spec.color)
   if (spec.method !== undefined) options.method = spec.method
   if (spec.ratio !== undefined) options.ratio = spec.ratio
   if (spec.round !== undefined) options.round = spec.round
@@ -225,8 +236,8 @@ function translateTree(
       x: 'x',
       y: 'y',
       key: 'id',
-      r: spec.r ?? 4.5,
-      color: spec.color ?? undefined,
+      r: typeof spec.r === 'string' ? hierarchyFieldChannel(spec.r) : (spec.r ?? 4.5),
+      color: spec.color === undefined ? undefined : hierarchyFieldChannel(spec.color),
       strokeWidth: 1.5,
       ...(nodeRScale !== undefined ? { rScale: nodeRScale } : {}),
     }),
