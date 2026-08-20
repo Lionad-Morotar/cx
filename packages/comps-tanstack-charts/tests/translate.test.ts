@@ -11,7 +11,7 @@ import {
   translateTransform,
 } from '../src/shared/translate'
 
-import type { CxChartAxisSpec } from '../src/shared/translate'
+import type { CxChartAxisSpec, CxChartMarkSpec } from '../src/shared/translate'
 
 /**
  * 翻译层行为契约：声明式 JSON（物料 data）→ TanStack Charts 运行时产物。
@@ -661,6 +661,54 @@ describe('polar 族（polar 容器 / pie 复合）', () => {
     })
     const scene = createChartScene(toStatic(definition), { width: 480, height: 480 })
     expect(renderChartSvg(scene, { ariaLabel: 'gauge' })).toContain('<svg')
+  })
+
+  it('radiusAxis.range 比例对物化：radius1:0 语义零映射到 range 内径（rose 形态）', () => {
+    const polarSpec = {
+      type: 'polar' as const,
+      marks: [
+        {
+          type: 'radialBarRadius' as const,
+          data: [{ cat: 'a', value: 72 }],
+          angle: 'cat',
+          radius: 'value',
+          radius1: 0,
+        },
+      ],
+    }
+    const render = (spec: CxChartMarkSpec) =>
+      renderChartSvg(
+        createChartScene(toStatic(translateChartSpec({ marks: [spec] }) as DomChartDefinition), {
+          width: 480,
+          height: 480,
+        }),
+        { ariaLabel: 'rose' },
+      )
+    const plain = render(polarSpec)
+    const ranged = render({ ...polarSpec, radiusAxis: { scale: { kind: 'linear' }, range: [0.5, 1] } })
+    // 单类别占满整圆时 d3 arc 用两段半圆弧表达。无 range：radius1:0 经默认 [0, radius]
+    // range 映射到物理圆心，弧半径集合只含外径；有 range [0.5, 1]：语义零映射到内径
+    // 0.5R，弧半径集合同时含外径 R 与内径 0.5R。
+    const radii = (svg: string) =>
+      [...new Set([...svg.matchAll(/A([\d.]+),\1[ ,]/g)].map((m) => Number(m[1])))].sort((a, b) => a - b)
+    expect(radii(plain).length).toBe(1)
+    const rangedRadii = radii(ranged)
+    expect(rangedRadii.length).toBe(2)
+    expect(rangedRadii[0]! / rangedRadii[1]!).toBeCloseTo(0.5, 5)
+  })
+
+  it('radiusAxis.range 非法比例对被拒绝（递减/负值/非有限）', () => {
+    const polarSpec = {
+      type: 'polar' as const,
+      marks: [
+        { type: 'radialBarRadius' as const, data: [{ cat: 'a', value: 72 }], angle: 'cat', radius: 'value' },
+      ],
+    }
+    for (const range of [[1, 0.5], [-0.1, 1], [Number.NaN, 1]] as const) {
+      expect(() =>
+        translateChartSpec({ marks: [{ ...polarSpec, radiusAxis: { range: range as unknown as [number, number] } }] }),
+      ).toThrow(/radiusAxis\.range/)
+    }
   })
 
   it('radialBarAngle 弧段起止 angle1/angle2 透传（显式堆叠弧段端到端可渲染）', () => {

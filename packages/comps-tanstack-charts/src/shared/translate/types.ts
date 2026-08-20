@@ -39,6 +39,12 @@ export interface CxChartAxisSpec {
   nice?: boolean | number
   reverse?: boolean
   grid?: boolean
+  /**
+   * 半径像素 range 的比例对（相对 polar 最终半径，0–1），仅 polar 容器的
+   * radiusAxis 消费；物化为官方 PolarLength 回调数组（resize 时随最终半径重解析）。
+   * 用途：rose/径向条等需要「语义零映射到内径偏移」而非物理圆心的场景。
+   */
+  range?: [number, number]
   axis?:
     | false
     | {

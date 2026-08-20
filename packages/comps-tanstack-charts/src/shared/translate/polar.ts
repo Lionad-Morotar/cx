@@ -122,11 +122,23 @@ function translatePolarGuide(spec: CxChartPolarGuideSpec): unknown {
 }
 
 /** polar axis 声明式（复用 scale 枚举；wrap 仅 angle 轴）→ PolarAngleOptions/PolarRadiusOptions */
-function translatePolarAxis(spec: CxChartMarkSpec['angleAxis']): Record<string, unknown> | undefined {
+function translatePolarAxis(
+  spec: CxChartMarkSpec['angleAxis'],
+  { allowRange = false }: { allowRange?: boolean } = {},
+): Record<string, unknown> | undefined {
   if (!spec) return undefined
   const axis: Record<string, unknown> = {}
   if (spec.scale) axis.scale = translateScale(spec.scale)
   if (spec.nice !== undefined) axis.nice = spec.nice
+  // range 仅 radius 轴有意义（官方 PolarRadiusOptions.range）；比例对物化为
+  // PolarLength 回调数组，随最终半径在 resize 时重解析。比例须有限非负且递增。
+  if (allowRange && spec.range !== undefined) {
+    const [r0, r1] = spec.range
+    if (!Number.isFinite(r0) || !Number.isFinite(r1) || r0 < 0 || r1 < r0) {
+      throw new Error(`translatePolar: radiusAxis.range 须为有限非负且递增的比例对，收到 [${r0}, ${r1}]`)
+    }
+    axis.range = [ratioToLength(r0), ratioToLength(r1)]
+  }
   return axis
 }
 
@@ -151,7 +163,7 @@ export function translatePolar(
   if (spec.inset !== undefined) options.inset = spec.inset
   if (spec.id !== undefined) options.id = spec.id
   const angle = translatePolarAxis(spec.angleAxis)
-  const radius = translatePolarAxis(spec.radiusAxis)
+  const radius = translatePolarAxis(spec.radiusAxis, { allowRange: true })
   // 未声明时注入缺省 scale：radialBar 系要求 band（需 bandwidth）——radialBarRadius
   // 的 angle 为类别、radialBarAngle 的 radius 为类别；按子 mark 构成分别注入。
   // 缺省注入同时兜底流式中间态（angleAxis/radiusAxis 字段尚未传到）。
