@@ -15,12 +15,15 @@ const HOST_PROP_KEYS = [
 ] as const
 
 /**
- * 命名数据集白名单（GenUI 数据顶层化契约）：
- * rows 恒为主数据集（流式 trigger arrayKey），nodes/links 承载关系型图双数据集；
- * 物料 data 顶层与 definition 平级的这三个数组字段分馏进 datasets 表，
- * 供 marks 内字符串引用解析。非数组值静默忽略（流式半值防御）。
+ * 命名数据集分馏（GenUI 数据顶层化契约）：
+ * 物料 data 顶层与 definition 平级的数组字段全量进 datasets 表——rows 恒为主
+ * 数据集（流式 trigger arrayKey），其余按语义自由命名：关系型图 nodes/links、
+ * geo 的 sphere/graticule/land、分层图 innerRows/outerRows、仪表 bandRows 等。
+ * 非数组值静默忽略（流式半值防御）。
+ * 排除集防串味：宿主 props（class/style Vue 绑定可为数组）、cx 内部键
+ * （comp 运行时节点、data-* 编辑标记、_ 前缀编辑器键）不是数据集。
  */
-const DATASET_KEYS = ['rows', 'nodes', 'links'] as const
+const DATASET_EXCLUDE_KEYS = new Set<string>(['definition', 'comp', 'class', 'style'])
 
 export interface CxChartHostPartition {
   /** <Chart> 宿主 props（标量白名单 + class/style） */
@@ -32,7 +35,7 @@ export interface CxChartHostPartition {
 export interface CxChartPropsPartition extends CxChartHostPartition {
   /** 物料 JSON definition（声明式 spec，待翻译层组装） */
   spec: ComputedRef<CxChartSpec>
-  /** 命名数据集表（rows/nodes/links 白名单分馏；marks 字符串引用在此解析） */
+  /** 命名数据集表（顶层数组字段全量分馏；marks 字符串引用在此解析） */
   datasets: ComputedRef<CxChartDatasets>
 }
 
@@ -73,9 +76,11 @@ export function useChartProps(attrs: Record<string, unknown>): CxChartPropsParti
   )
   const datasets = computed<CxChartDatasets>(() => {
     const table: CxChartDatasets = {}
-    for (const key of DATASET_KEYS) {
-      const value = attrs[key]
-      if (Array.isArray(value)) table[key] = value
+    for (const [key, value] of Object.entries(attrs)) {
+      if (!Array.isArray(value)) continue
+      if (DATASET_EXCLUDE_KEYS.has(key)) continue
+      if (key.startsWith('data-') || key.startsWith('_')) continue
+      table[key] = value
     }
     return table
   })

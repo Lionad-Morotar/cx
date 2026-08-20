@@ -175,4 +175,23 @@ describe('cx-chart 数据顶层化（GenUI 契约）', () => {
     })
     expect(wrapper.find('svg').exists()).toBe(true)
   })
+
+  it('任意语义命名的数组字段全量分馏（geo/分层/仪表等自定义命名不被丢弃）', () => {
+    // 分馏语义从 rows/nodes/links 白名单泛化为顶层数组字段：sphere/land、innerRows、
+    // bandRows 等 LLM 按语义命名的数据集必须同等命中（白名单时代静默回退空数组）
+    const wrapper = mountMaterial(byKey('cx-chart'), {
+      definition: {
+        marks: [{ type: 'barY', data: 'bandRows', x: 'label', y: 'value' }],
+        x: { scale: { kind: 'point' } },
+        y: { scale: { kind: 'linear' } },
+      },
+      bandRows: [
+        { label: 'a', value: 30 },
+        { label: 'b', value: 80 },
+      ],
+    })
+    const svg = wrapper.find('svg')
+    expect(svg.exists()).toBe(true)
+    expect(svg.html()).toMatch(/<(rect|path)[\s>]/)
+  })
 })

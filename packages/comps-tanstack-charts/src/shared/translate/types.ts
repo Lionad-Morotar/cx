@@ -489,7 +489,7 @@ export type CxChartTransformSpec =
       endAngle?: number
     }
 
-/** 命名数据集表：物料 data 顶层除 definition 外的数组字段（GenUI 契约 rows/nodes/links） */
+/** 命名数据集表：物料 data 顶层除 definition 外的数组字段全量分馏（rows 恒为主数据集，其余按语义自由命名：geo 的 sphere/land、分层图 innerRows/outerRows 等） */
 export type CxChartDatasets = Record<string, readonly unknown[] | undefined>
 
 /** viewGrid 网格轨道：size 固定像素 / grow 按比例分配剩余空间（min/max 钳制） */
