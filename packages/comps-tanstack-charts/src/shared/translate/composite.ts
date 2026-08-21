@@ -1,4 +1,4 @@
-import { dot, link, rect } from '@tanstack/charts'
+import { dot, d3Curve, link, rect } from '@tanstack/charts'
 import { facet } from '@tanstack/charts/facet'
 import { geoShape } from '@tanstack/charts/geo'
 import { sunburst } from '@tanstack/charts/hierarchy/sunburst'
@@ -15,6 +15,7 @@ import {
   geoNaturalEarth1,
   geoOrthographic,
 } from 'd3-geo'
+import { curveBumpX } from 'd3-shape'
 
 import type { ChartMark } from '@tanstack/charts'
 
@@ -79,6 +80,19 @@ function hierarchyFieldChannel(field: string): (node: unknown) => unknown {
     (node as { data?: Record<string, unknown> } | null)?.data?.[field]
 }
 
+/**
+ * sankey 布局行顶层只有 canonical 字段（key/width/坐标），原 datum 收纳在 .data 下；
+ * 声明式样式字段名（如 stroke:"色调"、color:"id"）须穿透到原 datum 解析，
+ * 否则 channel 按顶层查表得 undefined 而静默退回默认样式。
+ */
+function sankeyDatumField(field: string): (row: unknown) => unknown {
+  return (row) => {
+    const record = row as { data?: Record<string, unknown> } & Record<string, unknown>
+    if (record.data != null && field in record.data) return record.data[field]
+    return record[field]
+  }
+}
+
 /** sankey：固化 marks 回调 = link(布局连线) + rect(布局节点)，样式取自声明 */
 function translateSankey(
   spec: CxChartMarkSpec,
@@ -96,29 +110,47 @@ function translateSankey(
     source: spec.source,
     target: spec.target,
     value: spec.value,
-    marks: (context: { nodes: readonly unknown[]; links: readonly unknown[] }) => [
-      looseLink(context.links, {
-        x1: 'x1',
-        y1: 'y1',
-        x2: 'x2',
-        y2: 'y2',
-        // 布局行有 canonical key 字段（原 datum 收纳在 .data 下不展开，官方示例实证）
-        key: 'key',
-        strokeWidth: 'width',
-        lineCap: 'butt',
-        stroke: spec.stroke ?? undefined,
-        strokeOpacity: spec.strokeOpacity ?? 0.55,
-      }),
-      looseRect(context.nodes, {
-        x1: 'x0',
-        x2: 'x1',
-        y1: 'y0',
-        y2: 'y1',
-        key: 'key',
-        color: spec.color ?? 'key',
-        fillOpacity: spec.fillOpacity ?? undefined,
-      }),
-    ],
+    marks: (context: { nodes: readonly unknown[]; links: readonly unknown[] }) => {
+      // link 的 stroke 是 VisualChannel（字符串按 CSS 字面值消费，不过 scale）；
+      // 字段名须改挂 color channel 才能过 color scale。判别靠运行时探测 datum 字段：
+      // 「色调」命中连线 datum → color channel；「currentColor」不命中 → CSS 字面 stroke。
+      const strokeField =
+        typeof spec.stroke === 'string' &&
+        context.links.some(
+          (l) => (l as { data?: Record<string, unknown> } | null)?.data?.[spec.stroke as string] !== undefined,
+        )
+          ? (spec.stroke as string)
+          : null
+      return [
+        looseLink(context.links, {
+          x1: 'x1',
+          y1: 'y1',
+          x2: 'x2',
+          y2: 'y2',
+          // 布局行有 canonical key 字段（原 datum 收纳在 .data 下不展开，官方示例实证）
+          key: 'key',
+          // strokeWidth 同为 VisualChannel：宽度编码流量，必须回调取布局 width（官方同形）
+          strokeWidth: (row: { width?: unknown }) => Math.max(1, Number(row.width) || 1),
+          lineCap: 'butt',
+          // sankey 连线的可读形态是水平 S 形粗带：curveBumpX 把端点连成缓入缓出曲线，
+          // 缺省直线会把粗描边画成斜切四边形，视觉上不像流量
+          curve: d3Curve(curveBumpX),
+          color: strokeField ? sankeyDatumField(strokeField) : undefined,
+          stroke: strokeField ? undefined : (spec.stroke ?? undefined),
+          strokeOpacity: spec.strokeOpacity ?? 0.55,
+        }),
+        looseRect(context.nodes, {
+          x1: 'x0',
+          x2: 'x1',
+          y1: 'y0',
+          y2: 'y1',
+          key: 'key',
+          color:
+            typeof spec.color === 'string' ? sankeyDatumField(spec.color) : (spec.color ?? 'key'),
+          fillOpacity: spec.fillOpacity ?? undefined,
+        }),
+      ]
+    },
   }
   if (spec.id !== undefined) options.id = spec.id
   if (spec.align !== undefined) options.align = spec.align

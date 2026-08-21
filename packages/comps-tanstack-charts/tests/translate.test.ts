@@ -972,6 +972,59 @@ describe('复合 mark（sankey/sunburst/treemap/tree/forceGraph/geoShape/facet�
     expect(svg).toContain('<rect')
   })
 
+  it('sankey：连线渲染为 curveBumpX 曲线路径而非直线段', () => {
+    const nodes = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+    const links = [
+      { source: 'a', target: 'b', value: 30 },
+      { source: 'b', target: 'c', value: 20 },
+      { source: 'a', target: 'c', value: 10 },
+    ]
+    const definition = translateChartSpec(
+      {
+        marks: [
+          { type: 'sankey', nodes: 'nodes', links: 'links', nodeKey: 'id', source: 'source', target: 'target', value: 'value' },
+        ],
+      },
+      { nodes, links },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'sankey-curve' })
+    // 连线须为 <path> 且含三次贝塞尔命令（C）；直线形态会落成 <line>，视觉丢失流量带语义
+    const linkPaths = svg.match(/<path[^>]*data-ts-key="[^"]*link[^"]*"[^>]*>/g) ?? []
+    expect(linkPaths.length).toBe(3)
+    for (const p of linkPaths) expect(p).toContain('C')
+  })
+
+  it('sankey：stroke/color 字符串字段穿透布局行 .data 解析原 datum', () => {
+    const nodes = [{ id: 'a' }, { id: 'b' }]
+    const links = [{ source: 'a', target: 'b', value: 30, tone: '盈利' }]
+    const definition = translateChartSpec(
+      {
+        marks: [
+          {
+            type: 'sankey',
+            nodes: 'nodes',
+            links: 'links',
+            nodeKey: 'id',
+            source: 'source',
+            target: 'target',
+            value: 'value',
+            stroke: 'tone',
+            color: 'id',
+          },
+        ],
+        color: { domain: ['盈利', 'a', 'b'], range: ['#00b51a', '#111111', '#222222'] },
+      },
+      { nodes, links },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'sankey-datum' })
+    // stroke 穿透取到 datum.tone 并经 color scale 映射为 range 色
+    expect(svg).toContain('stroke="#00b51a"')
+    // rect 节点 color 穿透取 datum.id 映射（a → #111111）
+    expect(svg).toContain('fill="#111111"')
+  })
+
   it('sunburst：层级 path 数据源 + polar 容器包装（x/y null）端到端可渲染', () => {
     const rows = [
       { path: 'root/a/x', value: 30 },
