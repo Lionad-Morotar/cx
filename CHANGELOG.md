@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.20] - 2026-08-21
+
+### Added
+
+- motion 声明式契约：`spec.motion` 支持 tween/spring transition 标量子集（duration/easing 字符串枚举、stiffness/damping 等）+ `delay` + renderer 级 `initial`/`resize`，翻译为库 `definition.motion` 的 chart 级默认时序；声明 motion 的物料走自研 renderer adapter 挂载分支（`motion()` renderer）——库 vue adapter 的 Chart 写死 `createSvgChartRenderer` 无 motion 注入口子，此前动效族物料全部静默无动画
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.19] - 2026-08-21
 
 ### Fixed
