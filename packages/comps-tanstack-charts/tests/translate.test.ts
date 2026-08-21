@@ -187,6 +187,31 @@ describe('translateChartSpec', () => {
     expect(tipOf(translateChartSpec(base))).toBe(domChartTooltip)
   })
 
+  it('motion：transition/delay 翻译为 definition.motion 的 chart 级默认时序', () => {
+    const definition = translateChartSpec({
+      marks: [{ type: 'barY' as const, data: rows, x: 'month', y: 'value' }],
+      motion: {
+        transition: { type: 'tween' as const, duration: 640, easing: 'ease-out' as const },
+        delay: 40,
+        initial: 'always' as const,
+        resize: true,
+      },
+    })
+    // transition/delay 进 definition.motion(motion renderer 消费);
+    // initial/resize 是 renderer 级选项,不进 definition
+    expect((definition as { motion?: unknown }).motion).toEqual({
+      transition: { type: 'tween', duration: 640, easing: 'ease-out' },
+      delay: 40,
+    })
+    expect((definition as Record<string, unknown>).initial).toBeUndefined()
+    expect((definition as Record<string, unknown>).resize).toBeUndefined()
+    // 未声明时不挂 motion 字段(组件层据此分流挂载分支)
+    const plain = translateChartSpec({
+      marks: [{ type: 'barY' as const, data: rows, x: 'month', y: 'value' }],
+    })
+    expect((plain as { motion?: unknown }).motion).toBeUndefined()
+  })
+
   it('decorative:true 经库 decorative() 包装——几何保留（SSR 输出与未装饰版逐字节一致）', () => {
     const base = { type: 'lineY' as const, data: rows, x: 'month', y: 'value', strokeWidth: 2 }
     const axes = { x: { scale: { kind: 'point' as const } }, y: { scale: { kind: 'linear' as const } } }

@@ -6,6 +6,14 @@
   <div :class="[ns.b(), 'cx-charts']" data-testid="cx-tanstack-charts-chart">
     <!-- definition 未闭合期间骨架占位：空壳帧的空 marks 只渲染不可见空 svg，无反馈等同未渲染 -->
     <ChartSkeleton v-if="isStreaming" :height="skeletonHeight" />
+    <!-- motion 声明走自研挂载分支：库 vue adapter 无 motion renderer 注入口子 -->
+    <MotionChart
+      v-else-if="spec.motion !== undefined"
+      :definition="definition"
+      :ariaLabel="ariaLabel"
+      :motion-options="spec.motion"
+      v-bind="hostProps"
+    />
     <Chart v-else v-bind="hostProps" :definition="definition" :aria-label="ariaLabel" />
   </div>
 </template>
@@ -19,6 +27,8 @@ import ChartSkeleton from '../../shared/chart-skeleton.vue'
 import { streamingFields } from '../../shared/streaming'
 import { useChartProps } from '../../shared/use-chart-props'
 import { translateChartSpec } from '../../shared/translate'
+
+import MotionChart from './motion-chart.vue'
 
 defineOptions({ name: 'CxTanstackChartsChart', inheritAttrs: false })
 

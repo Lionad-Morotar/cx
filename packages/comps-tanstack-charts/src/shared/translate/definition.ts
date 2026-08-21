@@ -225,7 +225,7 @@ function buildDefinition(
   }
   if (mode === 'child') {
     // host 权属字段归外层组合定义持有（官方 assertChildDefinition 契约），子视图显式声明即抛错
-    for (const key of ['tooltip', 'pointer', 'keyboard', 'focusRing', 'focus'] as const) {
+    for (const key of ['tooltip', 'pointer', 'keyboard', 'focusRing', 'focus', 'motion'] as const) {
       if (spec[key] !== undefined) {
         throw new Error(`translateViewGrid 子视图不得声明 "${key}"（host 权属字段，配置在外层 spec）`)
       }
@@ -236,6 +236,14 @@ function buildDefinition(
   if (spec.keyboard !== undefined) definition.keyboard = spec.keyboard
   if (spec.focusRing !== undefined) definition.focusRing = spec.focusRing
   if (spec.focus !== undefined) definition.focus = spec.focus
+  // motion：transition/delay 进 definition.motion 作 chart 级默认时序（motion renderer
+  // 消费）；initial/resize 是 renderer 级选项，由组件层挂载时消费，不进 definition
+  if (spec.motion !== undefined) {
+    const timing: Record<string, unknown> = {}
+    if (spec.motion.transition !== undefined) timing.transition = spec.motion.transition
+    if (spec.motion.delay !== undefined) timing.delay = spec.motion.delay
+    definition.motion = timing
+  }
   // tooltip 缺省开启对齐官方 catalog 形态（官网图表恒有 tooltip，而 LLM 产
   // spec 极少显式配置；库层 undefined=关闭，故缺省显式挂默认 extension，
   // 显式 false 保留关闭逃生）

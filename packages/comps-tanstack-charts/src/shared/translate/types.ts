@@ -630,4 +630,29 @@ export interface CxChartSpec {
   keyboard?: boolean
   focusRing?: boolean
   focus?: 'nearest' | 'nearest-x' | 'nearest-y' | 'group-x' | 'group-y'
+  /**
+   * 动效声明（可 JSON 化子集）。声明即走 motion 挂载分支：库 vue adapter 未暴露
+   * motion renderer 注入，cx 组件层自组装 renderer adapter。transition/delay 翻译为
+   * 库 definition.motion 的 chart 级默认时序；initial/resize 为 renderer 级选项。
+   * mark 级 per-datum motion 回调不可 JSON 化，不收。
+   */
+  motion?: {
+    transition?:
+      | {
+          type: 'tween'
+          duration?: number
+          easing?: 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out'
+        }
+      | {
+          type: 'spring'
+          stiffness?: number
+          damping?: number
+          mass?: number
+          restSpeed?: number
+          restDelta?: number
+        }
+    delay?: number
+    initial?: boolean | 'always'
+    resize?: boolean
+  }
 }
