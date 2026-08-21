@@ -115,7 +115,32 @@ function translateRadialMark(
 function translatePolarGuide(spec: CxChartPolarGuideSpec): unknown {
   const factory = spec.kind === 'radialGrid' ? radialGrid : angleGrid
   const options: Record<string, unknown> = {}
-  for (const key of ['values', 'ticks', 'shape', 'labels', 'labelAngle', 'labelOffset'] as const) {
+  // 对齐库 PolarGuideStyle + 两 grid 特有字段;format 是函数形态不可 JSON,不收。
+  // label*/stroke*/fill* 缺了会被静默丢弃(物料写了不生效),须全量透传字面量。
+  for (const key of [
+    'values',
+    'ticks',
+    'shape',
+    'labels',
+    'labelAngle',
+    'labelOffset',
+    'id',
+    'className',
+    'labelClassName',
+    'stroke',
+    'strokeOpacity',
+    'strokeWidth',
+    'strokeDasharray',
+    'fill',
+    'fillOpacity',
+    'labelFill',
+    'labelFontSize',
+    'labelAnchor',
+    'labelBaseline',
+    'labelDx',
+    'labelDy',
+    'labelRotate',
+  ] as const) {
     if (spec[key] !== undefined) options[key] = spec[key]
   }
   return (factory as (options: Record<string, unknown>) => unknown)(options)

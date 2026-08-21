@@ -1151,6 +1151,94 @@ describe('复合 mark（sankey/sunburst/treemap/tree/forceGraph/geoShape/facet�
     expect(definition.y).not.toBeNull()
   })
 
+  it('geoShape fit {data} 引用另一数据集：叠加层共享底图投影（点落矩形中心）', () => {
+    // 底图拟合范围与叠加层不同（单点层 fit:'data' 会退化），共享 fit 是多层 geo 的唯一对齐方式
+    const base = [
+      {
+        type: 'Feature',
+        properties: { name: 'box' },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [0, 0],
+              [10, 0],
+              [10, 10],
+              [0, 10],
+              [0, 0],
+            ],
+          ],
+        },
+      },
+    ]
+    const point = [
+      {
+        type: 'Feature',
+        properties: { name: 'center' },
+        geometry: { type: 'Point', coordinates: [5, 5] },
+      },
+    ]
+    const definition = translateChartSpec(
+      {
+        marks: [
+          { type: 'geoShape', data: 'base', projection: 'mercator', fit: 'data' },
+          { type: 'geoShape', data: 'pts', projection: 'mercator', fit: { data: 'base' } },
+        ],
+      },
+      { base, pts: point },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'geo-shared-fit' })
+    expect(svg).not.toContain('NaN')
+    const path = svg.match(/<path[^>]*d="([^"]+)"/)?.[1] ?? ''
+    const nums = path.match(/-?[\d.]+/g)?.map(Number) ?? []
+    const xs = nums.filter((_, i) => i % 2 === 0)
+    const ys = nums.filter((_, i) => i % 2 === 1)
+    const cx = Number(svg.match(/<circle[^>]*cx="([\d.]+)"/)?.[1])
+    const cy = Number(svg.match(/<circle[^>]*cy="([\d.]+)"/)?.[1])
+    // 共享投影下中心点应落在底图 bbox 中心（而非本层退化的 0 或 NaN）
+    expect(cx).toBeCloseTo((Math.min(...xs) + Math.max(...xs)) / 2, 0)
+    expect(cy).toBeCloseTo((Math.min(...ys) + Math.max(...ys)) / 2, 0)
+  })
+
+  it('polar guide 样式字段全量透传（labelFill/labelFontSize/stroke 不再被白名单丢弃）', () => {
+    const definition = translateChartSpec({
+      marks: [
+        {
+          type: 'polar',
+          polarGuides: [
+            {
+              kind: 'angleGrid',
+              values: ['a', 'b', 'c'],
+              labels: true,
+              labelFill: 'rgb(1, 2, 3)',
+              labelFontSize: 15,
+              stroke: 'rgb(4, 5, 6)',
+              strokeWidth: 2.5,
+            },
+          ],
+          marks: [
+            {
+              type: 'radialDot',
+              data: [
+                { cat: 'a', value: 1 },
+                { cat: 'b', value: 2 },
+                { cat: 'c', value: 3 },
+              ],
+              angle: 'cat',
+              radius: 'value',
+            },
+          ],
+        },
+      ],
+    })
+    const scene = createChartScene(toStatic(definition), { width: 480, height: 480 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'polar-guide-style' })
+    expect(svg).toContain('rgb(1, 2, 3)')
+    expect(svg).toContain('rgb(4, 5, 6)')
+    expect(svg).toContain('15')
+  })
+
   it('facet：chart 子 spec 模板递归（分组行注入缺省 data）端到端可渲染', () => {
     const rows = [
       { series: 's1', x: 1, y: 2 },

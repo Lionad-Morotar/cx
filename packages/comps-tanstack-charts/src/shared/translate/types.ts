@@ -287,7 +287,9 @@ export interface CxChartMarkSpec {
   orientation?: 'left' | 'right' | 'top' | 'bottom'
   nodeSize?: [number, number]
   projection?: 'mercator' | 'orthographic' | 'naturalEarth1' | 'albersUsa' | 'equalEarth' | 'identity'
-  fit?: 'data' | 'sphere'
+  /* 'data' 拟合本层数据;'sphere' 拟合全球面;{data} 引用另一命名数据集——
+     多层 geoShape(底图+叠加层)共享同一 fit 目标时投影才对齐 */
+  fit?: 'data' | 'sphere' | { data: string }
   by?: string
   axes?: 'outer' | 'cell'
   minWidth?: number
@@ -305,6 +307,23 @@ export interface CxChartPolarGuideSpec {
   labels?: boolean
   labelAngle?: number
   labelOffset?: number
+  /* PolarGuideStyle 字面量子集(label*Option 的函数形态不可 JSON,仅收字面量) */
+  id?: string
+  className?: string
+  labelClassName?: string
+  stroke?: string
+  strokeOpacity?: number
+  strokeWidth?: number
+  strokeDasharray?: string
+  fill?: string
+  fillOpacity?: number
+  labelFill?: string
+  labelFontSize?: number
+  labelAnchor?: 'start' | 'middle' | 'end'
+  labelBaseline?: 'auto' | 'middle' | 'hanging'
+  labelDx?: number
+  labelDy?: number
+  labelRotate?: number
 }
 
 /**

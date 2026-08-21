@@ -326,7 +326,7 @@ const GEO_PROJECTION_FACTORIES = {
   identity: geoIdentity,
 } as const
 
-/** geoShape：projection 名称枚举 → descriptor {type, fit, inset}；fit:'data' 由库拟合数据本体 */
+/** geoShape：projection 名称枚举 → descriptor {type, fit, inset}；fit:'data' 由库拟合数据本体，{data:'<name>'} 拟合另一命名数据集 */
 function translateGeoShape(
   spec: CxChartMarkSpec,
   datasets: CxChartDatasets | undefined,
@@ -340,7 +340,12 @@ function translateGeoShape(
   const options: Record<string, unknown> = {
     projection: {
       type: factory,
-      fit: spec.fit ?? 'data',
+      // fit {data} 引用物化为 FeatureCollection:库 fitExtent 直接消费 GeoJSON 对象,
+      // 多层 geoShape 指向同一数据集即共享投影(底图+叠加层不错位)
+      fit:
+        typeof spec.fit === 'object' && spec.fit !== null
+          ? { type: 'FeatureCollection', features: resolveMarkData(spec.fit.data, datasets) }
+          : (spec.fit ?? 'data'),
       ...(spec.inset !== undefined ? { inset: spec.inset } : {}),
     },
   }
