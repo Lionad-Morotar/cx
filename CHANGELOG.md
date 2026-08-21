@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.17] - 2026-08-21
+
+### Added
+
+- facet 子模板 `$by` 按组实例化：chart 子模板字段值支持 `{$by: {组名: 值}}` 映射，递归翻译前按当前分组实例化（投影画廊等「同构分面、按组异参」场景，如四分面各用不同投影）；未命中分组显式抛错，防静默同参退化
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.16] - 2026-08-21
 
 ### Added
