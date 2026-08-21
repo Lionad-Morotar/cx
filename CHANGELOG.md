@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.18] - 2026-08-21
+
+### Added
+
+- geoShape `projection` 枚举新增 `equirectangular`（等距圆柱）：`identity` 直投的 stream 无 `sphere` 方法，球面描边层（`data`/`fit` 为 Sphere 几何）在 fitExtent 与 path 渲染两阶段都抛 `TypeError: this.stream.sphere is not a function`——投影画廊等场景的「等距圆柱」分面须用 equirectangular，identity 仅适合纯非球面几何的线性直投
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.17] - 2026-08-21
 
 ### Added
