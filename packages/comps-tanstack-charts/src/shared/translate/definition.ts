@@ -72,6 +72,7 @@ function translateTooltip(tooltip: NonNullable<CxChartSpec['tooltip']>): unknown
     'anchor',
     'sort',
     'items',
+    'className',
   ] as const) {
     if (tooltip[key] !== undefined) options[key] = tooltip[key]
   }

@@ -618,6 +618,9 @@ export interface CxChartSpec {
               y?: 'point' | 'pointer' | 'value' | 'group-center' | 'plot-top' | 'plot-center' | 'plot-bottom'
             }
         sort?: 'visual' | 'color-domain' | 'focus'
+        /** 追加到 tooltip 根元素的自定义类名(`ts-chart-tooltip <className>`),
+         *  供物料/宿主用 CSS 分化指示器等外壳样式 */
+        className?: string
         items?: (
           | 'x'
           | 'y'

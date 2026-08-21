@@ -182,6 +182,13 @@ describe('translateChartSpec', () => {
       placement: 'top',
       offset: 8,
     })
+    // className 透传:物料经自定义类名在 CSS 层分化 tooltip 外壳(指示器等)
+    expect(
+      tipOf(translateChartSpec({ ...base, tooltip: { className: 'sc-tooltip-no-indicator' } })),
+    ).toEqual({
+      use: domChartTooltip,
+      className: 'sc-tooltip-no-indicator',
+    })
     // 缺席缺省开启：库层 undefined 等于关闭（resolveTooltipInput 返回 null），
     // 而官方 catalog 图表恒有 tooltip——缺省显式挂默认 extension 对齐官网形态
     expect(tipOf(translateChartSpec(base))).toBe(domChartTooltip)
