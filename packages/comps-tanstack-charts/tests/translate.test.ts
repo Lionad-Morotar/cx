@@ -1112,6 +1112,31 @@ describe('复合 mark（sankey/sunburst/treemap/tree/forceGraph/geoShape/facet�
     expect(renderChartSvg(scene, { ariaLabel: 'geo' })).toContain('<svg')
   })
 
+  it('geoShape：equirectangular 投影可渲染 Sphere 几何（identity 会抛 stream.sphere 缺失）', () => {
+    // 等距圆柱语义的正确投影是 equirectangular；identity 直投的 stream 无 sphere
+    // 方法，球面描边层（110 投影画廊场景）在 fitExtent/path 两阶段都会抛 TypeError。
+    const sphere = [{ type: 'Feature', properties: {}, geometry: { type: 'Sphere' } }]
+    const definition = translateChartSpec(
+      {
+        marks: [
+          {
+            type: 'geoShape',
+            data: 'rows',
+            projection: 'equirectangular',
+            fit: 'sphere',
+            stroke: 'currentColor',
+            fill: 'none',
+          },
+        ],
+      },
+      { rows: sphere },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'geo-equirect' })
+    expect(svg).toContain('<svg')
+    expect(svg).not.toContain('NaN')
+  })
+
   it('纯 geoShape spec 缺省 x/y 置 null——geo mark 不物化直角 channel，缺省轴只剩 0-1 噪音', () => {
     const definition = translateChartSpec({
       marks: [

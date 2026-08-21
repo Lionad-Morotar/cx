@@ -294,8 +294,9 @@ export interface CxChartMarkSpec {
     | 'naturalEarth1'
     | 'albersUsa'
     | 'equalEarth'
+    | 'equirectangular'
     | 'identity'
-    | { $by: Record<string, 'mercator' | 'orthographic' | 'naturalEarth1' | 'albersUsa' | 'equalEarth' | 'identity'> }
+    | { $by: Record<string, 'mercator' | 'orthographic' | 'naturalEarth1' | 'albersUsa' | 'equalEarth' | 'equirectangular' | 'identity'> }
   /* 'data' 拟合本层数据;'sphere' 拟合全球面;{data} 引用另一命名数据集——
      多层 geoShape(底图+叠加层)共享同一 fit 目标时投影才对齐 */
   fit?: 'data' | 'sphere' | { data: string }

@@ -9,6 +9,7 @@ import { sankeyDiagram } from '@tanstack/charts/network/sankey'
 import {
   geoAlbersUsa,
   geoEqualEarth,
+  geoEquirectangular,
   geoIdentity,
   geoMercator,
   geoNaturalEarth1,
@@ -316,13 +317,16 @@ function translateForceGraph(
   }
 }
 
-/** d3-geo 投影名称枚举 → 工厂（descriptor.type 形态：() => projection） */
+/** d3-geo 投影名称枚举 → 工厂（descriptor.type 形态：() => projection）；
+ *  等距圆柱必须用 equirectangular 而非 identity：identity 的 stream 无 sphere 方法，
+ *  fit/渲染 Sphere 几何（球面描边层）直接抛 TypeError */
 const GEO_PROJECTION_FACTORIES = {
   mercator: geoMercator,
   orthographic: geoOrthographic,
   naturalEarth1: geoNaturalEarth1,
   albersUsa: geoAlbersUsa,
   equalEarth: geoEqualEarth,
+  equirectangular: geoEquirectangular,
   identity: geoIdentity,
 } as const
 
