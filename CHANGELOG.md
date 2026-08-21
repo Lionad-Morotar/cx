@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.19] - 2026-08-21
+
+### Fixed
+
+- sankey 连线渲染形态与字段解析：连线固化 `curveBumpX` 曲线（缺省直线把流量粗描边画成斜切四边形）；`strokeWidth` 由字符串 `'width'` 改为回调取布局宽度（VisualChannel 对字符串按 CSS 字面值消费，宽度曾原样输出为 `stroke-width="width"`）；`stroke`/`color` 字符串字段穿透布局行 `.data` 解析原 datum，`stroke` 命中 datum 字段时改挂 color channel 过 color scale（`stroke:"色调"` 等声明此前解析为 undefined 静默退回默认色），CSS 字面值（如 `currentColor`）保持挂 stroke 语义不变
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.18] - 2026-08-21
 
 ### Added
