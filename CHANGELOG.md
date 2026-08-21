@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.21] - 2026-08-21
+
+### Fixed
+
+- motion 入场动画在 prerender 首帧采用态下被跳过:自研挂载分支必然先注入首帧 markup 再 mount,库层 mount 恒判定 `adoptedRoot=true`,而 `initial: true` 语义对 adopted 首帧跳过入场动画(SSR 水合防闪动)——renderer 默认改为 `initial: 'always'` 重播,物料仍可显式 `initial: false` 关闭
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.20] - 2026-08-21
 
 ### Added
