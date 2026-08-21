@@ -333,6 +333,10 @@ function translateGeoShape(
 ): ChartMark<unknown, any, any> {
   const rows = resolveMarkData(spec.data, datasets)
   const projectionName = spec.projection ?? 'mercator'
+  if (typeof projectionName === 'object') {
+    // {$by} 形态只活在 facet 子模板,实例化后此处恒为字符串;泄漏即模板路径缺实例化
+    throw new Error('translateGeoShape: projection {$by} 仅允许出现在 facet chart 子模板内')
+  }
   const factory = GEO_PROJECTION_FACTORIES[projectionName]
   if (!factory) {
     throw new Error(`translateGeoShape: 未知投影 "${String(projectionName)}"`)
@@ -374,6 +378,32 @@ function translateGeoShape(
 }
 
 /**
+ * facet 子模板按组实例化:深度遍历,把 {$by:{组名:值}} 形态字段替换为当前组映射值。
+ * 未声明 $by 的字段原样保留;$by 表未命中当前组时抛错(静默回退会让分面悄悄同参)。
+ */
+function instantiateFacetTemplate<T>(node: T, groupKey: unknown): T {
+  if (Array.isArray(node)) return node.map((item) => instantiateFacetTemplate(item, groupKey)) as T
+  if (node && typeof node === 'object') {
+    const record = node as Record<string, unknown>
+    const keys = Object.keys(record)
+    if (keys.length === 1 && keys[0] === '$by') {
+      const table = record.$by as Record<string, unknown>
+      const hit = table[String(groupKey)]
+      if (hit === undefined) {
+        throw new Error(
+          `instantiateFacetTemplate: $by 映射未命中分组 "${String(groupKey)}"(可用键: ${Object.keys(table).join(', ')})`,
+        )
+      }
+      return hit as T
+    }
+    return Object.fromEntries(
+      Object.entries(record).map(([k, v]) => [k, instantiateFacetTemplate(v, groupKey)]),
+    ) as T
+  }
+  return node
+}
+
+/**
  * facet：chart 回调固化为递归子 spec 翻译——translateChild 由 definition.ts 注入
  * （子 spec 翻译与顶层同路径，仅数据集换为 facet 分组行；规避 composite ↔ definition 循环 import）。
  * label 语义：true 显示分组 key 标签（库的函数形态不可 JSON，布尔即可覆盖声明式场景）。
@@ -387,9 +417,16 @@ function translateFacet(
   if (!spec.by) throw new Error('translateFacet: facet 必须声明 by 分组字段')
   if (!spec.chart) throw new Error('translateFacet: facet 必须声明 chart 子 spec 模板')
   const childTemplate = spec.chart
+  const byField = spec.by
   const options: Record<string, unknown> = {
-    by: spec.by,
-    chart: (facetRows: readonly unknown[]) => translateChild(childTemplate, facetRows),
+    by: byField,
+    // 子模板按组实例化:字段值 {$by:{组名:值}} 替换为当前组映射值(投影画廊等
+    // 「同构图不同参数」场景);未命中显式抛错,防静默四图同参退化
+    chart: (facetRows: readonly unknown[]) =>
+      translateChild(
+        instantiateFacetTemplate(childTemplate, (facetRows[0] as Record<string, unknown> | undefined)?.[byField]),
+        facetRows,
+      ),
   }
   if (spec.id !== undefined) options.id = spec.id
   if (spec.columns !== undefined) options.columns = spec.columns

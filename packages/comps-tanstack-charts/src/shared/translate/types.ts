@@ -286,7 +286,16 @@ export interface CxChartMarkSpec {
   labelFontWeight?: number
   orientation?: 'left' | 'right' | 'top' | 'bottom'
   nodeSize?: [number, number]
-  projection?: 'mercator' | 'orthographic' | 'naturalEarth1' | 'albersUsa' | 'equalEarth' | 'identity'
+  /* facet 子模板内可用 {$by:{组名:投影名}} 按组分化(投影画廊场景);
+     实例化在 translateFacet 递归前完成,translateGeoShape 拿到的恒为枚举字符串 */
+  projection?:
+    | 'mercator'
+    | 'orthographic'
+    | 'naturalEarth1'
+    | 'albersUsa'
+    | 'equalEarth'
+    | 'identity'
+    | { $by: Record<string, 'mercator' | 'orthographic' | 'naturalEarth1' | 'albersUsa' | 'equalEarth' | 'identity'> }
   /* 'data' 拟合本层数据;'sphere' 拟合全球面;{data} 引用另一命名数据集——
      多层 geoShape(底图+叠加层)共享同一 fit 目标时投影才对齐 */
   fit?: 'data' | 'sphere' | { data: string }

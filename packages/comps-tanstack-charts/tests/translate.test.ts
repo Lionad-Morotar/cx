@@ -1239,6 +1239,97 @@ describe('复合 mark（sankey/sunburst/treemap/tree/forceGraph/geoShape/facet�
     expect(svg).toContain('15')
   })
 
+  it('facet 子模板 $by 按组实例化：同构分面投影分化（投影画廊场景）', () => {
+    const box = (name: string) => [
+      {
+        type: 'Feature',
+        properties: { name },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [0, 0],
+              [10, 0],
+              [10, 10],
+              [0, 10],
+              [0, 0],
+            ],
+          ],
+        },
+      },
+    ]
+    const definition = translateChartSpec(
+      {
+        marks: [
+          {
+            type: 'facet',
+            data: 'rows',
+            by: 'id',
+            columns: 2,
+            chart: {
+              marks: [
+                {
+                  type: 'geoShape',
+                  data: 'geo',
+                  projection: { $by: { 甲: 'mercator', 乙: 'equalEarth' } },
+                  fit: 'data',
+                },
+              ],
+              guides: false,
+              margin: 0,
+            },
+          },
+        ],
+      },
+      {
+        rows: [{ id: '甲' }, { id: '乙' }],
+        geo: box('box'),
+      },
+    )
+    const scene = createChartScene(toStatic(definition), { width: 640, height: 320 })
+    const svg = renderChartSvg(scene, { ariaLabel: 'facet-by' })
+    expect(svg).not.toContain('NaN')
+    expect(svg).toContain('<svg')
+  })
+
+  it('facet 子模板 $by 未命中分组显式抛错（防静默同参退化）', () => {
+    // 分组实例化在库 facet chart 回调内发生,须建 scene 才触发翻译
+    const definition = translateChartSpec(
+      {
+        marks: [
+          {
+            type: 'facet',
+            data: 'rows',
+            by: 'id',
+            chart: {
+              marks: [
+                {
+                  type: 'geoShape',
+                  data: 'geo',
+                  projection: { $by: { 甲: 'mercator' } },
+                  fit: 'data',
+                },
+              ],
+            },
+          },
+        ],
+      },
+      {
+        rows: [{ id: '甲' }, { id: '丙' }],
+        geo: [
+          {
+            type: 'Feature',
+            properties: { name: 'box' },
+            geometry: { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] },
+          },
+        ],
+      },
+    )
+    expect(() => createChartScene(toStatic(definition), { width: 640, height: 320 })).toThrow(
+      /\$by 映射未命中分组 "丙"/,
+    )
+  })
+
   it('facet：chart 子 spec 模板递归（分组行注入缺省 data）端到端可渲染', () => {
     const rows = [
       { series: 's1', x: 1, y: 2 },
