@@ -60,7 +60,10 @@ function toHostOptions() {
     className: props.className,
     idPrefix,
     renderer: motion({
-      initial: props.motionOptions?.initial ?? true,
+      // 本组件必然先注入 prerender 首帧再 mount,库层 mount 时恒判定 adoptedRoot=true;
+      // initial:true 对 adopted 首帧跳过入场动画(语义是 SSR 水合防闪动),而此处首帧
+      // 尚未播放过动画,故默认 'always' 重播;物料可显式传 initial:false 关闭
+      initial: props.motionOptions?.initial ?? 'always',
       resize: props.motionOptions?.resize,
     }),
   }
