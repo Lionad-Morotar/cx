@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.22] - 2026-08-21
+
+### Added
+
+- tooltip 标量子集新增 `className` 透传(追加到 `ts-chart-tooltip` 根元素):shadcn 系 tooltip 物料的外壳差异(指示器显隐等)可经自定义类名在 CSS 层表达
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.21] - 2026-08-21
 
 ### Fixed
