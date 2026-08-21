@@ -6,6 +6,16 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.16] - 2026-08-21
+
+### Added
+
+- geoShape `fit` 支持 `{data: '<name>'}` 数据集引用：多层 geoShape（底图+叠加层）各自 `fit:'data'` 会按本层数据分别拟合投影导致层间错位，fit 引用物化为 FeatureCollection 直传库 fitExtent，多层指向同一数据集即共享投影
+
+### Fixed
+
+- polar guides 白名单补全 PolarGuideStyle 字面量字段：`labelFill`/`labelFontSize`/`stroke`/`fill` 等 17 个样式字段此前被静默丢弃（物料写了不生效，radar 网格线与 label 配色回退缺省），现全量透传；`format` 函数形态不可 JSON 仍不收
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.15] - 2026-08-21
 
 ### Fixed
