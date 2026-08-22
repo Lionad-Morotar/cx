@@ -1,6 +1,6 @@
 # 验收脚本形态
 
-Stream 页面验收用 Playwright headless 脚本（落 .tmp/，不入库），1920×1080 视口。断言清单按序执行，任一环断裂即定位到对应契约（见 schema-contracts.md）。
+Stream 页面验收用 Playwright headless 脚本（落 .tmp/，不入库），1920×1080 视口。断言清单按序执行，任一环断裂即定位到对应契约（见 cx-context 技能 schema-contracts.md）。
 
 ## 前置：会话注入
 
@@ -14,7 +14,7 @@ Stream 页面验收用 Playwright headless 脚本（落 .tmp/，不入库），1
 3. **BEM 锚点分件计数**：按物料 BEM block class 逐件计数（.cx-chain-section/.cx-chain-node/.cx-tabs/.cx-company-card/...），与剧本节点数核对。禁用 .is-cx-component 全量计数——inheritAttrs:false 物料被吞标识后漏计，误报为「渲染不全」
 4. **伪联动闭环**：点击链节点 → link-hint 出现「已选「xxx」→ ...」文案 + tabs 激活面板切到目标（.cx-tabs__tab.is-active 文案断言）+ 节点选中态可视（滚动虚线框）
 5. **流式中途交互**：播放未结束时操作物料控件（点击 tab 头），跨 ≥1 秒（多个 tick）后断言状态保持——内部态被帧冲刷只有中途帧到达时才暴露，播完后验证必然漏诊；tabs 类节点在流序中靠后时先高速冲到可见再降速拉开交互窗口
-6. **console/page error 清零**：全程监听 console error 与 pageerror，收尾打印前 10 条——「功能正常但有 emitter TypeError」类噪音也算失败（见 schema-contracts.md 事件契约）。stream 页面同时把 **warning 纳入统计**：流式回放会把任何按实例/按帧计的 dev 警告（prop 校验、指令根形态、echarts 中间帧族）放大到刷屏量级，warning 总量超个位数即视为失败
+6. **console/page error 清零**：全程监听 console error 与 pageerror，收尾打印前 10 条——「功能正常但有 emitter TypeError」类噪音也算失败（见 cx-context 技能 schema-contracts.md 事件契约）。stream 页面同时把 **warning 纳入统计**：流式回放会把任何按实例/按帧计的 dev 警告（prop 校验、指令根形态、echarts 中间帧族）放大到刷屏量级，warning 总量超个位数即视为失败
 7. **full_page 截图**：布局排查留证（链区稀疏、列宽失衡、面板空白一眼可辨）；关键物料再截 viewport 近景
 
 ## 大消息量采集

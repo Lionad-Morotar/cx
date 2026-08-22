@@ -1,6 +1,6 @@
-# 物料 Fork 改造纪律
+# cx 物料改造纪律
 
-业务组件 → cx 物料（components/cx/<name>）的改造判据。目标形态：物料零宿主依赖（不调 svc、不碰 mittBus/全局 store），数据经 props 进、交互经 emits 出。
+cx 体系内业务组件 → cx 物料（components/cx/<name>）的改造判据。目标形态：物料零宿主依赖（不调 svc、不碰 mittBus/全局 store），数据经 props 进、交互经 emits 出。
 
 ## 剥离宿主依赖
 
