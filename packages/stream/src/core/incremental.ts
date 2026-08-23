@@ -77,6 +77,29 @@ export function createTriggerRegistry<TSpec = unknown>(): TriggerRegistry<TSpec>
   }
 }
 
+/**
+ * 合并多个注册表为新注册表（入参注册表不被修改）。
+ *
+ * 宿主按物料族分别持有注册表（各物料包自带 create*TriggerRegistry 工厂），
+ * 消费多族物料的宿主在此汇合装配。key 冲突显式抛错而非静默覆盖：
+ * 物料族 key 各自带命名空间前缀，冲突只会来自同一族被重复装配，
+ * 静默放行会让排错失去第一现场。
+ */
+export function mergeTriggerRegistries<TSpec = unknown>(
+  ...registries: TriggerRegistry<TSpec>[]
+): TriggerRegistry<TSpec> {
+  const merged = createTriggerRegistry<TSpec>()
+  for (const registry of registries) {
+    for (const [key, trigger] of registry.entries()) {
+      if (merged.has(key)) {
+        throw new Error(`TriggerRegistry key 冲突: ${key}`)
+      }
+      merged.register(key, trigger)
+    }
+  }
+  return merged
+}
+
 export interface IncrementalExtractorConfig<TSpec> {
   registry: TriggerRegistry<TSpec>
   /** 从完整解析的 Spec 中匹配 trigger（协议相关：如 cx 按节点 key 匹配） */

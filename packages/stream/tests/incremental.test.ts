@@ -3,6 +3,7 @@ import {
   closingBrackets,
   createIncrementalExtractor,
   createTriggerRegistry,
+  mergeTriggerRegistries,
 } from '../src/core/incremental'
 import { matchCxTrigger } from '../src/cx'
 
@@ -77,6 +78,44 @@ describe('createTriggerRegistry', () => {
     r.register('a', { scanPaths: [], buildPartial: () => null })
     expect(r.unregister('a')).toBe(true)
     expect(r.has('a')).toBe(false)
+  })
+})
+
+describe('mergeTriggerRegistries', () => {
+  it('多族合并：条目并入新表，入参注册表不被修改', () => {
+    const vtu = createTriggerRegistry<CxSpec>()
+    vtu.register('cx-vtu-data-table', tableTrigger)
+    const charts = createTriggerRegistry<CxSpec>()
+    charts.register('cx-chart', tableTrigger)
+
+    const merged = mergeTriggerRegistries(vtu, charts)
+    expect(merged.size).toBe(2)
+    expect(merged.has('cx-vtu-data-table')).toBe(true)
+    expect(merged.has('cx-chart')).toBe(true)
+    // 入参保持原状：合并产物是新表，后续对入参的增删不影响已合并结果
+    expect(vtu.size).toBe(1)
+    expect(charts.size).toBe(1)
+  })
+
+  it('合并产物与原表引用隔离：新注册不影响合并结果', () => {
+    const a = createTriggerRegistry<CxSpec>()
+    a.register('k1', tableTrigger)
+    const merged = mergeTriggerRegistries(a)
+    a.register('k2', tableTrigger)
+    expect(merged.has('k2')).toBe(false)
+    expect(merged.size).toBe(1)
+  })
+
+  it('key 冲突显式抛错（同一族重复装配的第一现场）', () => {
+    const a = createTriggerRegistry<CxSpec>()
+    a.register('cx-chart', tableTrigger)
+    const b = createTriggerRegistry<CxSpec>()
+    b.register('cx-chart', tableTrigger)
+    expect(() => mergeTriggerRegistries(a, b)).toThrow(/cx-chart/)
+  })
+
+  it('零入参返回空注册表', () => {
+    expect(mergeTriggerRegistries<CxSpec>().size).toBe(0)
   })
 })
 
