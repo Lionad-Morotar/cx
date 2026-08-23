@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.23] - 2026-08-23
+
+### Changed
+
+- `cx-chart` 流式触发器改为通配主数组（`arrayKey: '*'`）：data 下任意数组字段皆为主数组、逐字段按元素边界截断生长——关系型（桑基/力导向的 nodes+links）、嵌套环（innerRows+outerRows）、仪表（bandRows/tickRows）、地图（land/sphere/graticule/route）等无 rows 形态此前流式期全程静默、围栏闭合后才整体出现，现在与 rows 形态一致获得逐条生长效果，新增数据形态无需改触发器
+
+## [@lionad/cx-stream 0.1.0-alpha.12] - 2026-08-23
+
+### Added
+
+- `ArraySectionConfig.arrayKey` 支持 `'*'` 通配形态：data 下任意数组字段皆为主数组，按扫描匹配的具体路径分组、逐字段截断到已完整元素——多数据集形态（如 nodes+links）各按自身传输进度生长；空态透传改由 parse 结果中的空数组字段判定；通配与 `deriveTailFields` 组合编译期拒绝
+
 ## [@lionad/cx-stream 0.1.0-alpha.11] - 2026-08-23
 
 ### Added
