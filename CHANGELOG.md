@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-stream 0.1.0-alpha.11] - 2026-08-23
+
+### Added
+
+- `mergeTriggerRegistries(...registries)`：把多族物料注册表合并为新注册表（入参不被修改），key 冲突显式抛错防静默覆盖——消费多物料族的宿主（如 vtu + tanstack-charts 并存的聊天场景）装配统一注册表不再手写合并循环，同一族重复装配在第一现场被拦截
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.22] - 2026-08-21
 
 ### Added
