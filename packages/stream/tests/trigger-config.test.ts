@@ -368,6 +368,84 @@ describe('compileTrigger 经真实管线端到端', () => {
   })
 })
 
+describe('compileTrigger 通配主数组（arrayKey "*"）', () => {
+  const chartConfig: StreamTriggerConfig = {
+    key: 'cx-demo-chart',
+    sections: [{ kind: 'array', arrayKey: '*' }],
+    stateBranch: { emptyPassthrough: true },
+  }
+
+  function createChartExtractor() {
+    const registry = createTriggerRegistry<CxSpec>()
+    registry.register('cx-demo-chart', compileTrigger(chartConfig))
+    return createIncrementalExtractor({ registry, matchTrigger: matchCxTrigger })
+  }
+
+  it('多数据集形态：各数组按自身传输进度逐条截断（nodes 全量 + links 半量）', () => {
+    // 桑基图形状：definition 序列化在先，nodes 与 links 为两个独立增长数组
+    const extractor = createChartExtractor()
+    const partial = asNode(
+      extractor.next(
+        '{"key":"cx-demo-chart","data":{"definition":{"marks":[{"type":"sankey"}]},"nodes":[{"id":"a"},{"id":"b"}],"links":[{"source":"a","target":"b","value":4},{"source":"a","target":"c"',
+      ),
+    )
+    expect(partial?.key).toBe('cx-demo-chart')
+    expect(partial?.data?.nodes).toEqual([{ id: 'a' }, { id: 'b' }])
+    expect(partial?.data?.links).toEqual([{ source: 'a', target: 'b', value: 4 }])
+    // 主数组在先的 definition 完整随帧
+    expect(partial?.data?.definition).toEqual({ marks: [{ type: 'sankey' }] })
+  })
+
+  it('首个数组首条闭合即出帧（无帧沉默期仅到首条数据闭合）', () => {
+    const extractor = createChartExtractor()
+    expect(
+      extractor.next('{"key":"cx-demo-chart","data":{"definition":{"marks":[{"type":"sankey"}]},"nodes":[{"id":"a"'),
+    ).toBeNull()
+    const first = asNode(
+      extractor.next(
+        '{"key":"cx-demo-chart","data":{"definition":{"marks":[{"type":"sankey"}]},"nodes":[{"id":"a"}],"links":[{"source":"a"',
+      ),
+    )
+    expect(first?.data?.nodes).toEqual([{ id: 'a' }])
+    // links 尚无完整项：缺席而非空数组
+    expect('links' in (first?.data ?? {})).toBe(false)
+  })
+
+  it('空数组闭合经 parse 判定透传（真空态 ≠ 尚未开始传输）', () => {
+    const extractor = createChartExtractor()
+    const empty = asNode(
+      extractor.next('{"key":"cx-demo-chart","data":{"definition":{"marks":[]},"nodes":[],"links":[]} }'),
+    )
+    expect(empty, '空数组终态应透传而非永驻 pending').not.toBeNull()
+    expect(empty?.data?.nodes).toEqual([])
+    // definition 传输中且无任何数组闭合：保持 null（非空态不误透传）
+    expect(
+      createChartExtractor().next('{"key":"cx-demo-chart","data":{"definition":{"marks":[{"type":"sa'),
+    ).toBeNull()
+  })
+
+  it('完整文本终帧：全字段与尾随标量兜底在场', () => {
+    const extractor = createChartExtractor()
+    const full = asNode(
+      extractor.next(
+        '{"key":"cx-demo-chart","data":{"definition":{"marks":[]},"nodes":[{"id":"a"}],"links":[{"source":"a","target":"b","value":4}],"height":200}}',
+      ),
+    )
+    expect(full?.data?.nodes).toHaveLength(1)
+    expect(full?.data?.links).toHaveLength(1)
+    expect(full?.data?.height).toBe(200)
+  })
+
+  it('通配与 deriveTailFields 组合编译期拒绝', () => {
+    expect(() =>
+      compileTrigger({
+        key: 'cx-demo-chart',
+        sections: [{ kind: 'array', arrayKey: '*', deriveTailFields: () => ({}) }],
+      }),
+    ).toThrow(/deriveTailFields/)
+  })
+})
+
 describe('fromArrayTriggerConfig 迁移同一性', () => {
   function deriveChartTailFields(completeRows: unknown[]): Record<string, unknown> {
     const first = completeRows[0]

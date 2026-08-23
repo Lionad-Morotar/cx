@@ -12,11 +12,12 @@ import type { ArraySectionConfig, CxSpec, CxStreamNode } from '@lionad/cx-stream
 
 /**
  * stream-trigger 判定与回放链路契约：
- * - 注册完备与计数校验（6 array 全适用：预设 5 件主数组 data + chart 主数组 rows，
+ * - 注册完备与计数校验（6 array 全适用：预设 5 件主数组 data + chart 通配主数组，
  *   0 scalar 0 不适用，差集派生兜底）；
- * - chart array 数据顶层化语义：key 检出无帧（主数组缺席不产出，pending 由渲染
- *   管线承担）、rows 首行闭合出帧且 definition 必完整（序列化序前置）、行数单调
- *   递增、空 rows 终态经 emptyPassthrough 透传（组件空态接管）；
+ * - chart array 数据顶层化语义：key 检出无帧（数据数组缺席不产出，pending 由渲染
+ *   管线承担）、首行闭合出帧且 definition 必完整（序列化序前置）、行数单调
+ *   递增、空数组终态经 emptyPassthrough 透传（组件空态接管）、多数据集形态
+ *   （桑基 nodes+links）接力生长且中间帧挂载不抛错；
  * - 5 预设真实样本前缀播放增量收敛（行数单调递增、终态满行）；
  * - 增量帧喂包装层全链路实证：中间帧 data 挂载不抛错、svg 存在——序列化序
  *   使通道字段先于行闭合，且 composable 对通道缺席有回退（LLM 乱序场景双保险）。
@@ -82,7 +83,7 @@ describe('stream-trigger 判定完备性', () => {
     }
   })
 
-  it('array 触发器扫描路径：预设主数组 data、chart 主数组 rows + nodes/links 次路径（frameStride 10）', () => {
+  it('array 触发器扫描路径：预设主数组 data、chart 通配主数组（frameStride 10）', () => {
     for (const config of TANSTACK_CHARTS_STREAM_TRIGGERS) {
       expect(config.frameStride).toBe(10)
       const array = config.sections.find((s): s is ArraySectionConfig => s.kind === 'array')
@@ -94,13 +95,9 @@ describe('stream-trigger 判定完备性', () => {
     }
     const chart = TANSTACK_CHARTS_STREAM_TRIGGERS.find((c) => c.key === 'cx-chart')!
     const chartArray = chart.sections[0] as ArraySectionConfig
-    expect(chartArray.arrayKey).toBe('rows')
-    expect(chartArray.extraScanPaths).toEqual([
-      ['data', 'nodes', '*'],
-      ['data', 'links', '*'],
-    ])
-    // 空 rows 终态透传（组件空态接管）；无 rows 字段的 spec 不产帧——
-    // GenUI 契约锁死 rows 恒为主数据集在场，契约外形态由生成期校验门拦截
+    // 通配主数组：rows / nodes+links / innerRows+outerRows 等多数据形态统一流式
+    expect(chartArray.arrayKey).toBe('*')
+    // 空数组终态透传（组件空态接管，防流结束后 pending 永驻）
     expect(chart.stateBranch?.emptyPassthrough).toBe(true)
   })
 })
@@ -179,6 +176,77 @@ describe('chart array 形态 · 数据顶层化回放', () => {
     const final = extractorOf().next(script) as CxStreamNode | null
     expect(final, '空 rows 终态应透传而非永驻 pending').not.toBeNull()
     expect(final?.data?.rows).toEqual([])
+  })
+
+  /** 桑基形剧本：definition 在先（通道字段完整——序列化序保证增量帧必携），
+   * nodes 与 links 两个数据数组按序列化序接力 */
+  function sankeyScriptOf(): string {
+    const data = {
+      definition: {
+        marks: [
+          {
+            type: 'sankey',
+            nodes: 'nodes',
+            links: 'links',
+            nodeKey: 'id',
+            source: 'source',
+            target: 'target',
+            value: 'value',
+          },
+        ],
+      },
+      nodes: Array.from({ length: REAL_ROWS }, (_, i) => ({ id: `n${i}` })),
+      links: Array.from({ length: REAL_ROWS * 2 }, (_, i) => ({
+        source: `n${i % REAL_ROWS}`,
+        target: `n${(i + 1) % REAL_ROWS}`,
+        value: i + 1,
+      })),
+    }
+    return JSON.stringify({ id: 'test-sankey', key: 'cx-chart', data })
+  }
+
+  it('多数据集形态流式：nodes 与 links 各自逐条生长、单调递增收敛到满量', () => {
+    const script = sankeyScriptOf()
+    const extractor = extractorOf()
+    const nodeCounts: number[] = []
+    const linkCounts: number[] = []
+    const step = Math.max(1, Math.floor(script.length / 60))
+    for (let i = step; i < script.length; i += step) {
+      const partial = extractor.next(script.slice(0, i)) as CxStreamNode | null
+      if (partial) {
+        nodeCounts.push(((partial.data?.nodes as unknown[]) ?? []).length)
+        linkCounts.push(((partial.data?.links as unknown[]) ?? []).length)
+      }
+    }
+    const final = extractor.next(script) as CxStreamNode | null
+    expect((final?.data?.nodes as unknown[]).length).toBe(REAL_ROWS)
+    expect((final?.data?.links as unknown[]).length).toBe(REAL_ROWS * 2)
+    expect(nodeCounts.length, '应有可观察的增量窗口').toBeGreaterThan(0)
+    expect(nodeCounts[0], '首帧应少于完整节点数').toBeLessThan(REAL_ROWS)
+    expect(linkCounts[0], 'links 序列化在 nodes 后，首帧缺席计 0').toBe(0)
+    for (let i = 1; i < nodeCounts.length; i++) {
+      expect(nodeCounts[i]).toBeGreaterThanOrEqual(nodeCounts[i - 1]!)
+    }
+    for (let i = 1; i < linkCounts.length; i++) {
+      expect(linkCounts[i]).toBeGreaterThanOrEqual(linkCounts[i - 1]!)
+    }
+  })
+
+  it('桑基中间帧（部分 nodes+links）喂包装层挂载不抛错、svg 在场', () => {
+    const script = sankeyScriptOf()
+    const extractor = extractorOf()
+    let mid: CxStreamNode | null = null
+    const step = Math.max(1, Math.floor(script.length / 60))
+    for (let i = step; i < script.length && !mid; i += step) {
+      const partial = extractor.next(script.slice(0, i)) as CxStreamNode | null
+      if (partial && ((partial.data?.links as unknown[]) ?? []).length >= 1) mid = partial
+    }
+    expect(mid, '应存在含部分 links 的中间帧').not.toBeNull()
+    const wrapper = mount(byKey('cx-chart'), {
+      props: { comp: fakeComp('cx-chart'), ...(mid!.data as Record<string, unknown>) },
+    })
+    expect(wrapper.find('.ts-chart-host').exists()).toBe(true)
+    expect(wrapper.find('svg').exists()).toBe(true)
   })
 })
 

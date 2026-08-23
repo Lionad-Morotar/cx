@@ -18,26 +18,30 @@ import type { CxSpec, StreamTriggerConfig, TriggerRegistry } from '@lionad/cx-st
  *   arrayKey 恒为 'data'（单层字段名契约）；props 声明序通道字段（x/y/curve/
  *   name/value/innerRadiusRatio）前置、data 殿后——回放剧本序列化序使增量帧
  *   首行起即携带通道配置，尾随标量（height/ariaLabel）不入增量帧由终帧兜底。
- * - array 1 件：通用 chart 走数据顶层化契约，主数组是顶层 rows（逐行生长）；
- *   definition 序列化在 rows 前，rows 首行闭合时 definition 必然完整——图表
- *   以完整坐标系挂载、数据逐行生长（三段式：骨架→空坐标→行生长）。
+ * - array 1 件：通用 chart 走通配主数组契约（arrayKey '*'）——data 下任意
+ *   数组字段皆为主数组，逐字段按元素边界截断。图表数据形态多元：常规形态
+ *   rows、关系型 nodes+links（桑基/力导向）、嵌套环 innerRows+outerRows、
+ *   仪表 bandRows+tickRows、地图 land/sphere/graticule/route，通配使各形态
+ *   统一获得流式效果且新增数据形态无需改触发器。definition 序列化在任何数据
+ *   数组之前，首条数据闭合时坐标系必然完整——图表以完整坐标系挂载、数据逐条
+ *   生长（三段式：骨架→空坐标→数据生长）。多数据集按序列化序接力生长
+ *   （如 nodes 全量后 links 逐条），各自按自身传输进度截断、互不牵连。
  * - 不适用 0 件。计数校验：6 array + 0 scalar + 0 不适用（差集派生兜底）。
  *
  * produced 语义（增量提取器对中间态与终态走同一 buildPartial，实证
  * packages/stream/src/core/incremental.ts Step 5）：
- * - 出帧只由主数组匹配驱动；extraScanPaths（nodes/links）仅提供元素边界
- *   切分点，不驱动出帧——GenUI 契约据此锁死 rows 恒为主数据集在场
- *   （关系型图表 rows=节点行表、links 为边次数据集），无 rows 的 spec 永不
- *   出帧属契约外形态，由生成期校验门拦截。
- * - emptyPassthrough：rows=[] 空数组终态透传节点，由组件空态渲染接管，
- *   防流结束后 pending 永驻。
+ * - 出帧由任一主数组的完整元素驱动；尚无完整元素时保持 pending（骨架期由
+ *   渲染管线承担）。
+ * - emptyPassthrough：任一数据数组闭合为空（如 rows=[]）时终态透传节点，
+ *   由组件空态渲染接管，防流结束后 pending 永驻；判定据 parse 结果中的空
+ *   数组字段（截断语义下「闭合的空数组」以 [] 在场、「未开始传输」缺席）。
  *
- * 骨架裁决：不设 skeletonFields——rows 首行闭合即出帧逐行生长，天然有实时
- * 反馈；首行前的 pending 期由渲染管线承担（与预设物料同语义），物料内骨架
+ * 骨架裁决：不设 skeletonFields——首条数据闭合即出帧逐条生长，天然有实时
+ * 反馈；首条前的 pending 期由渲染管线承担（与预设物料同语义），物料内骨架
  * 判定保留兼容上游 _cx_streaming 注入。
  *
  * fallback 从简：渲染链路不过 zod，包装层无模板直访（useAttrs 平铺 +
- * composable 全回退，缺席不 TypeError）；rows 缺席的中间态经翻译层
+ * composable 全回退，缺席不 TypeError）；数据数组缺席的中间态经翻译层
  * resolveMarkData 回退空数组，translateChartSpec 组装不抛错（增量帧翻译
  * 实证进包内测试）。
  *
@@ -71,22 +75,12 @@ const ARRAY_PRESET_KEYS = [
 
 export const TANSTACK_CHARTS_STREAM_TRIGGERS: StreamTriggerConfig[] = [
   {
-    // 通用 chart 走数据顶层化契约：主数组 rows 逐行生长（definition 序列化在先，
-    // rows 首行闭合时 definition 必然完整）；nodes/links 关系型数据集为次增长路径
-    // （仅提供元素边界切分点，不驱动出帧——契约锁死 rows 恒在场）。
-    // emptyPassthrough 覆盖 rows=[] 空态终态透传。空壳骨架由渲染管线 pending 态
-    // 承担（与预设物料同语义），物料内骨架判定保留兼容上游 _cx_streaming 注入。
+    // 通用 chart 走通配主数组契约：data 下任意数组字段（rows / nodes+links /
+    // innerRows+outerRows / bandRows+tickRows / land+sphere+…）皆为主数组，
+    // 逐字段按元素边界截断生长（definition 序列化在先，首条数据闭合时坐标系
+    // 必然完整）。空数组终态经 emptyPassthrough 透传（parse 判定）。
     key: keyOf('cx-chart'),
-    sections: [
-      {
-        kind: 'array',
-        arrayKey: 'rows',
-        extraScanPaths: [
-          ['data', 'nodes', '*'],
-          ['data', 'links', '*'],
-        ],
-      },
-    ],
+    sections: [{ kind: 'array', arrayKey: '*' }],
     stateBranch: { emptyPassthrough: true },
     frameStride: 10,
   },
@@ -108,7 +102,11 @@ export function createTanstackChartsTriggerRegistry(): TriggerRegistry<CxSpec> {
   return registry
 }
 
-/** 增量节点的主数组（回放计数展示用）；非数组增长型物料或数组缺席时返回 null */
+/**
+ * 增量节点的主数组（回放计数展示用）；非数组增长型物料或数组缺席时返回 null。
+ * 通配主数组形态（arrayKey '*'）无单一主数组，取最长数组字段为主数据集
+ * （如桑基的 links 之于 nodes）；并列时取序列化序靠前者。
+ */
 export function mainArrayOf(node: {
   key: string
   data?: Record<string, unknown>
@@ -116,6 +114,15 @@ export function mainArrayOf(node: {
   const config = TANSTACK_CHARTS_STREAM_TRIGGERS.find((c) => c.key === node.key)
   const section = config?.sections.find((s) => s.kind === 'array')
   if (!section || section.kind !== 'array') return null
+  if (section.arrayKey === '*') {
+    let longest: unknown[] | null = null
+    for (const value of Object.values(node.data ?? {})) {
+      if (Array.isArray(value) && (longest === null || value.length > longest.length)) {
+        longest = value
+      }
+    }
+    return longest
+  }
   const arr = node.data?.[section.arrayKey]
   return Array.isArray(arr) ? arr : null
 }

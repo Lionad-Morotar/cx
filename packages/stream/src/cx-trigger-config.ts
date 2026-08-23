@@ -16,7 +16,14 @@ import type { CxSpec, CxStreamNode } from './cx'
 /** 数组项形态：字段名同 ArrayTriggerConfig，现有声明可机械包装迁移 */
 export interface ArraySectionConfig {
   kind: 'array'
-  /** data 下流式增长的主数组字段名 */
+  /**
+   * data 下流式增长的主数组字段名。
+   * `'*'` 为通配形态：data 下任意数组字段皆为主数组，逐字段按其元素边界截断
+   * （具体字段名取自扫描匹配的具体路径）。适用于主数据集 key 不固定的容器型
+   * 物料——如通用图表：常规形态 rows、关系型 nodes/links、仪表 bandRows/tickRows、
+   * 嵌套环 innerRows/outerRows 等多形态共存，通配使新增数据形态无需改触发器。
+   * 通配形态与 deriveTailFields 语义不兼容（无单一主数组可推导），编译期拒绝。
+   */
   arrayKey: string
   /** 主数组之外的补充扫描路径（次增长数组：列定义/系列/路线/操作按钮） */
   extraScanPaths?: ScanPath[]
@@ -134,6 +141,11 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
   if (config.stateBranch?.emptyPassthrough && !arraySection) {
     throw new Error('compileTrigger: stateBranch 要求 array 形态')
   }
+  const arrayWildcard = arraySection?.arrayKey === '*'
+  // 尾随字段推导以「单一主数组的已完整行」为输入，通配形态无单一主数组
+  if (arrayWildcard && arraySection?.deriveTailFields) {
+    throw new Error('compileTrigger: 通配主数组与 deriveTailFields 不兼容')
+  }
 
   // --- 标量主体形态：无 scanPaths，属性闭合事件经管线 closureFallback 驱动 ---
   if (scalarSection) {
@@ -164,11 +176,13 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
   let mainPath: ScanPath | null = null
   let containerPath: ScanPath | null = null
   if (arraySection) {
-    mainPath = ['data', arraySection.arrayKey, '*']
+    mainPath = ['data', arrayWildcard ? '*' : arraySection.arrayKey, '*']
     scanPaths.push(mainPath, ...(arraySection.extraScanPaths ?? []))
     // 容器级路径不带 *：匹配 ⟺ 主数组容器闭合，据此区分
-    // 「闭合且 0 元素」（真空表，透传空态）与「尚未开始传输」（保持 lastValid）
-    if (config.stateBranch?.emptyPassthrough) {
+    // 「闭合且 0 元素」（真空表，透传空态）与「尚未开始传输」（保持 lastValid）。
+    // 通配形态不做容器扫描：['data','*'] 无法区分数组与对象容器（definition
+    // 等对象闭合同样命中），其空态判定改由 parse 结果中空数组字段承担
+    if (config.stateBranch?.emptyPassthrough && !arrayWildcard) {
       containerPath = ['data', arraySection.arrayKey]
       scanPaths.push(containerPath)
     }
@@ -194,29 +208,59 @@ export function compileTrigger(config: StreamTriggerConfig): IncrementalTrigger<
 
       let complete = 0
       if (arraySection && mainPath) {
-        complete = matchesPerPath.get(JSON.stringify(mainPath))?.length ?? 0
-        if (complete > 0) {
-          const rows = (node.data?.[arraySection.arrayKey] as unknown[] | undefined) ?? []
-          const completeRows = rows.slice(0, complete)
-          const next: Record<string, unknown> = {
-            ...node.data,
-            [arraySection.arrayKey]: completeRows,
+        const mainMatches = matchesPerPath.get(JSON.stringify(mainPath)) ?? []
+        if (arrayWildcard) {
+          // 通配形态：匹配携带具体路径（['data', 字段, 索引]），按字段分组
+          // 逐数组截断到已完整元素——多数据集形态（nodes+links 等）各自
+          // 按自身传输进度生长，互不牵连
+          const completeByKey = new Map<string, number>()
+          for (const match of mainMatches) {
+            const fieldKey = match.path[1]
+            if (typeof fieldKey !== 'string') continue
+            completeByKey.set(fieldKey, (completeByKey.get(fieldKey) ?? 0) + 1)
           }
-          if (arraySection.deriveTailFields) {
-            for (const [k, v] of Object.entries(arraySection.deriveTailFields(completeRows))) {
-              next[k] ??= v
+          const next: Record<string, unknown> = { ...node.data }
+          for (const [fieldKey, count] of completeByKey) {
+            const arr = node.data?.[fieldKey]
+            if (!Array.isArray(arr) || count === 0) continue
+            next[fieldKey] = arr.slice(0, count)
+            complete += count
+          }
+          if (complete > 0) {
+            data = next
+            produced = true
+          }
+        } else {
+          complete = mainMatches.length
+          if (complete > 0) {
+            const rows = (node.data?.[arraySection.arrayKey] as unknown[] | undefined) ?? []
+            const completeRows = rows.slice(0, complete)
+            const next: Record<string, unknown> = {
+              ...node.data,
+              [arraySection.arrayKey]: completeRows,
             }
+            if (arraySection.deriveTailFields) {
+              for (const [k, v] of Object.entries(arraySection.deriveTailFields(completeRows))) {
+                next[k] ??= v
+              }
+            }
+            data = next
+            produced = true
           }
-          data = next
-          produced = true
         }
       }
 
       // 空态透传：主数组闭合且 0 完整行时放行节点（携带空数组），组件内置
-      // 空态接管渲染；空态内容属组件契约，trigger 只负责揭示时机
-      if (!produced && containerPath && complete === 0) {
-        const closed = (matchesPerPath.get(JSON.stringify(containerPath))?.length ?? 0) > 0
-        if (closed) {
+      // 空态接管渲染；空态内容属组件契约，trigger 只负责揭示时机。
+      // 通配形态据 parse 结果判定：截断语义下「闭合的空数组」必然以 [] 字段
+      // 在场、「尚未开始传输」必然缺席，无需容器级扫描即区分两态
+      if (!produced && config.stateBranch?.emptyPassthrough && arraySection) {
+        const emptyHold = arrayWildcard
+          ? Object.values(node.data ?? {}).some((v) => Array.isArray(v) && v.length === 0)
+          : complete === 0 &&
+            containerPath !== null &&
+            (matchesPerPath.get(JSON.stringify(containerPath))?.length ?? 0) > 0
+        if (emptyHold) {
           data = node.data ? { ...node.data } : node.data
           produced = true
         }
