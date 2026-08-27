@@ -87,15 +87,30 @@ function arraySectionOf(config: StreamTriggerConfig): ArraySectionConfig | null 
  * 从物料真实定义构造剧本 data：buildDefaultData 取全部 props 初值，
  * 主数组替换为真实数组的循环扩充。字段名错配（arrayKey 笔误/物料改名）
  * 在此即失败，而非静默生成空数组。
+ * 通配主数组契约（arrayKey '*'）无固定字段名，主数据集取 data 值中
+ * 最长的数组字段（与 stream-triggers mainArrayOf 同语义），扩充替换该字段。
  */
 function realDataOf(meta: CxMeta, arrayKey: string): Record<string, unknown> {
   const data = buildDefaultData(meta)
-  const arr = data[arrayKey]
+  let mainKey = arrayKey
+  if (arrayKey === '*') {
+    let longest: unknown[] | null = null
+    for (const [key, value] of Object.entries(data)) {
+      if (Array.isArray(value) && value.length > 0 && (longest === null || value.length > longest.length)) {
+        mainKey = key
+        longest = value
+      }
+    }
+    if (longest === null || mainKey === arrayKey) {
+      throw new Error(`${meta.key} 应有非空数组字段（通配主数组）`)
+    }
+  }
+  const arr = data[mainKey]
   // throw 守卫（而非 expect 断言）使 TS 对 arr 的数组收窄在下方生效
   if (!Array.isArray(arr) || arr.length === 0) {
-    throw new Error(`${meta.key} 应有非空数组字段 ${arrayKey}`)
+    throw new Error(`${meta.key} 应有非空数组字段 ${mainKey}`)
   }
-  data[arrayKey] = Array.from({ length: REAL_ROWS }, (_, i) => arr[i % arr.length])
+  data[mainKey] = Array.from({ length: REAL_ROWS }, (_, i) => arr[i % arr.length])
   return data
 }
 

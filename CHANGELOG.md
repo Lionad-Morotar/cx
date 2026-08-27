@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-nuxt 0.1.0-alpha.13] - 2026-08-28
+
+### Fixed
+
+- 移除 optimizeDeps 预声明残留的 `@lionad/cx-vue > anysort` 条目：cx-vue 已移除该依赖，残留条目使消费方 Nuxt dev 启动报 NUXT_B7002（optimizeDeps.include 解析不到）
+
+## [@lionad/cx-nuxt 0.1.0-alpha.12] - 2026-08-27
+
+### Changed
+
+- [internal] 依赖快照刷新至 cx-render v0.1.0-alpha.11：终结经旧 render → 旧 cx-vue → anysort 的传递泄漏
+
 ## [@lionad/cx-comps-tanstack-charts 0.1.0-alpha.23] - 2026-08-23
 
 ### Changed

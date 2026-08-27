@@ -81,7 +81,6 @@ const BASE_OPTIMIZE_DEPS = [
   '@lionad/cx-definition > lodash-es/upperFirst',
   // cx-vue 运行时依赖
   '@lionad/cx-vue > @iconify/vue',
-  '@lionad/cx-vue > anysort',
   '@lionad/cx-vue > use-semantic-version',
   '@lionad/cx-vue > vue-concurrency',
   // dayjs 及物料内引用的 plugin/locale（dayjs 由 cx-vue 声明，随任一物料安装）
