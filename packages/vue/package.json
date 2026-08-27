@@ -44,7 +44,6 @@
   "dependencies": {
     "@lionad/cx-definition": "workspace:*",
     "@vue/shared": "^3.5.40",
-    "anysort": "^2.0.0",
     "dayjs": "^1.11.21",
     "lodash-es": "^4.18.1",
     "use-semantic-version": "^0.0.7",
