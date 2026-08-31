@@ -47,7 +47,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@lionad/vtu-components": "^0.3.9",
+    "@lionad/vtu-components": "0.3.16-alpha.3",
     "@types/lodash-es": "^4.17.12",
     "@vueuse/core": "^14.3.0",
     "sass-embedded": "^1.100.0",

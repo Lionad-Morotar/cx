@@ -39,7 +39,7 @@ export type CxEventDisposition =
 export const DEFAULT_CX_EVENT_DISPOSITIONS: Record<string, Record<string, CxEventDispositionKind>> = {
   'cx-vtu-option-list': { action: 'confirm', change: 'append' },
   'cx-vtu-approval-card': { confirm: 'confirm' },
-  'cx-vtu-data-table': { 'link-click': 'direct' },
+  'cx-vtu-data-table': { 'link-click': 'direct', selectionChange: 'append' },
   'cx-vtu-item-carousel': { 'item-click': 'direct', 'item-action': 'direct' },
   'cx-vtu-link-preview': { navigate: 'direct' },
   'cx-vtu-message-draft': { send: 'direct', undo: 'append' },
@@ -93,6 +93,10 @@ function defaultAppendText(materialKey: string, event: string, args: unknown[]):
   switch (materialKey) {
     case 'cx-vtu-option-list':
       // change 载荷已被物料包装件翻译为选项 label(单选 label / 多选 label 数组)
+      return `已选:${cxSelectionToText(args[0])}`
+    case 'cx-vtu-data-table':
+      // selectionChange 载荷为选中行 id 数组(rowIdKey 指向语义列时即行文本);
+      // 包装件不反查行原文——vtu 的 rowId 探测/排序语义在组件内部,外部复刻必漂移
       return `已选:${cxSelectionToText(args[0])}`
     case 'cx-vtu-question-flow': {
       // select 载荷为对象 { optionIds, labels, stepId }(包装件已翻译 label 并补步骤上下文)

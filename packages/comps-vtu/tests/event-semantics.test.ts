@@ -57,6 +57,7 @@ describe('classifyCxEvent 四态分流', () => {
     ['cx-vtu-approval-card', 'confirm', 'confirm'],
     ['cx-vtu-approval-card', 'cancel', 'ignore'],
     ['cx-vtu-data-table', 'link-click', 'direct'],
+    ['cx-vtu-data-table', 'selectionChange', 'append'],
     ['cx-vtu-item-carousel', 'item-click', 'direct'],
     ['cx-vtu-item-carousel', 'item-action', 'direct'],
     ['cx-vtu-link-preview', 'navigate', 'direct'],
@@ -178,6 +179,14 @@ describe('cxAppendText 暂存回写文本', () => {
 
   it('message-draft: undo 固定「撤销草稿」', () => {
     expect(cxAppendText('cx-vtu-message-draft', 'undo', [])).toBe('撤销草稿')
+  })
+
+  it('data-table: selectionChange 载荷为 rowId 数组「已选:X」(rowIdKey 指向语义列即行文本)', () => {
+    expect(cxAppendText('cx-vtu-data-table', 'selectionChange', [['项目A']])).toBe('已选:项目A')
+    expect(cxAppendText('cx-vtu-data-table', 'selectionChange', [['项目A', '项目B']])).toBe(
+      '已选:项目A, 项目B'
+    )
+    expect(cxAppendText('cx-vtu-data-table', 'selectionChange', [[]])).toBe('已选:')
   })
 
   it('默认(表单 change):整值 JSON 摘要,超长截断', () => {

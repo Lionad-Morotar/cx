@@ -3,10 +3,15 @@
     vtu DataTable link 列的 <a> 自带 @click.stop(阻止冒泡直达物料根),
     包装件用 click 捕获阶段拦截再 re-emit,统一供 cx 渲染器经 _cx_events 接线(host 侧 hooks 拦截)。
   -->
+  <!--
+    selectionChange 由 vtu 行勾选(selectable 开启)真 emit,监听后 re-emit 为
+    包装组件 emits,与 link-click 同经 _cx_events 接线(host 侧 hooks 拦截)。
+  -->
   <DataTable
     v-bind="vtuProps"
     :class="ns.b()"
     @click.capture="onLinkClick"
+    @selection-change="(rowIds) => emit('selectionChange', rowIds)"
   />
 </template>
 
@@ -47,7 +52,7 @@ function onLinkClick(e: MouseEvent): void {
     rowIndex,
     text: anchor.textContent ?? '',
     row,
-    column: cellIndex >= 0 ? vtuProps.value.columns[cellIndex] : undefined,
+    column: cellIndex >= 0 ? vtuProps.value.columns?.[cellIndex] : undefined,
     href: anchor.getAttribute('href') ?? '',
   })
 }
@@ -55,6 +60,7 @@ function onLinkClick(e: MouseEvent): void {
 // 与 meta emits 同集合:declare 后这些 on* 从 $attrs 消费,避免 useVtuProps 二次透传造成重复绑定
 const emit = defineEmits<{
   'link-click': [payload: CxDataTableLinkClickPayload]
+  selectionChange: [rowIds: string[]]
 }>()
 
 const ns = useCxBEM('vtu-data-table')

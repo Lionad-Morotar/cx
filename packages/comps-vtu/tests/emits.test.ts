@@ -52,7 +52,7 @@ describe('物料 emits · meta 与 SFC 同集合', () => {
     ['cx-vtu-parameter-slider', ['change', 'action']],
     ['cx-vtu-item-carousel', ['item-click', 'item-action']],
     ['cx-vtu-link-preview', ['navigate']],
-    ['cx-vtu-data-table', ['link-click']],
+    ['cx-vtu-data-table', ['link-click', 'selectionChange']],
   ]
   for (const [key, expected] of CASES) {
     it(`${key}: ${expected.join('/')}`, () => {
@@ -338,5 +338,35 @@ describe('物料 emits · data-table 行级 link-click(DOM 委托)', () => {
     const cell = wrapper.find('tbody tr:nth-child(1) td:nth-child(1)')
     await cell.trigger('click')
     expect(wrapper.emitted('link-click')).toBeFalsy()
+  })
+})
+
+describe('物料 emits · data-table 行选择 selectionChange(行勾选 re-emit)', () => {
+  const columns = [
+    { key: 'name', label: '姓名' },
+    { key: 'dept', label: '部门' },
+  ]
+  const data = [
+    { name: '张三', dept: '研发' },
+    { name: '李四', dept: '设计' },
+  ]
+
+  it('行勾选触发 selectionChange,载荷为选中行 id 数组(按视图行序)', async () => {
+    const comp = byKey('cx-vtu-data-table')
+    const wrapper = mountMaterial(comp, { columns, data, selectable: true, rowIdKey: 'name' })
+    await wrapper.vm.$nextTick()
+    // 勾选第 2 行(row-select-李四):原生 input 在 sr-only label 内,setChecked 走 change 事件
+    const rowCheckbox = wrapper.find('tbody tr:nth-child(2) input[type="checkbox"]')
+    expect(rowCheckbox.exists()).toBe(true)
+    await rowCheckbox.setValue(true)
+    expect(wrapper.emitted('selectionChange')?.[0]).toEqual([['李四']])
+  })
+
+  it('未开启 selectable 不渲染勾选列也不触发 selectionChange', async () => {
+    const comp = byKey('cx-vtu-data-table')
+    const wrapper = mountMaterial(comp, { columns, data })
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('input[type="checkbox"]').exists()).toBe(false)
+    expect(wrapper.emitted('selectionChange')).toBeFalsy()
   })
 })
