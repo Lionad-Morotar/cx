@@ -6,6 +6,16 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-vtu 0.1.0-alpha.13] - 2026-09-03
+
+### Added
+
+- `cx-vtu-question-flow` 步骤支持表单字段（fields）：complete 载荷 texts 按步骤类型分化——选项步骤保持「已选:label…」，字段步骤逐项「label:值」连缀；字段值文案化覆盖 toggle/select 选项翻译、switch（是/否）、upload（文件名列表）、date/tags/input/textarea/rating/number 直出，空值项（空串/空数组/null/undefined）跳过，answers 结构化载荷原样透传
+
+### Changed
+
+- deps: vtu-components 0.3.16-alpha.3 → 0.3.17-alpha.2（字段步骤 fields 契约能力来源）；适配 QuestionFlow 选项改由 reka ListboxItem 渲染（div role=option）
+
 ## [@lionad/cx-nuxt 0.1.0-alpha.13] - 2026-08-28
 
 ### Fixed

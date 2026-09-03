@@ -214,20 +214,56 @@ describe('物料 emits · vtu 真 emit 上抛', () => {
     const byText = (t: string) => wrapper.findAll('button').find((b) => b.text().includes(t))!
     // upfront 形态 toggleOption 只写内部 answers、不 fire select(select 仅 progressive
     // 分支)——暂存链路在 upfront 收不到选择,回写信息源只能是 complete 载荷
-    await wrapper.find('button[data-id="a"]').trigger('click')
+    // (0.3.17 起选项由 reka ListboxItem 渲染,是 div role=option 而非 button)
+    await wrapper.find('[data-id="a"]').trigger('click')
     expect(wrapper.emitted('select')).toBeFalsy()
     await byText('下一步').trigger('click')
     // vtu 步骤过渡动画(EXIT/ENTER 约 250ms)期间选项 disabled,等动画落定再点
     await new Promise((r) => setTimeout(r, 300))
     expect(wrapper.emitted('step-change')?.[0]).toEqual(['q2'])
-    await wrapper.find('button[data-id="c"]').trigger('click')
-    await wrapper.find('button[data-id="d"]').trigger('click')
+    await wrapper.find('[data-id="c"]').trigger('click')
+    await wrapper.find('[data-id="d"]').trigger('click')
     expect(wrapper.emitted('select')).toBeFalsy()
     await byText('完成').trigger('click')
     expect(wrapper.emitted('complete')?.[0]).toEqual([
       {
         answers: { q1: ['a'], q2: ['c', 'd'] },
         texts: ['已选:Schema 驱动', '已选:首屏耗时, 交互延迟'],
+      },
+    ])
+  })
+
+  it('question-flow: 字段步骤(fields)——字段答案经 complete 摘要为「label:值」连缀', async () => {
+    const comp = byKey('cx-vtu-question-flow')
+    const wrapper = mountMaterial(comp, {
+      steps: [
+        {
+          id: 'q1',
+          title: '联系方式',
+          fields: [
+            { id: 'name', label: '姓名', type: 'input', required: true },
+            { id: 'channel', label: '联系渠道', type: 'toggle', options: [
+              { value: 'email', label: '邮箱' },
+              { value: 'phone', label: '电话' },
+            ] },
+            { id: 'subscribe', label: '订阅动态', type: 'switch', defaultChecked: false },
+            { id: 'unused', label: '选填备注', type: 'input' },
+          ],
+        },
+      ],
+    })
+    const input = wrapper.find('input')
+    await input.setValue('张三')
+    // toggle 单选项点击与「下一步/完成」按钮文本区分:toggle 选项是 role 按钮组,
+    // 找含「邮箱」的按钮;完成按钮在最后一步
+    const byText = (t: string) => wrapper.findAll('button').find((b) => b.text().includes(t))!
+    await byText('邮箱').trigger('click')
+    // 未动过的 switch/空字段不进 answers(vtu 仅变更时归集),摘要同步跳过
+    await byText('完成').trigger('click')
+    expect(wrapper.emitted('complete')?.[0]).toEqual([
+      {
+        answers: { q1: { name: '张三', channel: 'email' } },
+        texts: ['姓名:张三; 联系渠道:邮箱'],
       },
     ])
   })

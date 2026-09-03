@@ -11,7 +11,10 @@
     @select="(optionIds: string[]) => emit('select', toSelectPayload(optionIds))"
     @back="() => emit('back')"
     @step-change="onStepChange"
-    @complete="(answers: Record<string, string[]>) => emit('complete', toCompletePayload(answers))"
+    @complete="
+      (answers: Record<string, string[] | CxQuestionFlowFieldAnswers>) =>
+        emit('complete', toCompletePayload(answers))
+    "
   />
 </template>
 
@@ -22,7 +25,13 @@ import { useCxBEM } from '@lionad/cx-vue'
 
 import { useVtuProps } from '../../shared/use-vtu-props'
 
-import type { QuestionFlowUpfrontProps } from '@lionad/vtu-components'
+import type { PreferenceItem, PreferencesValue, QuestionFlowUpfrontProps } from '@lionad/vtu-components'
+
+/**
+ * 字段步骤答案值映射(itemId → 字段值)。vtu 内部类型 QuestionFlowFieldAnswers
+ * 未从包桶导出,经 PreferencesValue[string](其源类型)同构表达。
+ */
+type CxQuestionFlowFieldAnswers = Record<string, PreferencesValue[string]>
 
 /** select 上抛载荷:选项 id 全集 + 翻译后 label + 所在步骤 id(暂存按步骤幂等的锚) */
 export interface CxQuestionFlowSelectPayload {
@@ -32,13 +41,14 @@ export interface CxQuestionFlowSelectPayload {
 }
 
 /**
- * complete 上抛载荷:全量答案 + 每步「已选:label…」摘要。
+ * complete 上抛载荷:全量答案 + 每步人类可读摘要。
  * vtu upfront 形态 toggleOption 只写内部 answers、不 fire select(select 仅 progressive
  * 分支),暂存链路收不到选择——complete 载荷是回写唯一信息源,摘要在此翻译;
  * 与 select 暂存 text 同格式,语义层可直接拼接。
+ * 选项步骤 answer 是 id 数组;字段步骤是 itemId → 值映射(0.3.17 起支持 fields)。
  */
 export interface CxQuestionFlowCompletePayload {
-  answers: Record<string, string[]>
+  answers: Record<string, string[] | CxQuestionFlowFieldAnswers>
   texts: string[]
 }
 
@@ -81,17 +91,66 @@ function toSelectPayload(optionIds: string[]): CxQuestionFlowSelectPayload {
 }
 
 /**
- * complete 载荷装配:answers 的选项 id 经各步 options 查表翻译为 label,
- * 每步一条「已选:…」摘要(空答案步骤跳过);查不到退化 id 兜底。
+ * 字段值文案化:回写对话要用户可读文案。
+ * - toggle/select 选项类值是选项 value,查 options/selectOptions 翻译为 label(多选数组逐项);
+ * - switch 是布尔(是/否);rating/number 是数字;input/textarea/date/tags 是字符串或字符串数组;
+ * - upload 是 UploadedFile 数组,取文件名;
+ * - 空值语义与 PreferencesPanel 一致(空串/空数组/null/undefined 视为未填,跳过);
+ * 查不到的 toggle/select 值退化原值兜底。
  */
-function toCompletePayload(answers: Record<string, string[]>): CxQuestionFlowCompletePayload {
+function fieldValueToText(field: PreferenceItem, value: unknown): string | undefined {
+  const isEmpty =
+    value === undefined ||
+    value === null ||
+    value === '' ||
+    (Array.isArray(value) && value.length === 0)
+  if (isEmpty) return undefined
+
+  const optionLabel = (opts: Array<{ value: string; label: string }> | undefined, v: unknown) =>
+    opts?.find((o) => o.value === v)?.label ?? String(v)
+
+  if (field.type === 'switch') return value ? '是' : '否'
+  if (field.type === 'toggle') {
+    const opts = field.options
+    const vs = Array.isArray(value) ? value : [value]
+    return vs.map((v) => optionLabel(opts, v)).join(', ')
+  }
+  if (field.type === 'select') return optionLabel(field.selectOptions, value)
+  if (field.type === 'upload') {
+    const files = (Array.isArray(value) ? value : [value]) as Array<{ name?: string }>
+    return files.map((f) => f?.name ?? String(f)).join(', ')
+  }
+  if (Array.isArray(value)) return value.join(', ')
+  return String(value)
+}
+
+/**
+ * complete 载荷装配:每步一条人类可读摘要(空答案步骤跳过)。
+ * 选项步骤:「已选:label…」——answers 的选项 id 经该步 options 查表翻译,查不到退化 id;
+ * 字段步骤:「label:值」逐项连缀——字段值经 fieldValueToText 文案化;answers 原样透传
+ * (字段步骤值是 itemId → 值映射,宿主侧仅消费 texts 回写,answers 留作结构化通道)。
+ */
+function toCompletePayload(
+  answers: Record<string, string[] | CxQuestionFlowFieldAnswers>
+): CxQuestionFlowCompletePayload {
   const steps = vtuProps.value.steps ?? []
   const texts = steps
     .map((s) => {
-      const ids = answers[s.id]
-      if (!ids?.length) return undefined
-      const labels = ids.map((id) => s.options.find((o) => o.id === id)?.label ?? id)
-      return `已选:${labels.join(', ')}`
+      const answer = answers[s.id]
+      if (s.fields?.length) {
+        const pairs = s.fields
+          .map((f) => {
+            const text = fieldValueToText(f, (answer as CxQuestionFlowFieldAnswers)[f.id])
+            return text === undefined ? undefined : `${f.label}:${text}`
+          })
+          .filter((t): t is string => typeof t === 'string')
+        return pairs.length ? pairs.join('; ') : undefined
+      }
+      if (Array.isArray(answer) && answer.length) {
+        const labels = answer.map((id) => s.options?.find((o) => o.id === id)?.label ?? id)
+        return `已选:${labels.join(', ')}`
+      }
+      return undefined
     })
     .filter((t): t is string => typeof t === 'string')
   return { answers, texts }

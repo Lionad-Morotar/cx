@@ -453,8 +453,8 @@ importers:
         version: 4.4.3
     devDependencies:
       '@lionad/vtu-components':
-        specifier: 0.3.16-alpha.3
-        version: 0.3.16-alpha.3(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(70063972cb1b50ec37b05b1139a12b18))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@5.2.0(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.26(typescript@6.0.3)))(vue@3.5.26(typescript@6.0.3))
+        specifier: 0.3.17-alpha.2
+        version: 0.3.17-alpha.2(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(70063972cb1b50ec37b05b1139a12b18))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@5.2.0(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.26(typescript@6.0.3)))(vue@3.5.26(typescript@6.0.3))
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -1653,6 +1653,9 @@ packages:
   '@internationalized/date@3.12.2':
     resolution: {integrity: sha512-FY1Y+H64NDs+HAF6omlnWxm3mEpfgaCSWtL5l551ZZfImA+kGjPFgrnJrGjH6lfmLL0g8Z/mBu1R3kufeCp6Jw==}
 
+  '@internationalized/date@3.12.4':
+    resolution: {integrity: sha512-M1dEn4c1U1HsSlaVR8upZtSqvXrTkHDfv18H01uCSJyjVLDxnBR38v/fMxecmlwXKR4i9HeZcmgQAPE6A+aGJQ==}
+
   '@internationalized/number@3.6.7':
     resolution: {integrity: sha512-3ji1fcrT+FPAK86UqEhB/psHixYo6niWPJtt7+qRaYFynt/BaJG8GhAPimtWUpEiVSTq8ZM8L5psMxGquiB/Vg==}
 
@@ -1698,8 +1701,8 @@ packages:
   '@kwsites/promise-deferred@1.1.1':
     resolution: {integrity: sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==}
 
-  '@lionad/vtu-components@0.3.16-alpha.3':
-    resolution: {integrity: sha512-lCE2nq+n74kIPdv0sM6YIHYfJzlIhA3sNoCXu46lsAAm0qpB2pXPP3gcgHaNAD8W2duoc30wHS9/zmzWxU0d8Q==, tarball: https://registry.npmjs.org/@lionad/vtu-components/-/vtu-components-0.3.16-alpha.3.tgz}
+  '@lionad/vtu-components@0.3.17-alpha.2':
+    resolution: {integrity: sha512-Sw2s6CLL+QP6CfCdh/R4bT9tPmQPVbOfDBGKMI7+75HVhBjQ1vsSbw8LQcwocNi3uEsT4hgj108Vlylj2okCiA==, tarball: https://registry.npmjs.org/@lionad/vtu-components/-/vtu-components-0.3.17-alpha.2.tgz}
     peerDependencies:
       dompurify: ^3.0.0
       vue: 3.5.26
@@ -7102,6 +7105,11 @@ packages:
     peerDependencies:
       vue: 3.5.26
 
+  reka-ui@2.10.4:
+    resolution: {integrity: sha512-kbS5GAbkHkYj0EVKAg5ZPEPndhBjeUFSa1Aq5m5ftQwyHnB1v5tw8X6fcwfKH/ry3StPXblMWM1DW82MVS71cw==}
+    peerDependencies:
+      vue: 3.5.26
+
   remove-accents@0.5.0:
     resolution: {integrity: sha512-8g3/Otx1eJaVD12e31UbJj1YzdtVvzH85HV7t+9MJYk/u3XmkOUJ5Ys9wQrf9PCPK8+xn4ymzqYCiZl6QWKn+A==}
 
@@ -9157,6 +9165,10 @@ snapshots:
     dependencies:
       '@swc/helpers': 0.5.23
 
+  '@internationalized/date@3.12.4':
+    dependencies:
+      '@swc/helpers': 0.5.23
+
   '@internationalized/number@3.6.7':
     dependencies:
       '@swc/helpers': 0.5.23
@@ -9212,8 +9224,9 @@ snapshots:
 
   '@kwsites/promise-deferred@1.1.1': {}
 
-  '@lionad/vtu-components@0.3.16-alpha.3(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(70063972cb1b50ec37b05b1139a12b18))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@5.2.0(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.26(typescript@6.0.3)))(vue@3.5.26(typescript@6.0.3))':
+  '@lionad/vtu-components@0.3.17-alpha.2(async-validator@4.2.5)(fuse.js@7.5.0)(magic-string@1.0.0)(magicast@0.5.3)(nuxt@4.5.0(70063972cb1b50ec37b05b1139a12b18))(oxc-parser@0.139.0)(rolldown@1.2.0)(sortablejs@1.14.0)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0)))(vue-router@5.2.0(@vue/compiler-sfc@3.5.40)(esbuild@0.28.1)(rolldown@1.2.0)(rollup@4.62.2)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.7.0)(less@4.7.0(supports-color@10.2.2))(sass-embedded@1.100.0)(sass@1.100.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.26(typescript@6.0.3)))(vue@3.5.26(typescript@6.0.3))':
     dependencies:
+      '@internationalized/date': 3.12.4
       '@vue-leaflet/vue-leaflet': 0.10.1(leaflet@1.9.4)(typescript@6.0.3)
       '@vueuse/components': 14.3.0(vue@3.5.26(typescript@6.0.3))
       '@vueuse/core': 14.3.0(vue@3.5.26(typescript@6.0.3))
@@ -9229,6 +9242,7 @@ snapshots:
       leaflet: 1.9.4
       lucide-vue-next: 1.0.0(vue@3.5.26(typescript@6.0.3))
       marked: 15.0.12
+      reka-ui: 2.10.4(vue@3.5.26(typescript@6.0.3))
       shiki: 4.3.1
       supercluster: 8.0.1
       tailwind-merge: 3.6.0
@@ -9237,6 +9251,7 @@ snapshots:
       zod: 4.4.3
     transitivePeerDependencies:
       - '@types/leaflet'
+      - '@vue/composition-api'
       - async-validator
       - axios
       - change-case
@@ -16137,6 +16152,22 @@ snapshots:
       defu: 6.1.7
       ohash: 2.0.11
       vue: 3.5.26(typescript@7.0.2)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+
+  reka-ui@2.10.4(vue@3.5.26(typescript@6.0.3)):
+    dependencies:
+      '@floating-ui/dom': 1.8.0
+      '@floating-ui/vue': 1.1.11(vue@3.5.26(typescript@6.0.3))
+      '@internationalized/date': 3.12.2
+      '@internationalized/number': 3.6.7
+      '@tanstack/vue-virtual': 3.13.32(vue@3.5.26(typescript@6.0.3))
+      '@vueuse/core': 14.3.0(vue@3.5.26(typescript@6.0.3))
+      '@vueuse/shared': 14.4.0(vue@3.5.26(typescript@6.0.3))
+      aria-hidden: 1.2.6
+      defu: 6.1.7
+      ohash: 2.0.11
+      vue: 3.5.26(typescript@6.0.3)
     transitivePeerDependencies:
       - '@vue/composition-api'
 

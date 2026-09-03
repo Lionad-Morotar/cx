@@ -1,6 +1,6 @@
 {
   "name": "@lionad/cx-comps-vtu",
-  "version": "0.1.0-alpha.12",
+  "version": "0.1.0-alpha.13",
   "description": "cx material components wrapping tool-ui-vue (vtu) tool-call widgets",
   "author": "Lionad-Morotar",
   "keywords": [
@@ -47,7 +47,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@lionad/vtu-components": "0.3.16-alpha.3",
+    "@lionad/vtu-components": "0.3.17-alpha.2",
     "@types/lodash-es": "^4.17.12",
     "@vueuse/core": "^14.3.0",
     "sass-embedded": "^1.100.0",

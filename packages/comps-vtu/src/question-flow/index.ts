@@ -5,7 +5,7 @@ import component from './src/index.vue'
 export default define({
   name: '问答流',
   description:
-    '多步问答流（upfront 模式），steps 各含标题与至少一个选项，含 select/complete 事件。',
+    '多步问答流（upfront 模式），steps 各含标题与一组选项（options）或表单字段（fields，二选一），含 select/complete 事件。',
   key: 'cx-vtu-question-flow',
   icon: 'i-tabler-help-circle',
   component,
@@ -35,6 +35,10 @@ export default define({
     },
     back: { name: '返回上一步', description: '点击返回,宿主回写「返回到上一步」' },
     'step-change': { name: '步骤切换', description: '步骤推进或回退,载荷为进入的步骤 id' },
-    complete: { name: '流程完成', description: '全部步骤作答完成,宿主回写各题答案汇总' },
+    complete: {
+      name: '流程完成',
+      description:
+        '全部步骤作答完成,宿主回写各题答案汇总;texts 为每步人类可读摘要——选项步骤「已选:label…」,字段步骤「label:值」逐项连缀',
+    },
   },
 })
