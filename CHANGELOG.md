@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-stream 0.1.0-alpha.13] - 2026-09-07
+
+### Added
+
+- `degradeUnclosedSpecFences(text, config)`：流中断后的收尾降级——未闭合且判定为 spec 的围栏整段替换为「部分人话摘要 + 生成中断提示」纯文本，已闭合围栏与非 spec 未闭合代码块原样保留；判定与 spec-detector 的 pending 分支同规（空内容或前缀命中），替换式输出不携带原始 JSON，服务端落库结算与浏览器渲染超时兜底共享同一实现，摘要配置缺省消费 cx 预设、中断文案经 `notice` 注入平台常量覆盖
+- 新增 `./core/*` 子路径导出（core/ 纯 TS 管线独立构建产物）：服务端宿主可只消费管线与降级函数，不连带主入口的 vue composables 绑定层
+
 ## [@lionad/cx-comps-vtu 0.1.0-alpha.13] - 2026-09-03
 
 ### Added
@@ -180,7 +187,6 @@
 ### Fixed
 
 - [internal] 根补 `@types/node` 修复 vue-tsc TS2688；playground 与 comps-nuxt-ui-v2 显式声明 h3/ofetch/scule/vue-router/@vueuse/shared 传递依赖——pnpm 12 严格解析下未声明传递依赖不可提升，全仓测试恢复全绿
-
 
 ## [0.1.0-alpha.9] - 2026-08-12
 
