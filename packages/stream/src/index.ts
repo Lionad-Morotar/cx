@@ -20,6 +20,7 @@ export * from './core/spec-detector'
 export * from './core/incremental'
 export * from './core/structural-sharing'
 export * from './core/human-text'
+export * from './core/fallback'
 
 // --- vue：composables 绑定层 ---
 export * from './vue/useStreamChunks'
