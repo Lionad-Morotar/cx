@@ -6,6 +6,14 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-stream 0.1.0-alpha.14] - 2026-09-07
+
+### Fixed
+
+- `degradeUnclosedSpecFences` 降级摘要只产人话：句级回退候选句经 JSON 语法痕迹拒判（引号配对/花括号即拒），句界误判切出的原始 JSON 片段（如 `{"id":"a.`）不再进入降级产物；键名兜底整条移除——裸英文键名（如 `data`）不再被当人话摘要输出，无 meaningful 值时摘要缺省只产中断提示
+- 未闭合围栏的 pending 判定收敛为 `isPendingSpecFenceBlock` 单一实现（core/fence），spec-detector 的占位分支与降级结算同源消费，消除两处复制漂移风险
+- `cxHumanTextConfig` 默认实现下迁 `core/human-text-config`，`cx.ts` 同源再导出保持对外 API 不变；core 层新增静态 import 图守护（禁相对上级导入与框架依赖），保障 `./core/*` 子路径的服务端独立消费面
+
 ## [@lionad/cx-stream 0.1.0-alpha.13] - 2026-09-07
 
 ### Added
