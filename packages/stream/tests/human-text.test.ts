@@ -75,8 +75,13 @@ describe('extractLastSentence', () => {
     expect(extractLastSentence('Data is loading... Please wait.')).toBe('Please wait.')
   })
 
-  it('无边界时回退到最后一个 JSON key', () => {
-    expect(extractLastSentence('{"key": "value"}')).toBe('key')
+  it('JSON 残文不产键名兜底：键名即非人话', () => {
+    expect(extractLastSentence('{"key": "value"}')).toBeNull()
+  })
+
+  it('句界误判切出的 JSON 片段被拒判：不泄漏原始语法', () => {
+    // "a." 的句点后跟引号被误判为句界，候选句 {"id":"a. 属原始 JSON 语法痕迹
+    expect(extractLastSentence('{"id":"a.","key":"cx-demo-table"')).toBeNull()
   })
 
   it('空文本返回 null', () => {
@@ -92,6 +97,11 @@ describe('extractDisplayText', () => {
 
   it('非结构化时从 markdown 提取句子', () => {
     expect(extractDisplayText('Hello world. **Bold** text.', cxHumanTextConfig)).toBe('Bold text.')
+  })
+
+  it('结构化无 meaningful 值且句级回退为 JSON 残文时返回 null', () => {
+    // 无 meaningful 值 → 句级回退命中 {"id":"a. 原始 JSON 片段 → 拒判宁缺毋滥
+    expect(extractDisplayText('{"id":"a.","key":"cx-demo-table"', cxHumanTextConfig)).toBeNull()
   })
 
   it('无任何内容时返回 null', () => {

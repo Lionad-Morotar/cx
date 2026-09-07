@@ -12,7 +12,7 @@
  * 协议无关：Spec 的识别规则（前缀、结构校验、占位标签）全部经配置注入。
  */
 
-import { fenceBlockPattern } from './fence'
+import { fenceBlockPattern, isPendingSpecFenceBlock } from './fence'
 import { safeJsonParse } from './parse'
 
 /** HTML 属性值转义：防止节点 key 中的引号/尖括号破坏占位符或注入标签 */
@@ -188,9 +188,9 @@ export function createSpecDetector<TSpec = unknown>(config: SpecDetectorConfig<T
       const hasClosing = fullMatch.endsWith('```')
 
       if (!hasClosing) {
-        // 未闭合代码块：内容为空/空白或像 Spec 开头，都当作 pending——
-        // 避免 markdown 渲染器在流式初期看到空围栏时渲染成代码块闪烁
-        if (jsonStr.trim() === '' || config.looksLikeSpecPrefix(jsonStr)) {
+        // 未闭合块是否按 pending 处理：与 fallback 降级判定共享同一实现
+        // （isPendingSpecFenceBlock：空内容防流式初期空围栏渲染闪烁）
+        if (isPendingSpecFenceBlock(fullMatch, jsonStr, config.looksLikeSpecPrefix)) {
           blocks.push({
             start: matchIndex,
             end: matchIndex + fullMatch.length,

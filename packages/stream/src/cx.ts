@@ -9,7 +9,6 @@
  * createComponent/reInitComponent 从组件元信息自动补全。
  */
 
-import type { HumanTextConfig } from './core/human-text'
 import type { IncrementalTrigger, TriggerRegistry } from './core/incremental'
 import type { SpecDetectorConfig } from './core/spec-detector'
 
@@ -69,10 +68,11 @@ export const cxSpecDetectorConfig: SpecDetectorConfig<CxSpec> = {
 /**
  * cx 预设的人类文本提取配置：以 `"key":` 标记识别 cx Spec 流。
  * 供 usePendingTypewriter 的 humanText 选项使用。
+ *
+ * 实现下迁 core/human-text-config（fallback 缺省配置同源消费，core 层
+ * 自包含纪律禁止其相对上级导入）；此处再导出保持对外 API 兼容。
  */
-export const cxHumanTextConfig: HumanTextConfig = {
-  looksLikeStructured: (text) => /["']key["']\s*:/.test(text),
-}
+export { cxHumanTextConfig } from './core/human-text-config'
 
 /**
  * 递归修剪 key 未传完的部分节点。

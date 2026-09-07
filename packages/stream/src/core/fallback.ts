@@ -7,17 +7,18 @@
  * 已闭合围栏与非 spec 的未闭合代码块原样保留。
  *
  * 单实现双消费：服务端落库结算与浏览器渲染超时兜底共享同一判定，保证
- * 两侧产物一致。判定语义与 spec-detector 的 pending 分支对齐（内容空/空白
- * 或 looksLikeSpecPrefix 命中才降级）；替换式输出天然不携带原始 JSON 与
- * 围栏原文，与 pendingSources 的泄漏隔离纪律同规。
+ * 两侧产物一致。降级资格与 spec-detector 的 pending 分支同源共享
+ * isPendingSpecFenceBlock（内容空/空白或 looksLikeSpecPrefix 命中才降级）；
+ * 替换式输出天然不携带原始 JSON 与围栏原文，与 pendingSources 的泄漏隔离
+ * 纪律同规——摘要提取侧同样只产人话，JSON 残文候选句与键名一律拒判。
  */
 
-import { fenceBlockPattern } from './fence'
+import { fenceBlockPattern, isPendingSpecFenceBlock } from './fence'
 import { extractDisplayText } from './human-text'
 import type { HumanTextConfig } from './human-text'
-// 核心管线协议无关，缺省人话配置取包内 cx 预设（cx.ts 仅类型依赖 core，
-// 运行时无环）；宿主可经 humanText 注入自有预设覆盖
-import { cxHumanTextConfig } from '../cx'
+// 缺省人话配置住在 core 内（core 层自包含：禁止相对上级导入上层协议预设），
+// 宿主可经 humanText 注入自有预设覆盖
+import { cxHumanTextConfig } from './human-text-config'
 
 export interface SpecFallbackConfig {
   /** 代码围栏语言标记，如 'json'；传数组时任一标记命中（如 ['json','jsonc']） */
@@ -55,10 +56,9 @@ export function degradeUnclosedSpecFences(text: string, config: SpecFallbackConf
     const fullMatch = match[0] ?? ''
     const content = match[1] ?? ''
 
-    // 已闭合围栏由常规管线结算，降级只收拾流中断留下的悬空段
-    if (fullMatch.endsWith('```')) continue
-    // 非 spec 的未闭合代码块（贴代码被打断等）是用户内容，原样保留
-    if (content.trim() !== '' && !config.looksLikeSpecPrefix(content)) continue
+    // 判定与 spec-detector 的 pending 分支同源共享（isPendingSpecFenceBlock）：
+    // 已闭合围栏由常规管线结算，非 spec 的未闭合代码块是用户内容原样保留
+    if (!isPendingSpecFenceBlock(fullMatch, content, config.looksLikeSpecPrefix)) continue
 
     const start = match.index ?? 0
     const summary = extractDisplayText(content, humanTextConfig)

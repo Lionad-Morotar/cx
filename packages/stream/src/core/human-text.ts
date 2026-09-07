@@ -36,6 +36,12 @@ export interface HumanTextConfig {
 const HAS_CJK = /[一-鿿]/
 const IS_SHORT_ID = /^[a-zA-Z0-9_-]+$/
 
+/**
+ * JSON 语法痕迹（引号配对/花括号）：句子候选命中即非人话。
+ * 只认 ASCII 直引号与花括号——中文弯引号「“”」与全角括号不误伤正常文案。
+ */
+const JSON_TRACE_RE = /["{}]/
+
 export const defaultHumanTextConfig: Required<Omit<HumanTextConfig, 'looksLikeStructured'>> = {
   technicalPrefixes: ['lucide:'],
   isMeaningful: (value) => HAS_CJK.test(value) || (!IS_SHORT_ID.test(value) && value.length >= 4),
@@ -111,7 +117,7 @@ export function extractStructuredHumanText(raw: string, config: HumanTextConfig)
   return pick(values)
 }
 
-/** 提取最后一个完整句子，无边界时回退到最后一个 JSON key */
+/** 提取最后一个完整句子；候选句带 JSON 语法痕迹即拒，无干净句返回 null */
 export function extractLastSentence(text: string): string | null {
   if (!text) return null
 
@@ -137,14 +143,17 @@ export function extractLastSentence(text: string): string | null {
   }
 
   if (segments.length > 0) {
-    // 过滤纯标点/空白片段（如 "Loading..." 拆出的 "."）
-    const last = segments.filter((s) => !/^[\s.!?。：？！]+$/.test(s)).at(-1)
+    // 过滤纯标点/空白片段（如 "Loading..." 拆出的 "."）；再拒判 JSON 语法
+    // 痕迹——句界误判会把 JSON 残文切成「句子」（如 {"id":"a. 的句点边界），
+    // 此类片段连同键名兜底产物一样属原始语法而非人话，进入降级/预览产物即
+    // 泄漏，宁缺毋滥：无干净句宁可返回 null 交由上层走「无摘要」分支
+    const last = segments
+      .filter((s) => !/^[\s.!?。：？！]+$/.test(s) && !JSON_TRACE_RE.test(s))
+      .at(-1)
     if (last) return truncate(last)
   }
 
-  let lastKey: string | null = null
-  for (const m of text.matchAll(/"([^"]+)"\s*:/g)) lastKey = m[1]!
-  return lastKey ? truncate(lastKey) : null
+  return null
 }
 
 /** 综合提取：优先结构化字段值，其次 markdown 句子 */
