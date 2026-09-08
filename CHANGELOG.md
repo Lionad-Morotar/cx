@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [@lionad/cx-comps-vtu 0.1.0-alpha.15] - 2026-09-08
+
+### Changed
+
+- `@lionad/vtu-components` 依赖升级至 `0.3.17-alpha.3`：data-table 列宽不再被表格 w-full 压缩（min-width 下限钳制总宽），resizer 拖拽真实生效、手柄 hover 显现加宽热区，补发 columnResize 事件，总宽超出容器后横向可滚动
+
+
 ## [@lionad/cx-stream 0.1.0-alpha.14] - 2026-09-07
 
 ### Fixed
